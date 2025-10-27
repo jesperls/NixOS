@@ -88,7 +88,7 @@
 
       # Monitor configuration
       monitor = [
-        "DP-3, 2560x1440@144, 0x0, 1"
+        "DP-3, 2560x1440@240, 0x0, 1"
         "DP-2, 2560x1440@144, 2560x0, 1"
         "HDMI-A-1, 1920x1080@60, -1080x0, 1, transform, 1"
       ];
