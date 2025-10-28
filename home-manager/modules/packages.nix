@@ -14,6 +14,17 @@
 
     firefox
 
+    feh
+    evince
+    file-roller
+    
+    mpv
+    rhythmbox
+    
+    gedit
+    
+    libreoffice
+    
     cliphist
     grim
     slop
