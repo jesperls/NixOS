@@ -41,6 +41,9 @@
 
   hardware.logitech.wireless.enable = true;
 
+  # Enable Nix experimental features
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   home-manager = {
     users.${userConfig.username} = import ./home-manager/home.nix;
     useGlobalPkgs = true;

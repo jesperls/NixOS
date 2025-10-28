@@ -3,7 +3,7 @@
 {
   home.packages = with pkgs; [
     git
-    nixfmt
+    nixfmt-classic
     vscode
     uv
     python314
@@ -33,5 +33,7 @@
     slurp
     jq
     desync
+
+    nh
   ];
 }
