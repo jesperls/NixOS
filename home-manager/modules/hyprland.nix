@@ -58,6 +58,9 @@
         "$mainMod, L, exec, hyprlock"
         "$mainMod, W, togglefloating"
 
+        # Fullscreen toggle
+        "SHIFT, F11, fullscreen"
+
         # Focus movement
         "$mainMod, left, movefocus, l"
         "$mainMod, right, movefocus, r"
