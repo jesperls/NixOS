@@ -6,7 +6,8 @@
     shellAliases = {
       ll = "ls -la";
       ".." = "cd ..";
-      snis = "sudo nixos-rebuild switch --flake ~/nixos-config#${userConfig.hostname}";
+      snis =
+        "sudo nixos-rebuild switch --flake ~/nixos-config#${userConfig.hostname}";
     };
     bashrcExtra = ''
       if [ "$(tty)" = "/dev/tty1" ]; then

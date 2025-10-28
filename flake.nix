@@ -19,9 +19,7 @@
           ./configuration.nix
           ./hardware-configuration.nix
           home-manager.nixosModules.home-manager
-          {
-            _module.args = { inherit userConfig; };
-          }
+          { _module.args = { inherit userConfig; }; }
         ];
       };
     };

@@ -48,10 +48,5 @@
     extraSpecialArgs = { inherit userConfig; };
   };
 
-  systemd.tmpfiles.settings."10-nixos-directory"."/etc/nixos".d = {
-    group = "nix";
-    mode = "0755";
-  };
-
   system.stateVersion = "25.05";
 }
