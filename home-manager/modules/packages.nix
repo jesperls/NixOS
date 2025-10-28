@@ -36,5 +36,6 @@
     desync
 
     nh
+    xdg-utils
   ];
 }

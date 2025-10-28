@@ -9,7 +9,11 @@
     ./modules/mimeapps.nix
   ];
 
-  home.sessionVariables = { ELECTRON_ENABLE_NG_MODULES = "true"; };
+  home.sessionVariables = { 
+    ELECTRON_ENABLE_NG_MODULES = "true";
+    BROWSER = "firefox";
+    DEFAULT_BROWSER = "firefox";
+  };
 
   home.stateVersion = "25.05";
 }
