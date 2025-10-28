@@ -9,6 +9,9 @@
       snis = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
     };
     bashrcExtra = ''
+      if [ "$(tty)" = "/dev/tty1" ]; then
+        exec Hyprland
+      fi
     '';
   };
 
