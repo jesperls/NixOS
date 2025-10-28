@@ -31,5 +31,7 @@
     solaar
     wl-clipboard
     slurp
+    jq
+    desync
   ];
 }
