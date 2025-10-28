@@ -9,6 +9,7 @@
     python314
 
     vesktop
+    prismlauncher
 
     obsidian
 
