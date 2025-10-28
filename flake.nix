@@ -10,15 +10,18 @@
   outputs = { self, nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
-      hostname = "nixos";
+      userConfig = import ./user.nix;
     in {
-      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.${userConfig.hostname} = nixpkgs.lib.nixosSystem {
         inherit system;
 
         modules = [
           ./configuration.nix
           ./hardware-configuration.nix
           home-manager.nixosModules.home-manager
+          {
+            _module.args = { inherit userConfig; };
+          }
         ];
       };
     };

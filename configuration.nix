@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, userConfig, ... }:
 
 {
   imports = [
@@ -28,33 +28,24 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Networking
-  networking.hostName = "nixos";
+  networking.hostName = userConfig.hostname;
   networking.networkmanager.enable = true;
 
   # Time and Locale
-  time.timeZone = "Europe/Stockholm";
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "sv_SE.UTF-8";
-    LC_IDENTIFICATION = "sv_SE.UTF-8";
-    LC_MEASUREMENT = "sv_SE.UTF-8";
-    LC_MONETARY = "sv_SE.UTF-8";
-    LC_NAME = "sv_SE.UTF-8";
-    LC_NUMERIC = "sv_SE.UTF-8";
-    LC_PAPER = "sv_SE.UTF-8";
-    LC_TELEPHONE = "sv_SE.UTF-8";
-    LC_TIME = "sv_SE.UTF-8";
-  };
+  time.timeZone = userConfig.timeZone;
+  i18n.defaultLocale = userConfig.locale;
+  i18n.extraLocaleSettings = userConfig.extraLocaleSettings;
 
-  console.keyMap = "sv-latin1";
-  services.xserver.xkb.layout = "se";
+  console.keyMap = userConfig.consoleKeyMap;
+  services.xserver.xkb.layout = userConfig.keyboardLayout;
 
   hardware.logitech.wireless.enable = true;
 
   home-manager = {
-    users.jesperls = import ./home-manager/home.nix;
+    users.${userConfig.username} = import ./home-manager/home.nix;
     useGlobalPkgs = true;
     backupFileExtension = "backup";
+    extraSpecialArgs = { inherit userConfig; };
   };
 
   systemd.tmpfiles.settings."10-nixos-directory"."/etc/nixos".d = {

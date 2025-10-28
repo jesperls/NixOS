@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, userConfig, ... }:
 
 {
   programs.bash = {
@@ -6,7 +6,7 @@
     shellAliases = {
       ll = "ls -la";
       ".." = "cd ..";
-      snis = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
+      snis = "sudo nixos-rebuild switch --flake ~/nixos-config#${userConfig.hostname}";
     };
     bashrcExtra = ''
       if [ "$(tty)" = "/dev/tty1" ]; then
