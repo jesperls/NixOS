@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, zen-browser, ... }:
 
 {
   home.packages = with pkgs; [
@@ -13,6 +13,7 @@
     obsidian
 
     firefox
+    zen-browser.packages.${pkgs.system}.default
 
     feh
     evince

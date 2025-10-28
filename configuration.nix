@@ -1,4 +1,4 @@
-{ config, pkgs, userConfig, ... }:
+{ config, pkgs, userConfig, zen-browser, ... }:
 
 {
   imports = [
@@ -48,7 +48,7 @@
     users.${userConfig.username} = import ./home-manager/home.nix;
     useGlobalPkgs = true;
     backupFileExtension = "backup";
-    extraSpecialArgs = { inherit userConfig; };
+    extraSpecialArgs = { inherit userConfig zen-browser; };
   };
 
   system.stateVersion = "25.05";

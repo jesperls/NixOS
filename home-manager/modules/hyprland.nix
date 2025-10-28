@@ -13,7 +13,7 @@
       ];
 
       "$terminal" = "kitty";
-      "$browser" = "firefox";
+      "$browser" = "zen";
       "$mainMod" = "SUPER";
 
       general = {
