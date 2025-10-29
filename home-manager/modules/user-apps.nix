@@ -7,5 +7,6 @@
     stremio
     obsidian
     libreoffice
+    mission-center
   ];
 }

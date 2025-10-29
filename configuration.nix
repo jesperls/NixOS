@@ -19,6 +19,9 @@
     # Desktop modules
     ./modules/desktop/hyprland.nix
 
+    # Performance modules
+    ./modules/performance/optimizations.nix
+
     # User configuration
     ./modules/users.nix
   ];

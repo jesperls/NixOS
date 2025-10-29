@@ -20,7 +20,7 @@
     nh
     xdg-utils
     solaar
-    htop
+    htop 
     ncdu
     
     # Audio & Bluetooth
