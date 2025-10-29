@@ -10,6 +10,7 @@
     ./modules/gtk.nix
     ./modules/programs.nix
     ./modules/mimeapps.nix
+    ./modules/mako.nix
   ];
 
   home.sessionVariables = { 

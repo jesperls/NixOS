@@ -10,7 +10,6 @@ in
       exec-once = [
         "waybar"
         "systemctl --user start swww"
-        "mako"
         "solaar -w hide"
         "systemctl --user start hyprpolkitagent"
       ];
@@ -115,6 +114,5 @@ in
     hyprlock
     hyprpolkitagent
     waybar
-    mako
   ];
 }
