@@ -20,10 +20,18 @@
     nh
     xdg-utils
     solaar
+    
+    # Audio & Bluetooth
+    pavucontrol
+    bluez-tools
+    overskride
 
     # Essential Applications
     firefox
     gedit
+    wlogout
+    nm-tray
+    networkmanagerapplet
 
     # File Management & Viewers
     feh

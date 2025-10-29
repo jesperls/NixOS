@@ -9,6 +9,7 @@
 
     # Services modules
     ./modules/services/audio.nix
+    ./modules/services/bluetooth.nix
 
     # Programs modules
     ./modules/programs/gaming.nix
