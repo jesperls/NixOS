@@ -1,4 +1,4 @@
-{ config, pkgs, userConfig, ... }:
+{ config, pkgs, userConfig, swww, ... }:
 
 {
   imports = [
@@ -52,7 +52,7 @@
     users.${userConfig.username} = import ./home-manager/home.nix;
     useGlobalPkgs = true;
     backupFileExtension = "backup";
-    extraSpecialArgs = { inherit userConfig; };
+    extraSpecialArgs = { inherit userConfig swww; };
   };
 
   system.stateVersion = "25.05";

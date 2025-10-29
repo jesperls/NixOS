@@ -9,7 +9,7 @@ in
     settings = {
       exec-once = [
         "waybar"
-        "hyprpaper"
+        "systemctl --user start swww"
         "mako"
         "solaar -w hide"
         "systemctl --user start hyprpolkitagent"
@@ -61,6 +61,10 @@ in
         "$mainMod, L, exec, hyprlock"
         "$mainMod, W, togglefloating"
 
+        # Wallpaper controls
+        "$mainMod SHIFT, W, exec, wallpaper-switcher"
+        "$mainMod SHIFT, R, exec, wallpaper-manager random"
+
         # Fullscreen toggle
         "SHIFT, F11, fullscreen"
 
@@ -108,7 +112,6 @@ in
     aquamarine
     xdg-desktop-portal-hyprland
     hyprland
-    hyprpaper
     hyprlock
     hyprpolkitagent
     waybar

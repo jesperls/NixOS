@@ -5,6 +5,7 @@
     ./modules/packages.nix
     ./modules/user-apps.nix
     ./modules/hyprland.nix
+    ./modules/wallpaper.nix
     ./modules/waybar.nix
     ./modules/gtk.nix
     ./modules/programs.nix
