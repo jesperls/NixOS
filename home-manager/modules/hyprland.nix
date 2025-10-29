@@ -1,9 +1,7 @@
 { config, pkgs, ... }:
 
-let
-  userConfig = import ../../user.nix;
-in
-{
+let userConfig = import ../../user.nix;
+in {
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {

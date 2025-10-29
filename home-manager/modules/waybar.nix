@@ -12,18 +12,13 @@
         margin-top = 0;
         margin-left = 0;
         margin-right = 0;
-        
-        modules-left = [ 
-          "custom/launcher"
-          "hyprland/workspaces"
-          "hyprland/window"
-        ];
-        
-        modules-center = [ 
-          "clock" 
-        ];
-        
-        modules-right = [ 
+
+        modules-left =
+          [ "custom/launcher" "hyprland/workspaces" "hyprland/window" ];
+
+        modules-center = [ "clock" ];
+
+        modules-right = [
           "tray"
           "bluetooth"
           "network"
@@ -94,9 +89,13 @@
           format = "󰂯";
           format-connected = "󰂱 {num_connections}";
           format-disabled = "󰂲";
-          tooltip-format = "{controller_alias}\t{controller_address}";
-          tooltip-format-connected = "{controller_alias}\t{controller_address}\n\n{device_enumerate}";
-          tooltip-format-enumerate-connected = "{device_alias}\t{device_address}";
+          tooltip-format = "{controller_alias}	{controller_address}";
+          tooltip-format-connected = ''
+            {controller_alias}	{controller_address}
+
+            {device_enumerate}'';
+          tooltip-format-enumerate-connected =
+            "{device_alias}	{device_address}";
           on-click = "blueman-manager";
         };
 
@@ -123,7 +122,7 @@
             phone = "";
             portable = "";
             car = "";
-            default = ["󰕿" "󰖀" "󰕾"];
+            default = [ "󰕿" "󰖀" "󰕾" ];
           };
           on-click = "pamixer -t";
           on-click-right = "pavucontrol";
@@ -139,7 +138,7 @@
           format-charging = "󰂄 {capacity}%";
           format-plugged = "󰂄 {capacity}%";
           format-alt = "{icon} {time}";
-          format-icons = ["󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
+          format-icons = [ "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹" ];
           tooltip-format = "{timeTo}";
         };
 

@@ -20,9 +20,9 @@
     nh
     xdg-utils
     solaar
-    htop 
+    htop
     ncdu
-    
+
     # Audio & Bluetooth
     pavucontrol
     bluez-tools

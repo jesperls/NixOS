@@ -13,7 +13,7 @@
     ./modules/mako.nix
   ];
 
-  home.sessionVariables = { 
+  home.sessionVariables = {
     ELECTRON_ENABLE_NG_MODULES = "true";
     BROWSER = "firefox";
     DEFAULT_BROWSER = "firefox";

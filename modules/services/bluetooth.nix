@@ -17,9 +17,5 @@
   services.blueman.enable = true;
 
   # Additional Bluetooth packages
-  environment.systemPackages = with pkgs; [
-    bluez
-    bluez-tools
-    blueman
-  ];
+  environment.systemPackages = with pkgs; [ bluez bluez-tools blueman ];
 }
