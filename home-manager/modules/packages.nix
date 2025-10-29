@@ -2,40 +2,36 @@
 
 {
   home.packages = with pkgs; [
+    # Core Development Tools
     git
     nixfmt-classic
     vscode
     uv
     python314
 
-    vesktop
-    prismlauncher
-
-    obsidian
-
-    firefox
-
-    feh
-    evince
-    file-roller
-
-    mpv
-    rhythmbox
-
-    gedit
-
-    libreoffice
-
+    # System Utilities & Tools
     cliphist
     grim
     slop
-    solaar
     wl-clipboard
     slurp
     jq
     desync
-
     nh
     xdg-utils
+    solaar
+
+    # Essential Applications
+    firefox
+    gedit
+
+    # File Management & Viewers
+    feh
+    evince
+    file-roller
+
+    # Media Applications
+    mpv
+    rhythmbox
   ];
 }
