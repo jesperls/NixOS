@@ -20,6 +20,7 @@
     nh
     xdg-utils
     solaar
+    htop
     
     # Audio & Bluetooth
     pavucontrol
