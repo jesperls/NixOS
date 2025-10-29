@@ -9,6 +9,7 @@
       snis = "nh os switch ~/nixos-config";
       snus = "nh os switch ~/nixos-config --update";
       snuf = "nh clean all --keep 5";
+      disk = "ncdu";
     };
     bashrcExtra = ''
       if [ "$(tty)" = "/dev/tty1" ]; then
