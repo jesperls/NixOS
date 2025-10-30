@@ -6,6 +6,7 @@
 
     # Hardware modules
     ./modules/hardware/nvidia.nix
+    ./modules/hardware/vial.nix
 
     # Services modules
     ./modules/services/audio.nix

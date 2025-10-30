@@ -33,6 +33,7 @@
     settings = {
       show = "drun";
       allow_images = true;
+      insensitive = true;
       prompt = "Search:";
     };
   };

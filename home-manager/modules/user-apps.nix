@@ -8,5 +8,6 @@
     obsidian
     libreoffice
     mission-center
+    vial
   ];
 }
