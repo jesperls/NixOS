@@ -55,6 +55,29 @@
     backupFileExtension = "backup";
     extraSpecialArgs = { inherit userConfig swww; };
   };
-
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc.lib
+      zlib
+      openssl
+      libffi
+      libGL
+      libGLU
+      mesa
+      xorg.libX11
+      xorg.libXext
+      xorg.libXrender
+      glib
+      qt6.qtbase
+      qt6.qtwayland
+      libxkbcommon
+      wayland
+      fontconfig
+      freetype
+      dbus
+      libdrm
+    ];
+  };
   system.stateVersion = "25.05";
 }

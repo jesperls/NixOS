@@ -9,5 +9,7 @@
     libreoffice
     mission-center
     vial
+    p7zip
+    yt-dlp
   ];
 }
