@@ -22,6 +22,7 @@
     solaar
     htop
     ncdu
+    bruno
 
     # Audio & Bluetooth
     pavucontrol

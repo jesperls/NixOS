@@ -52,7 +52,6 @@
   home-manager = {
     users.${userConfig.username} = import ./home-manager/home.nix;
     useGlobalPkgs = true;
-    backupFileExtension = "backup";
     extraSpecialArgs = { inherit userConfig swww; };
   };
   programs.nix-ld = {

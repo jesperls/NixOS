@@ -7,7 +7,7 @@
     dedicatedServer.openFirewall = true;
     extraCompatPackages = with pkgs; [ proton-ge-bin ];
 
-    gamescopeSession.enable = false;
+    gamescopeSession.enable = true;
 
     package = pkgs.steam.override {
       extraPkgs = pkgs:
@@ -26,6 +26,7 @@
           libxkbcommon
           vulkan-loader
           vulkan-validation-layers
+          gamescope
         ];
     };
 
@@ -36,6 +37,11 @@
     enable = true;
     enableRenice = true;
     settings = { general = { renice = 10; }; };
+  };
+
+  programs.gamescope = {
+    enable = true;
+    capSysNice = false;
   };
 
   environment.systemPackages = with pkgs; [ mangohud gamemode ];

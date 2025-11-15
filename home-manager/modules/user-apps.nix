@@ -11,5 +11,8 @@
     vial
     p7zip
     yt-dlp
+    wineWowPackages.stable
+    winetricks
+    spotify
   ];
 }
