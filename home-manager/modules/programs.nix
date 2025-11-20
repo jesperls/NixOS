@@ -1,4 +1,4 @@
-{ config, pkgs, userConfig, ... }:
+{ config, pkgs, ... }:
 
 {
   programs.bash = {
@@ -11,7 +11,8 @@
       snuf = "nh clean all --keep 5";
       disk = "ncdu";
       ytmp3 = "yt-dlp -x --audio-format mp3";
-      ytmp4 = "yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'";
+      ytmp4 =
+        "yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'";
     };
     bashrcExtra = ''
       if [ "$(tty)" = "/dev/tty1" ]; then

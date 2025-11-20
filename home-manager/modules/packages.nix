@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, antigravity-nix, ... }:
 
 {
   home.packages = with pkgs; [
@@ -22,7 +22,7 @@
     solaar
     htop
     ncdu
-    bruno
+    nodejs
 
     # Audio & Bluetooth
     pavucontrol

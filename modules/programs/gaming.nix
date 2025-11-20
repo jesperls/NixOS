@@ -1,48 +1,57 @@
 { config, lib, pkgs, ... }:
 
-{
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-    extraCompatPackages = with pkgs; [ proton-ge-bin ];
+with lib;
 
-    gamescopeSession.enable = true;
+let cfg = config.mySystem.programs.gaming;
+in {
+  options.mySystem.programs.gaming = {
+    enable = mkEnableOption "Gaming configuration";
+  };
 
-    package = pkgs.steam.override {
-      extraPkgs = pkgs:
-        with pkgs; [
-          xorg.libXcursor
-          xorg.libXi
-          xorg.libXinerama
-          xorg.libXScrnSaver
-          libpng
-          libpulseaudio
-          libvorbis
-          stdenv.cc.cc.lib
-          libkrb5
-          keyutils
-          wayland
-          libxkbcommon
-          vulkan-loader
-          vulkan-validation-layers
-          gamescope
-        ];
+  config = mkIf cfg.enable {
+    programs.steam = {
+      enable = true;
+      remotePlay.openFirewall = true;
+      dedicatedServer.openFirewall = true;
+      extraCompatPackages = with pkgs; [ proton-ge-bin ];
+
+      gamescopeSession.enable = true;
+
+      package = pkgs.steam.override {
+        extraPkgs = pkgs:
+          with pkgs; [
+            xorg.libXcursor
+            xorg.libXi
+            xorg.libXinerama
+            xorg.libXScrnSaver
+            libpng
+            libpulseaudio
+            libvorbis
+            stdenv.cc.cc.lib
+            libkrb5
+            keyutils
+            wayland
+            libxkbcommon
+            vulkan-loader
+            vulkan-validation-layers
+            gamescope
+          ];
+      };
+
+      extraPackages = with pkgs; [ mangohud ];
     };
 
-    extraPackages = with pkgs; [ mangohud ];
-  };
+    programs.gamemode = {
+      enable = true;
+      enableRenice = true;
+      settings = { general = { renice = 10; }; };
+    };
 
-  programs.gamemode = {
-    enable = true;
-    enableRenice = true;
-    settings = { general = { renice = 10; }; };
-  };
+    programs.gamescope = {
+      enable = true;
+      capSysNice = false;
+    };
 
-  programs.gamescope = {
-    enable = true;
-    capSysNice = false;
+    environment.systemPackages = with pkgs; [ mangohud gamemode ];
   };
-
-  environment.systemPackages = with pkgs; [ mangohud gamemode ];
 }

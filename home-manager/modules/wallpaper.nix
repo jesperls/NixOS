@@ -1,7 +1,7 @@
 { config, pkgs, swww, ... }:
 
 let
-  userConfig = import ../../user.nix;
+
   system = pkgs.stdenv.hostPlatform.system;
 
   # Create wallpaper switching script

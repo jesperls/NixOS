@@ -1,11 +1,11 @@
-{ config, lib, pkgs, userConfig, ... }:
+{ config, lib, pkgs, ... }:
 
 {
-  users.users.${userConfig.username} = {
+  users.users.${config.mySystem.user.username} = {
     isNormalUser = true;
-    description = userConfig.fullName;
+    description = config.mySystem.user.fullName;
     extraGroups = [ "networkmanager" "wheel" "video" "audio" ];
   };
 
-  services.getty.autologinUser = userConfig.username;
+  services.getty.autologinUser = config.mySystem.user.username;
 }

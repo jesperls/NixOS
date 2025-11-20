@@ -1,7 +1,6 @@
-{ config, pkgs, ... }:
+{ config, pkgs, osConfig, ... }:
 
-let userConfig = import ../../user.nix;
-in {
+{
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
@@ -94,7 +93,7 @@ in {
       ];
 
       # Dynamic monitor configuration
-      monitor = userConfig.monitors;
+      monitor = osConfig.mySystem.monitors;
     };
   };
 

@@ -1,31 +1,38 @@
 { config, lib, pkgs, ... }:
 
-{
-  nixpkgs.config.allowUnfree = true;
+with lib;
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
+let cfg = config.mySystem.hardware.nvidia;
+in {
+  options.mySystem.hardware.nvidia = {
+    enable = mkEnableOption "Nvidia drivers";
   };
 
-  hardware.nvidia = {
-    modesetting.enable = true;
-    open = false;
+  config = mkIf cfg.enable {
+    hardware.graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
 
-    powerManagement.enable = true;
-    powerManagement.finegrained = false;
+    hardware.nvidia = {
+      modesetting.enable = true;
+      open = false;
 
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+      powerManagement.enable = true;
+      powerManagement.finegrained = false;
+
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
+    };
+
+    boot.kernelParams = [ "nvidia-drm.modeset=1" ];
+
+    environment.sessionVariables = {
+      LIBVA_DRIVER_NAME = "nvidia";
+      NIXOS_OZONE_WL = "1";
+      __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+      GBM_BACKEND = "nvidia-drm";
+    };
+
+    services.xserver.videoDrivers = [ "nvidia" ];
   };
-
-  boot.kernelParams = [ "nvidia-drm.modeset=1" ];
-
-  environment.sessionVariables = {
-    LIBVA_DRIVER_NAME = "nvidia";
-    NIXOS_OZONE_WL = "1";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    GBM_BACKEND = "nvidia-drm";
-  };
-
-  services.xserver.videoDrivers = [ "nvidia" ];
 }
