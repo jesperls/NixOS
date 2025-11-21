@@ -48,6 +48,7 @@
   services.xserver.xkb.layout = config.mySystem.system.keyboardLayout;
 
   hardware.logitech.wireless.enable = true;
+  programs.dconf.enable = true;
 
   home-manager = {
     users.${config.mySystem.user.username} = import ./home-manager/home.nix;

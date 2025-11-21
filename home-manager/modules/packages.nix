@@ -8,6 +8,7 @@
     vscode
     uv
     python314
+    antigravity-nix.packages.x86_64-linux.default
 
     # System Utilities & Tools
     cliphist
@@ -23,6 +24,8 @@
     htop
     ncdu
     nodejs
+    glib
+    gsettings-desktop-schemas
 
     # Audio & Bluetooth
     pavucontrol
