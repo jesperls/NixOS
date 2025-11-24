@@ -7,12 +7,13 @@
     ./modules/hyprland.nix
     ./modules/wallpaper.nix
     ./modules/waybar.nix
-    ./modules/gtk.nix
+    ./modules/theme.nix
     ./modules/programs.nix
     ./modules/zsh.nix
     ./modules/rofi.nix
     ./modules/swaync.nix
     ./modules/mimeapps.nix
+    ./modules/audio.nix
   ];
 
   home.sessionVariables = {

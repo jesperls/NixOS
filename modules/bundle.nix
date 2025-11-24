@@ -13,6 +13,7 @@
     ./services/audio.nix
     ./services/bluetooth.nix
     ./services/backup.nix
+    ./services/flatpak.nix
 
     ./programs/gaming.nix
     ./programs/fonts.nix

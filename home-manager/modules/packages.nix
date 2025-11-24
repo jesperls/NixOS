@@ -26,6 +26,7 @@
     nodejs
     glib
     gsettings-desktop-schemas
+    zulu24
 
     # Audio & Bluetooth
     pavucontrol

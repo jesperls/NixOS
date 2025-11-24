@@ -14,5 +14,7 @@
     wineWowPackages.stable
     winetricks
     spotify
+    heroic
+    qpwgraph
   ];
 }
