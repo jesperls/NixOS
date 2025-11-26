@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [ ../modules/bundle.nix ];
+  imports = [ ./hardware-configuration.nix ../../modules/nixos/bundle.nix ];
 
   mySystem = {
     user = {
@@ -53,7 +53,7 @@
 
   home-manager = {
     users.${config.mySystem.user.username} = {
-      imports = [ ../home-manager/home.nix ../home-manager/modules/audio.nix ];
+      imports = [ ./home.nix ../../modules/home-manager/audio.nix ];
     };
     useGlobalPkgs = true;
     useUserPackages = true;

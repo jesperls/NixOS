@@ -2,17 +2,17 @@
 
 {
   imports = [
-    ./modules/packages.nix
-    ./modules/user-apps.nix
-    ./modules/hyprland.nix
-    ./modules/wallpaper.nix
-    ./modules/waybar.nix
-    ./modules/theme.nix
-    ./modules/programs.nix
-    ./modules/zsh.nix
-    ./modules/rofi.nix
-    ./modules/swaync.nix
-    ./modules/mimeapps.nix
+    ../../modules/home-manager/packages.nix
+    ../../modules/home-manager/user-apps.nix
+    ../../modules/home-manager/hyprland.nix
+    ../../modules/home-manager/wallpaper.nix
+    ../../modules/home-manager/waybar.nix
+    ../../modules/home-manager/theme.nix
+    ../../modules/home-manager/programs.nix
+    ../../modules/home-manager/zsh.nix
+    ../../modules/home-manager/rofi.nix
+    ../../modules/home-manager/swaync.nix
+    ../../modules/home-manager/mimeapps.nix
   ];
 
   home.sessionVariables = {
