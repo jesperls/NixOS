@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, osConfig, ... }:
 
 {
   programs.rofi = {
@@ -23,17 +23,18 @@
     theme = let inherit (config.lib.formats.rasi) mkLiteral;
     in {
       "*" = {
-        bg-col = mkLiteral "#1e1e2e";
-        bg-col-light = mkLiteral "#313244";
-        border-col = mkLiteral "#45475a";
-        selected-col = mkLiteral "#313244";
-        selected-highlight = mkLiteral "#89b4fa";
-        blue = mkLiteral "#89b4fa";
-        fg-col = mkLiteral "#cdd6f4";
-        fg-col2 = mkLiteral "#f38ba8";
-        grey = mkLiteral "#6c7086";
+        bg-col = mkLiteral "${osConfig.mySystem.theme.colors.base}";
+        bg-col-light = mkLiteral "${osConfig.mySystem.theme.colors.surface}";
+        border-col = mkLiteral "${osConfig.mySystem.theme.colors.surface}";
+        selected-col = mkLiteral "${osConfig.mySystem.theme.colors.surface}";
+        selected-highlight =
+          mkLiteral "${osConfig.mySystem.theme.colors.accent}";
+        blue = mkLiteral "${osConfig.mySystem.theme.colors.accent}";
+        fg-col = mkLiteral "${osConfig.mySystem.theme.colors.text}";
+        fg-col2 = mkLiteral "${osConfig.mySystem.theme.colors.urgent}";
+        grey = mkLiteral "${osConfig.mySystem.theme.colors.subtext}";
         width = 900;
-        font = "JetBrainsMono Nerd Font 15";
+        font = "${osConfig.mySystem.theme.fonts.monospace} 15";
       };
 
       "element-text, element-icon , mode-switcher" = {
@@ -43,8 +44,9 @@
 
       "window" = {
         height = mkLiteral "750px";
-        border = mkLiteral "0px";
-        border-radius = mkLiteral "12px";
+        border = mkLiteral "${toString osConfig.mySystem.theme.borders}px";
+        border-radius =
+          mkLiteral "${toString osConfig.mySystem.theme.rounding}px";
         background-color = mkLiteral "@bg-col";
         padding = mkLiteral "20px";
       };
@@ -58,7 +60,8 @@
       "inputbar" = {
         children = map mkLiteral [ "prompt" "entry" ];
         background-color = mkLiteral "@bg-col-light";
-        border-radius = mkLiteral "8px";
+        border-radius =
+          mkLiteral "${toString osConfig.mySystem.theme.rounding}px";
         padding = mkLiteral "12px";
         spacing = mkLiteral "12px";
       };
@@ -67,8 +70,9 @@
         background-color = mkLiteral "@blue";
         padding = mkLiteral "10px 18px";
         text-color = mkLiteral "@bg-col";
-        border-radius = mkLiteral "6px";
-        font = "JetBrainsMono Nerd Font Bold 15";
+        border-radius =
+          mkLiteral "${toString osConfig.mySystem.theme.rounding}px";
+        font = "${osConfig.mySystem.theme.fonts.monospace} Bold 15";
       };
 
       "textbox-prompt-colon" = {
@@ -108,7 +112,8 @@
         padding = mkLiteral "10px 16px";
         background-color = mkLiteral "transparent";
         text-color = mkLiteral "@fg-col";
-        border-radius = mkLiteral "8px";
+        border-radius =
+          mkLiteral "${toString osConfig.mySystem.theme.rounding}px";
         spacing = mkLiteral "12px";
       };
 
@@ -131,7 +136,7 @@
       "element selected.normal" = {
         background-color = mkLiteral "@selected-col";
         text-color = mkLiteral "@selected-highlight";
-        border = mkLiteral "0px 0px 0px 2px";
+        border = mkLiteral "0px 0px 2px 0px";
         border-color = mkLiteral "@blue";
       };
 
@@ -151,7 +156,8 @@
         text-color = mkLiteral "@grey";
         vertical-align = mkLiteral "0.5";
         horizontal-align = mkLiteral "0.5";
-        border-radius = mkLiteral "8px";
+        border-radius =
+          mkLiteral "${toString osConfig.mySystem.theme.rounding}px";
       };
 
       "button selected" = {
@@ -165,7 +171,8 @@
         background-color = mkLiteral "@bg-col-light";
         margin = mkLiteral "6px";
         padding = mkLiteral "10px";
-        border-radius = mkLiteral "8px";
+        border-radius =
+          mkLiteral "${toString osConfig.mySystem.theme.rounding}px";
       };
 
       "textbox" = {

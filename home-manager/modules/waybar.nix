@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, osConfig, ... }:
 
 {
   programs.waybar = {
@@ -174,16 +174,18 @@
       * {
         border: none;
         border-radius: 0;
-        font-family: "JetBrainsMono Nerd Font", "Fira Code Nerd Font", monospace;
+        font-family: "${osConfig.mySystem.theme.fonts.monospace}", monospace;
         font-size: 13px;
         min-height: 0;
         font-weight: bold;
       }
 
       window#waybar {
-        background: #1e1e2e; /* Catppuccin Mocha Base */
-        color: #cdd6f4; /* Text */
-        border-bottom: 1px solid #313244;
+        background: ${osConfig.mySystem.theme.colors.base};
+        color: ${osConfig.mySystem.theme.colors.text};
+        border-bottom: ${
+          toString osConfig.mySystem.theme.borders
+        }px solid ${osConfig.mySystem.theme.colors.surface};
       }
 
       window#waybar.hidden {
@@ -197,81 +199,81 @@
 
       #workspaces button {
         padding: 0 5px;
-        color: #6c7086; /* Overlay0 */
+        color: ${osConfig.mySystem.theme.colors.subtext};
         background: transparent;
         border-bottom: 2px solid transparent;
         transition: all 0.3s ease-in-out;
       }
 
       #workspaces button.active {
-        color: #89b4fa; /* Blue */
-        border-bottom: 2px solid #89b4fa;
+        color: ${osConfig.mySystem.theme.colors.accent};
+        border-bottom: 2px solid ${osConfig.mySystem.theme.colors.accent};
       }
 
       #workspaces button:hover {
-        color: #b4befe; /* Lavender */
+        color: ${osConfig.mySystem.theme.colors.accent2};
         background: rgba(180, 190, 254, 0.1);
       }
 
       #custom-launcher {
-        color: #89b4fa; /* Blue */
+        color: ${osConfig.mySystem.theme.colors.accent};
         padding: 0 10px;
         font-size: 16px;
         margin-left: 4px;
       }
 
       #window {
-        color: #a6adc8; /* Subtext0 */
+        color: ${osConfig.mySystem.theme.colors.subtext};
         padding: 0 10px;
       }
 
       #clock {
-        color: #cdd6f4; /* Text */
+        color: ${osConfig.mySystem.theme.colors.text};
         padding: 0 10px;
       }
 
       #cpu, #memory, #disk {
-        color: #fab387; /* Peach */
+        color: ${osConfig.mySystem.theme.colors.warning};
         padding: 0 6px;
       }
 
       #network {
-        color: #94e2d5; /* Teal */
+        color: ${osConfig.mySystem.theme.colors.success};
         padding: 0 6px;
       }
 
       #bluetooth {
-        color: #89b4fa; /* Blue */
+        color: ${osConfig.mySystem.theme.colors.accent};
         padding: 0 6px;
       }
 
       #pulseaudio {
-        color: #f9e2af; /* Yellow */
+        color: ${osConfig.mySystem.theme.colors.warning};
         padding: 0 6px;
       }
 
       #battery {
-        color: #a6e3a1; /* Green */
+        color: ${osConfig.mySystem.theme.colors.success};
         padding: 0 6px;
       }
 
       #battery.charging {
-        color: #a6e3a1;
+        color: ${osConfig.mySystem.theme.colors.success};
       }
 
       #battery.warning:not(.charging) {
-        color: #fab387;
+        color: ${osConfig.mySystem.theme.colors.warning};
       }
 
       #battery.critical:not(.charging) {
-        color: #f38ba8;
+        color: ${osConfig.mySystem.theme.colors.urgent};
         animation: blink 0.8s linear infinite alternate;
       }
 
       @keyframes blink {
         to {
-          color: #1e1e2e;
-          background-color: #f38ba8;
+          color: ${osConfig.mySystem.theme.colors.base};
+          background-color: ${osConfig.mySystem.theme.colors.urgent};
         }
       }
 
@@ -280,18 +282,18 @@
       }
 
       #custom-power {
-        color: #f38ba8; /* Red */
+        color: ${osConfig.mySystem.theme.colors.urgent};
         padding: 0 10px;
         margin-right: 4px;
       }
 
       tooltip {
-        background-color: #1e1e2e;
-        border: 1px solid #313244;
+        background-color: ${osConfig.mySystem.theme.colors.base};
+        border: 1px solid ${osConfig.mySystem.theme.colors.surface};
       }
 
       tooltip label {
-        color: #cdd6f4;
+        color: ${osConfig.mySystem.theme.colors.text};
       }
     '';
   };

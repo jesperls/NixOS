@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, osConfig, ... }:
 
 let
   gtkThemeName = "catppuccin-mocha-blue-standard";
@@ -11,8 +11,8 @@ let
   iconThemeName = "Papirus-Dark";
   iconThemePackage = pkgs.papirus-icon-theme;
 
-  fontName = "Noto Sans";
-  fontSize = 11;
+  fontName = osConfig.mySystem.theme.fonts.default;
+  fontSize = osConfig.mySystem.theme.fonts.size;
 in {
   home.pointerCursor = {
     gtk.enable = true;

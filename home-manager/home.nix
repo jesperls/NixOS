@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, osConfig, ... }:
 
 {
   imports = [
@@ -13,7 +13,6 @@
     ./modules/rofi.nix
     ./modules/swaync.nix
     ./modules/mimeapps.nix
-    ./modules/audio.nix
   ];
 
   home.sessionVariables = {
@@ -32,5 +31,5 @@
     GTK_USE_PORTAL = "1";
   };
 
-  home.stateVersion = "25.05";
+  home.stateVersion = osConfig.mySystem.system.stateVersion;
 }

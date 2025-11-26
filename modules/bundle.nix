@@ -7,6 +7,8 @@
     ./core/nix.nix
     ./core/options.nix
 
+    ./themes/theme.nix
+
     ./hardware/nvidia.nix
     ./hardware/vial.nix
 

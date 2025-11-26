@@ -1,4 +1,4 @@
-{ config, pkgs, osConfig, ... }:
+{ config, pkgs, osConfig, lib, ... }:
 
 {
   wayland.windowManager.hyprland = {
@@ -22,15 +22,21 @@
       general = {
         gaps_in = 0;
         gaps_out = 0;
-        border_size = 0;
-        "col.active_border" = "rgba(89b4faee) rgba(cba6f7ee) 45deg";
-        "col.inactive_border" = "rgba(585b70aa)";
+        border_size = osConfig.mySystem.theme.borders;
+        "col.active_border" = "rgba(${
+            lib.removePrefix "#" osConfig.mySystem.theme.colors.accent
+          }ee) rgba(${
+            lib.removePrefix "#" osConfig.mySystem.theme.colors.accent2
+          }ee) 45deg";
+        "col.inactive_border" = "rgba(${
+            lib.removePrefix "#" osConfig.mySystem.theme.colors.surface
+          }aa)";
         layout = "dwindle";
         resize_on_border = true;
       };
 
       decoration = {
-        rounding = 0;
+        rounding = osConfig.mySystem.theme.rounding;
         blur = {
           enabled = true;
           size = 5;

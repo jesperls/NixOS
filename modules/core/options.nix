@@ -50,6 +50,11 @@ with lib;
         default = "nixos";
         description = "The system hostname.";
       };
+      stateVersion = mkOption {
+        type = types.str;
+        default = "25.05";
+        description = "The system state version.";
+      };
     };
 
     monitors = mkOption {
