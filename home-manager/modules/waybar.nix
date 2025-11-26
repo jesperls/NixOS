@@ -30,7 +30,6 @@
           "custom/power"
         ];
 
-        # Module configurations
         "custom/launcher" = {
           format = "";
           on-click = "rofi -show drun";

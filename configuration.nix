@@ -1,4 +1,4 @@
-{ config, pkgs, lib, swww, antigravity-nix, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [ ./hardware-configuration.nix ./modules/bundle.nix ];
@@ -55,7 +55,6 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
-    extraSpecialArgs = { inherit swww antigravity-nix; };
   };
 
   system.stateVersion = "25.05";

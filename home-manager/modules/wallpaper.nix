@@ -1,10 +1,7 @@
-{ config, pkgs, swww, ... }:
+{ config, pkgs, ... }:
 
 let
 
-  system = pkgs.stdenv.hostPlatform.system;
-
-  # Create wallpaper switching script
   wallpaperSwitcher = pkgs.writeShellScriptBin "wallpaper-switcher" ''
     #!/usr/bin/env bash
 
@@ -57,12 +54,7 @@ let
   '';
 
 in {
-  home.packages = with pkgs; [
-    swww.packages.${system}.swww
-    wallpaperSwitcher
-    jq
-    libnotify
-  ];
+  home.packages = with pkgs; [ swww wallpaperSwitcher jq libnotify ];
 
   home.file.".config/wallpapers/.keep".text = "";
 
@@ -77,7 +69,7 @@ in {
 
     Service = {
       Type = "simple";
-      ExecStart = "${swww.packages.${system}.swww}/bin/swww-daemon";
+      ExecStart = "${pkgs.swww}/bin/swww-daemon";
       Restart = "on-failure";
       RestartSec = 1;
       TimeoutStopSec = 10;

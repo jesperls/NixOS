@@ -1,4 +1,4 @@
-{ config, pkgs, antigravity-nix, ... }:
+{ config, pkgs, ... }:
 
 {
   home.packages = with pkgs; [
@@ -8,7 +8,7 @@
     vscode
     uv
     python314
-    antigravity-nix.packages.x86_64-linux.default
+    antigravity
 
     # System Utilities & Tools
     cliphist
@@ -26,7 +26,6 @@
     nodejs
     glib
     gsettings-desktop-schemas
-    zulu24
 
     # Audio & Bluetooth
     pavucontrol
@@ -37,7 +36,6 @@
     firefox
     gedit
     wlogout
-    nm-tray
     networkmanagerapplet
 
     # File Management & Viewers
