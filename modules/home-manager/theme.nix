@@ -1,6 +1,7 @@
 { config, pkgs, osConfig, ... }:
 
 let
+  # GTK theme configuration
   gtkThemeName = "catppuccin-mocha-blue-standard";
   gtkThemePackage = pkgs.catppuccin-gtk.override {
     accents = [ "blue" ];
@@ -8,12 +9,16 @@ let
     variant = "mocha";
   };
 
+  # Icon theme configuration
   iconThemeName = "Papirus-Dark";
   iconThemePackage = pkgs.papirus-icon-theme;
 
+  # Font configuration from system theme
   fontName = osConfig.mySystem.theme.fonts.default;
   fontSize = osConfig.mySystem.theme.fonts.size;
 in {
+
+  # Cursor theme
   home.pointerCursor = {
     gtk.enable = true;
     x11.enable = true;
@@ -23,6 +28,7 @@ in {
     hyprcursor.enable = true;
   };
 
+  # GTK theming
   gtk = {
     enable = true;
 
@@ -42,18 +48,12 @@ in {
     };
 
     gtk3.extraConfig = { gtk-application-prefer-dark-theme = 1; };
-
     gtk4.extraConfig = { gtk-application-prefer-dark-theme = 1; };
 
-    gtk3.bookmarks = [
-      #"file://${config.home.homeDirectory}/Documents"
-      "file://${config.home.homeDirectory}/Downloads"
-      #"file://${config.home.homeDirectory}/Pictures"
-      #"file://${config.home.homeDirectory}/Videos"
-      #"file://${config.home.homeDirectory}/Music"
-    ];
+    gtk3.bookmarks = [ "file://${config.home.homeDirectory}/Downloads" ];
   };
 
+  # GNOME dconf settings
   dconf = {
     enable = true;
     settings = {
@@ -66,6 +66,7 @@ in {
     };
   };
 
+  # XFCE settings
   xfconf = {
     enable = true;
     settings = {
@@ -77,6 +78,7 @@ in {
     };
   };
 
+  # Qt theming
   qt = {
     enable = true;
     platformTheme.name = "gtk3";

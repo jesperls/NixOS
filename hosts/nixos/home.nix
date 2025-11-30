@@ -3,12 +3,11 @@
 {
   imports = [
     ../../modules/home-manager/packages.nix
-    ../../modules/home-manager/user-apps.nix
     ../../modules/home-manager/hyprland.nix
     ../../modules/home-manager/wallpaper.nix
     ../../modules/home-manager/waybar.nix
     ../../modules/home-manager/theme.nix
-    ../../modules/home-manager/programs.nix
+    ../../modules/home-manager/cli.nix
     ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/rofi.nix
     ../../modules/home-manager/swaync.nix

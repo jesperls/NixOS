@@ -28,6 +28,8 @@
         LC_TIME = "sv_SE.UTF-8";
       };
     };
+
+    # Monitor configuration
     monitors = [
       "DP-3, 2560x1440@240, 0x0, 1"
       "DP-2, 2560x1440@144, 2560x0, 1"
@@ -36,25 +38,22 @@
       "Unknown-1, disable"
     ];
 
-    services.backup.enable = true;
+    # Hardware features
     hardware.nvidia.enable = true;
+    hardware.vial.enable = true;
+
+    # Services
+    services.backup.enable = true;
+    services.bluetooth.enable = true;
+    services.flatpak.enable = true;
+
+    # Programs
     programs.gaming.enable = true;
   };
 
-  time.timeZone = config.mySystem.system.timeZone;
-  i18n.defaultLocale = config.mySystem.system.locale;
-  i18n.extraLocaleSettings = config.mySystem.system.extraLocaleSettings;
-
-  console.keyMap = config.mySystem.system.consoleKeyMap;
-  services.xserver.xkb.layout = config.mySystem.system.keyboardLayout;
-
-  hardware.logitech.wireless.enable = true;
-  programs.dconf.enable = true;
-
+  # Home Manager configuration
   home-manager = {
-    users.${config.mySystem.user.username} = {
-      imports = [ ./home.nix ../../modules/home-manager/audio.nix ];
-    };
+    users.${config.mySystem.user.username} = { imports = [ ./home.nix ]; };
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";

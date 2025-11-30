@@ -1,5 +1,16 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
-{
-  services.flatpak.enable = true;
+with lib;
+
+let cfg = config.mySystem.services.flatpak;
+in {
+  options.mySystem.services.flatpak = {
+    enable = mkEnableOption "Flatpak package manager";
+  };
+
+  config = mkIf cfg.enable {
+    services.flatpak.enable = true;
+
+    xdg.portal.enable = true;
+  };
 }

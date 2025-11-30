@@ -4,6 +4,7 @@ with lib;
 
 {
   options.mySystem = {
+    # User configuration
     user = {
       username = mkOption {
         type = types.str;
@@ -19,6 +20,7 @@ with lib;
       };
     };
 
+    # System configuration
     system = {
       locale = mkOption {
         type = types.str;
@@ -57,6 +59,7 @@ with lib;
       };
     };
 
+    # Monitor configuration
     monitors = mkOption {
       type = types.listOf types.str;
       default = [ ];

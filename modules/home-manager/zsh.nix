@@ -21,6 +21,8 @@
       ytmp3 = "yt-dlp -x --audio-format mp3";
       ytmp4 =
         "yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'";
+      oracle = "TERM=xterm-256color ssh -i ~/.ssh/id_rsa ubuntu@132.145.48.11";
+      nuwa = "TERM=xterm-256color ssh -t jesper@192.168.1.49";
     };
 
     initContent = ''
