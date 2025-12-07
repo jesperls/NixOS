@@ -12,6 +12,25 @@
       support32Bit = true;
     };
     pulse.enable = true;
+
+    extraConfig.pipewire."99-hybrid-voice" = {
+      "context.modules" = [{
+        name = "libpipewire-module-loopback";
+        args = {
+          "node.description" = "Hybrid Voice";
+          "capture.props" = {
+            "node.name" = "hybrid_voice_input";
+            "media.class" = "Audio/Sink";
+            "audio.position" = [ "MONO" ];
+          };
+          "playback.props" = {
+            "node.name" = "hybrid_voice_output";
+            "media.class" = "Audio/Source";
+            "audio.position" = [ "MONO" ];
+          };
+        };
+      }];
+    };
   };
 
   environment.etc."wireplumber/wireplumber.conf.d/51-rename-devices.conf".text =
@@ -67,4 +86,21 @@
         }
       ]
     '';
+
+  systemd.user.services.audio-auto-switch = {
+    description = "Audio Auto Switcher Service";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = let
+        pythonScript = pkgs.writers.writePython3 "audio-monitor" {
+          libraries = [ pkgs.python3Packages.numpy ];
+          flakeIgnore = [ "E501" ];
+        } (builtins.readFile ./audio-monitor.py);
+      in "${pythonScript}";
+      Restart = "always";
+      RestartSec = "5";
+      Environment = "PATH=${lib.makeBinPath [ pkgs.pulseaudio pkgs.pipewire ]}";
+    };
+  };
 }

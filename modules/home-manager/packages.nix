@@ -31,12 +31,14 @@
     glib
     gsettings-desktop-schemas
     p7zip
+    parted
 
     # CUDA
     cudaPackages.cudnn
 
     # Audio & Bluetooth
     pavucontrol
+    pulseaudio
     bluez-tools
     overskride
     qpwgraph
@@ -60,6 +62,7 @@
     mpv
     rhythmbox
     gimp
+    kooha
 
     # Gaming
     prismlauncher
