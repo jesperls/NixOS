@@ -1,6 +1,9 @@
-{ config, pkgs, ... }:
+{ config, pkgs, osConfig, ... }:
 
-{
+let
+  colors = osConfig.mySystem.theme.colors;
+  fonts = osConfig.mySystem.theme.fonts;
+in {
   services.swaync = {
     enable = true;
     settings = {
@@ -9,7 +12,9 @@
       layer = "overlay";
       control-center-layer = "top";
       layer-shell = true;
-      cssPriority = "application";
+      layer-shell-cover-screen = false;
+      ignore-gtk-theme = true;
+      cssPriority = "user";
       control-center-margin-top = 0;
       control-center-margin-bottom = 0;
       control-center-margin-right = 0;
@@ -21,244 +26,104 @@
       notification-body-image-width = 200;
     };
     style = ''
+      /* Global Reset & Font */
       * {
-        font-family: "JetBrainsMono Nerd Font";
+        font-family: "${fonts.monospace}";
         font-weight: bold;
       }
-      .control-center .notification-row:focus,
-      .control-center .notification-row:hover {
-        opacity: 1;
-        background: #1e1e2e;
+
+      /* Structure & Transparency Overrides */
+      .control-center, .notification, .notification-list, .floating-notifications, .blank-window,
+      .widget-title, .widget-dnd, .widget-label, .widget-mpris, .widget-buttons-grid, .widget-menubar {
+        background: transparent !important;
       }
+
+      /* Notification Rows */
       .notification-row {
         outline: none;
         margin: 10px;
         padding: 0;
       }
-      .notification {
-        background: transparent;
-        padding: 0;
-        margin: 0px;
-      }
+
+      /* Notification Content */
       .notification-content {
-        background: #1e1e2e;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #89b4fa;
+        background: ${colors.base} !important;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid ${colors.surface};
         margin: 0;
+        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.5);
       }
-      .notification-default-action {
-        margin: 0;
-        padding: 0;
-        border-radius: 5px;
-      }
-      .close-button {
-        background: #f38ba8;
-        color: #1e1e2e;
-        text-shadow: none;
-        padding: 0;
-        border-radius: 5px;
-        margin-top: 5px;
-        margin-right: 5px;
-      }
-      .close-button:hover {
-        box-shadow: none;
-        background: #f38ba8;
-        transition: all 0.15s ease-in-out;
-        border: none;
-      }
-      .notification-action {
-        border: 2px solid #89b4fa;
-        border-top: none;
-        border-radius: 5px;
-      }
-      .notification-default-action:hover,
-      .notification-action:hover {
-        color: #89b4fa;
-        background: #89b4fa;
-      }
-      .notification-default-action {
-        border-radius: 5px;
-        margin: 0px;
-      }
-      .notification-default-action:not(:only-child) {
-        border-bottom-left-radius: 0px;
-        border-bottom-right-radius: 0px;
-      }
-      .notification-action:first-child {
-        border-bottom-left-radius: 10px;
-        background: #1e1e2e;
-      }
-      .notification-action:last-child {
-        border-bottom-right-radius: 10px;
-        background: #1e1e2e;
-      }
-      .inline-reply {
-        margin-top: 8px;
-      }
-      .inline-reply-entry {
-        background: #1e1e2e;
-        color: #cdd6f4;
-        border: 1px solid #89b4fa;
-        border-radius: 5px;
-      }
-      .inline-reply-button {
-        margin-left: 4px;
-        background: #1e1e2e;
-        border: 1px solid #89b4fa;
-        border-radius: 5px;
-        color: #cdd6f4;
-      }
-      .inline-reply-button:disabled {
-        background: initial;
-        color: #585b70;
-        border: 1px solid #585b70;
-      }
-      .inline-reply-button:hover {
-        background: #1e1e2e;
-      }
-      .body-image {
-        margin-top: 6px;
-        background-color: #cdd6f4;
-        border-radius: 5px;
-      }
-      .summary {
-        font-size: 16px;
-        font-weight: 700;
+
+      /* Hover & Focus Effects */
+      .control-center .notification-row:focus,
+      .control-center .notification-row:hover {
+        opacity: 1;
         background: transparent;
-        color: #cdd6f4;
-        text-shadow: none;
       }
-      .time {
-        font-size: 16px;
-        font-weight: 700;
-        background: transparent;
-        color: #cdd6f4;
-        text-shadow: none;
-        margin-right: 18px;
-      }
-      .body {
-        font-size: 15px;
-        font-weight: 400;
-        background: transparent;
-        color: #cdd6f4;
-        text-shadow: none;
-      }
+
+      /* Control Center Main Container */
       .control-center {
-        background: #1e1e2e;
-        border: 2px solid #89b4fa;
-        border-radius: 10px;
+        background: ${colors.base} !important;
+        border: 1px solid ${colors.surface};
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        margin: 15px;
+        padding: 0;
       }
-      .control-center-list {
-        background: transparent;
-      }
-      .control-center-list-placeholder {
-        opacity: 0.5;
-      }
-      .floating-notifications {
-        background: transparent;
-      }
-      .blank-window {
-        background: alpha(black, 0);
-      }
-      .widget-title {
-        color: #89b4fa;
-        background: #1e1e2e;
-        padding: 5px 10px;
-        margin: 10px 10px 5px 10px;
-        font-size: 1.5rem;
-        border-radius: 5px;
-      }
-      .widget-title > button {
-        font-size: 1rem;
-        color: #cdd6f4;
-        text-shadow: none;
-        background: #1e1e2e;
-        box-shadow: none;
-        border-radius: 5px;
-      }
-      .widget-title > button:hover {
-        background: #f38ba8;
-        color: #1e1e2e;
-      }
-      .widget-dnd {
-        background: #1e1e2e;
-        padding: 5px 10px;
-        margin: 10px 10px 5px 10px;
-        border-radius: 5px;
-        font-size: large;
-        color: #89b4fa;
-      }
-      .widget-dnd > switch {
-        border-radius: 5px;
-        background: #1e1e2e;
-      }
-      .widget-dnd > switch:checked {
-        background: #89b4fa;
-        border: 1px solid #89b4fa;
-      }
-      .widget-dnd > switch slider {
-        background: #1e1e2e;
-        border-radius: 5px;
-      }
-      .widget-dnd > switch:checked slider {
-        background: #1e1e2e;
-        border-radius: 5px;
-      }
-      .widget-label {
-        margin: 10px 10px 5px 10px;
-      }
-      .widget-label > label {
-        font-size: 1rem;
-        color: #cdd6f4;
-      }
-      .widget-mpris {
-        color: #cdd6f4;
-        background: #1e1e2e;
-        padding: 5px 10px;
-        margin: 10px 10px 5px 10px;
-        border-radius: 5px;
-      }
-      .widget-mpris > box > button {
-        border-radius: 5px;
-      }
-      .widget-mpris-player {
-        padding: 5px 10px;
-        margin: 10px;
-      }
-      .widget-mpris-title {
-        font-weight: 700;
-        font-size: 1.25rem;
-      }
-      .widget-mpris-subtitle {
-        font-size: 1.1rem;
-      }
-      .widget-buttons-grid {
-        padding: 5px;
-        margin: 10px 10px 5px 10px;
-        border-radius: 5px;
-        background: #1e1e2e;
-      }
-      .widget-buttons-grid > flowbox > flowboxchild > button {
-        background: #1e1e2e;
-        border-radius: 5px;
-      }
-      .widget-buttons-grid > flowbox > flowboxchild > button:hover {
-        background: #89b4fa;
-        color: #1e1e2e;
-      }
-      .widget-menubar > box > box > button {
-        border-radius: 5px;
-        background: #1e1e2e;
-      }
-      .widget-menubar > box > box > button:hover {
-        background: #89b4fa;
-        color: #1e1e2e;
-      }
-      .topbar-buttons > button {
+
+      /* Buttons & Actions Shared Styling */
+      .close-button, .notification-action, .notification-default-action,
+      .widget-title > button, .widget-dnd > switch, .widget-buttons-grid > flowbox > flowboxchild > button,
+      .widget-menubar > box > box > button, .widget-mpris > box > button {
+        background: ${colors.surface};
+        color: ${colors.text};
         border: none;
-        background: transparent;
+        border-radius: 12px;
+        box-shadow: none;
+        text-shadow: none;
       }
+
+      /* Button Hover Effects */
+      .close-button:hover, .notification-action:hover, .notification-default-action:hover,
+      .widget-title > button:hover, .widget-buttons-grid > flowbox > flowboxchild > button:hover,
+      .widget-menubar > box > box > button:hover {
+        background: ${colors.accent};
+        color: ${colors.base};
+        transition: all 0.15s ease-in-out;
+      }
+
+      /* Close Button Specifics */
+      .close-button {
+        background: ${colors.urgent};
+        color: ${colors.base};
+        border-radius: 100%;
+        margin: 5px 5px 0 0;
+        min-width: 24px;
+        min-height: 24px;
+      }
+      .close-button:hover { background: ${colors.urgent}; }
+
+      /* Text Styling */
+      .summary { font-size: 16px; font-weight: 800; color: ${colors.text}; background: transparent; }
+      .time { font-size: 14px; font-weight: 700; color: ${colors.subtext}; background: transparent; margin-right: 18px; }
+      .body { font-size: 15px; font-weight: 500; color: ${colors.text}; background: transparent; }
+      .widget-label > label { font-size: 1rem; color: ${colors.text}; }
+      .widget-title { color: ${colors.accent}; padding: 10px; margin: 10px; font-size: 1.5rem; }
+
+      /* Widget Containers */
+      .widget-dnd, .widget-mpris, .widget-buttons-grid {
+        background: ${colors.base} !important;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 12px;
+      }
+
+      /* Inputs & Toggles */
+      .widget-dnd > switch:checked { background: ${colors.accent}; border: 1px solid ${colors.accent}; }
+      .widget-dnd > switch slider { background: ${colors.text}; border-radius: 12px; }
+      .inline-reply-entry { background: ${colors.base}; color: ${colors.text}; border: 1px solid ${colors.surface}; border-radius: 12px; }
+      .body-image { background-color: ${colors.text}; border-radius: 12px; margin-top: 6px; }
     '';
   };
 }
