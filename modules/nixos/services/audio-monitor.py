@@ -2,11 +2,16 @@ import numpy as np
 import subprocess
 import time
 import sys
+import os
 import signal
 
-HYBRID_SINK = "hybrid_voice_input"
-A50_SOURCE = "alsa_input.usb-Logitech_A50-00.pro-input-0"
-SCARLETT_SOURCE = "alsa_input.usb-Focusrite_Scarlett_2i2_4th_Gen_S20KXTT350BDD8-00.pro-input-0"
+HYBRID_SINK = os.environ.get("SINK_NAME", "hybrid_voice_input")
+PREFERRED_NODE = os.environ.get("PREFERRED_NODE")
+FALLBACK_NODE = os.environ.get("FALLBACK_NODE")
+
+if not PREFERRED_NODE or not FALLBACK_NODE:
+    print("Error: PREFERRED_NODE and FALLBACK_NODE must be set.", flush=True)
+    sys.exit(1)
 
 SILENCE_THRESHOLD = 0.0001
 SILENCE_DURATION = 0.5
@@ -23,7 +28,7 @@ class AudioMonitor:
 
     def link_source(self, source, sink):
         try:
-            other_source = SCARLETT_SOURCE if source == A50_SOURCE else A50_SOURCE
+            other_source = FALLBACK_NODE if source == PREFERRED_NODE else PREFERRED_NODE
 
             # Disconnect the other source if it's connected
             subprocess.run(
@@ -54,9 +59,9 @@ class AudioMonitor:
 
     def run(self):
         print("Starting Audio Auto-Switch Monitor...", flush=True)
-        print(f"Targeting Source: {A50_SOURCE}", flush=True)
+        print(f"Targeting Source: {PREFERRED_NODE}", flush=True)
 
-        self.set_active_source(A50_SOURCE)
+        self.set_active_source(PREFERRED_NODE)
 
         samplerate = 48000
         channels = 1
@@ -66,7 +71,7 @@ class AudioMonitor:
 
         cmd = [
             "parec",
-            f"--device={A50_SOURCE}",
+            f"--device={PREFERRED_NODE}",
             f"--rate={samplerate}",
             f"--channels={channels}",
             f"--format={format_str}",
@@ -96,9 +101,9 @@ class AudioMonitor:
 
                 time_since_voice = time.time() - self.last_voice_time
                 if time_since_voice < SILENCE_DURATION:
-                    self.set_active_source(A50_SOURCE)
+                    self.set_active_source(PREFERRED_NODE)
                 else:
-                    self.set_active_source(SCARLETT_SOURCE)
+                    self.set_active_source(FALLBACK_NODE)
 
         except Exception as e:
             print(f"Fatal error: {e}", flush=True)
