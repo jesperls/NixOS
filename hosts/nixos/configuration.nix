@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
   imports = [ ./hardware-configuration.nix ../../modules/nixos/bundle.nix ];
@@ -67,6 +67,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
+    extraSpecialArgs = { inherit inputs; };
   };
 
   system.stateVersion = config.mySystem.system.stateVersion;

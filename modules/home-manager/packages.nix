@@ -78,5 +78,8 @@
     # Entertainment
     spotify
     yt-dlp
+
+    # Customization
+    swww
   ];
 }

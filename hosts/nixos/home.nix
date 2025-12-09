@@ -1,17 +1,42 @@
-{ config, pkgs, osConfig, ... }:
+{ config, pkgs, osConfig, inputs, ... }:
 
 {
   imports = [
     ../../modules/home-manager/packages.nix
     ../../modules/home-manager/hyprland.nix
-    ../../modules/home-manager/wallpaper.nix
-    ../../modules/home-manager/waybar.nix
     ../../modules/home-manager/theme.nix
     ../../modules/home-manager/cli.nix
     ../../modules/home-manager/zsh.nix
-    ../../modules/home-manager/rofi.nix
-    ../../modules/home-manager/swaync.nix
     ../../modules/home-manager/mimeapps.nix
+    inputs.caelestia-shell.homeManagerModules.default
+  ];
+
+  programs.caelestia = {
+    enable = true;
+    package =
+      inputs.caelestia-shell.packages.${pkgs.system}.default.overrideAttrs
+      (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace components/filedialog/FolderContents.qml \
+            --replace "model: FileSystemModel {" "model: FileSystemModel { showHidden: true;"
+        '';
+      });
+    systemd = {
+      enable = true;
+      target = "graphical-session.target";
+    };
+    cli.enable = true;
+    settings = {
+      appearance = { anim = { durations = { scale = 0.4; }; }; };
+      background = { enabled = false; };
+      general = { apps = { explorer = [ "thunar" ]; }; };
+    };
+  };
+
+  home.packages = [
+    (pkgs.callPackage "${inputs.caelestia-shell}/nix/app2unit.nix" {
+      inherit pkgs;
+    })
   ];
 
   home.sessionVariables = {

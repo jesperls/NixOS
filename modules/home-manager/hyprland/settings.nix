@@ -1,7 +1,5 @@
 { config, pkgs, lib, osConfig, ... }: {
   exec-once = [
-    "waybar"
-    "swaync"
     "systemctl --user start swww"
     "solaar -w hide"
     "systemctl --user start hyprpolkitagent"
