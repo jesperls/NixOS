@@ -29,6 +29,46 @@
       };
     };
 
+    theme = {
+      name = "Obsidian Mocha";
+      borders = 0;
+      rounding = 0;
+      colors = {
+        accent = "#d47fa6";
+        accent2 = "#e3b17a";
+        background = "#0f1117";
+        surface = "#191b21";
+        surfaceAlt = "#13141a";
+        text = "#e6e3e8";
+        muted = "#b3adb9";
+        border = "#2a2d36";
+        shadow = "#08090d";
+      };
+      gtk = {
+        theme = {
+          name = "adw-gtk3-dark";
+          package = pkgs.adw-gtk3;
+        };
+        iconTheme = {
+          name = "Papirus-Dark";
+          package = pkgs.papirus-icon-theme;
+        };
+        cursorTheme = {
+          name = "Bibata-Modern-Classic";
+          package = pkgs.bibata-cursors;
+          size = 24;
+        };
+      };
+      qt = {
+        styleName = "adwaita-dark";
+        stylePackage = pkgs.adwaita-qt;
+        platform = {
+          name = "gtk";
+          package = null;
+        };
+      };
+    };
+
     # Monitor configuration
     monitors = [
       "DP-3, 2560x1440@240, 0x0, 1"

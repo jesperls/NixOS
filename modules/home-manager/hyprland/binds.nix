@@ -2,7 +2,7 @@
   bind = [
     "$mainMod, T, exec, $terminal"
     "$mainMod, E, exec, thunar"
-    "$mainMod, A, exec, caelestia shell drawers toggle launcher"
+    "$mainMod, A, exec, caelestia-shell ipc --any-display call drawers toggle launcher"
     "$mainMod, Q, killactive,"
     "$mainMod, M, exit,"
     "$mainMod, D, exec, vesktop"

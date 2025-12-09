@@ -5,6 +5,7 @@
     ../../modules/home-manager/packages.nix
     ../../modules/home-manager/hyprland.nix
     ../../modules/home-manager/theme.nix
+    ../../modules/home-manager/firefox.nix
     ../../modules/home-manager/cli.nix
     ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/mimeapps.nix
@@ -29,6 +30,7 @@
     settings = {
       appearance = { anim = { durations = { scale = 0.4; }; }; };
       background = { enabled = false; };
+      paths.wallpaperDir = "~/Pictures/Wallpapers";
       general = { apps = { explorer = [ "thunar" ]; }; };
     };
   };
