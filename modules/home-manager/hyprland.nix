@@ -7,34 +7,71 @@ let
     text = ''
       set -euo pipefail
 
-      default_dir="$XDG_PICTURES_DIR"
-      [ -n "$default_dir" ] || default_dir="$HOME/Pictures"
-      default_dir="$default_dir/Wallpapers"
+      # Prefer XDG_PICTURES_DIR if set; fallback to ~/Pictures
+      default_dir="''${XDG_PICTURES_DIR:-$HOME/Pictures}/Wallpapers"
+      cache_dir="''${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper-manager"
+      mkdir -p "$cache_dir"
 
-      cmd="$1"
-      [ -n "$cmd" ] || cmd="random"
+      cmd="''${1:-cycle}"
+
       ensure_daemon() {
         if ! swww query >/dev/null 2>&1; then
           swww-daemon --format xrgb >/dev/null 2>&1 || swww-daemon --format rgb >/dev/null 2>&1
         fi
       }
 
-      pick_wall() {
-        local output="$1"; shift
-        local dir="$1"; shift
+      focused_output() {
+        hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .name' | head -n1
+      }
+
+      pick_list() {
+        local dir="$1"
         if [ ! -d "$dir" ]; then
           return 1
         fi
-        local file
-        file=$(find -L "$dir" -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' -o -iname '*.bmp' \) | shuf -n 1)
-        [ -n "$file" ] || return 1
+        find -L "$dir" -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' -o -iname '*.bmp' \) | LC_COLLATE=C sort
+      }
+
+      next_wall_for_output() {
+        local output="$1"
+        local dir="$2"
+        local state_file="$cache_dir/''${output//\//_}.idx"
+        mapfile -t files < <(pick_list "$dir") || true
+        if [ "''${#files[@]}" -eq 0 ]; then
+          return 1
+        fi
+
+        local last_idx=-1
+        if [ -f "$state_file" ]; then
+          read -r last_idx < "$state_file" || true
+        fi
+        local next_idx=$(( (last_idx + 1) % ''${#files[@]} ))
+        echo "$next_idx" > "$state_file"
+
+        local file="''${files[$next_idx]}"
         echo "$output -> $file" >&2
         swww img -o "$output" "$file" --transition-type grow --transition-duration 0.7 --transition-fps 60
+        return 0
+      }
+
+      cycle_focused() {
+        ensure_daemon
+        local out
+        out=$(focused_output)
+        if [ -z "$out" ]; then
+          echo "no focused monitor detected" >&2
+          exit 1
+        fi
+
+        next_wall_for_output "$out" "$default_dir/$out" || next_wall_for_output "$out" "$default_dir" || {
+          echo "no wallpapers found for $out" >&2
+          exit 1
+        }
       }
 
       if [ "$cmd" = "set" ]; then
-        output="$2"
-        file="$3"
+        output="''${2:-}"
+        file="''${3:-}"
         if [ -z "$output" ] || [ -z "$file" ]; then
           echo "usage: wallpaper-manager set <output> <file>" >&2
           exit 1
@@ -44,22 +81,17 @@ let
         exit 0
       fi
 
-      # default: random per connected output
-      ensure_daemon
-      outputs=$(hyprctl monitors -j | jq -r '.[].name')
-      for out in $outputs; do
-        # prefer per-output directory, fallback to shared
-        pick_wall "$out" "$default_dir/$out" || pick_wall "$out" "$default_dir" || echo "no wallpapers for $out" >&2
-      done
+      # default: cycle wallpapers on the focused monitor
+      cycle_focused
     '';
   };
-in
-{
+  hyprSettings = import ./hyprland/settings.nix { inherit config pkgs lib osConfig; };
+in {
   wayland.windowManager.hyprland = {
     enable = true;
     settings = lib.mkMerge [
       (import ./hyprland/variables.nix { })
-      (import ./hyprland/settings.nix { inherit config pkgs lib osConfig; })
+      hyprSettings.settings
       (import ./hyprland/binds.nix { })
       (import ./hyprland/windowrules.nix { })
     ];

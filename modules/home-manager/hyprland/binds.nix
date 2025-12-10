@@ -13,8 +13,7 @@
     "$mainMod, J, togglesplit"
 
     # Wallpaper controls
-    "$mainMod SHIFT, W, exec, wallpaper-switcher"
-    "$mainMod SHIFT, R, exec, wallpaper-manager random"
+    "$mainMod SHIFT, W, exec, wallpaper-manager"
 
     # Focus movement
     "$mainMod, left, movefocus, l"

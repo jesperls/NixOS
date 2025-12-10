@@ -32,7 +32,11 @@
     theme = {
       name = "Obsidian Mocha";
       borders = 0;
-      rounding = 0;
+      gaps = {
+        inner = 5;
+        outer = 10;
+      };
+      rounding = 25;
       colors = {
         accent = "#d47fa6";
         accent2 = "#e3b17a";

@@ -2,10 +2,8 @@
 
 with lib;
 
-let
-  hexColor = types.strMatching "^#[0-9a-fA-F]{6}$";
-in
-{
+let hexColor = types.strMatching "^#[0-9a-fA-F]{6}$";
+in {
   options.mySystem.theme = mkOption {
     description = "Base theme palette and toolkit settings";
     type = types.submodule {
@@ -19,13 +17,29 @@ in
         borders = mkOption {
           type = types.int;
           default = 3;
-          description = "Window border thickness in Hyprland and related tooling.";
+          description =
+            "Window border thickness in Hyprland and related tooling.";
         };
 
         rounding = mkOption {
           type = types.int;
           default = 10;
-          description = "Corner radius to use for window decorations and controls.";
+          description =
+            "Corner radius to use for window decorations and controls.";
+        };
+
+        gaps = {
+          inner = mkOption {
+            type = types.int;
+            default = 8;
+            description = "Inner gaps between tiled windows (pixels).";
+          };
+
+          outer = mkOption {
+            type = types.int;
+            default = 8;
+            description = "Outer gaps to screen edges (pixels).";
+          };
         };
 
         colors = {
@@ -95,7 +109,8 @@ in
             package = mkOption {
               type = types.nullOr types.package;
               default = null;
-              description = "GTK theme package providing the theme name (null uses built-in).";
+              description =
+                "GTK theme package providing the theme name (null uses built-in).";
             };
           };
 
@@ -159,7 +174,8 @@ in
                 package = mkOption {
                   type = types.nullOr types.package;
                   default = null;
-                  description = "Optional package providing the platform theme.";
+                  description =
+                    "Optional package providing the platform theme.";
                 };
               };
             };

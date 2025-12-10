@@ -8,7 +8,11 @@
     config = { common = { default = [ "hyprland" "gtk" ]; }; };
   };
 
-  environment.systemPackages = with pkgs; [ pamixer brightnessctl gpu-screen-recorder ];
+  environment.systemPackages = with pkgs; [
+    pamixer
+    brightnessctl
+    gpu-screen-recorder
+  ];
 
   security.wrappers.gsr-kms-server = {
     source = "${pkgs.gpu-screen-recorder}/bin/gsr-kms-server";

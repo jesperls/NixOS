@@ -4,8 +4,7 @@ let
   theme = osConfig.mySystem.theme;
   colors = theme.colors;
 
-in
-{
+in {
   gtk = {
     enable = true;
     theme = {
@@ -13,9 +12,7 @@ in
       package = theme.gtk.theme.package;
     };
     iconTheme = theme.gtk.iconTheme;
-    cursorTheme = {
-      inherit (theme.gtk.cursorTheme) name package size;
-    };
+    cursorTheme = { inherit (theme.gtk.cursorTheme) name package size; };
 
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
@@ -23,9 +20,7 @@ in
       gtk-menu-images = 1;
     };
 
-    gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = 1;
-    };
+    gtk4.extraConfig = { gtk-application-prefer-dark-theme = 1; };
   };
 
   qt = {

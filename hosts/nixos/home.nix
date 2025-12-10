@@ -1,6 +1,18 @@
 { config, pkgs, osConfig, inputs, ... }:
 
-{
+let
+  caelestiaShellPatched =
+    inputs.caelestia-shell.packages.${pkgs.stdenv.hostPlatform.system}."with-cli"
+    .overrideAttrs (old: {
+      prePatch = (old.prePatch or "") + ''
+        substituteInPlace services/GameMode.qml \
+          --replace '"general:border_size": 1' '"general:border_size": 0'
+        substituteInPlace services/Recorder.qml \
+          --replace 'property list<string> startArgs' 'property list<string> startArgs: []' \
+          --replace 'function start(extraArgs: list<string>): void {' 'function start(extraArgs = []) {'
+      '';
+    });
+in {
   imports = [
     ../../modules/home-manager/packages.nix
     ../../modules/home-manager/hyprland.nix
@@ -14,14 +26,7 @@
 
   programs.caelestia = {
     enable = true;
-    package =
-      inputs.caelestia-shell.packages.${pkgs.system}.default.overrideAttrs
-      (old: {
-        postPatch = (old.postPatch or "") + ''
-          substituteInPlace components/filedialog/FolderContents.qml \
-            --replace "model: FileSystemModel {" "model: FileSystemModel { showHidden: true;"
-        '';
-      });
+    package = caelestiaShellPatched;
     systemd = {
       enable = true;
       target = "graphical-session.target";
@@ -31,7 +36,17 @@
       appearance = { anim = { durations = { scale = 0.4; }; }; };
       background = { enabled = false; };
       paths.wallpaperDir = "~/Pictures/Wallpapers";
-      general = { apps = { explorer = [ "thunar" ]; }; };
+      bar.status = {
+        showBattery = false;
+        showAudio = true;
+      };
+      general = {
+        apps = { explorer = [ "thunar" ]; };
+        idle = {
+          lockBeforeSleep = false;
+          timeouts = [ ];
+        };
+      };
     };
   };
 

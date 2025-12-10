@@ -1,4 +1,6 @@
 { config, pkgs, lib, osConfig, ... }: {
+
+  settings = {
   exec-once = [
     "systemctl --user start swww"
     "solaar -w hide"
@@ -9,14 +11,10 @@
   ];
 
   general = {
-    gaps_in = 0;
-    gaps_out = 0;
+      gaps_in = osConfig.mySystem.theme.gaps.inner;
+      gaps_out = osConfig.mySystem.theme.gaps.outer;
     border_size = osConfig.mySystem.theme.borders;
-    "col.active_border" = "rgba(${
-        lib.removePrefix "#" osConfig.mySystem.theme.colors.accent
-      }ee) rgba(${
-        lib.removePrefix "#" osConfig.mySystem.theme.colors.accent2
-      }ee) 45deg";
+      "col.active_border" = "rgba(${lib.removePrefix "#" osConfig.mySystem.theme.colors.accent}ee) rgba(${lib.removePrefix "#" osConfig.mySystem.theme.colors.accent2}ee) 45deg";
     "col.inactive_border" =
       "rgba(${lib.removePrefix "#" osConfig.mySystem.theme.colors.surface}aa)";
     layout = "dwindle";
@@ -36,7 +34,23 @@
     shadow = { enabled = false; };
   };
 
-  animations = { enabled = true; };
+  animations = {
+    enabled = true;
+    bezier = [
+      "easeOutQuint,0.23,1,0.32,1"
+      "easeInOutQuint,0.83,0,0.17,1"
+      "sharpBounce,0.76,0,0.24,1.1"
+    ];
+    animation = [
+      "windows,1,3,easeOutQuint,slide"
+      "windowsOut,1,3,easeInOutQuint,slide"
+      #"border,1,8,easeInOutQuint"
+      #"borderangle,1,30,easeInOutQuint"
+      "fade,1,4,easeInOutQuint"
+      #"workspaces,1,8,easeOutQuint,slide"
+      #"specialWorkspace,1,8,easeOutQuint,slide"
+    ];
+  };
 
   input = {
     kb_layout = osConfig.mySystem.system.keyboardLayout;
@@ -60,4 +74,5 @@
   };
 
   monitor = osConfig.mySystem.monitors;
+  };
 }
