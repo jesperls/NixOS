@@ -12,6 +12,7 @@
     };
     zen-browser.url = "github:MarceColl/zen-browser-flake";
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
+    deltatune.url = "github:jesperls/deltatune-linux";
   };
 
   outputs = { self, nixpkgs, home-manager, ... }@inputs:

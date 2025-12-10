@@ -22,6 +22,7 @@
     parted
     desync
     yt-dlp
+    inputs.deltatune.packages.${pkgs.system}.default
 
     # Wayland & Desktop Tools
     grim
