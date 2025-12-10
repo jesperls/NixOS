@@ -1,6 +1,7 @@
 { config, pkgs, inputs, ... }:
 
-{
+let system = pkgs.stdenv.hostPlatform.system;
+in {
   home.packages = with pkgs; [
     # Development
     git
@@ -22,7 +23,7 @@
     parted
     desync
     yt-dlp
-    inputs.deltatune.packages.${pkgs.system}.default
+    inputs.deltatune.packages.${system}.default
 
     # Wayland & Desktop Tools
     grim
@@ -49,7 +50,7 @@
     vial
 
     # Apps
-    inputs.zen-browser.packages."${system}".default
+    inputs.zen-browser.packages.${system}.default
     vesktop
     obsidian
     libreoffice

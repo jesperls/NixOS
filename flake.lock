@@ -51,11 +51,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1765391489,
+        "lastModified": 1765449207,
         "narHash": "sha256-Bowj7lQ0qksJeDLHTvHhlMcpWEKGvchpKKMs4BxUkfY=",
         "owner": "jesperls",
         "repo": "deltatune-linux",
-        "rev": "ad14c61b58b946d811d51860ba1128b52e2b06eb",
+        "rev": "7ed17597f44636d06ead2402c40ee80120fa1f1d",
         "type": "github"
       },
       "original": {

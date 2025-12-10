@@ -7,10 +7,10 @@
     user = {
       username = "jesperls";
       fullName = "Jesper Lönn Stråle";
-      email = "jesperls@example.com";
+      email = "jesper.ls@hotmail.com";
     };
     system = {
-      hostName = "nixos";
+      hostName = "pangu";
       timeZone = "Europe/Stockholm";
       locale = "en_US.UTF-8";
       keyboardLayout = "se";
@@ -33,8 +33,8 @@
       name = "Obsidian Mocha";
       borders = 0;
       gaps = {
-        inner = 5;
-        outer = 10;
+        inner = 4;
+        outer = 8;
       };
       rounding = 25;
       colors = {
