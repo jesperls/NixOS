@@ -2,8 +2,8 @@
 
 let
   caelestiaShellPatched =
-    inputs.caelestia-shell.packages.${pkgs.stdenv.hostPlatform.system}."with-cli"
-    .overrideAttrs (old: {
+    inputs.caelestia-shell.packages.${pkgs.stdenv.hostPlatform.system}."with-cli".overrideAttrs
+    (old: {
       prePatch = (old.prePatch or "") + ''
         substituteInPlace services/GameMode.qml \
           --replace '"general:border_size": 1' '"general:border_size": 0'

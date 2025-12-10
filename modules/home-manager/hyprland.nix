@@ -85,7 +85,8 @@ let
       cycle_focused
     '';
   };
-  hyprSettings = import ./hyprland/settings.nix { inherit config pkgs lib osConfig; };
+  hyprSettings =
+    import ./hyprland/settings.nix { inherit config pkgs lib osConfig; };
 in {
   wayland.windowManager.hyprland = {
     enable = true;

@@ -22,7 +22,6 @@
     parted
     desync
 
-
     # Wayland & Desktop Tools
     grim
     slurp
