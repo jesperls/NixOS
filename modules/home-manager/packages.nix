@@ -21,6 +21,7 @@
     p7zip
     parted
     desync
+    yt-dlp
 
     # Wayland & Desktop Tools
     grim
@@ -33,6 +34,7 @@
     wlogout
     networkmanagerapplet
     mission-center
+    swww
 
     # Audio & Bluetooth
     pavucontrol
@@ -45,38 +47,25 @@
     solaar
     vial
 
-    # Browsing & Communication
+    # Apps
     inputs.zen-browser.packages."${system}".default
     vesktop
-
-    # Productivity & Notes
     obsidian
     libreoffice
     gedit
+    mpv
+    rhythmbox
+    gimp
+    prismlauncher
+    heroic
 
     # File Management & Viewers
     file-roller
     evince
     feh
 
-    # Media & Creative
-    mpv
-    rhythmbox
-    gimp
-
-    # Gaming
-    prismlauncher
-    heroic
-
     # Windows Compatibility
     wineWowPackages.stable
     winetricks
-
-    # Entertainment
-    spotify
-    yt-dlp
-
-    # Customization
-    swww
   ];
 }

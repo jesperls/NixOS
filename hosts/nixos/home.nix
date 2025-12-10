@@ -10,8 +10,12 @@ let
         substituteInPlace services/Recorder.qml \
           --replace 'property list<string> startArgs' 'property list<string> startArgs: []' \
           --replace 'function start(extraArgs: list<string>): void {' 'function start(extraArgs = []) {'
+        substituteInPlace services/Notifs.qml \
+          --replace 'notif.tracked = true;' 'const app = (notif.appName || "").toLowerCase(); if (app.includes("spotify")) return; notif.tracked = true;'
       '';
     });
+  spicePkgs =
+    inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 in {
   imports = [
     ../../modules/home-manager/packages.nix
@@ -21,6 +25,7 @@ in {
     ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/mimeapps.nix
     inputs.caelestia-shell.homeManagerModules.default
+    inputs.spicetify-nix.homeManagerModules.default
   ];
 
   programs.caelestia = {
@@ -49,12 +54,14 @@ in {
     };
   };
 
+  programs.spicetify = { enable = true; };
+
   home.sessionVariables = {
     ELECTRON_ENABLE_NG_MODULES = "true";
     BROWSER = "zen";
     DEFAULT_BROWSER = "zen";
     XDG_DATA_DIRS =
-      "${config.home.homeDirectory}/.nix-profile/share:${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:$XDG_DATA_DIRS";
+      "${config.home.homeDirectory}/.nix-profile/share:${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:${config.home.homeDirectory}/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:$XDG_DATA_DIRS";
     GDK_BACKEND = "wayland,x11";
     QT_QPA_PLATFORM = "wayland;xcb";
     CLUTTER_BACKEND = "wayland";
