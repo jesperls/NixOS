@@ -17,7 +17,6 @@ in {
     ../../modules/home-manager/packages.nix
     ../../modules/home-manager/hyprland.nix
     ../../modules/home-manager/theme.nix
-    ../../modules/home-manager/firefox.nix
     ../../modules/home-manager/cli.nix
     ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/mimeapps.nix
@@ -50,16 +49,10 @@ in {
     };
   };
 
-  home.packages = [
-    (pkgs.callPackage "${inputs.caelestia-shell}/nix/app2unit.nix" {
-      inherit pkgs;
-    })
-  ];
-
   home.sessionVariables = {
     ELECTRON_ENABLE_NG_MODULES = "true";
-    BROWSER = "firefox";
-    DEFAULT_BROWSER = "firefox";
+    BROWSER = "zen";
+    DEFAULT_BROWSER = "zen";
     XDG_DATA_DIRS =
       "${config.home.homeDirectory}/.nix-profile/share:${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:$XDG_DATA_DIRS";
     GDK_BACKEND = "wayland,x11";

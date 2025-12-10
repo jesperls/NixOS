@@ -1,75 +1,73 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
-  # User package installation
-  # Organized by category for easy maintenance
-
   home.packages = with pkgs; [
-    # Development Tools
+    # Development
     git
     nixfmt-classic
     vscode
     uv
     python314
-    antigravity
     nodejs
     dbeaver-bin
+    cudaPackages.cudnn
 
-    # System Utilities & Tools
-    cliphist
-    grim
-    slop
-    wl-clipboard
-    slurp
-    jq
-    desync
+    # CLI & System Utilities
     nh
+    jq
     xdg-utils
-    solaar
     htop
     ncdu
-    glib
-    gsettings-desktop-schemas
     p7zip
     parted
+    desync
 
-    # CUDA
-    cudaPackages.cudnn
+
+    # Wayland & Desktop Tools
+    grim
+    slurp
+    slop
+    wl-clipboard
+    cliphist
+    gsettings-desktop-schemas
+    glib
+    wlogout
+    networkmanagerapplet
+    mission-center
 
     # Audio & Bluetooth
     pavucontrol
     pulseaudio
     bluez-tools
-    overskride
     qpwgraph
+    overskride
 
-    # Desktop Applications
-    gedit
-    wlogout
-    networkmanagerapplet
-    firefox
-    vesktop
-    obsidian
-    mission-center
+    # Peripherals
+    solaar
     vial
 
+    # Browsing & Communication
+    inputs.zen-browser.packages."${system}".default
+    vesktop
+
+    # Productivity & Notes
+    obsidian
+    libreoffice
+    gedit
+
     # File Management & Viewers
-    feh
-    evince
     file-roller
+    evince
+    feh
 
     # Media & Creative
     mpv
     rhythmbox
     gimp
-    kooha
 
     # Gaming
     prismlauncher
     heroic
-
-    # Office & Productivity
-    libreoffice
 
     # Windows Compatibility
     wineWowPackages.stable
