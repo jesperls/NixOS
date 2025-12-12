@@ -15,7 +15,7 @@
       locale = "en_US.UTF-8";
       keyboardLayout = "se";
       consoleKeyMap = "sv-latin1";
-      stateVersion = "25.05";
+      stateVersion = "26.05";
       extraLocaleSettings = {
         LC_ADDRESS = "sv_SE.UTF-8";
         LC_IDENTIFICATION = "sv_SE.UTF-8";

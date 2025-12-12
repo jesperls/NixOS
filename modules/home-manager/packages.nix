@@ -50,7 +50,7 @@ in {
     vial
 
     # Apps
-    inputs.zen-browser.packages.${system}.default
+    inputs.zen-browser.packages.${system}.twilight
     vesktop
     obsidian
     libreoffice
