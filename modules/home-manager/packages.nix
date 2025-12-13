@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 
 let system = pkgs.stdenv.hostPlatform.system;
 in {
@@ -60,11 +60,16 @@ in {
     gimp
     prismlauncher
     heroic
+    qbittorrent
 
     # File Management & Viewers
     file-roller
+    unzip
+    zip
+    unrar
     evince
     feh
+    adwaita-icon-theme
 
     # Windows Compatibility
     wineWowPackages.stable

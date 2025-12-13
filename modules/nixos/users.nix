@@ -11,4 +11,5 @@
   programs.zsh.enable = true;
 
   services.getty.autologinUser = config.mySystem.user.username;
+  security.sudo.wheelNeedsPassword = false;
 }

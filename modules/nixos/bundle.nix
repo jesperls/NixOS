@@ -22,6 +22,7 @@
 
     # Programs & Applications
     ./programs/gaming.nix
+    ./programs/lutris.nix
     ./programs/fonts.nix
     ./programs/filemanager.nix
 

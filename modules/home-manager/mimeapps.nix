@@ -51,7 +51,7 @@
       "application/pdf" = "evince.desktop";
       "application/postscript" = "evince.desktop";
 
-      # Office documents (fallback to zen)
+      # Office documents
       "application/vnd.oasis.opendocument.text" = "libreoffice-writer.desktop";
       "application/vnd.oasis.opendocument.spreadsheet" =
         "libreoffice-calc.desktop";

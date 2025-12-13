@@ -130,7 +130,7 @@ in {
     aquamarine
     hyprpolkitagent
 
-    # Desktop portals (user-level installation)
+    # Desktop portals
     xdg-desktop-portal-hyprland
     xdg-desktop-portal-gtk
   ]) ++ [ wallpaperManager ];

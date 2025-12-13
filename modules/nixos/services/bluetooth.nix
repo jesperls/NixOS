@@ -9,7 +9,6 @@ in {
   };
 
   config = mkIf cfg.enable {
-    # Enable Bluetooth hardware
     hardware.bluetooth = {
       enable = true;
       powerOnBoot = true;
@@ -21,7 +20,6 @@ in {
       };
     };
 
-    # Bluetooth manager service
     services.blueman.enable = true;
   };
 }

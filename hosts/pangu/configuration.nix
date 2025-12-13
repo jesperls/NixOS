@@ -103,6 +103,7 @@
 
     # Programs
     programs.gaming.enable = true;
+    programs.lutris.enable = true;
   };
 
   # Home Manager configuration
