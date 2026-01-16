@@ -17,7 +17,7 @@
     ../../modules/home-manager/hyprland.nix
     ../../modules/home-manager/packages.nix
     ../../modules/home-manager/vesktop.nix
-    ../../modules/home-manager/caelestia.nix
+    ../../modules/home-manager/noctalia.nix
     ../../modules/home-manager/spicetify.nix
     ../../modules/home-manager/deltatune.nix
     ../../modules/home-manager/obs.nix

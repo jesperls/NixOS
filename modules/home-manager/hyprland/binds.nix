@@ -4,7 +4,7 @@
     # === Application Launchers ===
     "$mainMod, T, exec, $terminal"
     "$mainMod, E, exec, thunar"
-    "$mainMod, A, exec, caelestia-shell ipc --any-display call drawers toggle launcher"
+    "$mainMod, A, exec, noctalia-shell ipc call launcher toggle"
     "$mainMod, D, exec, vesktop"
     "$mainMod, B, exec, $browser"
     "$mainMod, C, exec, code"
@@ -20,9 +20,6 @@
     "$mainMod, G, togglegroup"
     "$mainMod, Tab, changegroupactive, f"
     "$mainMod SHIFT, Tab, changegroupactive, b"
-
-    # === Wallpaper ===
-    "$mainMod SHIFT, W, exec, wallpaper-manager"
 
     # === Focus Movement ===
     "$mainMod, left, movefocus, l"

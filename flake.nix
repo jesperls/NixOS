@@ -11,8 +11,8 @@
     };
 
     # Desktop
-    caelestia-shell = {
-      url = "github:caelestia-dots/shell";
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

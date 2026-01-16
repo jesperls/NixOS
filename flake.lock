@@ -1,51 +1,5 @@
 {
   "nodes": {
-    "caelestia-cli": {
-      "inputs": {
-        "caelestia-shell": [
-          "caelestia-shell"
-        ],
-        "nixpkgs": [
-          "caelestia-shell",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1768010798,
-        "narHash": "sha256-CmEy/t3CCDnUvn594sXtv0vRxt1JQaqj0nGdtQFU3mA=",
-        "owner": "caelestia-dots",
-        "repo": "cli",
-        "rev": "70a8624eacfc1b90fe248aef722ae708e775a927",
-        "type": "github"
-      },
-      "original": {
-        "owner": "caelestia-dots",
-        "repo": "cli",
-        "type": "github"
-      }
-    },
-    "caelestia-shell": {
-      "inputs": {
-        "caelestia-cli": "caelestia-cli",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "quickshell": "quickshell"
-      },
-      "locked": {
-        "lastModified": 1768561833,
-        "narHash": "sha256-WE5uqQTUtGDh199h/mLUdSN1rl9ui+dbWkjvQgtu/gg=",
-        "owner": "caelestia-dots",
-        "repo": "shell",
-        "rev": "d2c06587f5321ccf12feedd08d84fa11b9a2ff68",
-        "type": "github"
-      },
-      "original": {
-        "owner": "caelestia-dots",
-        "repo": "shell",
-        "type": "github"
-      }
-    },
     "deltatune": {
       "inputs": {
         "nixpkgs": "nixpkgs"
@@ -169,33 +123,32 @@
         "type": "github"
       }
     },
-    "quickshell": {
+    "noctalia": {
       "inputs": {
         "nixpkgs": [
-          "caelestia-shell",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1768080170,
-        "narHash": "sha256-HYKRNShQe5YnnxLazQajB9JkAPGpVcUt9jQ3KwilITQ=",
-        "ref": "refs/heads/master",
-        "rev": "bcc3d4265e8b3ed2b17b801923905b60a3927823",
-        "revCount": 722,
-        "type": "git",
-        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+        "lastModified": 1768574267,
+        "narHash": "sha256-ZBJiTu7FBEnF3zy8dgXtDEGhREqMeSeAeXt/JQ8jJzw=",
+        "owner": "noctalia-dev",
+        "repo": "noctalia-shell",
+        "rev": "73312a16de263fc5a32096b1192ac55df7d7a574",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+        "owner": "noctalia-dev",
+        "repo": "noctalia-shell",
+        "type": "github"
       }
     },
     "root": {
       "inputs": {
-        "caelestia-shell": "caelestia-shell",
         "deltatune": "deltatune",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs_2",
+        "noctalia": "noctalia",
         "spicetify-nix": "spicetify-nix",
         "zen-browser": "zen-browser"
       }
