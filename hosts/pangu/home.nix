@@ -16,9 +16,11 @@
     ../../modules/home-manager/cli.nix
     ../../modules/home-manager/hyprland.nix
     ../../modules/home-manager/packages.nix
+    ../../modules/home-manager/vesktop.nix
     ../../modules/home-manager/caelestia.nix
     ../../modules/home-manager/spicetify.nix
     ../../modules/home-manager/deltatune.nix
+    ../../modules/home-manager/obs.nix
   ];
 
   home.sessionVariables = {
@@ -41,6 +43,8 @@
     GTK_USE_PORTAL = "1";
 
     WLR_NO_HARDWARE_CURSORS = "1";
+
+    DISABLE_WAYLAND_IDLE_INHIBIT = "1";
   };
 
   home.sessionPath = [

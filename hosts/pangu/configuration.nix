@@ -111,6 +111,9 @@
     programs.lutris.enable = true;
   };
 
+  # Enable speech-dispatcher for text-to-speech
+  services.speechd.enable = true;
+
   home-manager = {
     users.${config.mySystem.user.username} = {
       imports = [ ./home.nix ];

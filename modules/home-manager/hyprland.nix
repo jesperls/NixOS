@@ -179,6 +179,7 @@ in
       hyprcursor
       aquamarine
       hyprpolkitagent
+      hyprpicker
 
       xdg-desktop-portal-hyprland
       xdg-desktop-portal-gtk

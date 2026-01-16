@@ -19,8 +19,6 @@ in
   };
 
   home.packages = with pkgs; [
-    git
-    gh
     nixfmt
     nil
     vscode
@@ -28,46 +26,52 @@ in
     python314
     nodejs
     dbeaver-bin
-    cudaPackages.cudnn
+    git
+    ydotool
 
+    # === CLI Utilities ===
     nh
     jq
     yq
     fd
     ripgrep
-    bat
     xdg-utils
     htop
-    btop
     ncdu
     p7zip
     parted
     yt-dlp
     playerctl
-    inputs.deltatune.packages.${system}.default
-    scrcpy
-
+    trash-cli
+    
+    # === Screen/Display ===
     grim
     slurp
     wl-clipboard
     cliphist
     wofi
+
+    # === System Integration ===
     gsettings-desktop-schemas
     glib
     wlogout
     networkmanagerapplet
     mission-center
 
+    # === Audio ===
     pavucontrol
     pulseaudio
     qpwgraph
     overskride
     easyeffects
+    espeak
 
+    # === Hardware ===
     solaar
+    scrcpy
 
+    # === Applications ===
     inputs.zen-browser.packages.${system}.beta
-    vesktop
     obsidian
     libreoffice
     gedit
@@ -78,6 +82,7 @@ in
     heroic
     qbittorrent
 
+    # === File Management ===
     file-roller
     unzip
     zip
@@ -85,9 +90,18 @@ in
     evince
     feh
     imv
+
+    # === Theming ===
     adwaita-icon-theme
 
+    # === Gaming/Wine ===
     wineWowPackages.stable
     winetricks
+
+    # === CUDA ===
+    cudaPackages.cudnn
+
+    # === Custom Packages ===
+    inputs.deltatune.packages.${system}.default
   ];
 }

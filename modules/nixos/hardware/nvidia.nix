@@ -19,6 +19,9 @@ in
     hardware.graphics = {
       enable = true;
       enable32Bit = true;
+      extraPackages = with pkgs; [
+        nvidia-vaapi-driver
+      ];
     };
 
     hardware.nvidia = {
@@ -28,6 +31,7 @@ in
       powerManagement.enable = true;
       powerManagement.finegrained = false;
 
+      nvidiaSettings = true;
       package = config.boot.kernelPackages.nvidiaPackages.stable;
     };
 
