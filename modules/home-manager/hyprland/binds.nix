@@ -7,9 +7,9 @@
     "$mainMod, D, exec, vesktop --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer --enable-features=UseOzonePlatform,WaylandWindowDecorations,WebRTCPipeWireCapturer,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder --enable-wayland-ime %U"
     "$mainMod, B, exec, $browser"
     "$mainMod, C, exec, code"
-    "$mainMod, L, exec, cd ~/Source/jsst && uv run main.py"
 
     "$mainMod, P, exec, qs-pkg-manager"
+    "$mainMod SHIFT, W, exec, wallpaper-manager pick"
 
     # === Window Management ===
     "$mainMod, Q, killactive,"
@@ -21,11 +21,9 @@
     "$mainMod, G, togglegroup"
     "$mainMod, Tab, changegroupactive, f"
     "$mainMod SHIFT, Tab, changegroupactive, b"
-    "$mainMod CTRL, Tab, hyprexpo:expo, toggle"
+    "$mainMod, Tab, hyprexpo:expo, toggle"
     "ALT, Tab, cyclenext"
     "ALT, Tab, bringactivetotop"
-    "ALT SHIFT, Tab, cyclenext, prev"
-    "ALT SHIFT, Tab, bringactivetotop"
 
     # === Focus Movement ===
     "$mainMod, left, movefocus, l"
@@ -64,27 +62,23 @@
     "$mainMod SHIFT, 0, movetoworkspace, 10"
 
     # === Workspace Scroll ===
-    "$mainMod, mouse_down, workspace, r-1"
-    "$mainMod, mouse_up, workspace, r+1"
+    "$mainMod, mouse_down, workspace, r+1"
+    "$mainMod, mouse_up, workspace, r-1"
 
     # === Special Workspace ===
     "$mainMod, grave, togglespecialworkspace, magic"
     "$mainMod SHIFT, grave, movetoworkspace, special:magic"
 
-    # === Screenshots ===
-    ''$mainMod, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
-    ''$mainMod SHIFT, S, exec, grim -g "$(slurp -w 0)" "$HOME/Pictures/Screenshots/$(date +'%Y-%m-%d-%H%M%S_grim.png')"''
-    "$mainMod CTRL, S, exec, grim - | wl-copy"
-    ''$mainMod ALT, S, exec, grim -g "$(hyprctl activewindow -j | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')" - | wl-copy''
+    # === Scratchpad  ===
+    "$mainMod, S, togglespecialworkspace, scratchpad"
+    "$mainMod SHIFT, S, movetoworkspace, special:scratchpad"
+    "$mainMod CTRL, S, exec, [workspace special:scratchpad silent] $terminal"
 
     # === Clipboard ===
     "$mainMod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
 
     # === Color Picker ===
     "$mainMod SHIFT, C, exec, hyprpicker -a"
-
-    # === Screen Recording ===
-    "$mainMod SHIFT, R, exec, pkill -x gpu-screen-recorder || gpu-screen-recorder -w $(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name') -f 60 -a default_output -o $HOME/Videos/$(date +'%Y-%m-%d-%H%M%S').mp4"
 
     # === Monitor focus ===
     "$mainMod, period, workspace, r+1"

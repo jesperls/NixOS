@@ -44,7 +44,7 @@
     enable = true;
     enableZshIntegration = true;
   };
-  programs.command-not-found.enable = false; # replaced by nix-index
+  programs.command-not-found.enable = false;
   environment.systemPackages = [ pkgs.comma ];
 
   programs.nix-ld = {

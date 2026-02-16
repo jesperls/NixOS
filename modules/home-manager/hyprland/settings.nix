@@ -108,7 +108,6 @@
       "7, monitor:HDMI-A-1, default:true"
       "8, monitor:DP-3, default:true"
       "9, monitor:DP-2, default:true"
-      "10, monitor:HDMI-A-1, default:true"
     ];
   };
 }
