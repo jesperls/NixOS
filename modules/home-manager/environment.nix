@@ -33,7 +33,7 @@ in
     ELECTRON_OZONE_PLATFORM_HINT = "auto";
 
     # === Theme ===
-    GTK_THEME = "${theme.gtk.theme.name}:dark";
+    GTK_THEME = theme.gtk.theme.name;
     XCURSOR_THEME = theme.gtk.cursorTheme.name;
     XCURSOR_SIZE = builtins.toString theme.gtk.cursorTheme.size;
     ICON_THEME = theme.gtk.iconTheme.name;

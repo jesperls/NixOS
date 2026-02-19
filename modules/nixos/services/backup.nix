@@ -21,7 +21,7 @@ in
 
       # Create backup directory if it doesn't exist
       mkdir -p "$BACKUP_DIR"
-      chown ${user.username}:users "$BACKUP_DIR"
+      chown ${user.username} "$BACKUP_DIR"
 
       # Find all .hm-backup files and move them to centralized location with timestamp
       ${pkgs.findutils}/bin/find /home/${user.username} -name "*.hm-backup" -type f 2>/dev/null | while read -r backup_file; do
@@ -35,7 +35,7 @@ in
           
           # Move to centralized backup location
           mv "$backup_file" "$BACKUP_DIR/''${safe_name}_''${timestamp}.backup"
-          chown ${user.username}:users "$BACKUP_DIR/''${safe_name}_''${timestamp}.backup"
+          chown ${user.username} "$BACKUP_DIR/''${safe_name}_''${timestamp}.backup"
         fi
       done
 

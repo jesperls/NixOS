@@ -17,7 +17,6 @@
     yq
     fd
     ripgrep
-    xdg-utils
     htop
     ncdu
     p7zip
@@ -31,7 +30,6 @@
     wl-clipboard
     cliphist
     wofi
-    xdg-desktop-portal-gtk
     gsettings-desktop-schemas
     glib
     wlogout

@@ -35,8 +35,14 @@
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     # Applications
-    spicetify-nix.url = "github:Gerg-L/spicetify-nix";
-    deltatune.url = "github:ThatOneCalculator/deltatune-linux";
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    deltatune = {
+      url = "github:ThatOneCalculator/deltatune-linux";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

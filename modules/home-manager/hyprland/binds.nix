@@ -19,8 +19,6 @@
     "$mainMod, J, togglesplit"
     "$mainMod, M, exec, easyeffects,"
     "$mainMod, G, exec, myna"
-    "$mainMod, Tab, changegroupactive, f"
-    "$mainMod SHIFT, Tab, changegroupactive, b"
     "$mainMod, Tab, hyprexpo:expo, toggle"
     "ALT, Tab, cyclenext"
     "ALT, Tab, bringactivetotop"

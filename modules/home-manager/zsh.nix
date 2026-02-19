@@ -10,7 +10,6 @@
     history = {
       size = 50000;
       save = 50000;
-      ignoreDups = true;
       ignoreAllDups = true;
       ignoreSpace = true;
       extended = true;

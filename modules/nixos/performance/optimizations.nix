@@ -21,14 +21,7 @@ in
       priority = 100;
     };
 
-    services.thermald.enable = true;
-
     hardware.enableRedistributableFirmware = true;
-
-    environment.sessionVariables = {
-      "__GL_SHADER_DISK_CACHE" = "1";
-      "__GL_SHADER_DISK_CACHE_PATH" = "$HOME/.cache/nvidia-shader-cache";
-    };
 
     boot.kernel.sysctl = {
       "vm.swappiness" = 133;

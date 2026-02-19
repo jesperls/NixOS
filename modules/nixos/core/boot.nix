@@ -22,9 +22,6 @@
       "rd.systemd.show_status=false"
       "rd.udev.log_level=3"
       "udev.log_priority=3"
-      "video=DP-3:2560x1440@240"
-      "video=DP-2:2560x1440@144"
-      "video=HDMI-A-1:1920x1080@60"
     ];
 
     plymouth.enable = false;

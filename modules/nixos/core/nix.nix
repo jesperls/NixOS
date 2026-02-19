@@ -52,72 +52,10 @@
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [
-      # Core C libraries
       stdenv.cc.cc.lib
-      stdenv.cc.libc
-
-      # Python essentials - these are critical for uv-managed Python
       zlib
       libffi
       openssl
-      openssl.dev
-      readline
-      ncurses
-      bzip2
-      xz
-      sqlite
-      tk
-      tcl
-      gdbm
-      expat
-      libxcrypt
-
-      # Graphics/GUI (for matplotlib, tkinter, etc.)
-      libgbm
-      mesa
-      libdrm
-      libx11
-      libxext
-      libxrender
-      libxcomposite
-      libxdamage
-      libxfixes
-      libxrandr
-      libxcb
-      libxcursor
-      libxi
-      libxinerama
-      libxscrnsaver
-      libxtst
-      libxkbcommon
-      wayland
-
-      # Desktop integration
-      nspr
-      nss
-      dbus
-      glib
-      atk
-      gtk3
-      cairo
-      pango
-      gdk-pixbuf
-      alsa-lib
-      cups
-      fontconfig
-      freetype
-
-      # Qt
-      qt6.qtbase
-      qt6.qtwayland
-
-      # Additional libraries for common Python packages
-      libGL
-      libGLU
-      libuuid
-      libxml2
-      libxslt
-      icu
     ];
   };
 }
