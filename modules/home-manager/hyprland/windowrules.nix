@@ -23,6 +23,8 @@
     "match:title ^(File Operation Progress)$, float on"
     "match:title ^(JSST Subtitles)$, float on"
     "match:title ^(JSST Subtitles)$, pin on"
+    "match:title ^(Quickshell Package Manager)$, float on"
+    "match:title ^(Quickshell Package Manager)$, center 1"
 
     # === Picture-in-Picture ===
     "match:title ^(Picture-in-Picture)$, float on"

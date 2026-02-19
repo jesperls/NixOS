@@ -26,6 +26,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    myna = {
+      url = "github:SmoxBoye/myna";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Kernel
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 

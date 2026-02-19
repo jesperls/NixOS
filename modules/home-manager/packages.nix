@@ -59,5 +59,6 @@
     unrar
     evince
     imv
+    teamspeak6-client
   ];
 }

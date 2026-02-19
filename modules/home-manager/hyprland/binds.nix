@@ -18,7 +18,7 @@
     "$mainMod SHIFT, F, fullscreen, 1"
     "$mainMod, J, togglesplit"
     "$mainMod, M, exec, easyeffects,"
-    "$mainMod, G, togglegroup"
+    "$mainMod, G, exec, myna"
     "$mainMod, Tab, changegroupactive, f"
     "$mainMod SHIFT, Tab, changegroupactive, b"
     "$mainMod, Tab, hyprexpo:expo, toggle"

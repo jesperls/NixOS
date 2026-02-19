@@ -14,10 +14,12 @@
     ./caelestia.nix
     ./spicetify.nix
     ./deltatune.nix
+    ./myna.nix
     ./obs.nix
     ./easyeffects.nix
     ./firefox.nix
     ./wallpaper-picker.nix
     ./quickshell-package-manager.nix
+    ./bonecontrol-listener.nix
   ];
 }

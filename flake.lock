@@ -3,11 +3,11 @@
     "cachyos-kernel": {
       "flake": false,
       "locked": {
-        "lastModified": 1770998657,
-        "narHash": "sha256-6akuxjMN7Aez099zMLYTWjGH7dXsKvgbIpuilVXHPLk=",
+        "lastModified": 1771263855,
+        "narHash": "sha256-akyds1g8cb742d2OrnQ4YciscpynsQ0+0YD2a8aZdvo=",
         "owner": "CachyOS",
         "repo": "linux-cachyos",
-        "rev": "8d17474572269bf35454d4ee2cf4824c4fa80cad",
+        "rev": "5ece16c7b4a7d1261da68153cafc318a60b78ce8",
         "type": "github"
       },
       "original": {
@@ -19,11 +19,11 @@
     "cachyos-kernel-patches": {
       "flake": false,
       "locked": {
-        "lastModified": 1770998580,
-        "narHash": "sha256-KyjnhzNFFxWoGUeoax+QHwgNohhxP1JpJTaWk9TKtUg=",
+        "lastModified": 1771246613,
+        "narHash": "sha256-GftqKiyIgMcSgVkbNqXQq7oNnoL1+EB9V71XG4lPBRs=",
         "owner": "CachyOS",
         "repo": "kernel-patches",
-        "rev": "c70ca0984ba05cc50504bda2f3a4ef56b60ab738",
+        "rev": "cb320a13e3c92f32ada27acb1fba8a828a22ae60",
         "type": "github"
       },
       "original": {
@@ -137,16 +137,37 @@
         ]
       },
       "locked": {
-        "lastModified": 1771188132,
-        "narHash": "sha256-qLXxN/tPrZtnekaLBQuVtxQfvqqs5cT5WbyH4zZaTGI=",
+        "lastModified": 1771422582,
+        "narHash": "sha256-xK5kl3OBZaF1VwziVMX+SZ2LT9Fbu5o8vRDt78uR7no=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "ae8003d8b61d0d373e7ca3da1a48f9c870d15df9",
+        "rev": "b3ccd4bb262f4e6d3248b46cede92b90c4a42094",
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
         "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "myna": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "quickshell": "quickshell_2"
+      },
+      "locked": {
+        "lastModified": 1771432020,
+        "narHash": "sha256-9Kd6Sytf+YF12QpJzB9fB3OOPGlCELWu3DKvatcpEsk=",
+        "owner": "SmoxBoye",
+        "repo": "myna",
+        "rev": "135709a6f96353657e778154eca03eab73e61121",
+        "type": "github"
+      },
+      "original": {
+        "owner": "SmoxBoye",
+        "repo": "myna",
         "type": "github"
       }
     },
@@ -159,11 +180,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1771178105,
-        "narHash": "sha256-wane+b0aW0Ryk8kjKGBik1EpJ6OTbGv8mPtZHIuwEq4=",
+        "lastModified": 1771353108,
+        "narHash": "sha256-5Xtei4UKrqRC6IYLgI1KEBaPN9Xfef5JeOexdqDWVeg=",
         "owner": "xddxdd",
         "repo": "nix-cachyos-kernel",
-        "rev": "c19db21911474fb795dcf03488f563d460463dd5",
+        "rev": "98e777cdcc39e6bd0312a9d756507ef9cbd284cb",
         "type": "github"
       },
       "original": {
@@ -206,11 +227,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1771129128,
-        "narHash": "sha256-zi224RqZ0dlo44oOMJTzQiRdNa5sJ2UjGiDgpK4xJeM=",
+        "lastModified": 1771309086,
+        "narHash": "sha256-25aY7PIHMmoVW5w/x8Bs4vsfSV94A5htwiLINJ4KMuY=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "626a1db9776eb9db61b1e1f394d928505162cf69",
+        "rev": "5e17f00eb60368a4b4b110a89f1c250f9a12c053",
         "type": "github"
       },
       "original": {
@@ -278,14 +299,14 @@
         "nixpkgs": [
           "nixpkgs"
         ],
-        "quickshell": "quickshell_2"
+        "quickshell": "quickshell_3"
       },
       "locked": {
-        "lastModified": 1771112751,
-        "narHash": "sha256-x8+GpRNtJ28hLs2429TAA+Drqs0lgMyh0fEmrnRgZ6o=",
+        "lastModified": 1771259599,
+        "narHash": "sha256-3CS+08tRza2QELaekrNMU1J1Wc4OlZHxIyDBTHAoR40=",
         "owner": "jesperls",
         "repo": "nix-quickshell-package-manager",
-        "rev": "84e3a8304947f14c62054e99dbcf370fdcf78d03",
+        "rev": "fcab0a689b23c3bf0705ea76bad136fc8b6f1490",
         "type": "github"
       },
       "original": {
@@ -295,6 +316,27 @@
       }
     },
     "quickshell_2": {
+      "inputs": {
+        "nixpkgs": [
+          "myna",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1770693276,
+        "narHash": "sha256-ngXnN5YXu+f45+QGYNN/VEBMQmcBCYGRCqwaK8cxY1s=",
+        "ref": "refs/heads/master",
+        "rev": "dacfa9de829ac7cb173825f593236bf2c21f637e",
+        "revCount": 735,
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      }
+    },
+    "quickshell_3": {
       "inputs": {
         "nixpkgs": [
           "quickshell-package-manager",
@@ -315,7 +357,7 @@
         "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
       }
     },
-    "quickshell_3": {
+    "quickshell_4": {
       "inputs": {
         "nixpkgs": [
           "wallpaper-picker",
@@ -341,6 +383,7 @@
         "caelestia-shell": "caelestia-shell",
         "deltatune": "deltatune",
         "home-manager": "home-manager",
+        "myna": "myna",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nixpkgs": "nixpkgs_3",
         "quickshell-package-manager": "quickshell-package-manager",
@@ -354,11 +397,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1771250419,
-        "narHash": "sha256-y62XsUspHUTEItHv9fMwYHg8dvi50qG52MfsnYzmOAg=",
+        "lastModified": 1771268051,
+        "narHash": "sha256-nGqPcngnezoT+/xAvw3UDjwdKP2MC4fO315A/Otb9eE=",
         "owner": "Gerg-L",
         "repo": "spicetify-nix",
-        "rev": "c3001380de3a95ea6351f9b68bd55efdf09dd237",
+        "rev": "b930de84c561f62a0c39a6a57c2ab553a97e8495",
         "type": "github"
       },
       "original": {
@@ -387,14 +430,14 @@
         "nixpkgs": [
           "nixpkgs"
         ],
-        "quickshell": "quickshell_3"
+        "quickshell": "quickshell_4"
       },
       "locked": {
-        "lastModified": 1771188719,
-        "narHash": "sha256-siJmShGxzlrRzCmZT2q8OA0WmBJEv9HntvIZbznd2g4=",
+        "lastModified": 1771259195,
+        "narHash": "sha256-p5xRgaQXqzwGHR6VH1muyZaKdwuAgTfs0Mct7yZuRgo=",
         "owner": "jesperls",
         "repo": "wallpaper-picker",
-        "rev": "33ce13e77e086e845a17752d12a77e5866fe270d",
+        "rev": "0749ca2c4f1a8e91872406d843413e1c43b1f1fc",
         "type": "github"
       },
       "original": {
