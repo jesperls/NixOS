@@ -7,7 +7,7 @@
     ./core/nix.nix
     ./core/options.nix
     ./core/locale.nix
-    ./core/theme.nix
+    ./core/theme-options.nix
 
     ./hardware/nvidia.nix
     ./hardware/vial.nix

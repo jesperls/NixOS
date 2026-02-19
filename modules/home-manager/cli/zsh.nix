@@ -37,7 +37,6 @@
 
       disk = "ncdu";
       cat = "bat --paging=never";
-      #grep = "rg";
       rm = "trash-put";
 
       ytmp3 = "yt-dlp -x --audio-format mp3 --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";

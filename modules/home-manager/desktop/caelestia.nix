@@ -1,13 +1,9 @@
 {
   inputs,
   osConfig,
+  config,
   ...
 }:
-
-let
-  colors = osConfig.mySystem.theme.colors;
-in
-
 {
   imports = [ inputs.caelestia-shell.homeManagerModules.default ];
 
@@ -19,14 +15,14 @@ in
     };
     cli.enable = true;
 
-    baseColors = colors;
+    baseColors = osConfig.mySystem.theme.colors;
 
     settings = {
       appearance = {
         anim.durations.scale = 0.4;
       };
       background.enabled = false;
-      paths.wallpaperDir = "~/Pictures/Wallpapers";
+      paths.wallpaperDir = config.programs.wallpaperPicker.wallpaperDir;
       bar.status = {
         showBattery = true;
         showAudio = true;

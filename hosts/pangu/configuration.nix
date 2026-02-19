@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   inputs,
   ...
 }:
@@ -8,6 +7,8 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./theme.nix
+    ./monitors.nix
     ../../modules/nixos/bundle.nix
   ];
 
@@ -37,69 +38,6 @@
       };
     };
 
-    theme = {
-      name = "Obsidian Mocha";
-      borders = 0;
-      gaps = {
-        inner = 4;
-        outer = 8;
-      };
-      rounding = 25;
-      colors = {
-        accent = "#a869a8";
-        accent2 = "#e3b17a";
-        background = "#000000";
-        surface = "#291825";
-        surfaceAlt = "#13141a";
-        text = "#e6e3e8";
-        muted = "#b3adb9";
-        border = "#2a2d36";
-        shadow = "#08090d";
-        activeBorder = "#a869a8";
-        inactiveBorder = "#291825";
-      };
-      opacity = {
-        activeBorder = "ee";
-        inactiveBorder = "aa";
-      };
-      borderGradient = {
-        enable = true;
-        secondColor = "#e3b17a";
-        angle = 45;
-      };
-      gtk = {
-        theme = {
-          name = "adw-gtk3-dark";
-          package = pkgs.adw-gtk3;
-        };
-        iconTheme = {
-          name = "Papirus-Dark";
-          package = pkgs.papirus-icon-theme;
-        };
-        cursorTheme = {
-          name = "Bibata-Modern-Classic";
-          package = pkgs.bibata-cursors;
-          size = 24;
-        };
-      };
-      qt = {
-        styleName = "adwaita-dark";
-        stylePackage = pkgs.adwaita-qt;
-        platform = {
-          name = "gtk";
-          package = null;
-        };
-      };
-    };
-
-    monitors = [
-      "DP-3, 2560x1440@240, 0x0, 1"
-      "DP-2, 2560x1440@144, 2560x0, 1"
-      "HDMI-A-1, 1920x1080@60, -1080x0, 1, transform, 1"
-      ", preferred, auto, 1"
-      "Unknown-1, disable"
-    ];
-
     hardware.nvidia.enable = true;
     hardware.vial.enable = true;
     hardware.webcam.enable = true;
@@ -110,6 +48,7 @@
     services.bluetooth.enable = true;
     services.flatpak.enable = true;
     services.audio.enable = true;
+    services.sunshine.enable = true;
 
     programs.gaming.enable = true;
     programs.lutris.enable = true;
@@ -119,7 +58,6 @@
     performance.enable = true;
   };
 
-  # Enable speech-dispatcher for text-to-speech
   services.speechd.enable = true;
 
   home-manager = {

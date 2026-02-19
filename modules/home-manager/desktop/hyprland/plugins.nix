@@ -1,8 +1,7 @@
-{
-  osConfig,
-  lib,
-  ...
-}:
+{ osConfig, ... }:
+let
+  accent = builtins.substring 1 6 osConfig.mySystem.theme.colors.accent;
+in
 {
   "plugin:hyprexpo" = {
     columns = 3;
@@ -12,7 +11,7 @@
     skip_empty = false;
   };
   "plugin:hyprtrails" = {
-    color = "rgb(A869A8)";
+    color = "rgb(${accent})";
   };
   "plugin:dynamic-cursors" = {
     mode = "tilt";

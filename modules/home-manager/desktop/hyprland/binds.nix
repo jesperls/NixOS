@@ -4,7 +4,7 @@
     # === Application Launchers ===
     "$mainMod, T, exec, $terminal"
     "$mainMod, E, exec, thunar"
-    "$mainMod, D, exec, vesktop --ozone-platform-hint=auto --enable-webrtc-pipewire-capturer --enable-features=UseOzonePlatform,WaylandWindowDecorations,WebRTCPipeWireCapturer,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder --enable-wayland-ime %U"
+    "$mainMod, D, exec, vesktop"
     "$mainMod, B, exec, $browser"
     "$mainMod, C, exec, code"
 

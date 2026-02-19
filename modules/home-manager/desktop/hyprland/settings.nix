@@ -17,7 +17,6 @@
 
     exec-once = [
       "solaar -w hide"
-      "systemctl --user start hyprpolkitagent"
       "wl-paste --type text --watch cliphist store"
       "wl-paste --type image --watch cliphist store"
       "qpwgraph -m"
@@ -96,18 +95,28 @@
       key_press_enables_dpms = true;
     };
 
-    monitor = osConfig.mySystem.monitors;
+    monitor =
+      let
+        renderMonitor = m:
+          if m.disabled then
+            "${m.name}, disable"
+          else
+            "${m.name}, ${m.resolution}@${toString m.refreshRate}, ${m.position}, ${m.scale}"
+            + (if m.transform != null then ", transform, ${toString m.transform}" else "");
+        catchAll = ", preferred, auto, 1";
+      in
+      (map renderMonitor osConfig.mySystem.monitors) ++ [ catchAll ];
 
-    workspace = [
-      "1, monitor:HDMI-A-1, default:true"
-      "2, monitor:DP-3, default:true"
-      "3, monitor:DP-2, default:true"
-      "4, monitor:HDMI-A-1, default:true"
-      "5, monitor:DP-3, default:true"
-      "6, monitor:DP-2, default:true"
-      "7, monitor:HDMI-A-1, default:true"
-      "8, monitor:DP-3, default:true"
-      "9, monitor:DP-2, default:true"
-    ];
+    workspace =
+      let
+        monitors = osConfig.mySystem.monitors;
+        numMonitors = builtins.length monitors;
+        mkWorkspace = i:
+          let
+            mon = builtins.elemAt monitors (lib.mod i numMonitors);
+          in
+          "${toString (i + 1)}, monitor:${mon.name}, default:true";
+      in
+      lib.genList mkWorkspace 9;
   };
 }

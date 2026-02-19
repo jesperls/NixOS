@@ -1,25 +1,24 @@
 { ... }:
-
 {
   imports = [
-    ./environment.nix
-    ./xdg.nix
-    ./theme.nix
-    ./mimeapps.nix
-    ./zsh.nix
-    ./cli.nix
-    ./hyprland.nix
+    ./cli/environment.nix
+    ./cli/zsh.nix
+    ./cli/cli.nix
+    ./desktop/xdg.nix
+    ./desktop/theme.nix
+    ./desktop/mimeapps.nix
+    ./desktop/hyprland.nix
+    ./desktop/caelestia.nix
+    ./desktop/wallpaper-picker.nix
+    ./programs/firefox.nix
+    ./programs/vesktop.nix
+    ./programs/spicetify.nix
+    ./programs/myna.nix
+    ./programs/obs.nix
+    ./programs/easyeffects.nix
+    ./services/bonecontrol-listener.nix
+    ./services/deltatune.nix
+    ./programs/quickshell-package-manager.nix
     ./packages.nix
-    ./vesktop.nix
-    ./caelestia.nix
-    ./spicetify.nix
-    ./deltatune.nix
-    ./myna.nix
-    ./obs.nix
-    ./easyeffects.nix
-    ./firefox.nix
-    ./wallpaper-picker.nix
-    ./quickshell-package-manager.nix
-    ./bonecontrol-listener.nix
   ];
 }
