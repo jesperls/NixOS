@@ -61,17 +61,31 @@
     monitors = lib.mkOption {
       default = [ ];
       description = "List of monitor configurations.";
-      type = lib.types.listOf (lib.types.submodule {
-        options = {
-          name = lib.mkOption { type = lib.types.str; };
-          resolution = lib.mkOption { type = lib.types.str; };
-          refreshRate = lib.mkOption { type = lib.types.int; };
-          position = lib.mkOption { type = lib.types.str; default = "0x0"; };
-          scale = lib.mkOption { type = lib.types.str; default = "1"; };
-          transform = lib.mkOption { type = lib.types.nullOr lib.types.int; default = null; };
-          disabled = lib.mkOption { type = lib.types.bool; default = false; };
-        };
-      });
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption { type = lib.types.str; };
+            resolution = lib.mkOption { type = lib.types.str; };
+            refreshRate = lib.mkOption { type = lib.types.int; };
+            position = lib.mkOption {
+              type = lib.types.str;
+              default = "0x0";
+            };
+            scale = lib.mkOption {
+              type = lib.types.str;
+              default = "1";
+            };
+            transform = lib.mkOption {
+              type = lib.types.nullOr lib.types.int;
+              default = null;
+            };
+            disabled = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
+          };
+        }
+      );
     };
   };
 }

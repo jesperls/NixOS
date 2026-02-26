@@ -56,6 +56,33 @@
       zlib
       libffi
       openssl
+      libGL
+      libxkbcommon
+      fontconfig
+      freetype
+      dbus
+      glib
+      libx11
+      libxcursor
+      libxrandr
+      libxi
+      libxcb
+      xcbutilwm
+      xcbutilimage
+      xcbutilkeysyms
+      xcbutilrenderutil
+      xcbutilcursor
+      wayland
+      qt6.qtwayland
+      alsa-lib
+      linuxPackages.nvidia_x11
+      cudaPackages.cudatoolkit
+      cudaPackages.cudnn
+      cudaPackages.libcublas
+      cudaPackages.libcusparse
+      cudaPackages.libcufft
+      cudaPackages.libcurand
+      cudaPackages.cuda_nvrtc
     ];
   };
 }

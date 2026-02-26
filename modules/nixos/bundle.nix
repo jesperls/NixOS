@@ -17,9 +17,7 @@
 
     ./services/audio.nix
     ./services/bluetooth.nix
-    ./services/backup.nix
     ./services/flatpak.nix
-    ./services/sunshine.nix
 
     ./programs/gaming.nix
     ./programs/lutris.nix

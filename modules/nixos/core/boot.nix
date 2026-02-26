@@ -30,8 +30,7 @@
     initrd.verbose = false;
 
     tmp = {
-      useTmpfs = true;
-      tmpfsSize = "8G";
+      useTmpfs = false;
     };
   };
 }

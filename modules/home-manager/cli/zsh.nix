@@ -35,9 +35,9 @@
       snuf = "nh clean all --keep 5";
       nfu = "nix flake update";
 
-      disk = "ncdu";
       cat = "bat --paging=never";
-      rm = "trash-put";
+      trash = "trash-put";
+      del = "trash-put";
 
       ytmp3 = "yt-dlp -x --audio-format mp3 --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
       ytmp4 = "yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";

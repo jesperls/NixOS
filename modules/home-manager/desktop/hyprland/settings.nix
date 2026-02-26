@@ -20,6 +20,7 @@
       "wl-paste --type text --watch cliphist store"
       "wl-paste --type image --watch cliphist store"
       "qpwgraph -m"
+      "systemctl --user start hyprpolkitagent"
     ];
 
     general = {
@@ -36,7 +37,8 @@
           "rgba(${c1}${a}) rgba(${lib.removePrefix "#" t.borderGradient.secondColor}${a}) ${toString t.borderGradient.angle}deg"
         else
           "rgba(${c1}${a})";
-      "col.inactive_border" = "rgba(${lib.removePrefix "#" osConfig.mySystem.theme.colors.inactiveBorder}${osConfig.mySystem.theme.opacity.inactiveBorder})";
+      "col.inactive_border" =
+        "rgba(${lib.removePrefix "#" osConfig.mySystem.theme.colors.inactiveBorder}${osConfig.mySystem.theme.opacity.inactiveBorder})";
       layout = "dwindle";
       resize_on_border = true;
     };
@@ -97,7 +99,8 @@
 
     monitor =
       let
-        renderMonitor = m:
+        renderMonitor =
+          m:
           if m.disabled then
             "${m.name}, disable"
           else
@@ -111,7 +114,8 @@
       let
         monitors = osConfig.mySystem.monitors;
         numMonitors = builtins.length monitors;
-        mkWorkspace = i:
+        mkWorkspace =
+          i:
           let
             mon = builtins.elemAt monitors (lib.mod i numMonitors);
           in

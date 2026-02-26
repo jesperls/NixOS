@@ -27,6 +27,9 @@
     aria2
     grim
     slurp
+    swappy
+    libnotify
+    gpu-screen-recorder-gtk
     wl-clipboard
     cliphist
     wofi
@@ -58,5 +61,7 @@
     evince
     imv
     teamspeak6-client
+    faugus-launcher
+    umu-launcher
   ];
 }

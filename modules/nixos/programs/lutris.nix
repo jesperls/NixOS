@@ -6,7 +6,6 @@
 }:
 
 let
-  cfg = config.mySystem.programs.lutris;
 
   lutrisWithDeps = pkgs.lutris.override {
     extraLibraries =
@@ -88,21 +87,15 @@ let
   };
 in
 {
-  options.mySystem.programs.lutris = {
-    enable = lib.mkEnableOption "Lutris with common gaming dependencies";
-  };
+  environment.systemPackages = [
+    lutrisWithDeps
+  ];
 
-  config = lib.mkIf cfg.enable {
-    environment.systemPackages = [
-      lutrisWithDeps
-    ];
-
-    # Prevent Wine/DXVK GPU hangs on NVIDIA that can freeze the system
-    environment.sessionVariables = {
-      # Disable NVIDIA threaded optimizations for Wine (common cause of hangs)
-      __GL_THREADED_OPTIMIZATIONS = "0";
-      # Wine large address aware — helps with Battle.net memory usage
-      WINE_LARGE_ADDRESS_AWARE = "1";
-    };
+  # Prevent Wine/DXVK GPU hangs on NVIDIA that can freeze the system
+  environment.sessionVariables = {
+    # Disable NVIDIA threaded optimizations for Wine (common cause of hangs)
+    __GL_THREADED_OPTIMIZATIONS = "0";
+    # Wine large address aware — helps with Battle.net memory usage
+    WINE_LARGE_ADDRESS_AWARE = "1";
   };
 }

@@ -19,7 +19,6 @@ in
     QT_QPA_PLATFORM = "wayland;xcb";
     QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
     CLUTTER_BACKEND = "wayland";
-    SDL_VIDEODRIVER = "wayland";
 
     # === XDG / Desktop ===
     XDG_CURRENT_DESKTOP = "Hyprland";
@@ -45,6 +44,9 @@ in
 
     # === Audio / TTS ===
     PHONEMIZER_ESPEAK_LIBRARY = "${pkgs.espeak-ng}/lib/libespeak-ng.so";
+
+    # === Nix Helpers ===
+    FLAKE = "${config.home.homeDirectory}/nixos-config";
   };
 
   home.sessionPath = [

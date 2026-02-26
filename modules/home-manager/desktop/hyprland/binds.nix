@@ -20,7 +20,7 @@
     "$mainMod, M, exec, easyeffects,"
     "$mainMod, G, exec, myna"
     "$mainMod, Tab, hyprexpo:expo, toggle"
-    "ALT, Tab, cyclenext"
+    "ALT, Tab, focuscurrentorlast"
     "ALT, Tab, bringactivetotop"
 
     # === Focus Movement ===
@@ -74,6 +74,10 @@
 
     # === Clipboard ===
     "$mainMod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
+
+    # === Screenshots & Recording ===
+    "$mainMod SHIFT, Print, exec, grim - | wl-copy && notify-send 'Screenshot Taken' 'Full screen copied to clipboard' -i video-display"
+    ",Print, exec, grim -g \"$(slurp)\" - | swappy -f - && notify-send 'Screenshot Taken' 'Captured area opened in Swappy' -i video-display"
 
     # === Color Picker ===
     "$mainMod SHIFT, C, exec, hyprpicker -a"

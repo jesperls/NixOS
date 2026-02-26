@@ -14,14 +14,14 @@
 
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 12345 ];
+      allowedTCPPorts = [ 12345 ];
     };
 
     nftables.enable = true;
   };
 
   services.openssh = {
-    enable = true;
+    enable = false;
     settings = {
       PermitRootLogin = "no";
       PasswordAuthentication = true;
