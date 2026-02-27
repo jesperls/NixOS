@@ -11,6 +11,10 @@
     };
 
     # Desktop
+    hyprnix = {
+      url = "github:hyprwm/hyprnix";
+    };
+
     caelestia-shell = {
       url = "github:jesperls/caelestia-shell";
       inputs.nixpkgs.follows = "nixpkgs";

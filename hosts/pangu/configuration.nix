@@ -39,8 +39,6 @@
     };
   };
 
-  services.speechd.enable = true;
-
   home-manager = {
     users.${config.mySystem.user.username} = {
       imports = [ ./home.nix ];

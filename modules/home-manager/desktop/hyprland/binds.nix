@@ -16,10 +16,10 @@
     "$mainMod, W, togglefloating"
     "$mainMod, F, fullscreen, 0"
     "$mainMod SHIFT, F, fullscreen, 1"
-    "$mainMod, J, togglesplit"
+    "$mainMod, J, layoutmsg, togglesplit"
     "$mainMod, M, exec, easyeffects,"
     "$mainMod, G, exec, myna"
-    "$mainMod, Tab, hyprexpo:expo, toggle"
+    #"$mainMod, Tab, hyprexpo:expo, toggle"
     "ALT, Tab, focuscurrentorlast"
     "ALT, Tab, bringactivetotop"
 
@@ -77,7 +77,7 @@
 
     # === Screenshots & Recording ===
     "$mainMod SHIFT, Print, exec, grim - | wl-copy && notify-send 'Screenshot Taken' 'Full screen copied to clipboard' -i video-display"
-    ",Print, exec, grim -g \"$(slurp)\" - | swappy -f - && notify-send 'Screenshot Taken' 'Captured area opened in Swappy' -i video-display"
+    ",Print, exec, grim -g \"$(slurp)\" - | wl-copy && notify-send 'Screenshot Taken' 'Area copied to clipboard' -i video-display"
 
     # === Color Picker ===
     "$mainMod SHIFT, C, exec, hyprpicker -a"

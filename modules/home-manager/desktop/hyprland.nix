@@ -3,10 +3,13 @@
   pkgs,
   osConfig,
   lib,
+  inputs,
   ...
 }:
 
 let
+  hyprnix = inputs.hyprnix.packages.${pkgs.stdenv.hostPlatform.system};
+
   hyprSettings = import ./hyprland/settings.nix {
     inherit
       config
@@ -17,16 +20,16 @@ let
   };
 
   hyprPlugins = [
-    pkgs.hyprlandPlugins.hyprexpo
-    pkgs.hyprlandPlugins.hyprtrails
-    pkgs.hyprlandPlugins.hypr-dynamic-cursors
+    # hyprnix.hyprexpo
+    # hyprnix.hyprtrails
+    # hyprnix.hypr-dynamic-cursors
   ];
 in
 {
   wayland.windowManager.hyprland = {
     enable = true;
-    package = pkgs.hyprland;
-    portalPackage = pkgs.xdg-desktop-portal-hyprland;
+    package = hyprnix.hyprland;
+    portalPackage = hyprnix.xdg-desktop-portal-hyprland;
     plugins = hyprPlugins;
     settings = lib.mkMerge [
       (import ./hyprland/variables.nix { })

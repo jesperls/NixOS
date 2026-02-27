@@ -1,11 +1,19 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
+let
+  hyprnix = inputs.hyprnix.packages.${pkgs.stdenv.hostPlatform.system};
+in
 {
+  programs.hyprland = {
+    enable = true;
+    package = hyprnix.hyprland;
+    portalPackage = hyprnix.xdg-desktop-portal-hyprland;
+  };
+
   xdg.portal = {
     enable = true;
     extraPortals = [
       pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-hyprland
     ];
     config = {
       common = {
