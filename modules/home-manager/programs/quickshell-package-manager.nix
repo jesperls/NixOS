@@ -8,7 +8,7 @@
 
   programs.quickshellPackageManager = {
     enable = true;
-    packagesFile = "~/nixos-config/modules/home-manager/packages.nix";
+    packagesFile = "~/nixos-config/hosts/pangu/packages.nix";
     channel = "nixos-unstable";
     rebuildAlias = "nh os switch ~/nixos-config";
     baseColors = osConfig.mySystem.theme.colors // {

@@ -29,4 +29,6 @@
   };
 
   systemd.services.NetworkManager-wait-online.enable = lib.mkDefault false;
+
+  services.speechd.enable = true;
 }

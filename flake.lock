@@ -43,11 +43,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1771469157,
-        "narHash": "sha256-SIgKOHGum14niivC8tAnjySxtRW0SdLULkvQoIYFYto=",
+        "lastModified": 1771987897,
+        "narHash": "sha256-5pNQFGxG3fxS9pGnNBJjT76veotKIKq2XpAVFGAhCdI=",
         "owner": "caelestia-dots",
         "repo": "cli",
-        "rev": "c22916fe4518d38d2c48b59090f9b7d1b41a6d92",
+        "rev": "b0d68f0a1c48fa138d6fde94dcbecea801a86a01",
         "type": "github"
       },
       "original": {
@@ -65,11 +65,11 @@
         "quickshell": "quickshell"
       },
       "locked": {
-        "lastModified": 1771536821,
-        "narHash": "sha256-7BwNgfyx07GhgmnMHN1Dw7SLiPRwW2Yfw/bERcoghr4=",
+        "lastModified": 1772179701,
+        "narHash": "sha256-8nWWTh0qJpmCyrmXjDt69u4R899wi+Cdc3/ZphkpkPk=",
         "owner": "jesperls",
         "repo": "caelestia-shell",
-        "rev": "21d3186cff9e70172b956e53de9528631bf54c44",
+        "rev": "32683e626f38ed2946bae49b1f811796ebdafde1",
         "type": "github"
       },
       "original": {
@@ -139,11 +139,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772060133,
-        "narHash": "sha256-VuyRptb8v1lVGMlLp4/1vRX3Efwec0CN0S6mKmDPzLg=",
+        "lastModified": 1772164835,
+        "narHash": "sha256-zRcwrZDeBfYipqv/7K7TqsfPb87LFU6b7JhoNUGSnvQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "ce9b6e52500a0ea0ec48f0bbf6d7a3e431d9dfa4",
+        "rev": "2a39b0828bbffce0d73769a61e46e780488d098b",
         "type": "github"
       },
       "original": {
@@ -251,11 +251,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770693276,
-        "narHash": "sha256-ngXnN5YXu+f45+QGYNN/VEBMQmcBCYGRCqwaK8cxY1s=",
+        "lastModified": 1771926182,
+        "narHash": "sha256-QbXuSLhiSxOq6ydBL3+KGe1aiYWBW+e3J6qjJZaRMq0=",
         "ref": "refs/heads/master",
-        "rev": "dacfa9de829ac7cb173825f593236bf2c21f637e",
-        "revCount": 735,
+        "rev": "cddb4f061bab495f4473ca5f2c571b6c710efef7",
+        "revCount": 744,
         "type": "git",
         "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
       },
@@ -272,11 +272,11 @@
         "quickshell": "quickshell_3"
       },
       "locked": {
-        "lastModified": 1771538114,
-        "narHash": "sha256-ejWYZpsAQII38vfE45p091bd7zOJgFpSI1JsT+Rcvd8=",
+        "lastModified": 1772179636,
+        "narHash": "sha256-5BatvxCc/DAJNQhUtG9TkQ0GvdoiSmhZlp1rBA3vsZY=",
         "owner": "jesperls",
         "repo": "nix-quickshell-package-manager",
-        "rev": "526f6eefb43d5433e081a85e706181804bc8dabf",
+        "rev": "77dc9b23296a53815bc53e4bb57d5b81db8a1be8",
         "type": "github"
       },
       "original": {
@@ -314,11 +314,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770693276,
-        "narHash": "sha256-ngXnN5YXu+f45+QGYNN/VEBMQmcBCYGRCqwaK8cxY1s=",
+        "lastModified": 1771926182,
+        "narHash": "sha256-QbXuSLhiSxOq6ydBL3+KGe1aiYWBW+e3J6qjJZaRMq0=",
         "ref": "refs/heads/master",
-        "rev": "dacfa9de829ac7cb173825f593236bf2c21f637e",
-        "revCount": 735,
+        "rev": "cddb4f061bab495f4473ca5f2c571b6c710efef7",
+        "revCount": 744,
         "type": "git",
         "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
       },
@@ -335,11 +335,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770693276,
-        "narHash": "sha256-ngXnN5YXu+f45+QGYNN/VEBMQmcBCYGRCqwaK8cxY1s=",
+        "lastModified": 1771926182,
+        "narHash": "sha256-QbXuSLhiSxOq6ydBL3+KGe1aiYWBW+e3J6qjJZaRMq0=",
         "ref": "refs/heads/master",
-        "rev": "dacfa9de829ac7cb173825f593236bf2c21f637e",
-        "revCount": 735,
+        "rev": "cddb4f061bab495f4473ca5f2c571b6c710efef7",
+        "revCount": 744,
         "type": "git",
         "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
       },
@@ -405,11 +405,11 @@
         "quickshell": "quickshell_4"
       },
       "locked": {
-        "lastModified": 1772144358,
-        "narHash": "sha256-n72cwMeHRqjNJn1BxAfUlaUv+3tqcEs31P98pNfRCJQ=",
+        "lastModified": 1772179650,
+        "narHash": "sha256-IKwsKsFTH4GP1tYMrkcd+8Z96CO0EkzbYjR24dIWhF0=",
         "owner": "jesperls",
         "repo": "wallpaper-picker",
-        "rev": "e7297cb02ebc4c350025ea4bfdd82df8f2df03c8",
+        "rev": "a3b775a49721dc0d1dec1d548e92dc5bd513b4d6",
         "type": "github"
       },
       "original": {
