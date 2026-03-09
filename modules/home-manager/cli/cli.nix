@@ -9,7 +9,6 @@
 let
   colors = osConfig.mySystem.theme.colors;
   theme = osConfig.mySystem.theme;
-  removeHash = builtins.replaceStrings [ "#" ] [ "" ];
 in
 {
   programs.starship = {

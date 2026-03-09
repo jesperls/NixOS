@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
 
 {
   options.mySystem = {
@@ -54,6 +54,36 @@
         type = lib.types.str;
         default = "26.05";
         description = "The system state version.";
+      };
+    };
+
+    # Home Manager configuration
+    home = {
+      stateVersion = lib.mkOption {
+        type = lib.types.str;
+        default = "26.05";
+        description = "The Home Manager state version.";
+      };
+    };
+
+    # Repository / host paths
+    paths = {
+      repoRoot = lib.mkOption {
+        type = lib.types.str;
+        default = "/home/${config.mySystem.user.username}/nixos-config";
+        description = "Absolute path to the local nixos-config checkout.";
+      };
+
+      hostDir = lib.mkOption {
+        type = lib.types.str;
+        default = "${config.mySystem.paths.repoRoot}/hosts/${config.mySystem.system.hostName}";
+        description = "Absolute path to the current host directory inside the repo.";
+      };
+
+      packagesFile = lib.mkOption {
+        type = lib.types.str;
+        default = "${config.mySystem.paths.hostDir}/packages.nix";
+        description = "Absolute path to the host-specific Home Manager packages file.";
       };
     };
 

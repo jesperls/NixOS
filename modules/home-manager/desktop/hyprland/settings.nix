@@ -121,6 +121,6 @@
           in
           "${toString (i + 1)}, monitor:${mon.name}, default:true";
       in
-      lib.genList mkWorkspace 9;
+      if numMonitors == 0 then [ ] else lib.genList mkWorkspace 9;
   };
 }

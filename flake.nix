@@ -60,21 +60,28 @@
     }@inputs:
     let
       system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
 
       specialArgs = { inherit inputs; };
+
+      pangu = nixpkgs.lib.nixosSystem {
+        inherit system specialArgs;
+        modules = [
+          ./hosts/pangu/configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
+          }
+        ];
+      };
     in
     {
+      formatter.${system} = pkgs.nixfmt-tree;
+
+      checks.${system}.pangu-system = pangu.config.system.build.toplevel;
+
       nixosConfigurations = {
-        pangu = nixpkgs.lib.nixosSystem {
-          inherit system specialArgs;
-          modules = [
-            ./hosts/pangu/configuration.nix
-            home-manager.nixosModules.home-manager
-            {
-              nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
-            }
-          ];
-        };
+        inherit pangu;
       };
     };
 }

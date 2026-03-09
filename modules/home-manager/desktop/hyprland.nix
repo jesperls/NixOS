@@ -34,12 +34,14 @@ in
     settings = lib.mkMerge [
       (import ./hyprland/variables.nix { })
       hyprSettings.settings
-      (import ./hyprland/plugins.nix {
-        inherit
-          lib
-          osConfig
-          ;
-      })
+      (lib.optionalAttrs (hyprPlugins != [ ]) (
+        import ./hyprland/plugins.nix {
+          inherit
+            lib
+            osConfig
+            ;
+        }
+      ))
       (import ./hyprland/binds.nix { })
       (import ./hyprland/windowrules.nix { })
     ];

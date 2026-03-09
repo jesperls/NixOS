@@ -41,7 +41,7 @@
     enable = true;
     clean.enable = true;
     clean.extraArgs = "--keep-since 4d --keep 3";
-    flake = "/home/${config.mySystem.user.username}/nixos-config";
+    flake = config.mySystem.paths.repoRoot;
   };
 
   programs.nix-index = {

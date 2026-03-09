@@ -63,5 +63,7 @@
     teamspeak6-client
     faugus-launcher
     umu-launcher
+    charasay
+    libreoffice-qt
   ];
 }

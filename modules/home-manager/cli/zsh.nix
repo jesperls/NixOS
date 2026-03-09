@@ -30,10 +30,10 @@
       "..." = "cd ../..";
       "...." = "cd ../../..";
 
-      snis = "nh os switch ~/nixos-config";
-      snus = "nh os switch ~/nixos-config --update";
+      snis = "nh os switch $FLAKE";
+      snus = "nh os switch $FLAKE --update";
       snuf = "nh clean all --keep 5";
-      nfu = "nix flake update";
+      nfu = "cd $FLAKE && nix flake update";
 
       cat = "bat --paging=never";
       trash = "trash-put";

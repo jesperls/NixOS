@@ -7,8 +7,10 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./modules.nix
     ./theme.nix
     ./monitors.nix
+
     ../../modules/nixos/bundle.nix
   ];
 
@@ -18,6 +20,7 @@
       fullName = "Jesper Lönn Stråle";
       email = "jesper.ls@hotmail.com";
     };
+
     system = {
       hostName = "pangu";
       timeZone = "Europe/Stockholm";
@@ -37,12 +40,15 @@
         LC_TIME = "sv_SE.UTF-8";
       };
     };
+
+    home.stateVersion = "26.05";
   };
 
   home-manager = {
     users.${config.mySystem.user.username} = {
       imports = [ ./home.nix ];
     };
+
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";

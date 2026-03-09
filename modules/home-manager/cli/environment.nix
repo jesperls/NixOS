@@ -46,7 +46,7 @@ in
     PHONEMIZER_ESPEAK_LIBRARY = "${pkgs.espeak-ng}/lib/libespeak-ng.so";
 
     # === Nix Helpers ===
-    FLAKE = "${config.home.homeDirectory}/nixos-config";
+    FLAKE = osConfig.mySystem.paths.repoRoot;
   };
 
   home.sessionPath = [

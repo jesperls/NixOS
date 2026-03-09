@@ -2,6 +2,7 @@
 
 {
   imports = [
+    # Shared configuration that should apply to all desktop hosts.
     ./core/boot.nix
     ./core/network.nix
     ./core/nix.nix
@@ -9,18 +10,9 @@
     ./core/locale.nix
     ./core/theme-options.nix
 
-    ./hardware/nvidia.nix
-    ./hardware/vial.nix
-    ./hardware/webcam.nix
-    ./hardware/fancontrol.nix
-    ./hardware/logitech.nix
-
     ./services/audio.nix
     ./services/bluetooth.nix
     ./services/flatpak.nix
-
-    ./programs/gaming.nix
-    ./programs/lutris.nix
     ./programs/fonts.nix
     ./programs/filemanager.nix
 

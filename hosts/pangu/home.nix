@@ -14,7 +14,6 @@
     ../../modules/home-manager/programs/firefox.nix
     ../../modules/home-manager/programs/vesktop.nix
     ../../modules/home-manager/programs/spicetify.nix
-    ../../modules/home-manager/programs/myna.nix
     ../../modules/home-manager/programs/obs.nix
     ../../modules/home-manager/programs/easyeffects.nix
     ../../modules/home-manager/services/bonecontrol-listener.nix
@@ -23,5 +22,5 @@
     ./packages.nix
   ];
 
-  home.stateVersion = osConfig.mySystem.system.stateVersion;
+  home.stateVersion = osConfig.mySystem.home.stateVersion;
 }
