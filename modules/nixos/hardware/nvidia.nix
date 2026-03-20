@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -33,7 +32,6 @@
   ];
 
   boot.kernelParams = [
-    "nvidia-drm.modeset=1"
     "nvidia-drm.fbdev=1"
   ];
 
@@ -41,7 +39,6 @@
     LIBVA_DRIVER_NAME = "nvidia";
     NIXOS_OZONE_WL = "1";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    GBM_BACKEND = "nvidia-drm";
   };
 
   services.xserver.videoDrivers = [ "nvidia" ];

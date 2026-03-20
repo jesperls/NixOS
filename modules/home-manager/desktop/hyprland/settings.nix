@@ -1,6 +1,4 @@
 {
-  config,
-  pkgs,
   lib,
   osConfig,
   ...
@@ -79,10 +77,6 @@
         natural_scroll = true;
       };
       sensitivity = 0;
-    };
-
-    cursor = {
-      no_hardware_cursors = true;
     };
 
     dwindle = {

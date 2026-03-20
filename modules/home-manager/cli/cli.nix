@@ -1,8 +1,6 @@
 {
-  config,
   pkgs,
   osConfig,
-  lib,
   ...
 }:
 
@@ -98,7 +96,7 @@ in
     settings = {
       font_family = theme.fonts.monospace;
       font_size = builtins.toString theme.fonts.size;
-      adjust_line_height = "120%";
+      modify_font = "cell_height 120%";
       window_padding_width = 10;
       confirm_os_window_close = 0;
 

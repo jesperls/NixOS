@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   osConfig,
   lib,
@@ -12,8 +11,6 @@ let
 
   hyprSettings = import ./hyprland/settings.nix {
     inherit
-      config
-      pkgs
       lib
       osConfig
       ;
@@ -32,7 +29,7 @@ in
     portalPackage = hyprnix.xdg-desktop-portal-hyprland;
     plugins = hyprPlugins;
     settings = lib.mkMerge [
-      (import ./hyprland/variables.nix { })
+      (import ./hyprland/variables.nix)
       hyprSettings.settings
       (lib.optionalAttrs (hyprPlugins != [ ]) (
         import ./hyprland/plugins.nix {
@@ -42,8 +39,8 @@ in
             ;
         }
       ))
-      (import ./hyprland/binds.nix { })
-      (import ./hyprland/windowrules.nix { })
+      (import ./hyprland/binds.nix)
+      (import ./hyprland/windowrules.nix)
     ];
   };
 

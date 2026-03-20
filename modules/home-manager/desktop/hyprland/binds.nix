@@ -1,4 +1,3 @@
-{ ... }:
 {
   bind = [
     # === Application Launchers ===
@@ -18,7 +17,7 @@
     "$mainMod SHIFT, F, fullscreen, 1"
     "$mainMod, J, layoutmsg, togglesplit"
     "$mainMod, M, exec, easyeffects,"
-    "$mainMod, G, exec, myna"
+    #"$mainMod, G, exec, myna"
     #"$mainMod, Tab, hyprexpo:expo, toggle"
     "ALT, Tab, focuscurrentorlast"
     "ALT, Tab, bringactivetotop"

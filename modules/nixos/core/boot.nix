@@ -1,6 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
+  nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
+
   boot = {
     loader = {
       systemd-boot = {
@@ -13,7 +15,7 @@
       timeout = 1;
     };
 
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
     kernelParams = [
       "quiet"
       "splash"
@@ -28,9 +30,5 @@
 
     consoleLogLevel = 0;
     initrd.verbose = false;
-
-    tmp = {
-      useTmpfs = false;
-    };
   };
 }

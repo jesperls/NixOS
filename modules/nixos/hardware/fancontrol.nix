@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
@@ -13,22 +8,8 @@
   ];
 
   services.udev.extraRules = ''
-    # NZXT Kraken coolers
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", MODE="0666"
-    # NZXT Smart Device / Grid
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="2006", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="2007", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="2009", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="200d", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="200e", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="200f", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="2010", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="2011", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="2012", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="2014", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="2019", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="201a", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", ATTR{idProduct}=="3008", MODE="0666"
+    # NZXT devices — grant access to logged-in user
+    SUBSYSTEM=="usb", ATTR{idVendor}=="1e71", TAG+="uaccess"
   '';
 
   boot.kernelModules = [

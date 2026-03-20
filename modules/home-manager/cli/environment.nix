@@ -39,11 +39,6 @@ in
 
     # === Python / uv ===
     UV_PYTHON_PREFERENCE = "managed";
-    SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-    LD_LIBRARY_PATH = "${pkgs.portaudio}/lib";
-
-    # === Audio / TTS ===
-    PHONEMIZER_ESPEAK_LIBRARY = "${pkgs.espeak-ng}/lib/libespeak-ng.so";
 
     # === Nix Helpers ===
     FLAKE = osConfig.mySystem.paths.repoRoot;

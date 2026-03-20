@@ -14,12 +14,15 @@
         "@wheel"
       ];
       warn-dirty = false;
+      min-free = 1073741824; # 1 GiB
+      max-free = 5368709120; # 5 GiB
       substituters = [
         "https://cache.nixos.org"
         "https://nix-community.cachix.org"
         "https://attic.xuyh0120.win/lantian"
         "https://cache.garnix.io"
         "https://hyprland.cachix.org"
+        "https://outfoxxed.cachix.org"
       ];
       trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
@@ -27,12 +30,9 @@
         "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
         "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+        "outfoxxed.cachix.org-1:GNw2we0wPzUikP3lB3j/H5s8mBw6L3c6C1sXUoamg5Y="
       ];
     };
-    extraOptions = ''
-      min-free = ${toString (1024 * 1024 * 1024)}
-      max-free = ${toString (5 * 1024 * 1024 * 1024)}
-    '';
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -55,6 +55,11 @@
     enable = true;
     libraries = with pkgs; [
       stdenv.cc.cc.lib
+      icu
+      libICE
+      libSM
+      libXext
+      vulkan-loader
       zlib
       libffi
       openssl
@@ -77,7 +82,7 @@
       wayland
       qt6.qtwayland
       alsa-lib
-      linuxPackages.nvidia_x11
+      config.boot.kernelPackages.nvidiaPackages.stable
       cudaPackages.cudatoolkit
       cudaPackages.cudnn
       cudaPackages.libcublas

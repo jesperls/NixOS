@@ -1,4 +1,3 @@
-{ ... }:
 {
   windowrule = [
     # === Floating Windows ===

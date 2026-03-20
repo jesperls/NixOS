@@ -6,7 +6,6 @@
 {
   home.packages = with pkgs; [
     nixfmt-tree
-    nixfmt
     nil
     vscode
     uv
@@ -65,5 +64,7 @@
     umu-launcher
     charasay
     libreoffice-qt
+    android-tools
+    limo
   ];
 }

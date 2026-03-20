@@ -1,4 +1,3 @@
-{ ... }:
 {
   "$terminal" = "kitty";
   "$browser" = "firefox";

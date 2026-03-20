@@ -30,11 +30,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    myna = {
-      url = "github:SmoxBoye/myna";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Kernel
     nix-cachyos-kernel = {
       url = "github:xddxdd/nix-cachyos-kernel/release";
@@ -69,9 +64,6 @@
         modules = [
           ./hosts/pangu/configuration.nix
           home-manager.nixosModules.home-manager
-          {
-            nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
-          }
         ];
       };
     in

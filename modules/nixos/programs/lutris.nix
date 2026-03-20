@@ -1,16 +1,9 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 
 let
-
   lutrisWithDeps = pkgs.lutris.override {
     extraLibraries =
       pkgs: with pkgs; [
-        # Audio / media
         libpulseaudio
         pipewire
         openal
@@ -18,14 +11,10 @@ let
         libogg
         libxkbcommon
         wayland
-
-        # SDL stack (needed by many launchers/installers)
         SDL2
         SDL2_image
         SDL2_mixer
         SDL2_ttf
-
-        # Video / rendering and input helpers
         v4l-utils
         libgudev
         libpng
@@ -40,15 +29,11 @@ let
         libxrandr
         libxxf86vm
         libxtst
-
-        # Crypto / TLS and system glue
         openssl
         gnutls
         libgcrypt
         lcms2
         zlib
-
-        # Battle.net / Blizzard launcher dependencies
         freetype
         glib
         openldap
@@ -61,7 +46,6 @@ let
         libunwind
         libopus
         libva
-
         gst_all_1.gstreamer
         gst_all_1.gst-plugins-base
         gst_all_1.gst-plugins-good
@@ -85,17 +69,19 @@ let
         protontricks
       ];
   };
+
+  # Scope Wine/NVIDIA env vars to Lutris only
+  lutrisWrapped = pkgs.symlinkJoin {
+    name = "lutris-wrapped";
+    paths = [ lutrisWithDeps ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/lutris \
+        --set __GL_THREADED_OPTIMIZATIONS 0 \
+        --set WINE_LARGE_ADDRESS_AWARE 1
+    '';
+  };
 in
 {
-  environment.systemPackages = [
-    lutrisWithDeps
-  ];
-
-  # Prevent Wine/DXVK GPU hangs on NVIDIA that can freeze the system
-  environment.sessionVariables = {
-    # Disable NVIDIA threaded optimizations for Wine (common cause of hangs)
-    __GL_THREADED_OPTIMIZATIONS = "0";
-    # Wine large address aware — helps with Battle.net memory usage
-    WINE_LARGE_ADDRESS_AWARE = "1";
-  };
+  environment.systemPackages = [ lutrisWrapped ];
 }

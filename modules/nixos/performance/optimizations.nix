@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 
 {
   zramSwap = {
@@ -56,10 +51,6 @@
   services.fstrim = {
     enable = true;
     interval = "weekly";
-  };
-
-  services.scx = {
-    enable = false; # Uses default eevdf kernel scheduler
   };
 
   services.fwupd.enable = true;

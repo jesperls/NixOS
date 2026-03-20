@@ -30,8 +30,8 @@
       "..." = "cd ../..";
       "...." = "cd ../../..";
 
-      snis = "nh os switch $FLAKE";
-      snus = "nh os switch $FLAKE --update";
+      snis = "nh os switch $FLAKE --max-jobs 8";
+      snus = "nh os switch $FLAKE --update --max-jobs 8";
       snuf = "nh clean all --keep 5";
       nfu = "cd $FLAKE && nix flake update";
 
@@ -39,9 +39,10 @@
       trash = "trash-put";
       del = "trash-put";
 
-      ytmp3 = "yt-dlp -x --audio-format mp3 --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
-      ytmp4 = "yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
-      ytbest = "yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
+      yt-dlp = "noglob yt-dlp";
+      ytmp3 = "noglob yt-dlp -x --audio-format mp3 --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
+      ytmp4 = "noglob yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
+      ytbest = "noglob yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
 
       oracle = "TERM=xterm-256color ssh -i ~/.ssh/id_rsa ubuntu@132.145.48.11";
       nuwa = "TERM=xterm-256color ssh -t jesper@192.168.1.49";
