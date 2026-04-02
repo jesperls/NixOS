@@ -79,6 +79,10 @@
       sensitivity = 0;
     };
 
+    cursor = {
+      no_hardware_cursors = false;
+    };
+
     dwindle = {
       pseudotile = true;
       preserve_split = true;

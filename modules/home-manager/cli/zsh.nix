@@ -40,9 +40,9 @@
       del = "trash-put";
 
       yt-dlp = "noglob yt-dlp";
-      ytmp3 = "noglob yt-dlp -x --audio-format mp3 --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
-      ytmp4 = "noglob yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
-      ytbest = "noglob yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
+      ytmp3 = "noglob yt-dlp -x --audio-format mp3 --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
+      ytmp4 = "noglob yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
+      ytbest = "noglob yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
 
       oracle = "TERM=xterm-256color ssh -i ~/.ssh/id_rsa ubuntu@132.145.48.11";
       nuwa = "TERM=xterm-256color ssh -t jesper@192.168.1.49";

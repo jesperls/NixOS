@@ -38,6 +38,8 @@
     ];
   };
 
+  environment.systemPackages = with pkgs; [ mgba ];
+
   programs.gamemode = {
     enable = true;
     enableRenice = true;

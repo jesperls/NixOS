@@ -3,7 +3,7 @@
     # === Application Launchers ===
     "$mainMod, T, exec, $terminal"
     "$mainMod, E, exec, thunar"
-    "$mainMod, D, exec, vesktop"
+    "$mainMod, D, exec, discord"
     "$mainMod, B, exec, $browser"
     "$mainMod, C, exec, code"
 

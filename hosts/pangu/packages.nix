@@ -6,6 +6,7 @@
 {
   home.packages = with pkgs; [
     nixfmt-tree
+    nixfmt
     nil
     vscode
     uv
@@ -51,6 +52,10 @@
     gimp
     prismlauncher
     qbittorrent
+    (discord.override {
+      withVencord = true;
+      withOpenASAR = true;
+    })
     antigravity
     ungoogled-chromium
     file-roller
@@ -66,5 +71,6 @@
     libreoffice-qt
     android-tools
     limo
+    protonup-qt
   ];
 }
