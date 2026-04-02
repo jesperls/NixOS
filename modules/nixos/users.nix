@@ -22,6 +22,12 @@
 
   programs.zsh.enable = true;
 
-  services.getty.autologinUser = config.mySystem.user.username;
+  systemd.services."getty@tty1" = {
+    overrideStrategy = "asDropin";
+    serviceConfig.ExecStart = [
+      ""
+      "@${pkgs.util-linux}/sbin/agetty agetty --autologin ${config.mySystem.user.username} --noclear %I $TERM"
+    ];
+  };
   security.sudo.wheelNeedsPassword = false;
 }

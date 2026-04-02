@@ -42,6 +42,14 @@
     };
 
     home.stateVersion = "26.05";
+
+    desktop = {
+      lockscreen = {
+        enable = true;
+        lockOnSleep = true;
+        lockOnBoot = true;
+      };
+    };
   };
 
   home-manager = {

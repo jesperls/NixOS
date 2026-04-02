@@ -1,5 +1,8 @@
 {
   bind = [
+    # === Lockscreen ===
+    "$mainMod, L, exec, caelestia-shell ipc --any-display call lock lock"
+
     # === Application Launchers ===
     "$mainMod, T, exec, $terminal"
     "$mainMod, E, exec, thunar"

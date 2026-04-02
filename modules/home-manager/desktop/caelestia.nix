@@ -2,8 +2,13 @@
   inputs,
   osConfig,
   config,
+  lib,
   ...
 }:
+
+let
+  lockscreen = osConfig.mySystem.desktop.lockscreen;
+in
 {
   imports = [ inputs.caelestia-shell.homeManagerModules.default ];
 
@@ -32,11 +37,18 @@
       general = {
         apps.explorer = [ "thunar" ];
         idle = {
-          lockBeforeSleep = false;
+          lockBeforeSleep = lockscreen.enable && lockscreen.lockOnSleep;
           timeouts = [ ];
         };
       };
+      lock.hideNotifs = lockscreen.enable;
       services.smartScheme = false;
     };
   };
+
+  wayland.windowManager.hyprland.settings.exec-once =
+    lib.mkIf (lockscreen.enable && lockscreen.lockOnBoot)
+      [
+        "sleep 1 && caelestia-shell ipc --any-display call lock lock"
+      ];
 }
