@@ -15,8 +15,13 @@
       url = "github:hyprwm/hyprnix";
     };
 
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins";
+      inputs.hyprland.follows = "hyprnix";
+    };
+
     caelestia-shell = {
-      url = "github:jesperls/caelestia-shell";
+      url = "path:/home/jesperls/nixos-config/caelestia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -42,6 +47,10 @@
     };
     deltatune = {
       url = "github:ThatOneCalculator/deltatune-linux";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    myna = {
+      url = "github:SmoxBoye/myna";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

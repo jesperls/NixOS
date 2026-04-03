@@ -62,11 +62,16 @@
         "easeOutQuint,0.23,1,0.32,1"
         "easeInOutQuint,0.83,0,0.17,1"
         "sharpBounce,0.76,0,0.24,1.1"
+        "easeInOutElastic,0.68,-0.55,0.265,1.55"
+        "easeInBounce,0.42,0,0.58,1"
+        "easeOutCubic,0.215,0.61,0.355,1"
+        "easeInOutCubic,0.65,0.05,0.36,1"
       ];
       animation = [
-        "windows,1,3,easeOutQuint,slide"
-        "windowsOut,1,3,easeInOutQuint,slide"
-        "fade,1,4,easeInOutQuint"
+        "windows,1,2,easeInOutQuint,slide"
+        "windowsOut,1,2,easeInOutQuint,slide"
+        "fade,1,2,easeInOutQuint"
+        "workspaces,1,2,easeInOutQuint,slidevert "
       ];
     };
 

@@ -6,9 +6,10 @@
     # === Application Launchers ===
     "$mainMod, T, exec, $terminal"
     "$mainMod, E, exec, thunar"
-    "$mainMod, D, exec, discord"
+    "$mainMod, D, exec, vesktop"
     "$mainMod, B, exec, $browser"
     "$mainMod, C, exec, code"
+    "$mainMod, G, exec, myna"
 
     "$mainMod, P, exec, qs-pkg-manager"
     "$mainMod SHIFT, W, exec, wallpaper-manager pick"
@@ -62,8 +63,8 @@
     "$mainMod SHIFT, 0, movetoworkspace, 10"
 
     # === Workspace Scroll ===
-    "$mainMod, mouse_down, workspace, r+1"
-    "$mainMod, mouse_up, workspace, r-1"
+    "$mainMod, mouse_down, workspace, r-1"
+    "$mainMod, mouse_up, workspace, r+1"
 
     # === Special Workspace ===
     "$mainMod, grave, togglespecialworkspace, magic"

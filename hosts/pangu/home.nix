@@ -19,6 +19,7 @@
     ../../modules/home-manager/services/bonecontrol-listener.nix
     ../../modules/home-manager/services/deltatune.nix
     ../../modules/home-manager/programs/quickshell-package-manager.nix
+    ../../modules/home-manager/programs/myna.nix
     ./packages.nix
   ];
 
