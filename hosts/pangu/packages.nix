@@ -68,5 +68,7 @@
     android-tools
     limo
     protonup-qt
+    aseprite
+    evtest
   ];
 }

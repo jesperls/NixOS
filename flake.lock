@@ -165,11 +165,11 @@
         "quickshell": "quickshell"
       },
       "locked": {
-        "lastModified": 1775252577,
-        "narHash": "sha256-sK465DbpHxfBfi0ynUVd6xk6KYV10TUf6BW5CB4vjRk=",
+        "lastModified": 1775804197,
+        "narHash": "sha256-bB/RrxLOOD2YhhMcEJt8xiw9XSYqRcaUF+rH8oXcFIk=",
         "owner": "jesperls",
         "repo": "caelestia-shell",
-        "rev": "74f8307514b7b8cc487977995c3431b98ac7b344",
+        "rev": "46ef1bd0ee718e047e0bb2e08bb5959238b19ce3",
         "type": "github"
       },
       "original": {
@@ -1376,6 +1376,30 @@
         "type": "github"
       }
     },
+    "qs-vpets": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "quickshell": [
+          "caelestia-shell",
+          "quickshell"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775842387,
+        "narHash": "sha256-Ciw2i1Nb+p/oNMVg0qFQ+XRABWUsds35yF9VFEWT9iA=",
+        "owner": "jesperls",
+        "repo": "qs-vpets",
+        "rev": "a19fb5d6598c81516da4712efb2b440cdaa9d455",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jesperls",
+        "repo": "qs-vpets",
+        "type": "github"
+      }
+    },
     "quickshell": {
       "inputs": {
         "nixpkgs": [
@@ -1491,6 +1515,7 @@
         "myna": "myna",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nixpkgs": "nixpkgs_3",
+        "qs-vpets": "qs-vpets",
         "quickshell-package-manager": "quickshell-package-manager",
         "spicetify-nix": "spicetify-nix",
         "wallpaper-picker": "wallpaper-picker"

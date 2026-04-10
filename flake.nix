@@ -53,6 +53,11 @@
       url = "github:SmoxBoye/myna";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    qs-vpets = {
+      url = "github:jesperls/qs-vpets";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.quickshell.follows = "caelestia-shell/quickshell";
+    };
   };
 
   outputs =
