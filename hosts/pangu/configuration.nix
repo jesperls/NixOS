@@ -45,7 +45,7 @@
 
     desktop = {
       lockscreen = {
-        enable = true;
+        enable = false;
         lockOnSleep = true;
         lockOnBoot = true;
       };

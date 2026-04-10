@@ -1,5 +1,16 @@
 { pkgs, inputs, ... }:
 
+let
+  cachyKernel = pkgs.cachyosKernels.linux-cachyos-latest.override {
+    cpusched = "eevdf";
+    lto = "thin";
+    processorOpt = "zen4";
+    bbr3 = true;
+    autofdo = true;
+  };
+
+  helpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
+in
 {
   nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
 
@@ -15,7 +26,7 @@
       timeout = 1;
     };
 
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
+    kernelPackages = helpers.kernelModuleLLVMOverride (pkgs.linuxKernel.packagesFor cachyKernel);
     kernelParams = [
       "quiet"
       "splash"
@@ -24,6 +35,8 @@
       "rd.systemd.show_status=false"
       "rd.udev.log_level=3"
       "udev.log_priority=3"
+      "amd_pstate=active"
+      "split_lock_detect=off"
     ];
 
     plymouth.enable = false;

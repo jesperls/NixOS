@@ -21,7 +21,7 @@
     };
 
     caelestia-shell = {
-      url = "path:/home/jesperls/nixos-config/caelestia-shell";
+      url = "github:jesperls/caelestia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

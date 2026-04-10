@@ -52,10 +52,6 @@
     gimp
     prismlauncher
     qbittorrent
-    (discord.override {
-      withVencord = true;
-      withOpenASAR = true;
-    })
     antigravity
     ungoogled-chromium
     file-roller

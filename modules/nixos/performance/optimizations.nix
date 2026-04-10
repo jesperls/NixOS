@@ -3,27 +3,33 @@
 {
   zramSwap = {
     enable = true;
-    algorithm = "zstd";
-    memoryPercent = 25;
+    algorithm = "lz4";
+    memoryPercent = 15;
     priority = 100;
   };
 
   hardware.enableRedistributableFirmware = true;
 
   boot.kernel.sysctl = {
-    "vm.swappiness" = 100;
+    "vm.swappiness" = 180;
     "vm.page-cluster" = 0;
     "vm.vfs_cache_pressure" = 50;
-    "vm.dirty_ratio" = 10;
-    "vm.dirty_background_ratio" = 5;
+    "vm.dirty_bytes" = 268435456; # 256MB
+    "vm.dirty_background_bytes" = 134217728; # 128MB
+    "vm.max_map_count" = 2147483642;
 
-    "net.core.rmem_max" = 16777216;
-    "net.core.wmem_max" = 16777216;
+    "net.core.rmem_max" = 33554432;
+    "net.core.wmem_max" = 33554432;
+    "net.core.netdev_max_backlog" = 16384;
     "net.ipv4.tcp_fastopen" = 3;
     "net.ipv4.tcp_congestion_control" = "bbr";
+    "net.ipv4.tcp_rmem" = "4096 131072 33554432";
+    "net.ipv4.tcp_wmem" = "4096 65536 33554432";
 
-    "fs.inotify.max_user_watches" = 524288;
+    "fs.inotify.max_user_watches" = 1048576;
     "fs.file-max" = 2097152;
+
+    "kernel.nmi_watchdog" = 0;
   };
 
   boot.kernelModules = [ "tcp_bbr" ];
@@ -37,7 +43,7 @@
 
   services.earlyoom = {
     enable = true;
-    freeMemThreshold = 10;
+    freeMemThreshold = 5;
     freeSwapThreshold = 10;
     enableNotifications = true;
     extraArgs = [

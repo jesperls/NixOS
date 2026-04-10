@@ -32,9 +32,9 @@
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
         "outfoxxed.cachix.org-1:GNw2we0wPzUikP3lB3j/H5s8mBw6L3c6C1sXUoamg5Y="
       ];
+    trusted-substituters = ["https://hyprland.cachix.org"];
     };
   };
-
   nixpkgs.config.allowUnfree = true;
 
   programs.nh = {
