@@ -107,7 +107,7 @@
           if m.disabled then
             "${m.name}, disable"
           else
-            "${m.name}, ${m.resolution}@${toString m.refreshRate}, ${m.position}, ${m.scale}"
+            "${m.name}, ${m.resolution}@${toString m.refreshRate}, ${m.position}, ${toString m.scale}"
             + (if m.transform != null then ", transform, ${toString m.transform}" else "");
         catchAll = ", preferred, auto, 1";
       in

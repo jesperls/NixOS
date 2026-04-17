@@ -20,7 +20,7 @@
   systemd.services.nzxt-fan-curve = {
     description = "Set NZXT AIO fan curve";
     wantedBy = [ "multi-user.target" ];
-    after = [ "multi-user.target" ];
+    after = [ "systemd-udev-settle.service" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;

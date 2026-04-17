@@ -15,30 +15,15 @@ let
       osConfig
       ;
   };
-
-  hyprPlugins = [
-    # hyprnix.hyprexpo
-    # hyprnix.hyprtrails
-    # hyprnix.hypr-dynamic-cursors
-  ];
 in
 {
   wayland.windowManager.hyprland = {
     enable = true;
     package = hyprnix.hyprland;
     portalPackage = hyprnix.xdg-desktop-portal-hyprland;
-    plugins = hyprPlugins;
     settings = lib.mkMerge [
       (import ./hyprland/variables.nix)
       hyprSettings.settings
-      (lib.optionalAttrs (hyprPlugins != [ ]) (
-        import ./hyprland/plugins.nix {
-          inherit
-            lib
-            osConfig
-            ;
-        }
-      ))
       (import ./hyprland/binds.nix)
       (import ./hyprland/windowrules.nix)
     ];

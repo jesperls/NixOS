@@ -34,7 +34,6 @@
     cliphist
     wofi
     gsettings-desktop-schemas
-    glib
     wlogout
     networkmanagerapplet
     mission-center
@@ -43,8 +42,6 @@
     overskride
     espeak-ng
     audacity
-    portaudio
-    pkg-config
     solaar
     scrcpy
     obsidian
@@ -52,6 +49,9 @@
     gimp
     prismlauncher
     qbittorrent
+    (discord.override {
+      withVencord = true;
+    })
     antigravity
     ungoogled-chromium
     file-roller

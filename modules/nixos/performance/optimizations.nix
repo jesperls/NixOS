@@ -4,7 +4,7 @@
   zramSwap = {
     enable = true;
     algorithm = "lz4";
-    memoryPercent = 15;
+    memoryPercent = 25;
     priority = 100;
   };
 
@@ -44,7 +44,7 @@
   services.earlyoom = {
     enable = true;
     freeMemThreshold = 5;
-    freeSwapThreshold = 10;
+    freeSwapThreshold = 5;
     enableNotifications = true;
     extraArgs = [
       "--prefer"

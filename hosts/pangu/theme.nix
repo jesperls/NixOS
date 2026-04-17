@@ -27,7 +27,7 @@
       inactiveBorder = "aa";
     };
     borderGradient = {
-      enable = true;
+      enable = false;
       secondColor = "#e3b17a";
       angle = 45;
     };

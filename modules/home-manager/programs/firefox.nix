@@ -1,12 +1,8 @@
-{
-  pkgs,
-  ...
-}:
+{ ... }:
 
 {
   programs.firefox = {
     enable = true;
-    package = pkgs.firefox;
 
     # Firefox policies for system-wide settings
     policies = {

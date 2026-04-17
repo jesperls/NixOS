@@ -6,7 +6,7 @@
     # === Application Launchers ===
     "$mainMod, T, exec, $terminal"
     "$mainMod, E, exec, thunar"
-    "$mainMod, D, exec, vesktop"
+    "$mainMod, D, exec, discord"
     "$mainMod, B, exec, $browser"
     "$mainMod, C, exec, code"
     "$mainMod, G, exec, myna"
@@ -21,8 +21,6 @@
     "$mainMod SHIFT, F, fullscreen, 1"
     "$mainMod, J, layoutmsg, togglesplit"
     "$mainMod, M, exec, easyeffects,"
-    #"$mainMod, G, exec, myna"
-    #"$mainMod, Tab, hyprexpo:expo, toggle"
     "ALT, Tab, focuscurrentorlast"
     "ALT, Tab, bringactivetotop"
 

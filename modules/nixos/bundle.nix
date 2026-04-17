@@ -18,6 +18,7 @@
 
     ./desktop/common.nix
     ./desktop/hyprland.nix
+    ./desktop/options.nix
 
     ./performance/optimizations.nix
 

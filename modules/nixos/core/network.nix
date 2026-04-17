@@ -6,14 +6,7 @@
 
     networkmanager.enable = true;
 
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [
-        12345 # bonecontrol-listener
-      ];
-    };
-
-    nftables.enable = true;
+    firewall.enable = false;
   };
 
   services.openssh = {

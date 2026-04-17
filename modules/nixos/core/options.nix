@@ -102,8 +102,8 @@
               default = "0x0";
             };
             scale = lib.mkOption {
-              type = lib.types.str;
-              default = "1";
+              type = lib.types.float;
+              default = 1.0;
             };
             transform = lib.mkOption {
               type = lib.types.nullOr lib.types.int;
@@ -118,25 +118,5 @@
       );
     };
 
-    # Desktop configuration
-    desktop = {
-      lockscreen = {
-        enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = "Enable the desktop lockscreen.";
-        };
-        lockOnSleep = lib.mkOption {
-          type = lib.types.bool;
-          default = true;
-          description = "Lock the screen before the system goes to sleep.";
-        };
-        lockOnBoot = lib.mkOption {
-          type = lib.types.bool;
-          default = true;
-          description = "Lock the screen automatically when the session starts.";
-        };
-      };
-    };
   };
 }
