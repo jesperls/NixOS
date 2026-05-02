@@ -2,29 +2,30 @@
   pkgs,
   osConfig,
   lib,
-  inputs,
   ...
 }:
 
 let
-  hyprnix = inputs.hyprnix.packages.${pkgs.stdenv.hostPlatform.system};
-
   hyprSettings = import ./hyprland/settings.nix {
     inherit
       lib
       osConfig
       ;
   };
+
+  hyprBinds = import ./hyprland/binds.nix {
+    inherit lib osConfig;
+  };
 in
 {
   wayland.windowManager.hyprland = {
     enable = true;
-    package = hyprnix.hyprland;
-    portalPackage = hyprnix.xdg-desktop-portal-hyprland;
+    package = null;
+    portalPackage = null;
     settings = lib.mkMerge [
       (import ./hyprland/variables.nix)
       hyprSettings.settings
-      (import ./hyprland/binds.nix)
+      hyprBinds
       (import ./hyprland/windowrules.nix)
     ];
   };

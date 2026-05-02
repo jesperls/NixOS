@@ -1,7 +1,6 @@
 { ... }:
 
 {
-  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
 
   # PipeWire configuration
@@ -17,12 +16,13 @@
   # PipeWire performance tuning for A50 headset (24-bit/48kHz)
   services.pipewire.extraConfig.pipewire."99-performance" = {
     "context.properties" = {
-      # Match A50's native sample rate to avoid resampling
       "default.clock.rate" = 48000;
-      "default.clock.allowed-rates" = [ 48000 ];
-      # Quantum settings for low-latency gaming audio
+      "default.clock.allowed-rates" = [
+        48000
+        44100
+      ];
       "default.clock.quantum" = 512;
-      "default.clock.min-quantum" = 512;
+      "default.clock.min-quantum" = 256;
       "default.clock.max-quantum" = 1024;
     };
   };

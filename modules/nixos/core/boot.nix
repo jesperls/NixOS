@@ -12,7 +12,18 @@ let
   helpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
 in
 {
-  nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
+  nixpkgs.overlays = [
+    inputs.nix-cachyos-kernel.overlays.pinned
+    # Skipping tests while upstream sorts it out, revert once
+    # Hydra consistently builds openldap green.
+    (final: prev: {
+      openldap = prev.openldap.overrideAttrs (_: {
+        doCheck = false;
+      });
+    })
+  ];
+
+  hardware.enableRedistributableFirmware = true;
 
   boot = {
     loader = {
@@ -36,7 +47,6 @@ in
       "rd.udev.log_level=3"
       "udev.log_priority=3"
       "amd_pstate=active"
-      "split_lock_detect=off"
     ];
 
     plymouth.enable = false;

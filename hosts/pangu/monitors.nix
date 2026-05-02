@@ -21,10 +21,5 @@
       position = "-1080x0";
       transform = 1;
     }
-    {
-      name = "Unknown-1";
-      resolution = "1920x1080";
-      refreshRate = 60;
-    }
   ];
 }

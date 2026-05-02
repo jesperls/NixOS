@@ -73,7 +73,7 @@
 
       "inode/directory" = "thunar.desktop";
 
-      "x-scheme-handler/discord" = "vesktop.desktop";
+      "x-scheme-handler/discord" = "discord.desktop";
 
       "x-scheme-handler/terminal" = "kitty.desktop";
       "application/x-terminal-emulator" = "kitty.desktop";

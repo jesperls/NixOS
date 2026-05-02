@@ -13,14 +13,6 @@
       "HYPRCURSOR_SIZE,${builtins.toString osConfig.mySystem.theme.gtk.cursorTheme.size}"
     ];
 
-    exec-once = [
-      "solaar -w hide"
-      "wl-paste --type text --watch cliphist store"
-      "wl-paste --type image --watch cliphist store"
-      "qpwgraph -m"
-      "systemctl --user start hyprpolkitagent"
-    ];
-
     general = {
       gaps_in = osConfig.mySystem.theme.gaps.inner;
       gaps_out = osConfig.mySystem.theme.gaps.outer;
@@ -82,10 +74,6 @@
         natural_scroll = true;
       };
       sensitivity = 0;
-    };
-
-    cursor = {
-      no_hardware_cursors = false;
     };
 
     dwindle = {

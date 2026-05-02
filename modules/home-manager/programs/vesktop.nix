@@ -1,11 +1,7 @@
 { pkgs, ... }:
 
 {
-  home.packages = [
-    (pkgs.vesktop.override {
-      withSystemVencord = false;
-    })
-  ];
+  home.packages = [ pkgs.vesktop ];
 
   # Vesktop Wayland & screen sharing flags
   # Based on: https://github.com/Vencord/Vesktop/issues/629

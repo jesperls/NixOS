@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
   zramSwap = {
@@ -7,8 +7,6 @@
     memoryPercent = 25;
     priority = 100;
   };
-
-  hardware.enableRedistributableFirmware = true;
 
   boot.kernel.sysctl = {
     "vm.swappiness" = 180;
@@ -32,8 +30,6 @@
     "kernel.nmi_watchdog" = 0;
   };
 
-  boot.kernelModules = [ "tcp_bbr" ];
-
   services.udev.extraRules = ''
     # Set scheduler for NVMe
     ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
@@ -48,7 +44,7 @@
     enableNotifications = true;
     extraArgs = [
       "--prefer"
-      "(^|/)(wine|wineserver|Battle\\.net|lutris-wrapper|\\.exe)$"
+      "(^|/)(wine|wineserver|Battle\\.net|lutris-wrapper)$|^/.*/(drive_c|Program Files|steamapps)/.*\\.exe$"
       "--avoid"
       "(^|/)(Hyprland|pipewire|wireplumber)$"
     ];

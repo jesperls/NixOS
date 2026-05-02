@@ -30,13 +30,8 @@
     "nvidia_drm"
   ];
 
-  boot.kernelParams = [
-    "nvidia-drm.fbdev=1"
-  ];
-
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
-    NIXOS_OZONE_WL = "1";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
   };
 

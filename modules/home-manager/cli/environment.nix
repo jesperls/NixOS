@@ -19,11 +19,9 @@ in
     QT_QPA_PLATFORM = "wayland;xcb";
     QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
     CLUTTER_BACKEND = "wayland";
+    NIXOS_OZONE_WL = "1";
 
     # === XDG / Desktop ===
-    XDG_CURRENT_DESKTOP = "Hyprland";
-    XDG_SESSION_TYPE = "wayland";
-    XDG_SESSION_DESKTOP = "Hyprland";
     GTK_USE_PORTAL = "1";
     DISABLE_WAYLAND_IDLE_INHIBIT = "1";
 
@@ -51,7 +49,5 @@ in
   xdg.systemDirs.data = [
     "${config.home.homeDirectory}/.local/share"
     "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
-    "${config.home.homeDirectory}/.local/share/flatpak/exports/share"
-    "/var/lib/flatpak/exports/share"
   ];
 }

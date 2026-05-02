@@ -16,8 +16,8 @@ in
       format = "$directory$git_branch$git_status$nix_shell$character";
       right_format = "$cmd_duration";
       character = {
-        success_symbol = "[➜](bold green)";
-        error_symbol = "[➜](bold red)";
+        success_symbol = "[➜](bold ${colors.accent2})";
+        error_symbol = "[✗](bold ${colors.accent})";
       };
       directory = {
         style = "bold ${colors.accent}";
@@ -143,7 +143,7 @@ in
   programs.bat = {
     enable = true;
     config = {
-      theme = "Dracula";
+      theme = "ansi";
       style = "numbers,changes,header";
       italic-text = "always";
     };
@@ -152,7 +152,7 @@ in
   programs.btop = {
     enable = true;
     settings = {
-      color_theme = "dracula";
+      color_theme = "Default";
       theme_background = false;
       vim_keys = true;
       rounded_corners = true;
@@ -186,7 +186,7 @@ in
       gpu-api = "vulkan";
       hwdec = "auto-safe";
       vo = "gpu-next";
-      profile = "gpu-hq";
+      profile = "high-quality";
     };
   };
 }

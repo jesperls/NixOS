@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, ... }:
 
 {
   networking = {
@@ -17,5 +17,5 @@
     };
   };
 
-  systemd.services.NetworkManager-wait-online.enable = lib.mkDefault false;
+  systemd.services.NetworkManager-wait-online.enable = false;
 }

@@ -14,10 +14,7 @@ in
 
   programs.caelestia = {
     enable = true;
-    systemd = {
-      enable = true;
-      target = "graphical-session.target";
-    };
+    systemd.enable = true;
     cli.enable = true;
 
     baseColors = osConfig.mySystem.theme.colors;
@@ -33,7 +30,7 @@ in
         showAudio = true;
         showWifi = false;
       };
-      border.thickness = 1;
+      border.thickness = osConfig.mySystem.theme.borders;
       general = {
         apps.explorer = [ "thunar" ];
         idle = {
