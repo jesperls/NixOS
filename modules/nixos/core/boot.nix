@@ -1,21 +1,8 @@
 { pkgs, inputs, ... }:
 
-let
-  cachyKernel = pkgs.cachyosKernels.linux-cachyos-latest.override {
-    cpusched = "eevdf";
-    lto = "thin";
-    processorOpt = "zen4";
-    bbr3 = true;
-    autofdo = true;
-  };
-
-  helpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
-in
 {
   nixpkgs.overlays = [
     inputs.nix-cachyos-kernel.overlays.pinned
-    # Skipping tests while upstream sorts it out, revert once
-    # Hydra consistently builds openldap green.
     (final: prev: {
       openldap = prev.openldap.overrideAttrs (_: {
         doCheck = false;
@@ -37,7 +24,7 @@ in
       timeout = 1;
     };
 
-    kernelPackages = helpers.kernelModuleLLVMOverride (pkgs.linuxKernel.packagesFor cachyKernel);
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
     kernelParams = [
       "quiet"
       "splash"

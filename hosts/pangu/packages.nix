@@ -1,7 +1,15 @@
 {
   pkgs,
+  inputs,
   ...
 }:
+
+let
+  discord-krisp = (import inputs.nixpkgs-discord-krisp {
+    system = pkgs.stdenv.system;
+    config.allowUnfree = true;
+  }).discord;
+in
 
 {
   home.packages = with pkgs; [
@@ -40,7 +48,6 @@
     pavucontrol
     qpwgraph
     overskride
-    espeak-ng
     audacity
     solaar
     scrcpy
@@ -49,26 +56,21 @@
     gimp
     prismlauncher
     qbittorrent
-    (discord.override {
+    (discord-krisp.override {
       withVencord = true;
+      withOpenASAR = true;
+      withKrisp = true;
     })
-    antigravity
-    ungoogled-chromium
     file-roller
     unzip
     zip
     unrar
     evince
     imv
-    teamspeak6-client
     faugus-launcher
     umu-launcher
-    charasay
-    libreoffice-qt
-    android-tools
-    limo
     protonup-qt
-    aseprite
     evtest
+    burpsuite
   ];
 }
