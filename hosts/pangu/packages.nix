@@ -5,10 +5,11 @@
 }:
 
 let
-  discord-krisp = (import inputs.nixpkgs-discord-krisp {
-    system = pkgs.stdenv.system;
-    config.allowUnfree = true;
-  }).discord;
+  discord-krisp =
+    (import inputs.nixpkgs-discord-krisp {
+      system = pkgs.stdenv.system;
+      config.allowUnfree = true;
+    }).discord;
 in
 
 {

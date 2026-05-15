@@ -2,7 +2,6 @@
   inputs,
   osConfig,
   config,
-  lib,
   ...
 }:
 
@@ -42,10 +41,4 @@ in
       services.smartScheme = false;
     };
   };
-
-  wayland.windowManager.hyprland.settings.exec-once =
-    lib.mkIf (lockscreen.enable && lockscreen.lockOnBoot)
-      [
-        "sleep 1 && caelestia-shell ipc --any-display call lock lock"
-      ];
 }
