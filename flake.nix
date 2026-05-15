@@ -4,9 +4,7 @@
   inputs = {
     # Core
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-discord-krisp = {
-      url = "github:FlameFlag/nixpkgs/flameflag/push-vmswpuqmvzpt";
-    };
+    nixcord.url = "github:FlameFlag/nixcord";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -62,7 +60,6 @@
     {
       self,
       nixpkgs,
-      nixpkgs-discord-krisp,
       home-manager,
       ...
     }@inputs:

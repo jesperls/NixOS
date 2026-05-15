@@ -1,17 +1,7 @@
 {
   pkgs,
-  inputs,
   ...
 }:
-
-let
-  discord-krisp =
-    (import inputs.nixpkgs-discord-krisp {
-      system = pkgs.stdenv.system;
-      config.allowUnfree = true;
-    }).discord;
-in
-
 {
   home.packages = with pkgs; [
     nixfmt-tree
@@ -57,11 +47,6 @@ in
     gimp
     prismlauncher
     qbittorrent
-    (discord-krisp.override {
-      withVencord = true;
-      withOpenASAR = true;
-      withKrisp = true;
-    })
     file-roller
     unzip
     zip

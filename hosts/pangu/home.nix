@@ -13,8 +13,8 @@
     ../../modules/home-manager/desktop/wallpaper-picker.nix
     ../../modules/home-manager/programs/firefox.nix
     ../../modules/home-manager/programs/flatpak.nix
-    ../../modules/home-manager/programs/vesktop.nix
     ../../modules/home-manager/programs/spicetify.nix
+    ../../modules/home-manager/programs/nixcord.nix
     ../../modules/home-manager/programs/obs.nix
     ../../modules/home-manager/programs/easyeffects.nix
     ../../modules/home-manager/services/bonecontrol-listener.nix
