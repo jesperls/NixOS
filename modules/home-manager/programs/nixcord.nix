@@ -16,7 +16,7 @@
         alwaysTrust.enable = true;
         betterGifPicker.enable = true;
         biggerStreamPreview.enable = true;
-        ClearURLs.enable = true;
+        clearUrls.enable = true;
         crashHandler.enable = true;
         fixYoutubeEmbeds.enable = true;
         gameActivityToggle.enable = true;

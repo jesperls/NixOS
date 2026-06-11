@@ -9,6 +9,7 @@
     ../../modules/nixos/hardware/logitech.nix
 
     ../../modules/nixos/services/sunshine.nix
+    ../../modules/nixos/services/docker.nix
 
     ../../modules/nixos/programs/gaming.nix
     ../../modules/nixos/programs/lutris.nix

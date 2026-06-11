@@ -3,17 +3,19 @@
 {
   networking = {
     hostName = config.mySystem.system.hostName;
-
     networkmanager.enable = true;
 
-    firewall.enable = false;
+    firewall.enable = true;
   };
 
   services.openssh = {
     enable = true;
+    openFirewall = true;
     settings = {
+      KbdInteractiveAuthentication = false;
+      PubkeyAuthentication = true;
       PermitRootLogin = "no";
-      PasswordAuthentication = true;
+      PasswordAuthentication = false;
     };
   };
 

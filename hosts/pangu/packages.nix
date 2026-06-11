@@ -11,6 +11,10 @@
     uv
     python314
     nodejs
+    cargo
+    rustc
+    gcc
+    openjdk25
     ydotool
     jq
     yq
@@ -25,6 +29,10 @@
     trash-cli
     aria2
     grim
+    ungoogled-chromium
+    ratty
+    teamspeak6-client
+    antigravity
     slurp
     swappy
     libnotify

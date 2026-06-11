@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -16,7 +17,7 @@
       "input"
       "storage"
       "gamemode"
-    ];
+    ] ++ lib.optional config.virtualisation.docker.enable "docker";
     shell = pkgs.zsh;
   };
 

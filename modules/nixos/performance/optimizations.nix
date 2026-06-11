@@ -35,6 +35,8 @@
     ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
     # Set scheduler for SSD
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
+    # Sunshine
+    KERNEL=="uinput", MODE="0660", GROUP="input", SYMLINK+="uinput"
   '';
 
   services.earlyoom = {

@@ -30,8 +30,9 @@
       "..." = "cd ../..";
       "...." = "cd ../../..";
 
-      snis = "nh os switch $FLAKE --max-jobs 8";
-      snus = "nh os switch $FLAKE --update --max-jobs 8";
+      snis = "nh os switch $FLAKE --max-jobs 16";
+      snub = "nh os boot $FLAKE --max-jobs 16";
+      snus = "nh os switch $FLAKE --update --max-jobs 16";
       snuf = "nh clean all --keep 5";
       nfu = "cd $FLAKE && nix flake update";
 

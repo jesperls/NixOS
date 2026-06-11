@@ -4,6 +4,7 @@
   inputs = {
     # Core
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-sunshine.url = "github:NixOS/nixpkgs?ref=pull/521906/head";
     nixcord.url = "github:FlameFlag/nixcord";
 
     home-manager = {
@@ -39,6 +40,10 @@
     # Applications
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     deltatune = {

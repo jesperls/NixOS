@@ -33,6 +33,7 @@ if state.lockscreen.enable then
 end
 
 bind_exec(mainMod, "T", terminal)
+bind_exec(mainMod, "R", "ratty")
 bind_exec(mainMod, "E", "thunar")
 bind_exec(mainMod, "D", "discord")
 bind_exec(mainMod, "B", browser)

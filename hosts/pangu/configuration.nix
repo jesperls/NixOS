@@ -40,6 +40,11 @@ in
     ../../modules/nixos/bundle.nix
   ];
 
+  networking.interfaces.eno1.wakeOnLan = {
+    enable = true;
+    policy = [ "magic" ];
+  };
+
   mySystem = {
     user = {
       username = "jesperls";
