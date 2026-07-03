@@ -1,99 +1,118 @@
-{ ... }:
+{ lib, osConfig, ... }:
 
+let
+  apps = osConfig.mySystem.defaultApps;
+
+  browserTypes = [
+    "text/html"
+    "application/xhtml+xml"
+    "x-scheme-handler/http"
+    "x-scheme-handler/https"
+    "x-scheme-handler/about"
+    "x-scheme-handler/unknown"
+    "x-scheme-handler/chrome"
+    "x-scheme-handler/ftp"
+    "x-scheme-handler/file"
+  ];
+
+  editorTypes = [
+    "text/x-readme"
+    "text/markdown"
+    "text/x-markdown"
+    "text/x-python"
+    "text/x-shellscript"
+    "text/x-csrc"
+    "text/x-chdr"
+    "text/x-c++src"
+    "text/x-c++hdr"
+    "text/javascript"
+    "text/css"
+    "text/xml"
+    "application/xml"
+    "application/json"
+    "application/x-yaml"
+    "text/x-yaml"
+    "application/x-shellscript"
+  ];
+
+  textEditorTypes = [
+    "text/plain"
+    "text/x-log"
+    "application/x-desktop"
+  ];
+
+  imageTypes = [
+    "image/jpeg"
+    "image/jpg"
+    "image/png"
+    "image/gif"
+    "image/webp"
+    "image/svg+xml"
+    "image/bmp"
+    "image/tiff"
+  ];
+
+  pdfTypes = [
+    "application/pdf"
+    "application/postscript"
+  ];
+
+  archiveTypes = [
+    "application/zip"
+    "application/x-rar-compressed"
+    "application/x-tar"
+    "application/x-bzip2"
+    "application/gzip"
+    "application/x-7z-compressed"
+  ];
+
+  avTypes = [
+    "audio/mpeg"
+    "audio/ogg"
+    "audio/wav"
+    "audio/flac"
+    "audio/aac"
+    "audio/x-mp3"
+    "video/mp4"
+    "video/x-msvideo"
+    "video/quicktime"
+    "video/x-matroska"
+    "video/webm"
+    "video/ogg"
+    "video/mpeg"
+    "video/x-ms-wmv"
+    "video/x-flv"
+  ];
+
+  assign = types: desktopFile: lib.genAttrs types (_: desktopFile);
+in
 {
   xdg.mimeApps = {
     enable = true;
 
-    defaultApplications = {
-      "text/html" = "firefox.desktop";
-      "x-scheme-handler/http" = "firefox.desktop";
-      "x-scheme-handler/https" = "firefox.desktop";
-      "x-scheme-handler/about" = "firefox.desktop";
-      "x-scheme-handler/unknown" = "firefox.desktop";
-      "x-scheme-handler/chrome" = "firefox.desktop";
-      "x-scheme-handler/ftp" = "firefox.desktop";
-      "x-scheme-handler/file" = "firefox.desktop";
+    defaultApplications =
+      assign browserTypes apps.browser.desktopFile
+      // assign editorTypes apps.editor.desktopFile
+      // assign textEditorTypes apps.textEditor.desktopFile
+      // assign imageTypes apps.imageViewer.desktopFile
+      // assign pdfTypes apps.pdfViewer.desktopFile
+      // assign archiveTypes apps.archiveManager.desktopFile
+      // assign avTypes apps.videoPlayer.desktopFile
+      // {
+        "inode/directory" = apps.fileManager.desktopFile;
+        "x-scheme-handler/discord" = "discord.desktop";
+        "x-scheme-handler/terminal" = apps.terminal.desktopFile;
+        "application/x-terminal-emulator" = apps.terminal.desktopFile;
+      };
 
-      "text/plain" = "gedit.desktop";
-      "text/x-readme" = "code.desktop";
-      "text/markdown" = "code.desktop";
-      "text/x-markdown" = "code.desktop";
-      "text/x-python" = "code.desktop";
-      "text/x-shellscript" = "code.desktop";
-      "text/x-csrc" = "code.desktop";
-      "text/x-chdr" = "code.desktop";
-      "text/x-c++src" = "code.desktop";
-      "text/x-c++hdr" = "code.desktop";
-      "text/javascript" = "code.desktop";
-      "text/css" = "code.desktop";
-      "text/xml" = "code.desktop";
-      "application/xml" = "code.desktop";
-      "application/json" = "code.desktop";
-      "application/x-yaml" = "code.desktop";
-      "text/x-yaml" = "code.desktop";
-      "text/x-log" = "gedit.desktop";
-      "application/x-desktop" = "gedit.desktop";
-      "application/x-shellscript" = "code.desktop";
-
-      "image/jpeg" = "imv.desktop";
-      "image/jpg" = "imv.desktop";
-      "image/png" = "imv.desktop";
-      "image/gif" = "imv.desktop";
-      "image/webp" = "imv.desktop";
-      "image/svg+xml" = "imv.desktop";
-      "image/bmp" = "imv.desktop";
-      "image/tiff" = "imv.desktop";
-
-      "application/pdf" = "evince.desktop";
-      "application/postscript" = "evince.desktop";
-
-      "application/zip" = "file-roller.desktop";
-      "application/x-rar-compressed" = "file-roller.desktop";
-      "application/x-tar" = "file-roller.desktop";
-      "application/x-bzip2" = "file-roller.desktop";
-      "application/gzip" = "file-roller.desktop";
-      "application/x-7z-compressed" = "file-roller.desktop";
-
-      "audio/mpeg" = "mpv.desktop";
-      "audio/ogg" = "mpv.desktop";
-      "audio/wav" = "mpv.desktop";
-      "audio/flac" = "mpv.desktop";
-      "audio/aac" = "mpv.desktop";
-      "audio/x-mp3" = "mpv.desktop";
-
-      "video/mp4" = "mpv.desktop";
-      "video/x-msvideo" = "mpv.desktop";
-      "video/quicktime" = "mpv.desktop";
-      "video/x-matroska" = "mpv.desktop";
-      "video/webm" = "mpv.desktop";
-      "video/ogg" = "mpv.desktop";
-      "video/mpeg" = "mpv.desktop";
-      "video/x-ms-wmv" = "mpv.desktop";
-      "video/x-flv" = "mpv.desktop";
-
-      "inode/directory" = "thunar.desktop";
-
-      "x-scheme-handler/discord" = "discord.desktop";
-
-      "x-scheme-handler/terminal" = "kitty.desktop";
-      "application/x-terminal-emulator" = "kitty.desktop";
-    };
-
-    associations.added = {
-      "x-scheme-handler/http" = "firefox.desktop";
-      "x-scheme-handler/https" = "firefox.desktop";
-      "text/html" = "firefox.desktop";
-      "application/x-extension-htm" = "firefox.desktop";
-      "application/x-extension-html" = "firefox.desktop";
-      "application/x-extension-shtml" = "firefox.desktop";
-      "application/xhtml+xml" = "firefox.desktop";
-      "application/x-extension-xhtml" = "firefox.desktop";
-      "application/x-extension-xht" = "firefox.desktop";
-      "x-scheme-handler/about" = "firefox.desktop";
-      "x-scheme-handler/unknown" = "firefox.desktop";
-      "x-scheme-handler/chrome" = "firefox.desktop";
-      "x-scheme-handler/ftp" = "firefox.desktop";
-      "x-scheme-handler/file" = "firefox.desktop";
-    };
+    associations.added =
+      assign browserTypes apps.browser.desktopFile
+      // assign [
+        "application/x-extension-htm"
+        "application/x-extension-html"
+        "application/x-extension-shtml"
+        "application/x-extension-xhtml"
+        "application/x-extension-xht"
+      ] apps.browser.desktopFile;
   };
 }

@@ -19,13 +19,20 @@ let
     }
     // lib.optionalAttrs (!monitor.disabled && monitor.transform != null) {
       transform = monitor.transform;
+    }
+    // lib.optionalAttrs (!monitor.disabled && monitor.vrr != 0) {
+      vrr = monitor.vrr;
+    }
+    // lib.optionalAttrs (!monitor.disabled && monitor.bitdepth != null) {
+      bitdepth = monitor.bitdepth;
     };
   monitors = osConfig.mySystem.monitors;
-  numMonitors = builtins.length monitors;
+  activeMonitors = builtins.filter (monitor: !monitor.disabled) monitors;
+  numMonitors = builtins.length activeMonitors;
   mkWorkspaceRule =
     index:
     let
-      monitor = builtins.elemAt monitors (lib.mod index numMonitors);
+      monitor = builtins.elemAt activeMonitors (lib.mod index numMonitors);
     in
     {
       workspace = toString (index + 1);

@@ -1,7 +1,6 @@
 {
   pkgs,
   osConfig,
-  config,
   lib,
   ...
 }:
@@ -31,14 +30,23 @@ let
       osConfig
       ;
   };
+  apps = osConfig.mySystem.defaultApps;
+  gaming = osConfig.mySystem.desktop.gaming;
   generatedState = {
     keyboard_layout = osConfig.mySystem.system.keyboardLayout;
     lockscreen = {
       enable = lockscreen.enable;
       lock_on_boot = lockscreen.enable && lockscreen.lockOnBoot;
     };
-    wallpaper_picker = {
-      enable = config.programs.wallpaperPicker.enable;
+    apps = {
+      terminal = apps.terminal.command;
+      browser = apps.browser.command;
+      file_manager = apps.fileManager.command;
+      editor = apps.editor.command;
+    };
+    gaming = {
+      tearing = gaming.tearing.enable;
+      tearing_class_patterns = gaming.tearing.classPatterns;
     };
     theme = {
       active_border = activeBorder;
@@ -47,6 +55,19 @@ let
       gaps_out = theme.gaps.outer;
       inactive_border = "rgba(${lib.removePrefix "#" theme.colors.inactiveBorder}${theme.opacity.inactiveBorder})";
       rounding = theme.rounding;
+      blur = {
+        enabled = theme.blur.enable;
+        size = theme.blur.size;
+        passes = theme.blur.passes;
+        xray = theme.blur.xray;
+      };
+      shadow_enabled = theme.shadow.enable;
+      animations = {
+        enabled = theme.animations.enable;
+        speed = theme.animations.speed;
+      };
+      translucent_opacity = theme.opacity.translucent;
+      translucent_apps = theme.opacity.translucentApps;
     };
   };
 in

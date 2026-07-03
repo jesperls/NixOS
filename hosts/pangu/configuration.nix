@@ -73,6 +73,8 @@ in
     };
 
     home.stateVersion = "26.05";
+
+    desktop.gaming.tearing.enable = true;
   };
 
   home-manager = {

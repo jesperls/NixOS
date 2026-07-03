@@ -4,7 +4,6 @@
 }:
 {
   home.packages = with pkgs; [
-    nixfmt-tree
     nixfmt
     nil
     vscode

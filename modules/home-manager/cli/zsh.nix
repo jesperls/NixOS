@@ -45,8 +45,8 @@
       ytmp4 = "noglob yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
       ytbest = "noglob yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
 
-      oracle = "TERM=xterm-256color ssh -i ~/.ssh/id_rsa ubuntu@132.145.48.11";
-      nuwa = "TERM=xterm-256color ssh -t jesper@192.168.1.49";
+      oracle = "ssh oracle";
+      nuwa = "ssh -t nuwa";
 
       gs = "git status";
       ga = "git add";
@@ -71,6 +71,24 @@
       autoload -z edit-command-line
       zle -N edit-command-line
       bindkey "^X^E" edit-command-line
+
+      # snil <input>... — rebuild with inputs overridden to local checkouts
+      snil() {
+        if [ "$#" -eq 0 ]; then
+          echo "usage: snil <input>... (caelestia-shell, wallpaper-picker, qs-vpets, quickshell-package-manager)" >&2
+          return 1
+        fi
+        local -a overrides
+        local input dir
+        for input in "$@"; do
+          case "$input" in
+            quickshell-package-manager|qpm) input=quickshell-package-manager dir=nix-quickshell-package-manager ;;
+            *) dir=$input ;;
+          esac
+          overrides+=(--override-input "$input" "path:$FLAKE/$dir")
+        done
+        nh os switch "$FLAKE" -- --no-write-lock-file "''${overrides[@]}"
+      }
     '';
   };
 }
