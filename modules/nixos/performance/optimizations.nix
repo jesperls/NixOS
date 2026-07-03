@@ -3,8 +3,8 @@
 {
   zramSwap = {
     enable = true;
-    algorithm = "lz4";
-    memoryPercent = 25;
+    algorithm = "zstd";
+    memoryPercent = 50;
     priority = 100;
   };
 
@@ -48,7 +48,8 @@
       "--prefer"
       "(^|/)(wine|wineserver|Battle\\.net|lutris-wrapper)$|^/.*/(drive_c|Program Files|steamapps)/.*\\.exe$"
       "--avoid"
-      "(^|/)(Hyprland|pipewire|wireplumber)$"
+      # quickshell matched unanchored: its comm name truncates to ".quickshell-wra"
+      "(^|/)(Hyprland|pipewire|wireplumber)$|quickshell|caelestia"
     ];
   };
 

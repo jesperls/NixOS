@@ -12,23 +12,24 @@ hl.config({
     },
     layout = "dwindle",
     resize_on_border = true,
+    allow_tearing = state.gaming.tearing,
   },
   decoration = {
     rounding = theme.rounding,
     blur = {
-      enabled = true,
-      size = 5,
-      passes = 2,
+      enabled = theme.blur.enabled,
+      size = theme.blur.size,
+      passes = theme.blur.passes,
       new_optimizations = true,
       ignore_opacity = true,
-      xray = true,
+      xray = theme.blur.xray,
     },
     shadow = {
-      enabled = false,
+      enabled = theme.shadow_enabled,
     },
   },
   animations = {
-    enabled = true,
+    enabled = theme.animations.enabled,
   },
   input = {
     kb_layout = state.keyboard_layout,
@@ -61,11 +62,14 @@ for _, curve in ipairs({
   hl.curve(curve[1], curve[2])
 end
 
+local animEnabled = theme.animations.enabled
+local animSpeed = theme.animations.speed
+
 for _, animation in ipairs({
-  { leaf = "windows", enabled = true, speed = 2, bezier = "easeInOutQuint", style = "slide" },
-  { leaf = "windowsOut", enabled = true, speed = 2, bezier = "easeInOutQuint", style = "slide" },
-  { leaf = "fade", enabled = true, speed = 2, bezier = "easeInOutQuint" },
-  { leaf = "workspaces", enabled = true, speed = 2, bezier = "easeInOutQuint", style = "slidevert" },
+  { leaf = "windows", enabled = animEnabled, speed = animSpeed, bezier = "easeInOutQuint", style = "slide" },
+  { leaf = "windowsOut", enabled = animEnabled, speed = animSpeed, bezier = "easeInOutQuint", style = "slide" },
+  { leaf = "fade", enabled = animEnabled, speed = animSpeed, bezier = "easeInOutQuint" },
+  { leaf = "workspaces", enabled = animEnabled, speed = animSpeed, bezier = "easeInOutQuint", style = "slidevert" },
 }) do
   hl.animation(animation)
 end

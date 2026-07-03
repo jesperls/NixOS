@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, osConfig, ... }:
 
 let
   homeDir = config.home.homeDirectory;
@@ -40,7 +40,7 @@ in
   };
 
   xdg.configFile."xfce4/helpers.rc".text = ''
-    TerminalEmulator=kitty
+    TerminalEmulator=${osConfig.mySystem.defaultApps.terminal.command}
     TerminalEmulatorDismissed=true
   '';
 }

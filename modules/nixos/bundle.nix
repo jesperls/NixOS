@@ -3,12 +3,12 @@
 {
   imports = [
     # Shared configuration that should apply to all desktop hosts.
+    ./options
+
     ./core/boot.nix
     ./core/network.nix
     ./core/nix.nix
-    ./core/options.nix
     ./core/locale.nix
-    ./core/theme-options.nix
 
     ./services/audio.nix
     ./services/bluetooth.nix
@@ -18,7 +18,6 @@
 
     ./desktop/common.nix
     ./desktop/hyprland.nix
-    ./desktop/options.nix
 
     ./performance/optimizations.nix
 

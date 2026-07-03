@@ -1,3 +1,5 @@
+local state = require("jesperls.generated")
+
 local function window_rule(rule)
   hl.window_rule(rule)
 end
@@ -44,12 +46,19 @@ window_rule({
   move = { "monitor_w - 490", "monitor_h - 280" },
 })
 
-for _, class in ipairs({ "kitty", "thunar", "gedit" }) do
-  window_rule({ match = { class = class }, opacity = "0.85 0.85" })
+local translucent = string.format("%.2f %.2f", state.theme.translucent_opacity, state.theme.translucent_opacity)
+for _, class in ipairs(state.theme.translucent_apps) do
+  window_rule({ match = { class = class }, opacity = translucent })
+end
+
+if state.gaming.tearing then
+  for _, pattern in ipairs(state.gaming.tearing_class_patterns) do
+    window_rule({ match = { class = pattern }, immediate = true })
+  end
 end
 
 window_rule({ match = { class = "xdg-desktop-portal-gtk" }, float = true })
-window_rule({ match = { class = "polkit-gnome-authentication-agent-1" }, float = true })
+window_rule({ match = { class = "hyprpolkitagent" }, float = true })
 
 window_rule({ match = { title = "Sharing your screen" }, opacity = "1.0 override 1.0 override" })
 window_rule({ match = { title = "sharing indicator" }, opacity = "1.0 override 1.0 override" })

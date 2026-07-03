@@ -7,12 +7,14 @@
 
 let
   theme = osConfig.mySystem.theme;
+  apps = osConfig.mySystem.defaultApps;
 in
 {
   home.sessionVariables = {
-    # === Browser ===
-    BROWSER = "firefox";
-    DEFAULT_BROWSER = "firefox";
+    # === Default applications ===
+    BROWSER = apps.browser.command;
+    DEFAULT_BROWSER = apps.browser.command;
+    TERMINAL = apps.terminal.command;
 
     # === Wayland / Display ===
     GDK_BACKEND = "wayland,x11,*";

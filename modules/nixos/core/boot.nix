@@ -3,11 +3,6 @@
 {
   nixpkgs.overlays = [
     inputs.nix-cachyos-kernel.overlays.pinned
-    (final: prev: {
-      openldap = prev.openldap.overrideAttrs (_: {
-        doCheck = false;
-      });
-    })
   ];
 
   hardware.enableRedistributableFirmware = true;
@@ -24,10 +19,11 @@
       timeout = 1;
     };
 
+    tmp.useTmpfs = true;
+
     kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
     kernelParams = [
       "quiet"
-      "splash"
       "nowatchdog"
       "loglevel=3"
       "rd.systemd.show_status=false"

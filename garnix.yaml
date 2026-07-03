@@ -1,0 +1,4 @@
+# Requires the garnix GitHub app; results are served from cache.garnix.io.
+builds:
+  include:
+    - "checks.x86_64-linux.*"

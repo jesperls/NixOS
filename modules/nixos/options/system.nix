@@ -109,6 +109,21 @@
               type = lib.types.nullOr lib.types.int;
               default = null;
             };
+            vrr = lib.mkOption {
+              type = lib.types.ints.between 0 3;
+              default = 0;
+              description = "Adaptive sync mode for this monitor (0 = off, 1 = on, 2 = fullscreen only, 3 = fullscreen with video/game content type).";
+            };
+            bitdepth = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  8
+                  10
+                ]
+              );
+              default = null;
+              description = "Output bit depth (10 enables 10-bit output).";
+            };
             disabled = lib.mkOption {
               type = lib.types.bool;
               default = false;
@@ -117,6 +132,5 @@
         }
       );
     };
-
   };
 }

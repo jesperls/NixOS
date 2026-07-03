@@ -7,8 +7,8 @@
         "nix-command"
         "flakes"
       ];
-      auto-optimise-store = true;
       max-jobs = "auto";
+      keep-outputs = true;
       trusted-users = [
         "root"
         "@wheel"
@@ -33,8 +33,12 @@
         "outfoxxed.cachix.org-1:GNw2we0wPzUikP3lB3j/H5s8mBw6L3c6C1sXUoamg5Y="
       ];
     };
+
+    optimise.automatic = true;
   };
   nixpkgs.config.allowUnfree = true;
+
+  documentation.nixos.enable = false;
 
   programs.nh = {
     enable = true;
@@ -82,13 +86,6 @@
       qt6.qtwayland
       alsa-lib
       config.boot.kernelPackages.nvidiaPackages.stable
-      cudaPackages.cudatoolkit
-      cudaPackages.cudnn
-      cudaPackages.libcublas
-      cudaPackages.libcusparse
-      cudaPackages.libcufft
-      cudaPackages.libcurand
-      cudaPackages.cuda_nvrtc
     ];
   };
 }

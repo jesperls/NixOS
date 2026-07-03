@@ -31,7 +31,7 @@ in
       };
       border.thickness = osConfig.mySystem.theme.borders;
       general = {
-        apps.explorer = [ "thunar" ];
+        apps.explorer = [ osConfig.mySystem.defaultApps.fileManager.command ];
         idle = {
           lockBeforeSleep = lockscreen.enable && lockscreen.lockOnSleep;
           timeouts = [ ];

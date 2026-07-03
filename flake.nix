@@ -5,7 +5,10 @@
     # Core
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-sunshine.url = "github:NixOS/nixpkgs?ref=pull/521906/head";
-    nixcord.url = "github:FlameFlag/nixcord";
+    nixcord = {
+      url = "github:FlameFlag/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -25,11 +28,13 @@
     wallpaper-picker = {
       url = "github:jesperls/wallpaper-picker";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.quickshell.follows = "caelestia-shell/quickshell";
     };
 
     quickshell-package-manager = {
       url = "github:jesperls/nix-quickshell-package-manager";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.quickshell.follows = "caelestia-shell/quickshell";
     };
 
     # Kernel
@@ -53,6 +58,7 @@
     myna = {
       url = "github:SmoxBoye/myna";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.quickshell.follows = "caelestia-shell/quickshell";
     };
     qs-vpets = {
       url = "github:jesperls/qs-vpets";
