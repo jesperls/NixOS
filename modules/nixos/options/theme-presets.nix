@@ -14,6 +14,21 @@
     };
   };
 
+  adventure-time = {
+    name = "Adventure Time";
+    colors = {
+      accent = "#64b153";
+      accent2 = "#fcc992";
+      background = "#746965";
+      surface = "#397156";
+      surfaceAlt = "#4d886a";
+      text = "#fbf3dd";
+      muted = "#d9ceb2";
+      border = "#7a5236";
+      shadow = "#26331f";
+    };
+  };
+
   muted-rose = {
     name = "Muted Rose";
     colors = {

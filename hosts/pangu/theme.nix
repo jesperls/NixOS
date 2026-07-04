@@ -2,7 +2,7 @@
 
 {
   mySystem.theme = {
-    preset = "obsidian-mocha";
+    preset = "adventure-time";
     borders = 0;
     gaps = {
       inner = 4;

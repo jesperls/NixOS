@@ -42,6 +42,8 @@ bind_dispatch(mainMod, "Q", hl.dsp.window.close())
 bind_dispatch(mainMod, "W", hl.dsp.window.float({ action = "toggle" }))
 bind_dispatch(mainMod, "F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 bind_dispatch(mainMod .. " SHIFT", "F", hl.dsp.window.fullscreen({ mode = "maximized" }))
+-- Fake fullscreen: the client renders fullscreen but the window stays tiled.
+bind_dispatch(mainMod .. " CTRL", "F", hl.dsp.window.fullscreen_state({ internal = 0, client = 2, action = "toggle" }))
 bind_dispatch(mainMod, "J", hl.dsp.layout("togglesplit"))
 bind_dispatch("ALT", "Tab", hl.dsp.focus({ last = true }))
 bind_dispatch("ALT", "Tab", hl.dsp.window.alter_zorder({ mode = "top" }))
@@ -74,6 +76,20 @@ bind_dispatch(mainMod, "mouse:273", hl.dsp.window.resize(), { mouse = true })
 bind_dispatch(mainMod, "Z", hl.dsp.window.drag(), { mouse = true })
 bind_dispatch(mainMod, "X", hl.dsp.window.resize(), { mouse = true })
 
+-- Layouts ----------------------------------------------------------------
+
+bind_dispatch(mainMod, "O", function()
+  local layout = hl.get_config("general.layout")
+  hl.config({ general = { layout = layout == "scrolling" and "dwindle" or "scrolling" } })
+end)
+
+bind_dispatch(mainMod, "minus", hl.dsp.layout("colresize -conf"))
+bind_dispatch(mainMod, "equal", hl.dsp.layout("colresize +conf"))
+bind_dispatch(mainMod .. " ALT", "left", hl.dsp.layout("consume_or_expel prev"))
+bind_dispatch(mainMod .. " ALT", "right", hl.dsp.layout("consume_or_expel next"))
+bind_dispatch(mainMod .. " ALT", "up", hl.dsp.layout("center"))
+bind_dispatch(mainMod .. " ALT", "down", hl.dsp.layout("fit visible"))
+
 -- Workspaces -----------------------------------------------------------
 
 for workspace = 1, 10 do
@@ -84,8 +100,31 @@ for workspace = 1, 10 do
   bind_dispatch(mainMod .. " SHIFT", key, hl.dsp.window.move({ workspace = workspaceId }))
 end
 
-bind_dispatch(mainMod, "mouse_down", hl.dsp.focus({ workspace = "r-1" }))
-bind_dispatch(mainMod, "mouse_up", hl.dsp.focus({ workspace = "r+1" }))
+local function scroll_bind(workspace, column)
+  return function()
+    if hl.get_config("general.layout") == "scrolling" then
+      hl.dispatch(hl.dsp.layout("move " .. column))
+    else
+      hl.dispatch(hl.dsp.focus({ workspace = workspace }))
+    end
+  end
+end
+
+bind_dispatch(mainMod, "mouse_down", scroll_bind("r-1", "-col"))
+bind_dispatch(mainMod, "mouse_up", scroll_bind("r+1", "+col"))
+
+local function scrolling_only(msg)
+  return function()
+    if hl.get_config("general.layout") == "scrolling" then
+      hl.dispatch(hl.dsp.layout(msg))
+    end
+  end
+end
+
+bind_dispatch(mainMod .. " SHIFT", "mouse_down", scrolling_only("swapcol l"))
+bind_dispatch(mainMod .. " SHIFT", "mouse_up", scrolling_only("swapcol r"))
+bind_dispatch(mainMod .. " CTRL", "mouse_down", scrolling_only("colresize -0.05"))
+bind_dispatch(mainMod .. " CTRL", "mouse_up", scrolling_only("colresize +0.05"))
 bind_dispatch(mainMod, "period", hl.dsp.focus({ workspace = "r+1" }))
 bind_dispatch(mainMod, "comma", hl.dsp.focus({ workspace = "r-1" }))
 

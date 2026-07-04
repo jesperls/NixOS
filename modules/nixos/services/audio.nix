@@ -3,7 +3,6 @@
 {
   security.rtkit.enable = true;
 
-  # PipeWire configuration
   services.pipewire = {
     enable = true;
     alsa = {
@@ -13,7 +12,6 @@
     pulse.enable = true;
   };
 
-  # PipeWire performance tuning for A50 headset (24-bit/48kHz)
   services.pipewire.extraConfig.pipewire."99-performance" = {
     "context.properties" = {
       "default.clock.rate" = 48000;
@@ -27,7 +25,6 @@
     };
   };
 
-  # WirePlumber configuration for A50 device naming and optimization
   services.pipewire.wireplumber.extraConfig."51-a50-config" = {
     "monitor.alsa.rules" = [
       {

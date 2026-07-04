@@ -13,6 +13,12 @@ hl.config({
     layout = "dwindle",
     resize_on_border = true,
     allow_tearing = state.gaming.tearing,
+    snap = {
+      enabled = true,
+    },
+  },
+  layout = {
+    single_window_aspect_ratio = { 16, 9 },
   },
   decoration = {
     rounding = theme.rounding,
@@ -41,6 +47,14 @@ hl.config({
   },
   dwindle = {
     preserve_split = true,
+  },
+  scrolling = {
+    column_width = 0.5,
+    explicit_column_widths = "0.25, 0.333, 0.5, 0.667, 1.0",
+  },
+  binds = {
+    -- Must stay 0: throttled scroll events leak through to the window.
+    scroll_event_delay = 0,
   },
   misc = {
     disable_hyprland_logo = true,

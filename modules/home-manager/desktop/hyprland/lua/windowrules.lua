@@ -40,10 +40,10 @@ window_rule({ match = { title = "^(Quickshell Package Manager)$" }, center = tru
 
 window_rule({ match = { title = "^(Picture-in-Picture)$" }, float = true })
 window_rule({ match = { title = "^(Picture-in-Picture)$" }, pin = true })
-window_rule({ match = { title = "^(Picture-in-Picture)$" }, size = { 480, 270 } })
+window_rule({ match = { title = "^(Picture-in-Picture)$" }, size = { 640, 360 } })
 window_rule({
   match = { title = "^(Picture-in-Picture)$" },
-  move = { "monitor_w - 490", "monitor_h - 280" },
+  move = { "monitor_w - 660", "monitor_h - 380" },
 })
 
 local translucent = string.format("%.2f %.2f", state.theme.translucent_opacity, state.theme.translucent_opacity)

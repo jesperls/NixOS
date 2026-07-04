@@ -2,7 +2,6 @@
 
 {
   imports = [
-    # Shared configuration that should apply to all desktop hosts.
     ./options
 
     ./core/boot.nix
