@@ -39,6 +39,30 @@ let
       monitor = monitor.name;
       default = true;
     };
+  monitorWidth = monitor: lib.toInt (builtins.head (lib.splitString "x" monitor.resolution));
+  specialWorkspaceRules =
+    if numMonitors == 0 then
+      [ ]
+    else
+      let
+        width = monitorWidth (builtins.head activeMonitors);
+        sideGap = (width - 2560) / 2;
+      in
+      lib.optionals (width > 3440) (
+        map (workspace: {
+          inherit workspace;
+          gaps_out = {
+            left = sideGap;
+            right = sideGap;
+            top = 30;
+            bottom = 30;
+          };
+        })
+          [
+            "special:magic"
+            "special:scratchpad"
+          ]
+      );
 in
 {
   env = [
@@ -69,5 +93,6 @@ in
     }
   ];
 
-  workspace_rule = if numMonitors == 0 then [ ] else lib.genList mkWorkspaceRule 9;
+  workspace_rule =
+    (if numMonitors == 0 then [ ] else lib.genList mkWorkspaceRule 9) ++ specialWorkspaceRules;
 }
