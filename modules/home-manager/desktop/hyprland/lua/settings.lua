@@ -18,7 +18,8 @@ hl.config({
     },
   },
   layout = {
-    single_window_aspect_ratio = { 16, 9 },
+    single_window_aspect_ratio = state.layouts.single_window_ratio,
+    single_window_aspect_ratio_tolerance = 0,
   },
   decoration = {
     rounding = theme.rounding,
@@ -47,10 +48,6 @@ hl.config({
   },
   dwindle = {
     preserve_split = true,
-  },
-  scrolling = {
-    column_width = 0.5,
-    explicit_column_widths = "0.25, 0.333, 0.5, 0.667, 1.0",
   },
   binds = {
     -- Must stay 0: throttled scroll events leak through to the window.
