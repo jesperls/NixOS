@@ -60,6 +60,10 @@ end
 window_rule({ match = { class = "xdg-desktop-portal-gtk" }, float = true })
 window_rule({ match = { class = "hyprpolkitagent" }, float = true })
 
+window_rule({ match = { workspace = "special:scratchpad" }, float = true })
+window_rule({ match = { workspace = "special:scratchpad" }, size = { 900, 700 } })
+window_rule({ match = { workspace = "special:scratchpad" }, center = true })
+
 window_rule({ match = { title = "Sharing your screen" }, opacity = "1.0 override 1.0 override" })
 window_rule({ match = { title = "sharing indicator" }, opacity = "1.0 override 1.0 override" })
 

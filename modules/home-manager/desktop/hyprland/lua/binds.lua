@@ -26,7 +26,7 @@ bind_exec(mainMod, "E", apps.file_manager)
 bind_exec(mainMod, "C", apps.editor)
 bind_exec(mainMod, "R", "ratty")
 bind_exec(mainMod, "D", "discord")
-bind_exec(mainMod, "G", "myna")
+bind_exec(mainMod, "G", "caelestia-shell ipc call gameMode toggle")
 bind_exec(mainMod, "M", "easyeffects")
 bind_exec(mainMod, "P", "qs-pkg-manager")
 bind_exec(mainMod .. " SHIFT", "W", "wallpaper-manager pick")
@@ -50,7 +50,15 @@ bind_dispatch("ALT", "Tab", hl.dsp.window.alter_zorder({ mode = "top" }))
 
 for key, direction in pairs({ left = "l", right = "r", up = "u", down = "d" }) do
   bind_dispatch(mainMod, key, hl.dsp.focus({ direction = direction }))
-  bind_dispatch(mainMod .. " SHIFT", key, hl.dsp.window.move({ direction = direction }))
+
+  local move = hl.dsp.window.move({ direction = direction })
+  bind_dispatch(mainMod .. " SHIFT", key, function()
+    if hl.get_config("general.layout") == "lua:centered" then
+      hl.dispatch(hl.dsp.layout("move " .. direction))
+    else
+      hl.dispatch(move)
+    end
+  end)
 end
 
 for key, delta in pairs({
@@ -78,17 +86,20 @@ bind_dispatch(mainMod, "X", hl.dsp.window.resize(), { mouse = true })
 
 -- Layouts ----------------------------------------------------------------
 
-bind_dispatch(mainMod, "O", function()
-  local layout = hl.get_config("general.layout")
-  hl.config({ general = { layout = layout == "scrolling" and "dwindle" or "scrolling" } })
-end)
+bind_dispatch(mainMod, "O", require("jesperls.layout_modes").toggle)
 
-bind_dispatch(mainMod, "minus", hl.dsp.layout("colresize -conf"))
-bind_dispatch(mainMod, "equal", hl.dsp.layout("colresize +conf"))
-bind_dispatch(mainMod .. " ALT", "left", hl.dsp.layout("consume_or_expel prev"))
-bind_dispatch(mainMod .. " ALT", "right", hl.dsp.layout("consume_or_expel next"))
-bind_dispatch(mainMod .. " ALT", "up", hl.dsp.layout("center"))
-bind_dispatch(mainMod .. " ALT", "down", hl.dsp.layout("fit visible"))
+local function centered_only(msg)
+  return function()
+    if hl.get_config("general.layout") == "lua:centered" then
+      hl.dispatch(hl.dsp.layout(msg))
+    end
+  end
+end
+
+bind_dispatch(mainMod, "minus", centered_only("mfact -" .. state.layouts.centered.resize_step))
+bind_dispatch(mainMod, "equal", centered_only("mfact +" .. state.layouts.centered.resize_step))
+bind_dispatch(mainMod, "Return", centered_only("promote"))
+bind_dispatch(mainMod, "mouse:274", centered_only("promote"))
 
 -- Workspaces -----------------------------------------------------------
 
@@ -100,31 +111,8 @@ for workspace = 1, 10 do
   bind_dispatch(mainMod .. " SHIFT", key, hl.dsp.window.move({ workspace = workspaceId }))
 end
 
-local function scroll_bind(workspace, column)
-  return function()
-    if hl.get_config("general.layout") == "scrolling" then
-      hl.dispatch(hl.dsp.layout("move " .. column))
-    else
-      hl.dispatch(hl.dsp.focus({ workspace = workspace }))
-    end
-  end
-end
-
-bind_dispatch(mainMod, "mouse_down", scroll_bind("r-1", "-col"))
-bind_dispatch(mainMod, "mouse_up", scroll_bind("r+1", "+col"))
-
-local function scrolling_only(msg)
-  return function()
-    if hl.get_config("general.layout") == "scrolling" then
-      hl.dispatch(hl.dsp.layout(msg))
-    end
-  end
-end
-
-bind_dispatch(mainMod .. " SHIFT", "mouse_down", scrolling_only("swapcol l"))
-bind_dispatch(mainMod .. " SHIFT", "mouse_up", scrolling_only("swapcol r"))
-bind_dispatch(mainMod .. " CTRL", "mouse_down", scrolling_only("colresize -0.05"))
-bind_dispatch(mainMod .. " CTRL", "mouse_up", scrolling_only("colresize +0.05"))
+bind_dispatch(mainMod, "mouse_down", hl.dsp.focus({ workspace = "r-1" }))
+bind_dispatch(mainMod, "mouse_up", hl.dsp.focus({ workspace = "r+1" }))
 bind_dispatch(mainMod, "period", hl.dsp.focus({ workspace = "r+1" }))
 bind_dispatch(mainMod, "comma", hl.dsp.focus({ workspace = "r-1" }))
 

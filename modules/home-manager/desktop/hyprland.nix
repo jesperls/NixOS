@@ -32,6 +32,23 @@ let
   };
   apps = osConfig.mySystem.defaultApps;
   gaming = osConfig.mySystem.desktop.gaming;
+  layouts = osConfig.mySystem.desktop.layouts;
+  autoFakeFullscreen = osConfig.mySystem.desktop.autoFakeFullscreen;
+  primaryMonitor = let
+    enabled = builtins.filter (m: !m.disabled) osConfig.mySystem.monitors;
+  in
+    if enabled != [ ] then lib.head enabled else null;
+  singleWindowRatio =
+    if primaryMonitor == null then
+      [ 16 9 ]
+    else
+      let
+        parts = lib.splitString "x" primaryMonitor.resolution;
+      in
+      [
+        (layouts.centered.masterWidth * (lib.toInt (lib.elemAt parts 0)))
+        (lib.toInt (lib.elemAt parts 1))
+      ];
   generatedState = {
     keyboard_layout = osConfig.mySystem.system.keyboardLayout;
     lockscreen = {
@@ -47,6 +64,25 @@ let
     gaming = {
       tearing = gaming.tearing.enable;
       tearing_class_patterns = gaming.tearing.classPatterns;
+    };
+    layouts = {
+      default = layouts.default;
+      cycle = layouts.cycle;
+      centered = {
+        master_width = layouts.centered.masterWidth;
+        master_width_min = layouts.centered.masterWidthMin;
+        master_width_max = layouts.centered.masterWidthMax;
+        resize_step = layouts.centered.resizeStep;
+      };
+      single_window_ratio = singleWindowRatio;
+    };
+    auto_fake_fullscreen = {
+      enable = autoFakeFullscreen.enable;
+      classes =
+        if autoFakeFullscreen.classes == [ ] then
+          [ apps.browser.command ]
+        else
+          autoFakeFullscreen.classes;
     };
     theme = {
       active_border = activeBorder;
@@ -89,6 +125,9 @@ in
     "hypr/jesperls/settings.lua".source = ./hyprland/lua/settings.lua;
     "hypr/jesperls/windowrules.lua".source = ./hyprland/lua/windowrules.lua;
     "hypr/jesperls/startup.lua".source = ./hyprland/lua/startup.lua;
+    "hypr/jesperls/layouts.lua".source = ./hyprland/lua/layouts.lua;
+    "hypr/jesperls/layout_modes.lua".source = ./hyprland/lua/layout_modes.lua;
+    "hypr/jesperls/events.lua".source = ./hyprland/lua/events.lua;
     "hypr/jesperls/generated.lua".text = "return ${toLua generatedState}\n";
     "hypr/xdph.conf".text = ''
       screencopy {

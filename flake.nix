@@ -55,11 +55,6 @@
       url = "github:ThatOneCalculator/deltatune-linux";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    myna = {
-      url = "github:SmoxBoye/myna";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.quickshell.follows = "caelestia-shell/quickshell";
-    };
     qs-vpets = {
       url = "github:jesperls/qs-vpets";
       inputs.nixpkgs.follows = "nixpkgs";

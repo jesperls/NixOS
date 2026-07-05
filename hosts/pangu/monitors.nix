@@ -7,7 +7,7 @@
       resolution = "5120x1440";
       refreshRate = 240;
       position = "0x0";
-      vrr = 2;
+      vrr = 1;
       bitdepth = 10;
     }
   ];

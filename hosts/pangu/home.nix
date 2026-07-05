@@ -22,7 +22,6 @@
     ../../modules/home-manager/services/deltatune.nix
     ../../modules/home-manager/services/desktop-autostarts.nix
     ../../modules/home-manager/programs/quickshell-package-manager.nix
-    ../../modules/home-manager/programs/myna.nix
     ../../modules/home-manager/programs/qs-vpets.nix
     ./packages.nix
   ];
