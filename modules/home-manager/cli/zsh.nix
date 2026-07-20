@@ -75,7 +75,7 @@
       # snil <input>... — rebuild with inputs overridden to local checkouts
       snil() {
         if [ "$#" -eq 0 ]; then
-          echo "usage: snil <input>... (caelestia-shell, wallpaper-picker, qs-vpets, quickshell-package-manager)" >&2
+          echo "usage: snil <input>... (ambxst, qs-vpets, quickshell-package-manager)" >&2
           return 1
         fi
         local -a overrides
@@ -83,6 +83,7 @@
         for input in "$@"; do
           case "$input" in
             quickshell-package-manager|qpm) input=quickshell-package-manager dir=nix-quickshell-package-manager ;;
+            ambxst) dir=Ambxst ;;
             *) dir=$input ;;
           esac
           overrides+=(--override-input "$input" "path:$FLAKE/$dir")

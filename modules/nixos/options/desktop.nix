@@ -20,6 +20,39 @@
       };
     };
 
+    idle = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Run idle actions (dim, screen off, suspend, and idle lock) after periods of inactivity. When disabled, no idle timers fire at all.";
+      };
+      dimTimeout = lib.mkOption {
+        type = lib.types.ints.unsigned;
+        default = 150;
+        description = "Seconds of inactivity before the screen dims. 0 disables dimming.";
+      };
+      dimBrightness = lib.mkOption {
+        type = lib.types.ints.between 0 100;
+        default = 10;
+        description = "Brightness percentage to dim to when idle.";
+      };
+      lockTimeout = lib.mkOption {
+        type = lib.types.ints.unsigned;
+        default = 300;
+        description = "Seconds of inactivity before locking the screen. Only takes effect when desktop.lockscreen.enable is true. 0 disables the idle lock even when the lockscreen is enabled.";
+      };
+      screenOffTimeout = lib.mkOption {
+        type = lib.types.ints.unsigned;
+        default = 330;
+        description = "Seconds of inactivity before turning the display off (DPMS). 0 disables.";
+      };
+      suspendTimeout = lib.mkOption {
+        type = lib.types.ints.unsigned;
+        default = 1800;
+        description = "Seconds of inactivity before suspending the system. 0 disables idle suspend.";
+      };
+    };
+
     gaming = {
       tearing = {
         enable = lib.mkOption {
@@ -52,23 +85,26 @@
       centered = {
         masterWidth = lib.mkOption {
           type = lib.types.numbers.between 0.0 1.0;
-          default = 0.55;
-          description = "Fraction of the workspace width the centered master column occupies.";
+          default = 0.50;
+          description = "Fraction of the workspace width the fixed centered master column occupies.";
         };
-        masterWidthMin = lib.mkOption {
-          type = lib.types.numbers.between 0.0 1.0;
-          default = 0.2;
-          description = "Lower bound when resizing the master column.";
+        fullHeight = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Make the centered master span the full monitor height at a fixed aspect ratio, extending over the bar's reserved area. The bar is expected to split around it (Ambxst listens for the centergap event).";
         };
-        masterWidthMax = lib.mkOption {
-          type = lib.types.numbers.between 0.0 1.0;
-          default = 0.8;
-          description = "Upper bound when resizing the master column.";
+        fullHeightAspect = lib.mkOption {
+          type = lib.types.listOf lib.types.int;
+          default = [
+            16
+            9
+          ];
+          description = "Aspect ratio (width height) of the full-height centered master.";
         };
-        resizeStep = lib.mkOption {
-          type = lib.types.numbers.between 0.0 1.0;
-          default = 0.05;
-          description = "How much the master width changes per resize keypress.";
+        heightResizeStep = lib.mkOption {
+          type = lib.types.numbers.between 0.0 2.0;
+          default = 0.15;
+          description = "How much a side window's height weight changes per resize keypress.";
         };
       };
     };

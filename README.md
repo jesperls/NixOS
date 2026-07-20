@@ -7,9 +7,13 @@ layer so additional hosts only need their own `hosts/<name>/` directory.
 ## Layout
 
 ```
-flake.nix                  Inputs + nixosConfigurations. Subprojects are
-                           consumed from github:jesperls/*, with `follows`
-                           pinning everything to one nixpkgs + one quickshell.
+flake.nix                  Inputs + nixosConfigurations. Quickshell subprojects
+                           are consumed from github:jesperls/* (Ambxst from the
+                           local checkout via git+file), with `follows` pinning
+                           everything to one nixpkgs + one quickshell.
+Ambxst/                    Local fork of the Ambxst desktop shell. Owns Hyprland
+                           appearance and app colors; commit here before a flake
+                           update so the git+file input picks it up.
 hosts/pangu/
   configuration.nix        Entry point: mySystem settings, HM wiring.
   modules.nix              Host-specific module imports (hardware, gaming...).
@@ -35,21 +39,27 @@ modules/home-manager/      HM modules; read system config via osConfig.
 `mySystem.theme` (palette picked via `theme.preset`, override any color
 individually) flows into:
 
-- Hyprland (borders, gaps, blur, shadows, animations) via `generated.lua`
+- Hyprland (borders, gaps, blur, shadows, animations) via `generated.lua` —
+  unless Ambxst is enabled, in which case Ambxst owns those settings
 - kitty, fzf, starship colors
 - GTK (adw-gtk3 + accent CSS), Qt (qt5ct/qt6ct palette + Fusion)
-- caelestia-shell, wallpaper-picker, quickshell-package-manager via each
-  flake's `baseColors` option (derived into a full M3 palette at build time)
+- quickshell-package-manager via its `baseColors` option (derived into a
+  full M3 palette at build time)
+
+Keybinds, autostarts, and layouts always come from the nix-managed Lua
+config (`modules/home-manager/desktop/hyprland/lua/`); Ambxst's own
+management of them is switched off by an `ExecStartPre` on its service.
 
 ## Subproject development
 
-The quickshell apps (caelestia-shell, wallpaper-picker, qs-vpets,
-nix-quickshell-package-manager) are checked out inside this directory
-(gitignored) and consumed from GitHub. For local iteration without
-pushing, rebuild with the input overridden to the local checkout:
+The quickshell apps (Ambxst, qs-vpets, nix-quickshell-package-manager) are
+checked out inside this directory and consumed as flake inputs — Ambxst
+directly from its checkout, the others from GitHub (checkouts gitignored).
+For local iteration without pushing, rebuild with inputs overridden to the
+local checkouts:
 
 ```
-snil caelestia-shell            # any combination of inputs works
+snil ambxst                     # any combination of inputs works
 ```
 
 Thanks to the `follows` graph this only rebuilds the app itself, not

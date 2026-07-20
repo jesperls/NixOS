@@ -4,11 +4,6 @@
   inputs = {
     # Core
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-sunshine.url = "github:NixOS/nixpkgs?ref=pull/521906/head";
-    nixcord = {
-      url = "github:FlameFlag/nixcord";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -18,31 +13,43 @@
     # Desktop
     hyprnix = {
       url = "github:hyprwm/hyprnix";
+      # Drop when hyprnix bumps its aquamarine pin.
+      inputs.aquamarine.url = "github:hyprwm/aquamarine/v0.13.0";
     };
 
-    caelestia-shell = {
-      url = "github:jesperls/caelestia-shell";
+    # Shared quickshell build for the local quickshell subprojects.
+    quickshell = {
+      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    wallpaper-picker = {
-      url = "github:jesperls/wallpaper-picker";
+    ambxst = {
+      url = "git+file:///home/jesperls/nixos-config/Ambxst";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.quickshell.follows = "caelestia-shell/quickshell";
+    };
+
+    systems-linux.url = "github:nix-systems/default-linux";
+
+    linux-wallpaper-engine = {
+      url = "github:jagrat7/linux-wallpaper-engine";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.bun2nix.inputs.systems.follows = "systems-linux";
     };
 
     quickshell-package-manager = {
       url = "github:jesperls/nix-quickshell-package-manager";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.quickshell.follows = "caelestia-shell/quickshell";
+      inputs.quickshell.follows = "quickshell";
     };
 
     # Kernel
-    nix-cachyos-kernel = {
-      url = "github:xddxdd/nix-cachyos-kernel/release";
-    };
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     # Applications
+    nixcord = {
+      url = "github:FlameFlag/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -58,7 +65,7 @@
     qs-vpets = {
       url = "github:jesperls/qs-vpets";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.quickshell.follows = "caelestia-shell/quickshell";
+      inputs.quickshell.follows = "quickshell";
     };
   };
 

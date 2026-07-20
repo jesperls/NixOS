@@ -2,7 +2,6 @@
 
 {
   options.mySystem = {
-    # User configuration
     user = {
       username = lib.mkOption {
         type = lib.types.str;
@@ -18,7 +17,6 @@
       };
     };
 
-    # System configuration
     system = {
       locale = lib.mkOption {
         type = lib.types.str;
@@ -57,7 +55,6 @@
       };
     };
 
-    # Home Manager configuration
     home = {
       stateVersion = lib.mkOption {
         type = lib.types.str;
@@ -66,7 +63,6 @@
       };
     };
 
-    # Repository / host paths
     paths = {
       repoRoot = lib.mkOption {
         type = lib.types.str;
@@ -87,7 +83,6 @@
       };
     };
 
-    # Monitor configuration
     monitors = lib.mkOption {
       default = [ ];
       description = "List of monitor configurations.";
@@ -123,6 +118,33 @@
               );
               default = null;
               description = "Output bit depth (10 enables 10-bit output).";
+            };
+            cm = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "auto"
+                  "srgb"
+                  "wide"
+                  "edid"
+                  "hdr"
+                  "hdredid"
+                  "dcip3"
+                  "dp3"
+                  "adobe"
+                ]
+              );
+              default = null;
+              description = "Color management preset (auto picks wide gamut for 10-bit outputs).";
+            };
+            sdrbrightness = lib.mkOption {
+              type = lib.types.nullOr lib.types.float;
+              default = null;
+              description = "SDR content brightness multiplier in HDR mode.";
+            };
+            sdrsaturation = lib.mkOption {
+              type = lib.types.nullOr lib.types.float;
+              default = null;
+              description = "SDR content saturation multiplier in HDR mode.";
             };
             disabled = lib.mkOption {
               type = lib.types.bool;

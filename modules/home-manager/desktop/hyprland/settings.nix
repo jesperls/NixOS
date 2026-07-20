@@ -25,6 +25,15 @@ let
     }
     // lib.optionalAttrs (!monitor.disabled && monitor.bitdepth != null) {
       bitdepth = monitor.bitdepth;
+    }
+    // lib.optionalAttrs (!monitor.disabled && monitor.cm != null) {
+      cm = monitor.cm;
+    }
+    // lib.optionalAttrs (!monitor.disabled && monitor.sdrbrightness != null) {
+      sdrbrightness = monitor.sdrbrightness;
+    }
+    // lib.optionalAttrs (!monitor.disabled && monitor.sdrsaturation != null) {
+      sdrsaturation = monitor.sdrsaturation;
     };
   monitors = osConfig.mySystem.monitors;
   activeMonitors = builtins.filter (monitor: !monitor.disabled) monitors;
@@ -40,24 +49,29 @@ let
       default = true;
     };
   monitorWidth = monitor: lib.toInt (builtins.head (lib.splitString "x" monitor.resolution));
+  # On ultrawide monitors, pad special workspaces down to a regular-width
+  # centered column instead of spanning the whole screen.
   specialWorkspaceRules =
     if numMonitors == 0 then
       [ ]
     else
       let
+        ultrawideThreshold = 3440;
+        specialWidth = 2560;
         width = monitorWidth (builtins.head activeMonitors);
-        sideGap = (width - 2560) / 2;
+        sideGap = (width - specialWidth) / 2;
       in
-      lib.optionals (width > 3440) (
-        map (workspace: {
-          inherit workspace;
-          gaps_out = {
-            left = sideGap;
-            right = sideGap;
-            top = 30;
-            bottom = 30;
-          };
-        })
+      lib.optionals (width > ultrawideThreshold) (
+        map
+          (workspace: {
+            inherit workspace;
+            gaps_out = {
+              left = sideGap;
+              right = sideGap;
+              top = 30;
+              bottom = 30;
+            };
+          })
           [
             "special:magic"
             "special:scratchpad"
@@ -65,24 +79,21 @@ let
       );
 in
 {
-  env = [
-    (mkCall [
-      "XCURSOR_THEME"
-      cursorTheme.name
-    ])
-    (mkCall [
-      "XCURSOR_SIZE"
-      (toString cursorTheme.size)
-    ])
-    (mkCall [
-      "HYPRCURSOR_THEME"
-      cursorTheme.name
-    ])
-    (mkCall [
-      "HYPRCURSOR_SIZE"
-      (toString cursorTheme.size)
-    ])
-  ];
+  env =
+    lib.mapAttrsToList
+      (
+        name: value:
+        mkCall [
+          name
+          value
+        ]
+      )
+      {
+        XCURSOR_THEME = cursorTheme.name;
+        XCURSOR_SIZE = toString cursorTheme.size;
+        HYPRCURSOR_THEME = cursorTheme.name;
+        HYPRCURSOR_SIZE = toString cursorTheme.size;
+      };
 
   monitor = (map renderMonitor monitors) ++ [
     {
@@ -94,5 +105,5 @@ in
   ];
 
   workspace_rule =
-    (if numMonitors == 0 then [ ] else lib.genList mkWorkspaceRule 9) ++ specialWorkspaceRules;
+    (if numMonitors == 0 then [ ] else lib.genList mkWorkspaceRule 10) ++ specialWorkspaceRules;
 }

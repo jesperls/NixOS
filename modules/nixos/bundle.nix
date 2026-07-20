@@ -17,6 +17,7 @@
 
     ./desktop/common.nix
     ./desktop/hyprland.nix
+    ./desktop/ambxst.nix
 
     ./performance/optimizations.nix
 

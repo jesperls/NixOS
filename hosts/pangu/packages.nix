@@ -47,7 +47,6 @@
     qpwgraph
     overskride
     audacity
-    solaar
     scrcpy
     obsidian
     gedit

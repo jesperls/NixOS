@@ -1,4 +1,5 @@
 local state = require("jesperls.generated")
+local fullscreen = require("jesperls.fullscreen")
 
 if not state.auto_fake_fullscreen.enable then
   return true
@@ -9,12 +10,10 @@ for _, class in ipairs(state.auto_fake_fullscreen.classes) do
   classes[class] = true
 end
 
--- Demote fullscreen to client-only when the window shares the workspace
--- with tiled windows: the video fills the tile, real fullscreen when alone.
 local demoting = false
 
 hl.on("window.fullscreen", function(window)
-  if demoting or not window or not classes[window.class] or window.fullscreen ~= 2 then
+  if demoting or fullscreen.suppress or not window or not classes[window.class] or window.fullscreen ~= 2 then
     return
   end
 

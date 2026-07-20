@@ -1,8 +1,10 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   programs.firefox = {
     enable = true;
+
+    nativeMessagingHosts = [ pkgs.fx-cast-bridge ];
 
     policies = {
       DisableTelemetry = true;

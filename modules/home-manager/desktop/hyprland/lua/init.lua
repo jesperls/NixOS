@@ -1,3 +1,4 @@
+require("jesperls.ambxst")
 require("jesperls.settings")
 require("jesperls.startup")
 require("jesperls.windowrules")

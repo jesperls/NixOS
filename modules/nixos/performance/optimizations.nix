@@ -33,8 +33,6 @@
   services.udev.extraRules = ''
     ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
-    # uinput access for Sunshine
-    KERNEL=="uinput", MODE="0660", GROUP="input", SYMLINK+="uinput"
   '';
 
   services.earlyoom = {
@@ -46,8 +44,7 @@
       "--prefer"
       "(^|/)(wine|wineserver|Battle\\.net|lutris-wrapper)$|^/.*/(drive_c|Program Files|steamapps)/.*\\.exe$"
       "--avoid"
-      # quickshell matched unanchored: its comm name truncates to ".quickshell-wra"
-      "(^|/)(Hyprland|pipewire|wireplumber)$|quickshell|caelestia"
+      "(^|/)(Hyprland|pipewire|wireplumber|qs|\\.qs-wrapped|axctl)$|quickshell|ambxst"
     ];
   };
 

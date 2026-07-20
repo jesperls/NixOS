@@ -3,5 +3,5 @@
 {
   imports = [ inputs.qs-vpets.homeManagerModules.default ];
 
-  programs.qs-vpets.enable = true;
+  programs.qs-vpets.enable = false;
 }

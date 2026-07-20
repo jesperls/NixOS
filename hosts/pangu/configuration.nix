@@ -11,7 +11,6 @@ let
     name = "hm-rotating-backup";
     runtimeInputs = [ pkgs.coreutils ];
     text = ''
-      set -u
       target="''${1:?target path required}"
       keep=3
 
@@ -75,6 +74,7 @@ in
     home.stateVersion = "26.05";
 
     desktop.gaming.tearing.enable = true;
+    desktop.layouts.centered.fullHeight = true;
   };
 
   home-manager = {
@@ -87,6 +87,39 @@ in
     backupCommand = lib.getExe hmRotatingBackup;
     extraSpecialArgs = { inherit inputs; };
   };
+
+  services.minidlna = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      friendly_name = "DLNA MEDIA";
+      media_dir = [
+        "V,/srv/media/videos"
+      ];
+      log_level = "error";
+    };
+  };
+
+  users.users.minidlna = {
+    extraGroups = [ "users" ];
+  };
+
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    publish = {
+      enable = true;
+      addresses = true;
+      workstation = true;
+    };
+  };
+
+  networking.firewall.allowedUDPPortRanges = [
+    {
+      from = 32768;
+      to = 61000;
+    }
+  ];
 
   system.stateVersion = config.mySystem.system.stateVersion;
 }

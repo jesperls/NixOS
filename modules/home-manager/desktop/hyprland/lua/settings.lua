@@ -1,16 +1,34 @@
 local state = require("jesperls.generated")
 local theme = state.theme
 
+if not state.ambxst then
+  hl.config({
+    general = {
+      gaps_in = theme.gaps_in,
+      gaps_out = theme.gaps_out,
+      border_size = theme.border_size,
+      col = {
+        active_border = theme.active_border,
+        inactive_border = theme.inactive_border,
+      },
+    },
+    decoration = {
+      rounding = theme.rounding,
+      blur = {
+        enabled = theme.blur.enabled,
+        size = theme.blur.size,
+        passes = theme.blur.passes,
+      },
+      shadow = {
+        enabled = theme.shadow_enabled,
+      },
+    },
+  })
+end
+
 hl.config({
   general = {
-    gaps_in = theme.gaps_in,
-    gaps_out = theme.gaps_out,
-    border_size = theme.border_size,
-    col = {
-      active_border = theme.active_border,
-      inactive_border = theme.inactive_border,
-    },
-    layout = "dwindle",
+    layout = state.layouts.default,
     resize_on_border = true,
     allow_tearing = state.gaming.tearing,
     snap = {
@@ -22,17 +40,10 @@ hl.config({
     single_window_aspect_ratio_tolerance = 0,
   },
   decoration = {
-    rounding = theme.rounding,
     blur = {
-      enabled = theme.blur.enabled,
-      size = theme.blur.size,
-      passes = theme.blur.passes,
       new_optimizations = true,
       ignore_opacity = true,
       xray = theme.blur.xray,
-    },
-    shadow = {
-      enabled = theme.shadow_enabled,
     },
   },
   animations = {
@@ -73,15 +84,15 @@ for _, curve in ipairs({
   hl.curve(curve[1], curve[2])
 end
 
-local animEnabled = theme.animations.enabled
-local animSpeed = theme.animations.speed
-
 for _, animation in ipairs({
-  { leaf = "windows", enabled = animEnabled, speed = animSpeed, bezier = "easeInOutQuint", style = "slide" },
-  { leaf = "windowsOut", enabled = animEnabled, speed = animSpeed, bezier = "easeInOutQuint", style = "slide" },
-  { leaf = "fade", enabled = animEnabled, speed = animSpeed, bezier = "easeInOutQuint" },
-  { leaf = "workspaces", enabled = animEnabled, speed = animSpeed, bezier = "easeInOutQuint", style = "slidevert" },
+  { leaf = "windows", style = "slide" },
+  { leaf = "windowsOut", style = "slide" },
+  { leaf = "fade" },
+  { leaf = "workspaces", style = "slidevert" },
 }) do
+  animation.enabled = theme.animations.enabled
+  animation.speed = theme.animations.speed
+  animation.bezier = "easeInOutQuint"
   hl.animation(animation)
 end
 
