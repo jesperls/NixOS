@@ -466,14 +466,13 @@ function M.end_drag()
   end
 end
 
-local major, minor = hl.version():match("^(%d+)%.(%d+)")
-if tonumber(major) > 0 or tonumber(minor) >= 56 then
-  hl.on("input.keyboard.key", function(keycode, _, state)
-    if drag and state == 0 and (keycode == 133 or keycode == 134) then
-      M.end_drag()
-    end
-  end)
-end
+-- Releasing SUPER ends a drag: the mouse-button release bind never fires when
+-- the modifier goes up first. 133/134 are the left/right Super keycodes.
+hl.on("input.keyboard.key", function(keycode, _, state)
+  if drag and state == 0 and (keycode == 133 or keycode == 134) then
+    M.end_drag()
+  end
+end)
 
 hl.layout.register("centered", {
   recalculate = function(ctx)

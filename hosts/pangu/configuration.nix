@@ -1,34 +1,5 @@
-{
-  config,
-  inputs,
-  lib,
-  pkgs,
-  ...
-}:
+{ config, ... }:
 
-let
-  hmRotatingBackup = pkgs.writeShellApplication {
-    name = "hm-rotating-backup";
-    runtimeInputs = [ pkgs.coreutils ];
-    text = ''
-      target="''${1:?target path required}"
-      keep=3
-
-      rm -f -- "$target.hm-backup.$keep"
-      i=$((keep - 1))
-      while [ "$i" -ge 1 ]; do
-        src="$target.hm-backup.$i"
-        dst="$target.hm-backup.$((i + 1))"
-        if [ -e "$src" ] || [ -L "$src" ]; then
-          mv -f -- "$src" "$dst"
-        fi
-        i=$((i - 1))
-      done
-
-      mv -f -- "$target" "$target.hm-backup.1"
-    '';
-  };
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -38,11 +9,6 @@ in
 
     ../../modules/nixos/bundle.nix
   ];
-
-  networking.interfaces.eno1.wakeOnLan = {
-    enable = true;
-    policy = [ "magic" ];
-  };
 
   mySystem = {
     user = {
@@ -55,71 +21,33 @@ in
       hostName = "pangu";
       timeZone = "Europe/Stockholm";
       locale = "en_US.UTF-8";
+      regionalLocale = "sv_SE.UTF-8";
       keyboardLayout = "se";
       consoleKeyMap = "sv-latin1";
       stateVersion = "26.05";
-      extraLocaleSettings = lib.genAttrs [
-        "LC_ADDRESS"
-        "LC_IDENTIFICATION"
-        "LC_MEASUREMENT"
-        "LC_MONETARY"
-        "LC_NAME"
-        "LC_NUMERIC"
-        "LC_PAPER"
-        "LC_TELEPHONE"
-        "LC_TIME"
-      ] (_: "sv_SE.UTF-8");
+      autoLogin = true;
+      passwordlessSudo = true;
     };
 
     home.stateVersion = "26.05";
 
+    desktop.idle.enable = false;
     desktop.gaming.tearing.enable = true;
     desktop.layouts.centered.fullHeight = true;
-  };
 
-  home-manager = {
-    users.${config.mySystem.user.username} = {
-      imports = [ ./home.nix ];
-    };
-
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupCommand = lib.getExe hmRotatingBackup;
-    extraSpecialArgs = { inherit inputs; };
-  };
-
-  services.minidlna = {
-    enable = true;
-    openFirewall = true;
-    settings = {
-      friendly_name = "DLNA MEDIA";
-      media_dir = [
-        "V,/srv/media/videos"
-      ];
-      log_level = "error";
-    };
-  };
-
-  users.users.minidlna = {
-    extraGroups = [ "users" ];
-  };
-
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    publish = {
+    services.dlna = {
       enable = true;
-      addresses = true;
-      workstation = true;
+      friendlyName = "DLNA MEDIA";
+      mediaDirs = [ "V,/srv/media/videos" ];
     };
   };
 
-  networking.firewall.allowedUDPPortRanges = [
-    {
-      from = 32768;
-      to = 61000;
-    }
-  ];
+  networking.interfaces.eno1.wakeOnLan = {
+    enable = true;
+    policy = [ "magic" ];
+  };
+
+  home-manager.users.${config.mySystem.user.username}.imports = [ ./home.nix ];
 
   system.stateVersion = config.mySystem.system.stateVersion;
 }

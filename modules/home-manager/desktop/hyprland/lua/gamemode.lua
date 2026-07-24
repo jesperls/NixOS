@@ -1,3 +1,5 @@
+-- Per-workspace "game mode": strips gaps, borders, rounding and animations so
+-- a fullscreen game gets a pixel-exact, effect-free surface.
 local active = {}
 
 local M = {}
@@ -19,7 +21,6 @@ function M.toggle()
     for _, rule in ipairs(rules) do
       rule:set_enabled(false)
     end
-    -- hl.exec_cmd("notify-send -e 'Game mode' 'Disabled on workspace " .. id .. "' -i input-gaming")
   else
     active[id] = {
       hl.workspace_rule({
@@ -36,8 +37,11 @@ function M.toggle()
         no_blur = true,
       }),
     }
-    -- hl.exec_cmd("notify-send -e 'Game mode' 'Enabled on workspace " .. id .. "' -i input-gaming")
   end
+
+  -- The centergap event carries a "square" flag derived from this state, so
+  -- the bar's split strip has to be told even when nothing else changed.
+  require("jesperls.layouts").schedule_scan()
 end
 
 return M

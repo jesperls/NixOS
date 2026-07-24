@@ -85,7 +85,6 @@
       wayland
       qt6.qtwayland
       alsa-lib
-      config.boot.kernelPackages.nvidiaPackages.stable
     ];
   };
 }

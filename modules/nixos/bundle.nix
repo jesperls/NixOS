@@ -12,6 +12,7 @@
     ./services/audio.nix
     ./services/bluetooth.nix
     ./services/flatpak.nix
+    ./services/dlna.nix
     ./programs/fonts.nix
     ./programs/filemanager.nix
 
@@ -21,6 +22,7 @@
 
     ./performance/optimizations.nix
 
+    ./home-manager.nix
     ./users.nix
   ];
 }

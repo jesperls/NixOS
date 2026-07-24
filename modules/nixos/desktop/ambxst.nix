@@ -16,7 +16,8 @@ let
 
   listeners = lib.optionals idle.enable (
     lib.optional (idle.dimTimeout > 0) (
-      mkListener idle.dimTimeout "ambxst brightness ${toString idle.dimBrightness} -s" "ambxst brightness -r"
+      mkListener idle.dimTimeout "ambxst brightness ${toString idle.dimBrightness} -s"
+        "ambxst brightness -r"
     )
     ++ lib.optional (lock.enable && idle.lockTimeout > 0) (
       mkListener idle.lockTimeout "loginctl lock-session" null
@@ -76,6 +77,4 @@ in
   programs.ambxst.systemd.enable = true;
 
   systemd.user.services.ambxst.serviceConfig.ExecStartPre = lib.getExe integrationScript;
-
-  environment.systemPackages = [ pkgs.linux-wallpaperengine ];
 }

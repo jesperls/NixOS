@@ -21,7 +21,17 @@
       locale = lib.mkOption {
         type = lib.types.str;
         default = "en_US.UTF-8";
-        description = "The system locale.";
+        description = "The system locale (messages, sorting, program language).";
+      };
+      regionalLocale = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "sv_SE.UTF-8";
+        description = ''
+          Locale used for the regional LC_* categories (dates, numbers, paper,
+          addresses) while messages stay in `locale`. Null keeps `locale`
+          everywhere.
+        '';
       };
       timeZone = lib.mkOption {
         type = lib.types.str;
@@ -41,7 +51,7 @@
       extraLocaleSettings = lib.mkOption {
         type = lib.types.attrsOf lib.types.str;
         default = { };
-        description = "Extra locale settings.";
+        description = "Additional LC_* overrides, applied on top of `regionalLocale`.";
       };
       hostName = lib.mkOption {
         type = lib.types.str;
@@ -52,6 +62,16 @@
         type = lib.types.str;
         default = "26.05";
         description = "The system state version.";
+      };
+      autoLogin = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Log the primary user into tty1 without a prompt.";
+      };
+      passwordlessSudo = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Let wheel members run sudo without entering a password.";
       };
     };
 

@@ -5,31 +5,33 @@
   ...
 }:
 
+let
+  cfg = config.mySystem;
+in
 {
-  users.users.${config.mySystem.user.username} = {
+  users.users.${cfg.user.username} = {
     isNormalUser = true;
-    description = config.mySystem.user.fullName;
+    description = cfg.user.fullName;
     extraGroups = [
       "networkmanager"
       "wheel"
       "video"
-      "audio"
       "input"
-      "storage"
-      "gamemode"
     ]
-    ++ lib.optional config.virtualisation.docker.enable "docker";
+    ++ lib.optional config.virtualisation.docker.enable "docker"
+    ++ lib.optional config.programs.gamemode.enable "gamemode";
     shell = pkgs.zsh;
   };
 
   programs.zsh.enable = true;
 
-  systemd.services."getty@tty1" = {
+  systemd.services."getty@tty1" = lib.mkIf cfg.system.autoLogin {
     overrideStrategy = "asDropin";
     serviceConfig.ExecStart = [
       ""
-      "@${pkgs.util-linux}/sbin/agetty agetty --autologin ${config.mySystem.user.username} --noclear %I $TERM"
+      "@${pkgs.util-linux}/sbin/agetty agetty --autologin ${cfg.user.username} --noclear %I $TERM"
     ];
   };
-  security.sudo.wheelNeedsPassword = false;
+
+  security.sudo.wheelNeedsPassword = !cfg.system.passwordlessSudo;
 }

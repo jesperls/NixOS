@@ -31,7 +31,7 @@
     ungoogled-chromium
     ratty
     teamspeak6-client
-    antigravity
+    antigravity-ide
     slurp
     swappy
     libnotify

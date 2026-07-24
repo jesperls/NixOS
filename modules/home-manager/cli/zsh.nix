@@ -30,9 +30,9 @@
       "..." = "cd ../..";
       "...." = "cd ../../..";
 
-      snis = "nh os switch $FLAKE --max-jobs 16";
-      snub = "nh os boot $FLAKE --max-jobs 16";
-      snus = "nh os switch $FLAKE --update --max-jobs 16";
+      snis = "nh os switch $FLAKE";
+      snub = "nh os boot $FLAKE";
+      snus = "nh os switch $FLAKE --update";
       snuf = "nh clean all --keep 5";
       nfu = "cd $FLAKE && nix flake update";
 
@@ -59,11 +59,13 @@
       phone = "scrcpy --render-driver=vulkan";
     };
 
-    initContent = ''
-      if [ "$(tty)" = "/dev/tty1" ]; then
+    loginExtra = ''
+      if [ "$(tty)" = /dev/tty1 ] && [ -z "$WAYLAND_DISPLAY" ]; then
         exec start-hyprland
       fi
+    '';
 
+    initContent = ''
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
       zstyle ':completion:*' menu select
       zstyle ':completion:*' list-colors "''${(s.:.)LS_COLORS}"

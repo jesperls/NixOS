@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   osConfig,
   ...
@@ -8,13 +9,19 @@
 let
   theme = osConfig.mySystem.theme;
 
+  # Ambxst regenerates this palette on every theme change; without it a custom
+  # palette would point at a file that never exists.
+  ambxstPalette = osConfig.programs.ambxst.enable or false;
+
   qtctSettings = ver: {
     Appearance = {
       style = theme.qt.style;
-      custom_palette = true;
-      color_scheme_path = "${config.home.homeDirectory}/.config/${ver}/colors/ambxst.colors";
+      custom_palette = ambxstPalette;
       icon_theme = theme.gtk.iconTheme.name;
       standard_dialogs = "xdgdesktopportal";
+    }
+    // lib.optionalAttrs ambxstPalette {
+      color_scheme_path = "${config.home.homeDirectory}/.config/${ver}/colors/ambxst.colors";
     };
     Fonts = {
       general = ''"${theme.fonts.sans},${toString theme.fonts.size}"'';

@@ -5,38 +5,15 @@
 }:
 
 let
-  hyprlandTarget = "hyprland-session.target";
+  mkAutostart = args: import ../lib/autostart.nix args;
 
   cursorTheme = osConfig.mySystem.theme.gtk.cursorTheme;
-  graphicalEnv = [
+  cursorEnv = [
     "XCURSOR_THEME=${cursorTheme.name}"
     "XCURSOR_SIZE=${toString cursorTheme.size}"
     "HYPRCURSOR_THEME=${cursorTheme.name}"
     "HYPRCURSOR_SIZE=${toString cursorTheme.size}"
   ];
-
-  mkAutostart =
-    {
-      description,
-      execStart,
-      unit ? { },
-      service ? { },
-    }:
-    {
-      Unit = {
-        Description = description;
-        After = [ hyprlandTarget ];
-        PartOf = [ hyprlandTarget ];
-      }
-      // unit;
-      Service = {
-        ExecStart = execStart;
-        Restart = "on-failure";
-        RestartSec = 2;
-      }
-      // service;
-      Install.WantedBy = [ hyprlandTarget ];
-    };
 in
 {
   systemd.user.services = {
@@ -44,10 +21,10 @@ in
       description = "qpwgraph — PipeWire graph (minimized)";
       execStart = "${pkgs.qpwgraph}/bin/qpwgraph -m";
       unit.After = [
-        hyprlandTarget
+        "hyprland-session.target"
         "pipewire.service"
       ];
-      service.Environment = graphicalEnv;
+      service.Environment = cursorEnv;
     };
 
     hyprpolkitagent = mkAutostart {

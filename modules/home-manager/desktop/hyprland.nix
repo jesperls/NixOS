@@ -39,6 +39,8 @@ let
       enabled = builtins.filter (m: !m.disabled) osConfig.mySystem.monitors;
     in
     if enabled != [ ] then lib.head enabled else null;
+  # A lone tiled window keeps the centered master's footprint on every layout,
+  # so cycling layouts with one window open doesn't move it.
   singleWindowRatio =
     if primaryMonitor == null then
       [

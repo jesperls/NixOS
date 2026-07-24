@@ -5,78 +5,65 @@
 }:
 let
   cursorTheme = osConfig.mySystem.theme.gtk.cursorTheme;
+  special = osConfig.mySystem.desktop.specialWorkspaces;
+
   mkCall = args: { _args = args; };
+
+  monitorWidth = monitor: lib.toInt (builtins.head (lib.splitString "x" monitor.resolution));
+
   renderMonitor =
     monitor:
     {
       output = monitor.name;
       disabled = monitor.disabled;
     }
-    // lib.optionalAttrs (!monitor.disabled) {
-      mode = "${monitor.resolution}@${toString monitor.refreshRate}";
-      position = monitor.position;
-      scale = monitor.scale;
-    }
-    // lib.optionalAttrs (!monitor.disabled && monitor.transform != null) {
-      transform = monitor.transform;
-    }
-    // lib.optionalAttrs (!monitor.disabled && monitor.vrr != 0) {
-      vrr = monitor.vrr;
-    }
-    // lib.optionalAttrs (!monitor.disabled && monitor.bitdepth != null) {
-      bitdepth = monitor.bitdepth;
-    }
-    // lib.optionalAttrs (!monitor.disabled && monitor.cm != null) {
-      cm = monitor.cm;
-    }
-    // lib.optionalAttrs (!monitor.disabled && monitor.sdrbrightness != null) {
-      sdrbrightness = monitor.sdrbrightness;
-    }
-    // lib.optionalAttrs (!monitor.disabled && monitor.sdrsaturation != null) {
-      sdrsaturation = monitor.sdrsaturation;
-    };
-  monitors = osConfig.mySystem.monitors;
-  activeMonitors = builtins.filter (monitor: !monitor.disabled) monitors;
+    // lib.optionalAttrs (!monitor.disabled) (
+      {
+        mode = "${monitor.resolution}@${toString monitor.refreshRate}";
+        inherit (monitor) position scale;
+      }
+      // lib.filterAttrs (_: value: value != null) {
+        inherit (monitor)
+          transform
+          bitdepth
+          cm
+          sdrbrightness
+          sdrsaturation
+          ;
+      }
+      // lib.optionalAttrs (monitor.vrr != 0) { inherit (monitor) vrr; }
+    );
+
+  activeMonitors = builtins.filter (monitor: !monitor.disabled) osConfig.mySystem.monitors;
   numMonitors = builtins.length activeMonitors;
-  mkWorkspaceRule =
-    index:
-    let
-      monitor = builtins.elemAt activeMonitors (lib.mod index numMonitors);
-    in
-    {
-      workspace = toString (index + 1);
-      monitor = monitor.name;
-      default = true;
-    };
-  monitorWidth = monitor: lib.toInt (builtins.head (lib.splitString "x" monitor.resolution));
-  # On ultrawide monitors, pad special workspaces down to a regular-width
-  # centered column instead of spanning the whole screen.
+
+  mkWorkspaceRule = index: {
+    workspace = toString (index + 1);
+    monitor = (builtins.elemAt activeMonitors (lib.mod index numMonitors)).name;
+    default = true;
+  };
+
   specialWorkspaceRules =
-    if numMonitors == 0 then
-      [ ]
-    else
-      let
-        ultrawideThreshold = 3440;
-        specialWidth = 2560;
-        width = monitorWidth (builtins.head activeMonitors);
-        sideGap = (width - specialWidth) / 2;
-      in
-      lib.optionals (width > ultrawideThreshold) (
-        map
-          (workspace: {
-            inherit workspace;
-            gaps_out = {
-              left = sideGap;
-              right = sideGap;
-              top = 30;
-              bottom = 30;
-            };
-          })
-          [
-            "special:magic"
-            "special:scratchpad"
-          ]
-      );
+    let
+      width = monitorWidth (builtins.head activeMonitors);
+      sideGap = (width - special.maxWidth) / 2;
+    in
+    lib.optionals (numMonitors > 0 && special.maxWidth > 0 && width > special.maxWidth) (
+      map
+        (workspace: {
+          inherit workspace;
+          gaps_out = {
+            left = sideGap;
+            right = sideGap;
+            top = special.verticalGap;
+            bottom = special.verticalGap;
+          };
+        })
+        [
+          "special:magic"
+          "special:scratchpad"
+        ]
+    );
 in
 {
   env =
@@ -95,7 +82,7 @@ in
         HYPRCURSOR_SIZE = toString cursorTheme.size;
       };
 
-  monitor = (map renderMonitor monitors) ++ [
+  monitor = (map renderMonitor osConfig.mySystem.monitors) ++ [
     {
       output = "";
       mode = "preferred";
@@ -105,5 +92,5 @@ in
   ];
 
   workspace_rule =
-    (if numMonitors == 0 then [ ] else lib.genList mkWorkspaceRule 10) ++ specialWorkspaceRules;
+    lib.optionals (numMonitors > 0) (lib.genList mkWorkspaceRule 10) ++ specialWorkspaceRules;
 }

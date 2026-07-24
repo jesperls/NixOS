@@ -23,8 +23,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Local fork lives in ./Ambxst (gitignored). Consumed from GitHub so CI and
+    # garnix can resolve it; iterate locally with `snil ambxst`.
     ambxst = {
-      url = "git+file:///home/jesperls/nixos-config/Ambxst";
+      url = "github:jesperls/Ambxst";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -77,26 +79,31 @@
       ...
     }@inputs:
     let
+      inherit (nixpkgs) lib;
+
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
-      specialArgs = { inherit inputs; };
+      mkHost =
+        hostName:
+        lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs; };
+          modules = [
+            ./hosts/${hostName}/configuration.nix
+            home-manager.nixosModules.home-manager
+          ];
+        };
 
-      pangu = nixpkgs.lib.nixosSystem {
-        inherit system specialArgs;
-        modules = [
-          ./hosts/pangu/configuration.nix
-          home-manager.nixosModules.home-manager
-        ];
-      };
+      hosts = lib.genAttrs [ "pangu" ] mkHost;
     in
     {
+      nixosConfigurations = hosts;
+
       formatter.${system} = pkgs.nixfmt-tree;
 
-      checks.${system}.pangu-system = pangu.config.system.build.toplevel;
-
-      nixosConfigurations = {
-        inherit pangu;
-      };
+      checks.${system} = lib.mapAttrs' (
+        hostName: host: lib.nameValuePair "${hostName}-system" host.config.system.build.toplevel
+      ) hosts;
     };
 }

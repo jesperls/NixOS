@@ -23,8 +23,13 @@
     idle = {
       enable = lib.mkOption {
         type = lib.types.bool;
-        default = true;
-        description = "Run idle actions (dim, screen off, suspend, and idle lock) after periods of inactivity. When disabled, no idle timers fire at all.";
+        default = false;
+        description = ''
+          Run idle actions (dim, screen off, suspend, and idle lock) after
+          periods of inactivity. Off by default: the timeouts below are
+          laptop-shaped, and a desktop silently suspending itself is worse
+          than one that never does.
+        '';
       };
       dimTimeout = lib.mkOption {
         type = lib.types.ints.unsigned;
@@ -50,6 +55,23 @@
         type = lib.types.ints.unsigned;
         default = 1800;
         description = "Seconds of inactivity before suspending the system. 0 disables idle suspend.";
+      };
+    };
+
+    specialWorkspaces = {
+      maxWidth = lib.mkOption {
+        type = lib.types.ints.unsigned;
+        default = 2560;
+        description = ''
+          Width special workspaces are padded down to on wider monitors, so
+          they stay a readable centered column instead of spanning an
+          ultrawide. 0 lets them use the full width.
+        '';
+      };
+      verticalGap = lib.mkOption {
+        type = lib.types.ints.unsigned;
+        default = 30;
+        description = "Top/bottom gap for padded special workspaces.";
       };
     };
 
