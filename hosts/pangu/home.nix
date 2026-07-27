@@ -10,10 +10,9 @@
     ../../modules/home-manager/programs/obs.nix
     ../../modules/home-manager/programs/claude-code.nix
     ../../modules/home-manager/programs/easyeffects.nix
-    ../../modules/home-manager/programs/quickshell-package-manager.nix
-    ../../modules/home-manager/programs/qs-vpets.nix
     ../../modules/home-manager/services/deltatune.nix
 
     ./packages.nix
+    ./cli.nix
   ];
 }

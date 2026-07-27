@@ -19,7 +19,7 @@
     yq
     fd
     ripgrep
-    htop
+    tmux
     ncdu
     p7zip
     parted
@@ -35,12 +35,9 @@
     slurp
     swappy
     libnotify
-    gpu-screen-recorder-gtk
     wl-clipboard
     cliphist
-    wofi
     gsettings-desktop-schemas
-    wlogout
     networkmanagerapplet
     mission-center
     pavucontrol
@@ -64,5 +61,6 @@
     protonup-qt
     evtest
     burpsuite
+    dbeaver-bin
   ];
 }

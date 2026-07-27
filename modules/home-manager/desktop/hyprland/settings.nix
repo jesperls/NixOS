@@ -76,8 +76,6 @@ in
         ]
       )
       {
-        XCURSOR_THEME = cursorTheme.name;
-        XCURSOR_SIZE = toString cursorTheme.size;
         HYPRCURSOR_THEME = cursorTheme.name;
         HYPRCURSOR_SIZE = toString cursorTheme.size;
       };

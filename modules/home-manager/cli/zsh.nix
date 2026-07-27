@@ -45,18 +45,12 @@
       ytmp4 = "noglob yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
       ytbest = "noglob yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
 
-      oracle = "ssh oracle";
-      nuwa = "ssh -t nuwa";
-
       gs = "git status";
       ga = "git add";
       gc = "git commit";
       gp = "git push";
       gl = "git log --oneline --graph";
       gd = "git diff";
-
-      webcam = "scrcpy --video-source=camera --camera-facing=back --camera-size=1920x1080 --v4l2-sink=/dev/video2 --no-audio --no-playback";
-      phone = "scrcpy --render-driver=vulkan";
     };
 
     loginExtra = ''
@@ -73,25 +67,6 @@
       autoload -z edit-command-line
       zle -N edit-command-line
       bindkey "^X^E" edit-command-line
-
-      # snil <input>... — rebuild with inputs overridden to local checkouts
-      snil() {
-        if [ "$#" -eq 0 ]; then
-          echo "usage: snil <input>... (ambxst, qs-vpets, quickshell-package-manager)" >&2
-          return 1
-        fi
-        local -a overrides
-        local input dir
-        for input in "$@"; do
-          case "$input" in
-            quickshell-package-manager|qpm) input=quickshell-package-manager dir=nix-quickshell-package-manager ;;
-            ambxst) dir=Ambxst ;;
-            *) dir=$input ;;
-          esac
-          overrides+=(--override-input "$input" "path:$FLAKE/$dir")
-        done
-        nh os switch "$FLAKE" -- --no-write-lock-file "''${overrides[@]}"
-      }
     '';
   };
 }

@@ -19,7 +19,8 @@ in
       "input"
     ]
     ++ lib.optional config.virtualisation.docker.enable "docker"
-    ++ lib.optional config.programs.gamemode.enable "gamemode";
+    ++ lib.optional config.programs.gamemode.enable "gamemode"
+    ++ lib.optional config.hardware.i2c.enable "i2c";
     shell = pkgs.zsh;
   };
 

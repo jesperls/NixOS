@@ -8,20 +8,36 @@
 
 let
   theme = osConfig.mySystem.theme;
+  cursor = theme.gtk.cursorTheme;
 
-  # Ambxst regenerates this palette on every theme change; without it a custom
-  # palette would point at a file that never exists.
-  ambxstPalette = osConfig.programs.ambxst.enable or false;
+  hyprcursorTheme =
+    pkgs.runCommand "${cursor.name}-hyprcursor"
+      {
+        nativeBuildInputs = [
+          pkgs.hyprcursor
+          pkgs.xcur2png
+        ];
+      }
+      ''
+        hyprcursor-util --extract ${cursor.package}/share/icons/${cursor.name} --output .
+        substituteInPlace "extracted_${cursor.name}/manifest.hl" \
+          --replace-fail "name = Extracted Theme" "name = ${cursor.name}"
+        hyprcursor-util --create extracted_${cursor.name} --output .
+        mkdir -p $out/share/icons
+        cp -r "theme_${cursor.name}" $out/share/icons/${cursor.name}
+      '';
+
+  shellPalette = osConfig.mySystem.desktop.shell.enable;
 
   qtctSettings = ver: {
     Appearance = {
       style = theme.qt.style;
-      custom_palette = ambxstPalette;
+      custom_palette = shellPalette;
       icon_theme = theme.gtk.iconTheme.name;
       standard_dialogs = "xdgdesktopportal";
     }
-    // lib.optionalAttrs ambxstPalette {
-      color_scheme_path = "${config.home.homeDirectory}/.config/${ver}/colors/ambxst.colors";
+    // lib.optionalAttrs shellPalette {
+      color_scheme_path = "${config.home.homeDirectory}/.config/${ver}/colors/pangu.colors";
     };
     Fonts = {
       general = ''"${theme.fonts.sans},${toString theme.fonts.size}"'';
@@ -38,6 +54,10 @@ in
     };
     iconTheme = theme.gtk.iconTheme;
     cursorTheme = { inherit (theme.gtk.cursorTheme) name package size; };
+    font = {
+      name = theme.fonts.sans;
+      size = theme.fonts.size;
+    };
     gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
     gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
   };
@@ -60,6 +80,7 @@ in
 
   home.packages = [
     theme.gtk.iconTheme.package
+    hyprcursorTheme
     pkgs.hicolor-icon-theme
     pkgs.adwaita-icon-theme
     pkgs.libappindicator-gtk3
@@ -71,5 +92,7 @@ in
     cursor-theme = theme.gtk.cursorTheme.name;
     cursor-size = theme.gtk.cursorTheme.size;
     color-scheme = "prefer-dark";
+    font-name = "${theme.fonts.sans} ${toString theme.fonts.size}";
+    monospace-font-name = "${theme.fonts.monospace} ${toString theme.fonts.size}";
   };
 }

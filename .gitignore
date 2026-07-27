@@ -1,9 +1,6 @@
 .#*
 __pycache__
-qs-vpets
 deltatune-linux
 wallpaper-picker
-nix-quickshell-package-manager
 *.md
 !README.md
-Ambxst/

@@ -1,0 +1,182 @@
+{
+  lib,
+  buildEnv,
+  stdenvNoCC,
+  writeShellApplication,
+
+  quickshell,
+
+  kdePackages,
+  qt6,
+
+  bash,
+  brightnessctl,
+  coreutils,
+  curl,
+  ddcutil,
+  ffmpeg,
+  gawk,
+  glib,
+  gnugrep,
+  gpu-screen-recorder,
+  grim,
+  imagemagick,
+  inetutils,
+  jq,
+  libnotify,
+  matugen,
+  mpvpaper,
+  power-profiles-daemon,
+  procps,
+  python3,
+  slurp,
+  socat,
+  sqlite,
+  systemd,
+  tesseract,
+  tmux,
+  util-linux,
+  wl-clipboard,
+  wlsunset,
+  wtype,
+  xdg-user-dirs,
+  xdg-utils,
+  zbar,
+  zenity,
+
+  version ? "1.1.5",
+  ocrLanguages ? [
+    "eng"
+    "spa"
+    "lat"
+    "jpn"
+    "chi_sim"
+    "chi_tra"
+    "kor"
+  ],
+}:
+
+let
+  src = stdenvNoCC.mkDerivation {
+    name = "pangu-shell";
+    src = lib.cleanSourceWith {
+      src = ../../share/shell;
+      filter =
+        name: type:
+        lib.cleanSourceFilter name type && baseNameOf name != "__pycache__" && !lib.hasSuffix ".pyc" name;
+    };
+
+    nativeBuildInputs = [
+      bash
+      python3
+      qt6.qtdeclarative # qmllint
+    ];
+
+    dontConfigure = true;
+    dontBuild = true;
+    dontWrapQtApps = true; # qtdeclarative is here for qmllint only
+
+    doCheck = true;
+    checkPhase = ''
+      runHook preCheck
+
+      command -v qmllint >/dev/null || { echo "qmllint not on PATH" >&2; exit 1; }
+
+      find . -name '*.qml' -exec qmllint {} + >qmllint.log 2>&1 || true
+      if grep -F '[syntax]' qmllint.log; then
+        echo "pangu: QML syntax errors above" >&2
+        exit 1
+      fi
+      rm -f qmllint.log
+
+      runHook postCheck
+    '';
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p "$out"
+      cp -r . "$out"
+      chmod -R u+w "$out"
+      chmod +x "$out"/scripts/*
+      patchShebangs "$out/scripts"
+      runHook postInstall
+    '';
+  };
+
+  qmlEnv = buildEnv {
+    name = "pangu-qml";
+    paths = [
+      kdePackages.qtmultimedia
+      kdePackages.syntax-highlighting
+      qt6.qtdeclarative
+      qt6.qtimageformats
+      qt6.qtsvg
+    ];
+    pathsToLink = [ "/lib/qt-6/qml" ];
+  };
+in
+writeShellApplication {
+  name = "pangu";
+
+  runtimeInputs = [
+    quickshell
+
+    bash # the shell spawns `bash -c` constantly and gets a bare systemd PATH
+    brightnessctl
+    coreutils
+    curl
+    ddcutil
+    ffmpeg
+    gawk
+    glib # gsettings
+    gnugrep
+    gpu-screen-recorder
+    grim
+    imagemagick
+    inetutils # hostname
+    jq
+    libnotify
+    matugen
+    mpvpaper
+    power-profiles-daemon
+    procps # pgrep/pkill
+    python3
+    slurp
+    socat # mpv IPC sockets for animated wallpapers
+    sqlite
+    systemd # systemctl, loginctl
+    (tesseract.override { enableLanguages = ocrLanguages; })
+    tmux # the dashboard's tmux tab drives real sessions
+    util-linux # setsid, used to detach the wallpaper-engine renderer
+    wl-clipboard
+    wlsunset
+    wtype
+    xdg-user-dirs
+    xdg-utils
+    zbar
+    zenity
+  ];
+
+  text = ''
+    shellRoot=${src}
+    version=${version}
+    export PANGU_VERSION="$version"
+
+    export QML2_IMPORT_PATH="${qmlEnv}/lib/qt-6/qml''${QML2_IMPORT_PATH:+:$QML2_IMPORT_PATH}"
+    export QML_IMPORT_PATH="$QML2_IMPORT_PATH"
+
+    if [ -d /run/wrappers/bin ]; then
+      # Wrappers first so the setuid gpu-screen-recorder wins over our
+      # unprivileged copy.
+      export PATH="/run/wrappers/bin:$PATH"
+    fi
+  ''
+  + builtins.readFile ./cli.sh;
+
+  meta = {
+    description = "Pangu — the desktop shell for this configuration";
+    license = lib.licenses.agpl3Only;
+    mainProgram = "pangu";
+    platforms = lib.platforms.linux;
+  };
+}

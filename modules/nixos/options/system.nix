@@ -89,18 +89,6 @@
         default = "/home/${config.mySystem.user.username}/nixos-config";
         description = "Absolute path to the local nixos-config checkout.";
       };
-
-      hostDir = lib.mkOption {
-        type = lib.types.str;
-        default = "${config.mySystem.paths.repoRoot}/hosts/${config.mySystem.system.hostName}";
-        description = "Absolute path to the current host directory inside the repo.";
-      };
-
-      packagesFile = lib.mkOption {
-        type = lib.types.str;
-        default = "${config.mySystem.paths.hostDir}/packages.nix";
-        description = "Absolute path to the host-specific Home Manager packages file.";
-      };
     };
 
     monitors = lib.mkOption {

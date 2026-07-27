@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   nix = {
@@ -7,7 +12,7 @@
         "nix-command"
         "flakes"
       ];
-      max-jobs = "auto";
+      max-jobs = lib.mkDefault "auto";
       keep-outputs = true;
       trusted-users = [
         "root"
@@ -16,6 +21,13 @@
       warn-dirty = false;
       min-free = 1073741824; # 1 GiB
       max-free = 5368709120; # 5 GiB
+
+      http-connections = lib.mkDefault 64;
+      max-substitution-jobs = lib.mkDefault 32;
+      download-buffer-size = lib.mkDefault 536870912; # 512 MiB
+
+      connect-timeout = 5;
+      fallback = true;
       substituters = [
         "https://cache.nixos.org"
         "https://nix-community.cachix.org"

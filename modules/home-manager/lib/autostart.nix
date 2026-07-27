@@ -1,5 +1,3 @@
-# Builds a systemd user unit tied to the Hyprland session, so autostarts stop
-# with the session instead of lingering in the user manager.
 {
   description,
   execStart,

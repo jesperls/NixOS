@@ -20,7 +20,7 @@ in
       videos = "${homeDir}/Videos";
       extraConfig = {
         XDG_SCREENSHOTS_DIR = "${homeDir}/Pictures/Screenshots";
-        XDG_WALLPAPERS_DIR = "${homeDir}/Pictures/Wallpapers";
+        XDG_WALLPAPERS_DIR = osConfig.mySystem.desktop.shell.wallpapers;
         XDG_PROJECTS_DIR = "${homeDir}/Projects";
         XDG_GAMES_DIR = "${homeDir}/Games";
       };

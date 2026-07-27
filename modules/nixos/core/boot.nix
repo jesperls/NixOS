@@ -1,5 +1,14 @@
-{ pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
+let
+  cfg = config.mySystem.performance;
+in
 {
   nixpkgs.overlays = [
     inputs.nix-cachyos-kernel.overlays.pinned
@@ -21,7 +30,10 @@
 
     tmp.useTmpfs = true;
 
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
+    initrd.systemd.enable = lib.mkDefault true;
+
+    kernelPackages = lib.mkDefault pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
+
     kernelParams = [
       "quiet"
       "nowatchdog"
@@ -29,8 +41,11 @@
       "rd.systemd.show_status=false"
       "rd.udev.log_level=3"
       "udev.log_priority=3"
-      "amd_pstate=active"
-    ];
+    ]
+    ++ lib.optional (cfg.cpuVendor == "amd") "amd_pstate=active"
+    ++ lib.optional (
+      cfg.transparentHugepages != null
+    ) "transparent_hugepage=${cfg.transparentHugepages}";
 
     plymouth.enable = false;
 

@@ -2,7 +2,6 @@
   description = "NixOS configuration for jesperls";
 
   inputs = {
-    # Core
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
@@ -10,27 +9,25 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Desktop
     hyprnix = {
       url = "github:hyprwm/hyprnix";
-      # Drop when hyprnix bumps its aquamarine pin.
       inputs.aquamarine.url = "github:hyprwm/aquamarine/v0.13.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.systems.follows = "systems-linux";
     };
 
-    # Shared quickshell build for the local quickshell subprojects.
     quickshell = {
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Local fork lives in ./Ambxst (gitignored). Consumed from GitHub so CI and
-    # garnix can resolve it; iterate locally with `snil ambxst`.
-    ambxst = {
-      url = "github:jesperls/Ambxst";
+    systems-linux.url = "github:nix-systems/default-linux";
+
+    hypr-dynamic-cursors = {
+      url = "github:VirtCode/hypr-dynamic-cursors/f5ba36c7622098b53bf62ddb8ddf03b914abbdf8";
+      inputs.hyprland.follows = "hyprnix/hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    systems-linux.url = "github:nix-systems/default-linux";
 
     linux-wallpaper-engine = {
       url = "github:jagrat7/linux-wallpaper-engine";
@@ -38,16 +35,8 @@
       inputs.bun2nix.inputs.systems.follows = "systems-linux";
     };
 
-    quickshell-package-manager = {
-      url = "github:jesperls/nix-quickshell-package-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.quickshell.follows = "quickshell";
-    };
-
-    # Kernel
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
-    # Applications
     nixcord = {
       url = "github:FlameFlag/nixcord";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -63,11 +52,6 @@
     deltatune = {
       url = "github:ThatOneCalculator/deltatune-linux";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    qs-vpets = {
-      url = "github:jesperls/qs-vpets";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.quickshell.follows = "quickshell";
     };
   };
 
@@ -92,6 +76,14 @@
           modules = [
             ./hosts/${hostName}/configuration.nix
             home-manager.nixosModules.home-manager
+            {
+              nixpkgs.overlays = [
+                self.overlays.default
+                (final: _: {
+                  quickshell = inputs.quickshell.packages.${final.stdenv.hostPlatform.system}.default;
+                })
+              ];
+            }
           ];
         };
 
@@ -99,6 +91,12 @@
     in
     {
       nixosConfigurations = hosts;
+
+      overlays.default = import ./pkgs;
+
+      packages.${system} = {
+        inherit (pkgs.extend self.overlays.default) pangu ttf-phosphor-icons;
+      };
 
       formatter.${system} = pkgs.nixfmt-tree;
 

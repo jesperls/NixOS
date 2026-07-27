@@ -70,7 +70,6 @@ let
       ];
   };
 
-  # Scope Wine/NVIDIA env vars to Lutris only
   lutrisWrapped = pkgs.symlinkJoin {
     name = "lutris-wrapped";
     paths = [ lutrisWithDeps ];

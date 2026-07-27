@@ -6,8 +6,8 @@
 }:
 
 let
-  # home-manager's default backup clobbers the previous backup on every
-  # rebuild; rotate instead so a bad generation is still recoverable.
+  # home-manager's default backup clobbers the previous one every rebuild;
+  # rotate so a bad generation stays recoverable.
   rotatingBackup = pkgs.writeShellApplication {
     name = "hm-rotating-backup";
     runtimeInputs = [ pkgs.coreutils ];

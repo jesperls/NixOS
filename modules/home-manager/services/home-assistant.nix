@@ -1,0 +1,49 @@
+{
+  lib,
+  osConfig,
+  pkgs,
+  ...
+}:
+
+let
+  cfg = osConfig.mySystem.services.homeAssistant;
+
+  agent = if cfg.privileged then "/run/wrappers/bin/go-hass-agent" else lib.getExe pkgs.go-hass-agent;
+
+  configureMqtt = pkgs.writeShellApplication {
+    name = "go-hass-agent-configure";
+    runtimeInputs = [
+      pkgs.go-hass-agent
+      pkgs.coreutils
+    ];
+    text = ''
+      go-hass-agent --no-log-file config \
+        --mqtt-enabled \
+        --mqtt-server ${lib.escapeShellArg cfg.mqtt.server} \
+        --mqtt-topic-prefix ${lib.escapeShellArg cfg.mqtt.topicPrefix} \
+        ${lib.optionalString (cfg.mqtt.user != null) "--mqtt-user ${lib.escapeShellArg cfg.mqtt.user}"} \
+        ${lib.optionalString (
+          cfg.mqtt.passwordFile != null
+        ) ''--mqtt-password "$(cat ${lib.escapeShellArg cfg.mqtt.passwordFile})"''}
+    '';
+  };
+in
+lib.mkIf cfg.enable {
+  home.packages = [
+    pkgs.go-hass-agent
+    pkgs.ffmpeg
+  ];
+
+  systemd.user.services.go-hass-agent = import ../lib/autostart.nix {
+    description = "Go Hass Agent — Home Assistant desktop agent";
+    execStart = "${agent} --no-log-file run";
+    unit.StartLimitIntervalSec = 0;
+    service = {
+      Restart = "always";
+      RestartSec = 10;
+    }
+    // lib.optionalAttrs cfg.mqtt.enable {
+      ExecStartPre = lib.getExe configureMqtt;
+    };
+  };
+}

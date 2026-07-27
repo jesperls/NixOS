@@ -4,7 +4,8 @@
 }:
 
 let
-  # nixpkgs snes9x-gtk 1.63 misses minizip's headers, which moved to include/minizip/
+  # nixpkgs snes9x-gtk 1.63 misses minizip's headers, which moved to
+  # include/minizip/.
   snes9x-gtk-fixed = pkgs.snes9x-gtk.overrideAttrs (old: {
     env = (old.env or { }) // {
       NIX_CFLAGS_COMPILE = (old.env.NIX_CFLAGS_COMPILE or "") + " -I${pkgs.minizip}/include/minizip";
@@ -56,7 +57,19 @@ in
   programs.gamemode = {
     enable = true;
     enableRenice = true;
+    settings = {
+      general = {
+        renice = 10;
+        ioprio = 0;
+        inhibit_screensaver = 1;
+      };
+    };
   };
 
-  programs.gamescope.enable = true;
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+  };
+
+  hardware.xpadneo.enable = true;
 }

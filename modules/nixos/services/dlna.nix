@@ -32,12 +32,12 @@ in
       };
     };
 
-    # minidlna reads the library as its own user, so it needs a group that the
-    # media directories are actually readable by.
+    # minidlna reads the library as its own user, so it needs a group the media
+    # dirs are readable by.
     users.users.minidlna.extraGroups = [ "users" ];
 
-    # DLNA clients reply to SSDP discovery on minidlna's ephemeral source port
-    # rather than to the advertised port.
+    # DLNA clients reply to SSDP discovery on minidlna's ephemeral source port,
+    # not the advertised one.
     networking.firewall.allowedUDPPortRanges = [
       {
         from = 32768;

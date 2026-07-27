@@ -23,8 +23,6 @@
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
-  hardware.nvidia-container-toolkit.enable = true;
-
   programs.nix-ld.libraries = [ config.hardware.nvidia.package ];
 
   boot.initrd.kernelModules = [
@@ -34,11 +32,15 @@
     "nvidia_drm"
   ];
 
+  boot.extraModprobeConfig = ''
+    options nvidia NVreg_UsePageAttributeTable=1
+  '';
+
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    # nvidia-vaapi-driver's default EGL backend is broken on current drivers;
-    # without this hardware video decoding silently falls back to software.
+    # The default EGL backend is broken on current drivers: hw video decode
+    # silently falls back to software.
     NVD_BACKEND = "direct";
   };
 
