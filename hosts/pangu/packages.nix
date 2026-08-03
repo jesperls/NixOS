@@ -44,6 +44,7 @@
     qpwgraph
     overskride
     audacity
+    reaper
     scrcpy
     obsidian
     gedit
@@ -62,5 +63,7 @@
     evtest
     burpsuite
     dbeaver-bin
+    alsa-scarlett-gui
+    fastfetch
   ];
 }

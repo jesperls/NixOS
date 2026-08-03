@@ -496,21 +496,7 @@ PanelWindow {
     }
 
     function updateMpvRuntime(enable) {
-        var cmdString;
-        if (enable) {
-            var setCmd = JSON.stringify({
-                "command": ["set_property", "glsl-shaders", mpvShaderPath]
-            });
-            cmdString = "echo '" + setCmd + "' | socat - " + mpvSocket;
-        } else {
-            var jsonCmd = JSON.stringify({
-                "command": ["set_property", "glsl-shaders", ""]
-            });
-            cmdString = "echo '" + jsonCmd + "' | socat - " + mpvSocket;
-        }
-
-        mpvIpcProcess.command = ["bash", "-c", cmdString];
-        mpvIpcProcess.running = true;
+        mpvIpc.send(mpvSocket, ["set_property", "glsl-shaders", enable ? mpvShaderPath : ""], 10);
     }
 
     function requestVideoSync() {
@@ -529,16 +515,10 @@ PanelWindow {
         repeat: false
         onTriggered: {
             console.log("Broadcasting video sync to all mpvpaper sockets...");
-            mpvSyncProcess.running = true;
-        }
-    }
-
-    Process {
-        id: mpvSyncProcess
-        running: false
-        command: ["bash", "-c", "for sock in " + Paths.runtimePath("mpv-*.sock") + "; do echo '{ \"command\": [\"set_property\", \"time-pos\", 0] }' | socat - \"$sock\" 2>/dev/null; done"]
-        onExited: code => {
-            console.log("Video sync broadcast completed with code:", code);
+            for (const screen of Quickshell.screens) {
+                mpvIpc.send(Paths.runtimePath("mpv-" + screen.name + ".sock"), ["set_property", "time-pos", 0], 0);
+            }
+            mpvIpc.send(Paths.runtimePath("mpv-ALL.sock"), ["set_property", "time-pos", 0], 0);
         }
     }
 
@@ -587,30 +567,67 @@ PanelWindow {
         mpvShaderWriter.running = true;
     }
 
-    property int ipcRetryCount: 0
+    Socket {
+        id: mpvIpc
+
+        property var queue: []
+        property var job: null
+
+        function send(sockPath, cmd, retries) {
+            queue.push({
+                path: sockPath,
+                data: JSON.stringify({
+                    "command": cmd
+                }) + "\n",
+                retries: retries
+            });
+            pump();
+        }
+
+        function pump() {
+            if (connected || job || queue.length === 0)
+                return;
+            job = queue.shift();
+            path = job.path;
+            connected = true;
+        }
+
+        onConnectionStateChanged: {
+            if (connected && job) {
+                write(job.data);
+                flush();
+                job = null;
+                connected = false;
+            } else if (!connected) {
+                Qt.callLater(pump);
+            }
+        }
+
+        onError: {
+            if (job) {
+                if (job.retries > 0) {
+                    job.retries--;
+                    ipcRetryTimer.job = job;
+                    ipcRetryTimer.restart();
+                } else {
+                    console.warn("MPV IPC failed (is mpvpaper running?):", path);
+                }
+                job = null;
+            }
+            Qt.callLater(pump);
+        }
+    }
 
     Timer {
         id: ipcRetryTimer
         interval: 200
         repeat: false
+        property var job: null
         onTriggered: {
-            mpvIpcProcess.running = true;
-        }
-    }
-
-    Process {
-        id: mpvIpcProcess
-        running: false
-        onExited: code => {
-            if (code !== 0) {
-                console.warn("MPV IPC failed (is mpvpaper running?) Code:", code);
-                if (ipcRetryCount < 10) {
-                    ipcRetryCount++;
-                    console.log("Retrying IPC (" + ipcRetryCount + "/10)...");
-                    ipcRetryTimer.restart();
-                }
-            } else {
-                ipcRetryCount = 0;
+            if (job) {
+                mpvIpc.queue.push(job);
+                job = null;
+                mpvIpc.pump();
             }
         }
     }

@@ -81,7 +81,7 @@ Item {
 
                     Text {
                         visible: !EasyEffectsService.available
-                        text: "EasyEffects not installed"
+                        text: "EasyEffects not running"
                         font.family: Config.theme.font
                         font.pixelSize: Config.theme.fontSize
                         color: Colors.overSurfaceVariant

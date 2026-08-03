@@ -124,22 +124,6 @@ Item {
                 }
             }
 
-            StyledRect {
-                visible: root.network?.is5GHz ?? false
-                variant: "common"
-                implicitWidth: 32
-                implicitHeight: 18
-                radius: Styling.radius(-4)
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "5G"
-                    font.family: Config.theme.font
-                    font.pixelSize: 10
-                    font.weight: Font.Bold
-                    color: Colors.overSurfaceVariant
-                }
-            }
         }
 
         ColumnLayout {

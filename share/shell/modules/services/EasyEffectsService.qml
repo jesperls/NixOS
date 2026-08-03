@@ -8,199 +8,104 @@ Singleton {
     id: root
 
     property bool available: false
-    
+
     property bool bypassed: false
-    
+
     property var outputPresets: []
     property var inputPresets: []
-    
+
     property string activeOutputPreset: ""
     property string activeInputPreset: ""
 
-    function toggleBypass() {
-        bypassToggleProcess.command = ["easyeffects", "-b", bypassed ? "2" : "1"];
-        bypassToggleProcess.running = true;
+    property int _replyIndex: 2
+
+    function _query() {
+        _replyIndex = 0;
+        socket.write("get_global_bypass\nget_last_loaded_preset:input\nget_last_loaded_preset:output\n");
+        socket.flush();
     }
-    
+
     function setBypass(enable: bool) {
-        bypassToggleProcess.command = ["easyeffects", "-b", enable ? "1" : "2"];
-        bypassToggleProcess.running = true;
+        if (!socket.connected) return;
+        socket.write("global_bypass:" + (enable ? "1" : "0") + "\n");
+        _query();
     }
 
     function loadOutputPreset(name: string) {
+        if (!socket.connected) return;
         root.activeOutputPreset = name;  // Optimistic
-        loadPresetProcess.command = ["easyeffects", "-l", name];
-        loadPresetProcess.running = true;
+        socket.write("load_preset:output:" + name + "\n");
+        _query();
     }
 
     function loadInputPreset(name: string) {
+        if (!socket.connected) return;
         root.activeInputPreset = name;  // Optimistic
-        loadPresetProcess.command = ["easyeffects", "-l", name];
-        loadPresetProcess.running = true;
-    }
-
-    function loadPreset(name: string) {
-        loadPresetProcess.command = ["easyeffects", "-l", name];
-        loadPresetProcess.running = true;
+        socket.write("load_preset:input:" + name + "\n");
+        _query();
     }
 
     function refresh() {
-        checkAvailableProcess.running = true;
+        outputPresetsProcess.running = true;
+        inputPresetsProcess.running = true;
+        if (socket.connected) {
+            _query();
+        } else {
+            socket.connected = true;
+        }
     }
 
     function openApp() {
         Quickshell.execDetached(["easyeffects"]);
     }
 
-    property bool _initialized: false
-
     function initialize() {
-        if (_initialized) return;
-        _initialized = true;
-        checkAvailableProcess.running = true;
+        refresh();
     }
 
-    Process {
-        id: checkAvailableProcess
-        command: ["which", "easyeffects"]
-        running: false
-        onExited: (exitCode, exitStatus) => {
-            root.available = (exitCode === 0);
-            if (root.available) {
-                bypassStateProcess.running = true;
-                presetsProcess.running = true;
-                activePresetsProcess.running = true;
+    Socket {
+        id: socket
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/EasyEffectsServer"
+        connected: false
+        onConnectionStateChanged: {
+            root.available = connected;
+            if (connected) {
+                root._query();
             }
         }
-    }
-
-    Process {
-        id: bypassStateProcess
-        command: ["easyeffects", "-b", "3"]
-        running: false
-        environment: ({ LANG: "C.UTF-8", LC_ALL: "C.UTF-8" })
-        stdout: SplitParser {
+        onError: root.available = false
+        parser: SplitParser {
             onRead: data => {
-                const val = data.trim();
-                root.bypassed = (val === "1");
-            }
-        }
-    }
-
-    Process {
-        id: bypassToggleProcess
-        running: false
-        onExited: {
-            bypassStateProcess.running = true;
-        }
-    }
-
-    Process {
-        id: loadPresetProcess
-        running: false
-        onExited: {
-            refreshDelayTimer.restart();
-        }
-    }
-
-    property var refreshDelayTimer: Timer {
-        id: refreshDelayTimer
-        interval: 100
-        repeat: false
-        onTriggered: {
-            activePresetsProcess.running = true;
-            bypassStateProcess.running = true;
-        }
-    }
-
-    Process {
-        id: presetsProcess
-        command: ["easyeffects", "-p"]
-        running: false
-        property string buffer: ""
-        environment: ({ LANG: "C.UTF-8", LC_ALL: "C.UTF-8" })
-        stdout: SplitParser {
-            onRead: data => {
-                presetsProcess.buffer += data + "\n";
-            }
-        }
-        onExited: {
-            const text = presetsProcess.buffer;
-            presetsProcess.buffer = "";
-            
-            const lines = text.split("\n");
-            let isOutput = false;
-            let isInput = false;
-            let outputList = [];
-            let inputList = [];
-            
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (trimmed.toLowerCase().includes("output")) {
-                    isOutput = true;
-                    isInput = false;
-                    const parts = trimmed.split(":");
-                    if (parts.length > 1 && parts[1].trim()) {
-                        outputList = parts[1].trim().split(",").map(p => p.trim()).filter(p => p);
+                if (root._replyIndex === 0) {
+                    const m = data.match(/^([12])(.*)$/);  // get_global_bypass reply has no newline, fusing it to the next line
+                    if (m) {
+                        root.bypassed = (m[1] === "1");
+                        root.activeInputPreset = m[2];
                     }
-                } else if (trimmed.toLowerCase().includes("input")) {
-                    isInput = true;
-                    isOutput = false;
-                    const parts = trimmed.split(":");
-                    if (parts.length > 1 && parts[1].trim()) {
-                        inputList = parts[1].trim().split(",").map(p => p.trim()).filter(p => p);
-                    }
-                } else if (trimmed && !trimmed.includes(":")) {
-                    if (isOutput) outputList.push(trimmed);
-                    else if (isInput) inputList.push(trimmed);
-                }
-            }
-            
-            root.outputPresets = outputList;
-            root.inputPresets = inputList;
-        }
-    }
-
-    Process {
-        id: activePresetsProcess
-        command: ["easyeffects", "-a"]
-        running: false
-        property string buffer: ""
-        environment: ({ LANG: "C.UTF-8", LC_ALL: "C.UTF-8" })
-        stdout: SplitParser {
-            onRead: data => {
-                activePresetsProcess.buffer += data + "\n";
-            }
-        }
-        onExited: {
-            const text = activePresetsProcess.buffer;
-            activePresetsProcess.buffer = "";
-            
-            const lines = text.split("\n");
-            for (const line of lines) {
-                const trimmed = line.trim().toLowerCase();
-                if (trimmed.includes("output")) {
-                    const parts = line.split(":");
-                    if (parts.length > 1) {
-                        root.activeOutputPreset = parts[1].trim();
-                    }
-                } else if (trimmed.includes("input")) {
-                    const parts = line.split(":");
-                    if (parts.length > 1) {
-                        root.activeInputPreset = parts[1].trim();
-                    }
+                    root._replyIndex = 1;
+                } else if (root._replyIndex === 1) {
+                    root.activeOutputPreset = data;
+                    root._replyIndex = 2;
                 }
             }
         }
     }
 
-    property var pollTimer: Timer {
-        interval: 5000
-        running: root.available && !SuspendManager.isSuspending
-        repeat: true
-        onTriggered: {
-            bypassStateProcess.running = true;
-            activePresetsProcess.running = true;
+    Process {
+        id: outputPresetsProcess
+        command: ["sh", "-c", 'ls -1 "${XDG_DATA_HOME:-$HOME/.local/share}/easyeffects/output" 2>/dev/null']
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: root.outputPresets = text.split("\n").filter(n => n.endsWith(".json")).map(n => n.slice(0, -5))
+        }
+    }
+
+    Process {
+        id: inputPresetsProcess
+        command: ["sh", "-c", 'ls -1 "${XDG_DATA_HOME:-$HOME/.local/share}/easyeffects/input" 2>/dev/null']
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: root.inputPresets = text.split("\n").filter(n => n.endsWith(".json")).map(n => n.slice(0, -5))
         }
     }
 }

@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Quickshell.Bluetooth
 import qs.modules.theme
 import qs.modules.components
 import qs.modules.services
@@ -12,6 +13,8 @@ Item {
     id: root
 
     required property BluetoothDevice device
+
+    readonly property int batteryPercent: Math.round((device?.battery ?? 0) * 100)
 
     property bool expanded: false
 
@@ -109,7 +112,7 @@ Item {
                         }
 
                         if (root.device?.batteryAvailable) {
-                            status += ` - ${root.device.battery}%`;
+                            status += ` - ${root.batteryPercent}%`;
                         }
 
                         return status;
@@ -134,7 +137,7 @@ Item {
 
                 Text {
                     text: {
-                        const battery = root.device?.battery ?? 0;
+                        const battery = root.batteryPercent;
                         if (battery > 80)
                             return Icons.batteryFull;
                         if (battery > 60)
@@ -148,7 +151,7 @@ Item {
                     font.family: Icons.font
                     font.pixelSize: 18
                     color: {
-                        const battery = root.device?.battery ?? 0;
+                        const battery = root.batteryPercent;
                         if (battery > 60)
                             return Colors.green;
                         if (battery > 40)
@@ -225,8 +228,8 @@ Item {
                 onClicked: {
                     if (root.device?.connected) {
                         root.device.disconnect();
-                    } else {
-                        root.device.connect();
+                    } else if (root.device) {
+                        BluetoothService.connectDevice(root.device);
                     }
                 }
             }

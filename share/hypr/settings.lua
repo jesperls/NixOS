@@ -59,7 +59,7 @@ hl.config({
       tilt = {
         limit = 10000,
         activation = "negative_quadratic",
-        window = 200,
+        window = 150,
         full = 90,
       },
       stretch = {
