@@ -41,9 +41,6 @@
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    # The default EGL backend is broken on current drivers: hw video decode
-    # silently falls back to software.
-    NVD_BACKEND = "direct";
   };
 
   services.xserver.videoDrivers = [ "nvidia" ];

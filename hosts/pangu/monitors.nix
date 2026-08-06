@@ -3,7 +3,7 @@
 {
   mySystem.monitors = [
     {
-      name = "DP-2";
+      name = "desc:Samsung Electric Company LC49G95T H4ZT301631";
       resolution = "5120x1440";
       refreshRate = 240;
       position = "0x0";

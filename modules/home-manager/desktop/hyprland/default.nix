@@ -2,7 +2,6 @@
   pkgs,
   osConfig,
   lib,
-  inputs,
   ...
 }:
 
@@ -99,9 +98,6 @@ in
     package = null;
     portalPackage = null;
     configType = "lua";
-    plugins = [
-      inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.default
-    ];
     settings = hyprSettings;
     extraConfig = ''
       require("pangu.init")

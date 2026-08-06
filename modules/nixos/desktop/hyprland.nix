@@ -1,16 +1,9 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 
-let
-  hyprnix = inputs.hyprnix.packages.${pkgs.stdenv.hostPlatform.system};
-in
 {
   security.polkit.enable = true;
 
-  programs.hyprland = {
-    enable = true;
-    package = hyprnix.hyprland;
-    portalPackage = hyprnix.xdg-desktop-portal-hyprland;
-  };
+  programs.hyprland.enable = true;
 
   xdg.portal = {
     enable = true;

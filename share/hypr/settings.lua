@@ -47,45 +47,6 @@ hl.config({
     focus_on_activate = true,
     render_unfocused_fps = 30,
   },
-  plugin = {
-    dynamic_cursors = {
-      enabled = true,
-      mode = "tilt",
-      threshold = 2,
-      rotate = {
-        length = 20,
-        offset = 0.0,
-      },
-      tilt = {
-        limit = 10000,
-        activation = "negative_quadratic",
-        window = 150,
-        full = 90,
-      },
-      stretch = {
-        limit = 3000,
-        activation = "quadratic",
-        window = 100,
-      },
-      shake = {
-        enabled = true,
-        threshold = 6.0,
-        base = 4.0,
-        speed = 4.0,
-        influence = 0.0,
-        limit = 0.0,
-        timeout = 2000,
-        effects = false,
-        ipc = false,
-      },
-      hyprcursor = {
-        nearest = true,
-        enabled = true,
-        resolution = -1,
-        fallback = "clientside",
-      },
-    },
-  },
 })
 
 for _, curve in ipairs({

@@ -28,10 +28,7 @@
     trash-cli
     aria2
     grim
-    ungoogled-chromium
     ratty
-    teamspeak6-client
-    antigravity-ide
     slurp
     swappy
     libnotify
@@ -61,9 +58,10 @@
     umu-launcher
     protonup-qt
     evtest
-    burpsuite
     dbeaver-bin
     alsa-scarlett-gui
     fastfetch
+    helix
+    lazygit
   ];
 }

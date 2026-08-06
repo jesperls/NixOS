@@ -9,25 +9,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hyprnix = {
-      url = "github:hyprwm/hyprnix";
-      inputs.aquamarine.url = "github:hyprwm/aquamarine/v0.13.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems-linux";
-    };
-
-    quickshell = {
-      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     systems-linux.url = "github:nix-systems/default-linux";
-
-    hypr-dynamic-cursors = {
-      url = "github:VirtCode/hypr-dynamic-cursors/f5ba36c7622098b53bf62ddb8ddf03b914abbdf8";
-      inputs.hyprland.follows = "hyprnix/hyprland";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     linux-wallpaper-engine = {
       url = "github:jagrat7/linux-wallpaper-engine";
@@ -77,12 +59,7 @@
             ./hosts/${hostName}/configuration.nix
             home-manager.nixosModules.home-manager
             {
-              nixpkgs.overlays = [
-                self.overlays.default
-                (final: _: {
-                  quickshell = inputs.quickshell.packages.${final.stdenv.hostPlatform.system}.default;
-                })
-              ];
+              nixpkgs.overlays = [ self.overlays.default ];
             }
           ];
         };
