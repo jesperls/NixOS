@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell.Widgets
 import qs.modules.theme
 import qs.modules.components
 import qs.modules.globals
@@ -12,7 +11,6 @@ Item {
     property bool schemeListExpanded: false
     readonly property var matugenSchemes: ["scheme-content", "scheme-expressive", "scheme-fidelity", "scheme-fruit-salad", "scheme-monochrome", "scheme-neutral", "scheme-rainbow", "scheme-tonal-spot"]
     property var presets: GlobalStates.wallpaperManager ? GlobalStates.wallpaperManager.colorPresets : []
-    onPresetsChanged: console.log("SchemeSelector received presets:", presets)
 
     property var combinedModel: {
         var currentPresets = presets;  // Explicit dependency
@@ -145,15 +143,7 @@ Item {
     }
 
     implicitWidth: 200
-    implicitHeight: schemeListExpanded ? 40 + 4 + (40 * 3) + 8 : 48
-
-    Behavior on implicitHeight {
-        enabled: Config.animDuration > 0
-        NumberAnimation {
-            duration: Config.animDuration
-            easing.type: Easing.OutQuart
-        }
-    }
+    implicitHeight: 48
 
     StyledRect {
         variant: keyboardNavigationActive && schemeButton.activeFocus ? "focus" : "pane"
@@ -228,12 +218,14 @@ Item {
                             if (selectedSchemeIndex < combinedModel.length - 1) {
                                 selectedSchemeIndex++;
                                 schemeListView.currentIndex = selectedSchemeIndex;
+                                schemeListView.positionViewAtIndex(selectedSchemeIndex, ListView.Contain);
                             }
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Up) {
                             if (selectedSchemeIndex > 0) {
                                 selectedSchemeIndex--;
                                 schemeListView.currentIndex = selectedSchemeIndex;
+                                schemeListView.positionViewAtIndex(selectedSchemeIndex, ListView.Contain);
                             }
                             event.accepted = true;
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
@@ -331,19 +323,59 @@ Item {
                 }
             }
 
-            RowLayout {
+        }
+    }
+
+    onSchemeListExpandedChanged: {
+        if (schemeListExpanded) {
+            schemeListPopup.open();
+        } else {
+            schemeListPopup.close();
+        }
+    }
+
+    Popup {
+        id: schemeListPopup
+        parent: root
+        x: 0
+        y: root.height + 4
+        width: root.width
+        height: 40 * 3 + 8
+        padding: 4
+        modal: false
+        focus: false
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+        onClosed: {
+            if (root.schemeListExpanded) {
+                root.schemeListExpanded = false;
+            }
+        }
+
+        background: Rectangle {
+            color: Colors.background
+            radius: Styling.radius(0)
+        }
+
+        contentItem: RowLayout {
+            spacing: 4
+
+            Item {
                 Layout.fillWidth: true
-                spacing: 4
+                Layout.fillHeight: true
 
-                ClippingRectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: schemeListExpanded ? 40 * 3 : 0
-                    Layout.topMargin: schemeListExpanded ? 4 : 0
-                    color: Colors.background
-                    radius: Styling.radius(0)
-                    opacity: schemeListExpanded ? 1 : 0
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.AllButtons
+                    onWheel: wheel => {
+                        wheel.accepted = true;
+                    }
+                    onPressed: mouse => {
+                        mouse.accepted = true;
+                    }
+                }
 
-                    ListView {
+                ListView {
                         id: schemeListView
                         anchors.fill: parent
                         clip: true
@@ -352,9 +384,6 @@ Item {
                         interactive: true
                         boundsBehavior: Flickable.StopAtBounds
                         highlightFollowsCurrentItem: !isScrolling
-                        highlightRangeMode: ListView.ApplyRange
-                        preferredHighlightBegin: 0
-                        preferredHighlightEnd: height
 
                         property bool isScrolling: dragging || flicking
 
@@ -441,35 +470,11 @@ Item {
                         highlightResizeDuration: Config.animDuration / 2
                         highlightResizeVelocity: -1
                     }
-
-                    Behavior on Layout.topMargin {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration
-                            easing.type: Easing.OutQuart
-                        }
-                    }
-
-                    Behavior on Layout.preferredHeight {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration
-                            easing.type: Easing.OutQuart
-                        }
-                    }
-
-                    Behavior on opacity {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration
-                            easing.type: Easing.OutQuart
-                        }
-                    }
                 }
 
                 ScrollBar {
                     Layout.preferredWidth: 8
-                    Layout.preferredHeight: schemeListExpanded ? (40 * 3) - 32 : 0
+                    Layout.preferredHeight: (40 * 3) - 32
                     Layout.alignment: Qt.AlignVCenter
                     orientation: Qt.Vertical
                     visible: schemeListView.contentHeight > schemeListView.height
@@ -499,5 +504,4 @@ Item {
                 }
             }
         }
-    }
 }

@@ -163,11 +163,7 @@ NotchAnimationBehavior {
                 property real idx2: root.state.currentTab
 
                 function getYForIndex(idx) {
-                    if (idx <= 2) {
-                        return idx * (width + root.tabSpacing);
-                    } else {
-                        return controlsButtonContainer.y;
-                    }
+                    return idx * (width + root.tabSpacing);
                 }
 
                 property real targetY1: getYForIndex(idx1)

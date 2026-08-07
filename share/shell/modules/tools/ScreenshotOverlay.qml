@@ -207,13 +207,13 @@ PanelWindow {
                 icon: Icons.edit
                 onTriggered: {
                     var proc = Qt.createQmlObject('import Quickshell; import Quickshell.Io; Process { }', root);
-                    proc.command = ["bash", "-c", "if command -v gradia >/dev/null; then gradia \"" + root.imagePath + "\"; else flatpak run be.alexandervanhee.gradia \"" + root.imagePath + "\"; fi & disown"];
+                    proc.command = ["swappy", "-f", root.imagePath, "-o", root.imagePath];
                     proc.running = true;
                     root.imagePath = "";
                 }
                 StyledToolTip {
                     show: parent.containsMouse
-                    tooltipText: "Edit with Gradia"
+                    tooltipText: "Annotate"
                 }
             }
 

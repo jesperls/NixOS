@@ -121,8 +121,11 @@ Singleton {
     property string screenshotCaptureMode: "region" // region, window, screen
 
     property bool screenRecordToolVisible: false
+    property bool screenRecordReplayMode: false
 
     property bool mirrorWindowVisible: false
+
+    property bool cheatsheetVisible: false
 
     property bool settingsWindowVisible: false
     property int settingsTargetWorkspaceId: 0
@@ -143,7 +146,7 @@ Singleton {
     }
 
     readonly property var _simpleThemeProps: [
-        "roundness", "oledMode", "lightMode", "font", "fontSize", "monoFont", "monoFontSize",
+        "roundness", "oledMode", "lightMode", "dynamicColors", "font", "fontSize", "monoFont", "monoFontSize",
         "tintIcons", "enableCorners", "animDuration",
         "shadowOpacity", "shadowColor", "shadowXOffset", "shadowYOffset", "shadowBlur"
     ]
@@ -268,7 +271,7 @@ Singleton {
         "workspaces": ["shown", "showAppIcons", "alwaysShowNumbers", "showNumbers", "dynamic"],
         "overview": ["rows", "columns", "scale", "workspaceSpacing"],
         "dock": ["enabled", "theme", "position", "height", "iconSize", "spacing", "margin", "hoverRegionHeight", "pinnedOnStartup", "hoverToReveal", "availableOnFullscreen", "showRunningIndicators", "showPinButton", "showOverviewButton", "screenList", "keepHidden"],
-        "lockscreen": ["position"],
+        "lockscreen": ["position", "lockOnBoot", "showClock", "showMediaPlayer", "showAvatar", "blurWallpaper", "dimOpacity"],
         "desktop": ["enabled", "iconSize", "spacingVertical", "textColor"],
         "system": ["idle", "ocr"]
     }

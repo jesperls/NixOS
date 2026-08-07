@@ -20,7 +20,7 @@ in
     loader = {
       systemd-boot = {
         enable = true;
-        configurationLimit = 5;
+        configurationLimit = config.mySystem.system.keepGenerations;
         editor = false;
         consoleMode = "max";
       };
@@ -29,6 +29,7 @@ in
     };
 
     tmp.useTmpfs = true;
+    tmp.tmpfsSize = "75%";
 
     initrd.systemd.enable = lib.mkDefault true;
 
@@ -51,5 +52,11 @@ in
 
     consoleLogLevel = 0;
     initrd.verbose = false;
+  };
+
+  specialisation.fallback.configuration = {
+    boot.kernelPackages = lib.mkForce pkgs.linuxPackages;
+    services.scx.enable = lib.mkForce false;
+    system.nixos.tags = [ "stock-kernel" ];
   };
 }

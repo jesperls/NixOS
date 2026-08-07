@@ -64,6 +64,7 @@ Singleton {
         adapter: JsonAdapter {
             property bool oledMode: false
             property bool lightMode: false
+            property bool dynamicColors: true
             property int roundness: 16
             property string font: "Roboto Condensed"
             property int fontSize: 14
@@ -436,7 +437,6 @@ Singleton {
             property string pillStyle: "default"
             property list<string> screenList: []
             property bool enableFirefoxPlayer: false
-            property list<var> barColor: [["surface", 0.0]]
             property bool frameEnabled: false
             property int frameThickness: 6
             property bool pinnedOnStartup: true
@@ -512,7 +512,6 @@ Singleton {
             property bool syncShadowColor: false
             property int gapsIn: 2
             property int gapsOut: 4
-            property string layout: "dwindle"
             property bool shadowEnabled: true
             property int shadowRange: 8
             property int shadowRenderPower: 3
@@ -552,6 +551,7 @@ Singleton {
             property bool windowPreview: true
             property bool wavyLine: true
             property bool rotateCoverArt: true
+            property bool audioVisualizer: true
             property bool dashboardPersistTabs: true
             property int dashboardMaxPersistentTabs: 2
         }
@@ -585,6 +585,12 @@ Singleton {
 
         adapter: JsonAdapter {
             property string position: "bottom"
+            property bool lockOnBoot: false
+            property bool showClock: true
+            property bool showMediaPlayer: true
+            property bool showAvatar: true
+            property bool blurWallpaper: true
+            property int dimOpacity: 25
         }
     }
 
@@ -608,31 +614,25 @@ Singleton {
         adapter: JsonAdapter {
             property list<string> disks: ["/"]
             property JsonObject idle: JsonObject {
+                property bool enabled: false
                 property JsonObject general: JsonObject {
                     property string lock_cmd: "pangu lock"
                     property string before_sleep_cmd: "loginctl lock-session"
                     property string after_sleep_cmd: "pangu screen on"
                 }
-                property list<var> listeners: [
-                    {
-                        "timeout": 150,
-                        "onTimeout": "pangu brightness 10 -s",
-                        "onResume": "pangu brightness -r"
-                    },
-                    {
-                        "timeout": 300,
-                        "onTimeout": "loginctl lock-session"
-                    },
-                    {
-                        "timeout": 330,
-                        "onTimeout": "pangu screen off",
-                        "onResume": "pangu screen on"
-                    },
-                    {
-                        "timeout": 1800,
-                        "onTimeout": "pangu suspend"
-                    }
-                ]
+                property JsonObject lock: JsonObject {
+                    property bool enabled: true
+                    property int timeout: 300
+                }
+                property JsonObject screenOff: JsonObject {
+                    property bool enabled: true
+                    property int timeout: 330
+                }
+                property JsonObject suspend: JsonObject {
+                    property bool enabled: false
+                    property int timeout: 1800
+                }
+                property list<var> listeners: []
             }
             property JsonObject ocr: JsonObject {
                 property bool eng: true
@@ -648,6 +648,19 @@ Singleton {
                 property int restTime: 300
                 property bool autoStart: false
                 property bool syncSpotify: false
+            }
+            property JsonObject replay: JsonObject {
+                property int seconds: 60
+            }
+            property JsonObject nightLight: JsonObject {
+                property int temperature: 4500
+            }
+            property JsonObject slideshow: JsonObject {
+                property int minutes: 30
+            }
+            property JsonObject autoTheme: JsonObject {
+                property string dayStart: "08:00"
+                property string nightStart: "20:00"
             }
         }
     }
@@ -722,7 +735,7 @@ Singleton {
     onLightModeChanged: {
         const manager = GlobalStates.wallpaperManager;
         if (manager && manager.currentWallpaper)
-            manager.runMatugenForCurrentWallpaper();
+            manager.runMatugenForCurrentWallpaper(true);
     }
 
     onNotchPositionChanged: {

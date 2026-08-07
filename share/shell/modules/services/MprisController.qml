@@ -37,11 +37,15 @@ Singleton {
     property bool shuffleSupported: activePlayer && activePlayer.shuffleSupported && activePlayer.canControl
     property bool hasShuffle: activePlayer ? activePlayer.shuffle : false
 
+    function playerBaseName(name) {
+        return (name || "").toLowerCase().replace(/\.instance[-_a-z0-9]*$/, "");
+    }
+
     onFilteredPlayersChanged: {
         if (root.isInitializing && root.cachedDbusName && root.filteredPlayers.length > 0) {
             for (let i = 0; i < root.filteredPlayers.length; i++) {
                 const player = root.filteredPlayers[i];
-                if (player.dbusName === root.cachedDbusName) {
+                if (playerBaseName(player.dbusName) === playerBaseName(root.cachedDbusName)) {
                     root.trackedPlayer = player;
                     root.isInitializing = false;
                     return;
@@ -73,12 +77,12 @@ Singleton {
 
         for (let i = 0; i < root.filteredPlayers.length; i++) {
             const player = root.filteredPlayers[i];
-            if (player.dbusName === root.cachedDbusName) {
+            if (playerBaseName(player.dbusName) === playerBaseName(root.cachedDbusName)) {
                 root.trackedPlayer = player;
-                root.isInitializing = false;
-                return;
+                break;
             }
         }
+        root.isInitializing = false;
     }
 
     function saveLastPlayer() {
@@ -162,7 +166,7 @@ Singleton {
                 if (root.trackedPlayer === modelData) {
                     for (let i = 0; i < root.filteredPlayers.length; i++) {
                         const player = root.filteredPlayers[i];
-                        if (player.playbackState.isPlaying) {
+                        if (player.isPlaying) {
                             root.trackedPlayer = player;
                             break;
                         }
@@ -175,6 +179,16 @@ Singleton {
             }
 
             function onPlaybackStateChanged() {
+                if (!modelData.isPlaying)
+                    return;
+                const dbusName = (modelData.dbusName || "").toLowerCase();
+                if (!Config.bar.enableFirefoxPlayer && dbusName.includes("firefox"))
+                    return;
+                if (root.trackedPlayer !== modelData && !(root.trackedPlayer && root.trackedPlayer.isPlaying)) {
+                    root.isInitializing = false;
+                    root.trackedPlayer = modelData;
+                    root.saveLastPlayer();
+                }
             }
         }
     }

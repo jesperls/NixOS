@@ -6,6 +6,7 @@ import QtQuick.Layouts
 import qs.modules.theme
 import qs.modules.components
 import qs.modules.globals
+import qs.modules.services
 import qs.config
 
 Item {
@@ -81,7 +82,7 @@ Item {
                     id: titlebar
                     width: root.contentWidth
                     anchors.horizontalCenter: parent.horizontalCenter
-                    title: root.currentSection === "" ? "System" : (root.currentSection === "system" ? "System Resources" : (root.currentSection.charAt(0).toUpperCase() + root.currentSection.slice(1)))
+                    title: root.currentSection === "" ? "System" : (root.currentSection === "system" ? "System Resources" : (root.currentSection === "daynight" ? "Day & Night" : (root.currentSection.charAt(0).toUpperCase() + root.currentSection.slice(1))))
                     statusText: ""
 
                     actions: {
@@ -135,6 +136,26 @@ Item {
                         SectionButton {
                             text: "Idle"
                             sectionId: "idle"
+                        }
+                        SectionButton {
+                            text: "Recording"
+                            sectionId: "recording"
+                        }
+                        SectionButton {
+                            text: "Wallpaper"
+                            sectionId: "wallpaper"
+                        }
+                        SectionButton {
+                            text: "Day & Night"
+                            sectionId: "daynight"
+                        }
+                        SectionButton {
+                            text: "Notifications"
+                            sectionId: "notifications"
+                        }
+                        SectionButton {
+                            text: "Pomodoro"
+                            sectionId: "pomodoro"
                         }
                     }
 
@@ -397,6 +418,36 @@ Item {
 
                         ToggleRow {
                             Layout.fillWidth: true
+                            label: "Audio Visualizer"
+                            description: "Animated bars in the media player"
+                            checked: Config.performance.audioVisualizer
+                            onToggled: checked => {
+                                Config.performance.audioVisualizer = checked;
+                            }
+                        }
+
+                        ToggleRow {
+                            Layout.fillWidth: true
+                            label: "Persist Dashboard Tabs"
+                            description: "Keep dashboard tabs loaded in the background"
+                            checked: Config.performance.dashboardPersistTabs
+                            onToggled: checked => {
+                                Config.performance.dashboardPersistTabs = checked;
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Max Persistent Tabs"
+                            value: Config.performance.dashboardMaxPersistentTabs
+                            minValue: 1
+                            maxValue: 3
+                            onValueEdited: newValue => {
+                                Config.performance.dashboardMaxPersistentTabs = newValue;
+                            }
+                        }
+
+                        ToggleRow {
+                            Layout.fillWidth: true
                             label: "Disable Cover Art Rotation"
                             description: "Stop the vinyl disc from spinning"
                             checked: !Config.performance.rotateCoverArt
@@ -576,26 +627,88 @@ Item {
                             Layout.bottomMargin: -4
                         }
 
+                        ToggleRow {
+                            label: "Idle Actions"
+                            description: "Master switch for all idle timers below"
+                            checked: Config.system.idle.enabled ?? false
+                            onToggled: checked => {
+                                Config.system.idle.enabled = checked;
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Lock on Sleep"
+                            description: "Lock before the system suspends"
+                            checked: (Config.system.idle.general.before_sleep_cmd ?? "") !== ""
+                            onToggled: checked => {
+                                Config.system.idle.general.before_sleep_cmd = checked ? "loginctl lock-session" : "";
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Lock When Idle"
+                            checked: Config.system.idle.lock.enabled ?? true
+                            onToggled: checked => {
+                                Config.system.idle.lock.enabled = checked;
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Lock After"
+                            value: Config.system.idle.lock.timeout ?? 300
+                            minValue: 10
+                            maxValue: 14400
+                            suffix: "s"
+                            onValueEdited: newValue => {
+                                Config.system.idle.lock.timeout = newValue;
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Screen Off When Idle"
+                            checked: Config.system.idle.screenOff.enabled ?? true
+                            onToggled: checked => {
+                                Config.system.idle.screenOff.enabled = checked;
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Screen Off After"
+                            value: Config.system.idle.screenOff.timeout ?? 330
+                            minValue: 10
+                            maxValue: 14400
+                            suffix: "s"
+                            onValueEdited: newValue => {
+                                Config.system.idle.screenOff.timeout = newValue;
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Suspend When Idle"
+                            checked: Config.system.idle.suspend.enabled ?? false
+                            onToggled: checked => {
+                                Config.system.idle.suspend.enabled = checked;
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Suspend After"
+                            value: Config.system.idle.suspend.timeout ?? 1800
+                            minValue: 60
+                            maxValue: 28800
+                            suffix: "s"
+                            onValueEdited: newValue => {
+                                Config.system.idle.suspend.timeout = newValue;
+                            }
+                        }
+
                         TextInputRow {
                             label: "Lock Cmd"
                             value: Config.system.idle.general.lock_cmd ?? ""
                             placeholder: "Command to lock screen"
                             onValueEdited: newValue => {
                                 if (newValue !== Config.system.idle.general.lock_cmd) {
-                                    GlobalStates.markShellChanged();
                                     Config.system.idle.general.lock_cmd = newValue;
-                                }
-                            }
-                        }
-
-                        TextInputRow {
-                            label: "Before Sleep"
-                            value: Config.system.idle.general.before_sleep_cmd ?? ""
-                            placeholder: "Command before sleep"
-                            onValueEdited: newValue => {
-                                if (newValue !== Config.system.idle.general.before_sleep_cmd) {
-                                    GlobalStates.markShellChanged();
-                                    Config.system.idle.general.before_sleep_cmd = newValue;
                                 }
                             }
                         }
@@ -606,14 +719,13 @@ Item {
                             placeholder: "Command after sleep"
                             onValueEdited: newValue => {
                                 if (newValue !== Config.system.idle.general.after_sleep_cmd) {
-                                    GlobalStates.markShellChanged();
                                     Config.system.idle.general.after_sleep_cmd = newValue;
                                 }
                             }
                         }
 
                         Text {
-                            text: "Listeners"
+                            text: "Custom Listeners"
                             font.family: Config.theme.font
                             font.pixelSize: Styling.fontSize(0)
                             color: Colors.overBackground
@@ -674,7 +786,6 @@ Item {
                                                     list.push(Config.system.idle.listeners[i]);
                                                 list.splice(index, 1);
                                                 Config.system.idle.listeners = list;
-                                                GlobalStates.markShellChanged();
                                             }
                                         }
                                     }
@@ -691,7 +802,6 @@ Item {
                                             list.push(Config.system.idle.listeners[i]);
                                         list[index].timeout = val;
                                         Config.system.idle.listeners = list;
-                                        GlobalStates.markShellChanged();
                                     }
                                 }
 
@@ -704,7 +814,6 @@ Item {
                                             list.push(Config.system.idle.listeners[i]);
                                         list[index].onTimeout = val;
                                         Config.system.idle.listeners = list;
-                                        GlobalStates.markShellChanged();
                                     }
                                 }
 
@@ -717,7 +826,6 @@ Item {
                                             list.push(Config.system.idle.listeners[i]);
                                         list[index].onResume = val;
                                         Config.system.idle.listeners = list;
-                                        GlobalStates.markShellChanged();
                                     }
                                 }
                             }
@@ -754,8 +862,224 @@ Item {
                                         "onResume": ""
                                     });
                                     Config.system.idle.listeners = list;
-                                    GlobalStates.markShellChanged();
                                 }
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "recording"
+                        property string settingsSection: "recording"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "Recording"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        NumberInputRow {
+                            label: "Replay Buffer Length"
+                            value: Config.system.replay.seconds
+                            minValue: 5
+                            maxValue: 600
+                            suffix: "s"
+                            onValueEdited: newValue => {
+                                Config.system.replay.seconds = newValue;
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "wallpaper"
+                        property string settingsSection: "wallpaper"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "Wallpaper"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        ToggleRow {
+                            Layout.fillWidth: true
+                            label: "Slideshow"
+                            description: "Cycle wallpapers automatically"
+                            checked: WallpaperSlideshowService.enabled
+                            onToggled: checked => {
+                                WallpaperSlideshowService.toggle();
+                            }
+                        }
+
+                        ToggleRow {
+                            Layout.fillWidth: true
+                            label: "Shuffle"
+                            description: "Pick the next wallpaper at random"
+                            checked: WallpaperSlideshowService.shuffle
+                            onToggled: checked => {
+                                WallpaperSlideshowService.shuffle = checked;
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Interval"
+                            value: Config.system.slideshow.minutes
+                            minValue: 1
+                            maxValue: 1440
+                            suffix: "min"
+                            onValueEdited: newValue => {
+                                Config.system.slideshow.minutes = newValue;
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "daynight"
+                        property string settingsSection: "daynight"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "Day & Night"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        ToggleRow {
+                            Layout.fillWidth: true
+                            label: "Auto Theme"
+                            description: "Switch between light and dark on schedule"
+                            checked: AutoThemeService.enabled
+                            onToggled: checked => {
+                                AutoThemeService.toggle();
+                            }
+                        }
+
+                        TextInputRow {
+                            label: "Day Starts"
+                            value: Config.system.autoTheme.dayStart
+                            placeholder: "HH:MM"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.system.autoTheme.dayStart) {
+                                    Config.system.autoTheme.dayStart = newValue;
+                                }
+                            }
+                        }
+
+                        TextInputRow {
+                            label: "Night Starts"
+                            value: Config.system.autoTheme.nightStart
+                            placeholder: "HH:MM"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.system.autoTheme.nightStart) {
+                                    Config.system.autoTheme.nightStart = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Night Light Temperature"
+                            value: Config.system.nightLight.temperature
+                            minValue: 1000
+                            maxValue: 6500
+                            suffix: "K"
+                            onValueEdited: newValue => {
+                                Config.system.nightLight.temperature = newValue;
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "notifications"
+                        property string settingsSection: "notifications"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "Notifications"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        ToggleRow {
+                            Layout.fillWidth: true
+                            label: "Do Not Disturb"
+                            description: "Silence popups, notifications still reach history"
+                            checked: Notifications.silent
+                            onToggled: checked => {
+                                Notifications.silent = checked;
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "pomodoro"
+                        property string settingsSection: "pomodoro"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "Pomodoro"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        NumberInputRow {
+                            label: "Work Session"
+                            value: Config.system.pomodoro.workTime
+                            minValue: 60
+                            maxValue: 7200
+                            suffix: "s"
+                            onValueEdited: newValue => {
+                                Config.system.pomodoro.workTime = newValue;
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Rest Session"
+                            value: Config.system.pomodoro.restTime
+                            minValue: 60
+                            maxValue: 3600
+                            suffix: "s"
+                            onValueEdited: newValue => {
+                                Config.system.pomodoro.restTime = newValue;
+                            }
+                        }
+
+                        ToggleRow {
+                            Layout.fillWidth: true
+                            label: "Auto Start Next"
+                            description: "Begin the next session automatically"
+                            checked: Config.system.pomodoro.autoStart
+                            onToggled: checked => {
+                                Config.system.pomodoro.autoStart = checked;
+                            }
+                        }
+
+                        ToggleRow {
+                            Layout.fillWidth: true
+                            label: "Sync Spotify"
+                            description: "Play on work, pause on rest"
+                            checked: Config.system.pomodoro.syncSpotify
+                            onToggled: checked => {
+                                Config.system.pomodoro.syncSpotify = checked;
                             }
                         }
                     }
@@ -795,6 +1119,32 @@ Item {
             Layout.preferredHeight: 32
             radius: Styling.radius(-2)
 
+
+            Rectangle {
+                id: rejectOverlay
+                anchors.fill: parent
+                radius: parent.radius
+                color: Colors.error
+                opacity: 0
+            }
+
+            SequentialAnimation {
+                id: rejectFlash
+                loops: 2
+                NumberAnimation {
+                    target: rejectOverlay
+                    property: "opacity"
+                    to: 0.4
+                    duration: 90
+                }
+                NumberAnimation {
+                    target: rejectOverlay
+                    property: "opacity"
+                    to: 0
+                    duration: 140
+                }
+            }
+
             TextInput {
                 id: numberTextInput
                 anchors.fill: parent
@@ -818,6 +1168,27 @@ Item {
                     }
                 }
                 Component.onCompleted: text = configValue.toString()
+
+                Keys.onReturnPressed: event => {
+                    if (acceptableInput) {
+                        event.accepted = false;
+                    } else {
+                        rejectFlash.restart();
+                    }
+                }
+                Keys.onEnterPressed: event => {
+                    if (acceptableInput) {
+                        event.accepted = false;
+                    } else {
+                        rejectFlash.restart();
+                    }
+                }
+                onActiveFocusChanged: {
+                    if (!activeFocus && !acceptableInput) {
+                        rejectFlash.restart();
+                        text = configValue.toString();
+                    }
+                }
 
                 onEditingFinished: {
                     let newVal = parseInt(text);
@@ -947,85 +1318,81 @@ Item {
         }
     }
 
-    component ToggleRow: RowLayout {
+    component ToggleRow: ColumnLayout {
+        id: toggleRowRoot
         property string label: ""
         property string description: ""
         property bool checked: false
         signal toggled(bool checked)
 
-        spacing: 8
+        Layout.fillWidth: true
+        spacing: 2
 
-        ColumnLayout {
+        RowLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: 8
 
             Text {
-                text: label
+                text: toggleRowRoot.label
                 font.family: Config.theme.font
                 font.pixelSize: Styling.fontSize(0)
                 color: Colors.overBackground
+                Layout.fillWidth: true
             }
 
-            Text {
-                visible: description !== ""
-                text: description
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(-2)
-                color: Colors.overSurfaceVariant
-                opacity: 0.7
-            }
-        }
+            Item {
+                Layout.preferredWidth: 40
+                Layout.preferredHeight: 20
+                Layout.alignment: Qt.AlignVCenter
 
-        Item {
-            Layout.preferredWidth: 32
-            Layout.preferredHeight: 32
+                Rectangle {
+                    anchors.fill: parent
+                    radius: height / 2
+                    color: toggleRowRoot.checked ? Styling.srItem("overprimary") : Colors.surfaceBright
+                    border.color: toggleRowRoot.checked ? Styling.srItem("overprimary") : Colors.outline
 
-            Rectangle {
-                anchors.fill: parent
-                radius: Styling.radius(-4)
-                color: Colors.background
-                visible: !checked
-            }
-
-            StyledRect {
-                variant: "primary"
-                anchors.fill: parent
-                radius: Styling.radius(-4)
-                visible: checked
-                opacity: checked ? 1.0 : 0.0
-
-                Behavior on opacity {
-                    enabled: Config.animDuration > 0
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                        easing.type: Easing.OutQuart
-                    }
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: Icons.accept
-                    color: Styling.srItem("primary")
-                    font.family: Icons.font
-                    font.pixelSize: 16
-                    scale: checked ? 1.0 : 0.0
-
-                    Behavior on scale {
+                    Behavior on color {
                         enabled: Config.animDuration > 0
-                        NumberAnimation {
+                        ColorAnimation {
                             duration: Config.animDuration / 2
-                            easing.type: Easing.OutBack
-                            easing.overshoot: 1.5
+                        }
+                    }
+
+                    Rectangle {
+                        x: toggleRowRoot.checked ? parent.width - width - 2 : 2
+                        y: 2
+                        width: parent.height - 4
+                        height: width
+                        radius: width / 2
+                        color: toggleRowRoot.checked ? Colors.background : Colors.overSurfaceVariant
+
+                        Behavior on x {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation {
+                                duration: Config.animDuration / 2
+                                easing.type: Easing.OutCubic
+                            }
                         }
                     }
                 }
-            }
 
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: toggled(!checked)
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: toggleRowRoot.toggled(!toggleRowRoot.checked)
+                }
             }
+        }
+
+        Text {
+            visible: toggleRowRoot.description !== ""
+            text: toggleRowRoot.description
+            font.family: Config.theme.font
+            font.pixelSize: Styling.fontSize(-2)
+            color: Colors.overSurfaceVariant
+            opacity: 0.7
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
         }
     }
 }

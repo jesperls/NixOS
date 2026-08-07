@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, osConfig, ... }:
 
 {
   programs.zsh = {
@@ -33,7 +33,7 @@
       snis = "nh os switch $FLAKE";
       snub = "nh os boot $FLAKE";
       snus = "nh os switch $FLAKE --update";
-      snuf = "nh clean all --keep 5";
+      snuf = "nh clean all --keep ${toString osConfig.mySystem.system.keepGenerations}";
       nfu = "cd $FLAKE && nix flake update";
 
       cat = "bat --paging=never";

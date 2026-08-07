@@ -1,6 +1,5 @@
 require("pangu.shell")
 require("pangu.settings")
-require("pangu.startup")
 require("pangu.windowrules")
 require("pangu.gamemode")
 require("pangu.layouts")

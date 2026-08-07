@@ -489,6 +489,12 @@ Item {
                             endRadius: root.innerRadius
                         }
 
+                        RecordingIndicator {
+                            startRadius: root.innerRadius
+                            endRadius: root.innerRadius
+                            enableShadow: root.shadowsEnabled
+                        }
+
                         ControlsButton {
                             id: controlsButton
                             bar: root
@@ -543,6 +549,13 @@ Item {
                             enableShadow: root.shadowsEnabled
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
+                        }
+
+                        RecordingIndicator {
+                            vertical: true
+                            startRadius: root.innerRadius
+                            endRadius: root.innerRadius
+                            enableShadow: root.shadowsEnabled
                         }
 
                         ToolsButton {

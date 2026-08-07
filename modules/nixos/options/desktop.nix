@@ -37,62 +37,6 @@
       };
     };
 
-    lockscreen = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable the desktop lockscreen.";
-      };
-      lockOnSleep = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Lock the screen before the system goes to sleep.";
-      };
-      lockOnBoot = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Lock the screen automatically when the session starts.";
-      };
-    };
-
-    idle = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = ''
-          Run idle actions (dim, screen off, suspend, and idle lock) after
-          periods of inactivity. Off by default: the timeouts below are
-          laptop-shaped, and a desktop silently suspending itself is worse
-          than one that never does.
-        '';
-      };
-      dimTimeout = lib.mkOption {
-        type = lib.types.ints.unsigned;
-        default = 150;
-        description = "Seconds of inactivity before the screen dims. 0 disables dimming.";
-      };
-      dimBrightness = lib.mkOption {
-        type = lib.types.ints.between 0 100;
-        default = 10;
-        description = "Brightness percentage to dim to when idle.";
-      };
-      lockTimeout = lib.mkOption {
-        type = lib.types.ints.unsigned;
-        default = 300;
-        description = "Seconds of inactivity before locking the screen. Only takes effect when desktop.lockscreen.enable is true. 0 disables the idle lock even when the lockscreen is enabled.";
-      };
-      screenOffTimeout = lib.mkOption {
-        type = lib.types.ints.unsigned;
-        default = 330;
-        description = "Seconds of inactivity before turning the display off (DPMS). 0 disables.";
-      };
-      suspendTimeout = lib.mkOption {
-        type = lib.types.ints.unsigned;
-        default = 1800;
-        description = "Seconds of inactivity before suspending the system. 0 disables idle suspend.";
-      };
-    };
-
     specialWorkspaces = {
       maxWidth = lib.mkOption {
         type = lib.types.ints.unsigned;

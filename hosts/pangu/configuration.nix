@@ -3,7 +3,6 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./modules.nix
     ./theme.nix
     ./monitors.nix
     ./audio.nix
@@ -32,7 +31,11 @@
 
     home.stateVersion = "26.05";
 
-    desktop.idle.enable = false;
+    network.hosts = {
+      nuwa = "192.168.1.49";
+      oracle = "132.145.48.11";
+    };
+
     desktop.gaming.tearing.enable = true;
     desktop.layouts.centered.fullHeight = true;
     desktop.input.accelProfile = "flat";
@@ -40,12 +43,22 @@
     performance.transparentHugepages = "always";
     performance.zram.memoryPercent = 25;
 
+    hardware.nvidia.enable = true;
+    hardware.vial.enable = true;
+    hardware.webcam.enable = true;
+    hardware.sensors.enable = true;
+
+    programs.gaming.enable = true;
+    programs.lutris.enable = true;
+
+    services.sunshine.enable = true;
+
     services.homeAssistant = {
-      enable = true;
+      enable = false;
       privileged = true;
       mqtt = {
         enable = true;
-        server = "tcp://192.168.1.49:1883";
+        server = "tcp://${config.mySystem.network.hosts.nuwa}:1883";
       };
     };
 

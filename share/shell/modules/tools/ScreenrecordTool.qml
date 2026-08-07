@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs.modules.theme
 import qs.modules.components
+import qs.modules.globals
 import qs.modules.services
 import qs.config
 
@@ -30,13 +32,31 @@ PanelWindow {
     property string currentMode: "region" // region, window, screen, portal
     property var activeWindows: []
 
+    property bool replayMode: false
+    property int replaySeconds: 60
+    readonly property var replayDurations: [30, 60, 120, 300]
+
     property bool recordAudioOutput: false
     property bool recordAudioInput: false
+
+    function formatDuration(seconds) {
+        return seconds < 60 ? seconds + "s" : (seconds / 60) + "m";
+    }
 
     property var focusedMonitor: null  // List of monitor objects from compositor
 
     function getModes() {
         return [
+            {
+                name: "modeswitch",
+                icon: replayMode ? Icons.rewind : Icons.recordScreen,
+                tooltip: replayMode ? "Replay Buffer (click for recording)" : "Recording (click for replay buffer)",
+                type: "toggle",
+                variant: replayMode ? "tertiary" : "primary"
+            },
+            {
+                type: "separator"
+            },
             {
                 name: "audio",
                 icon: recordAudioOutput ? Icons.speakerHigh : Icons.speakerSlash,
@@ -75,24 +95,36 @@ PanelWindow {
             {
                 name: "portal",
                 icon: Icons.aperture,
-                tooltip: "Portal"
+                tooltip: replayMode ? "Portal (recording only)" : "Portal",
+                enabled: !replayMode
             }
         ];
     }
 
     function open() {
+        screenrecordPopup.replayMode = GlobalStates.screenRecordReplayMode;
+        screenrecordPopup.replaySeconds = Config.system.replay?.seconds ?? 60;
         if (modeGrid)
-            modeGrid.currentIndex = ScreenRecorder.canRecordDirectly ? 3 : 6;  // Default to region (3) or portal (6)
+            modeGrid.currentIndex = ScreenRecorder.canRecordDirectly ? 5 : 8;
         screenrecordPopup.currentMode = ScreenRecorder.canRecordDirectly ? "region" : "portal";
-        screenrecordPopup.recordAudioOutput = false;
+        screenrecordPopup.recordAudioOutput = screenrecordPopup.replayMode;
         screenrecordPopup.recordAudioInput = false;
-        
+
         Screenshot.fetchWindows();
-        
+
         screenrecordPopup.state = "active";
-        
+
         if (modeGrid)
             modeGrid.forceActiveFocus();
+    }
+
+    function startCapture(mode, regionStr) {
+        if (screenrecordPopup.replayMode) {
+            ReplayService.startWithOptions(mode === "screen" ? "screen" : "region", regionStr, screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, screenrecordPopup.replaySeconds);
+        } else {
+            ScreenRecorder.startRecording(screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, mode, regionStr);
+        }
+        screenrecordPopup.close();
     }
 
     function close() {
@@ -101,8 +133,7 @@ PanelWindow {
 
     function executeCapture() {
         if (screenrecordPopup.currentMode === "screen") {
-            ScreenRecorder.startRecording(screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, "screen", "");
-            screenrecordPopup.close();
+            startCapture("screen", "");
         } else if (screenrecordPopup.currentMode === "region") {
             if (selectionRect.width > 0) {
                 var w = Math.round(selectionRect.width);
@@ -110,18 +141,14 @@ PanelWindow {
                 var x = Math.round(selectionRect.x);
                 var y = Math.round(selectionRect.y);
 
-				x = x + screenrecordPopup.focusedMonitor.x;
-				y = y + screenrecordPopup.focusedMonitor.y;
+                x = x + screenrecordPopup.focusedMonitor.x;
+                y = y + screenrecordPopup.focusedMonitor.y;
 
-                var regionStr = w + "x" + h + "+" + x + "+" + y;
-
-                ScreenRecorder.startRecording(screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, "region", regionStr);
-                screenrecordPopup.close();
+                startCapture("region", w + "x" + h + "+" + x + "+" + y);
             }
         } else if (screenrecordPopup.currentMode === "window") {
         } else if (screenrecordPopup.currentMode === "portal") {
-            ScreenRecorder.startRecording(screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, "portal", "");
-            screenrecordPopup.close();
+            startCapture("portal", "");
         }
     }
 
@@ -202,10 +229,7 @@ PanelWindow {
                             var x = Math.round(modelData.at[0]);
                             var y = Math.round(modelData.at[1]);
 
-                            var regionStr = w + "x" + h + "+" + x + "+" + y;
-
-                            ScreenRecorder.startRecording(screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, "region", regionStr);
-                            screenrecordPopup.close();
+                            screenrecordPopup.startCapture("region", w + "x" + h + "+" + x + "+" + y);
                         }
                     }
                 }
@@ -237,11 +261,9 @@ PanelWindow {
 
             onClicked: {
                 if (screenrecordPopup.currentMode === "screen") {
-                    ScreenRecorder.startRecording(screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, "screen", "");
-                    screenrecordPopup.close();
+                    screenrecordPopup.startCapture("screen", "");
                 } else if (screenrecordPopup.currentMode === "portal") {
-                    ScreenRecorder.startRecording(screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, "portal", "");
-                    screenrecordPopup.close();
+                    screenrecordPopup.startCapture("portal", "");
                 }
             }
 
@@ -269,13 +291,10 @@ PanelWindow {
                     var x = Math.round(selectionRect.x);
                     var y = Math.round(selectionRect.y);
 
-					x = x + screenrecordPopup.focusedMonitor.x;
-					y = y + screenrecordPopup.focusedMonitor.y;
+                    x = x + screenrecordPopup.focusedMonitor.x;
+                    y = y + screenrecordPopup.focusedMonitor.y;
 
-                    var regionStr = w + "x" + h + "+" + x + "+" + y;
-
-                    ScreenRecorder.startRecording(screenrecordPopup.recordAudioOutput, screenrecordPopup.recordAudioInput, "region", regionStr);
-                    screenrecordPopup.close();
+                    screenrecordPopup.startCapture("region", w + "x" + h + "+" + x + "+" + y);
                 }
             }
         }
@@ -300,8 +319,8 @@ PanelWindow {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottomMargin: 50
 
-            width: modeGrid.width + 32
-            height: modeGrid.height + 32
+            width: contentColumn.width + 32
+            height: contentColumn.height + 32
 
             radius: Styling.radius(20)
             color: Colors.background
@@ -315,31 +334,96 @@ PanelWindow {
                 preventStealing: true
             }
 
-            ActionGrid {
-                id: modeGrid
+            ColumnLayout {
+                id: contentColumn
                 anchors.centerIn: parent
-                actions: screenrecordPopup.getModes()
-                buttonSize: 48
-                iconSize: 24
-                spacing: 10
+                spacing: 12
 
-                onCurrentIndexChanged: {
-                    if (currentIndex > 2) {
-                        var captureIndex = currentIndex - 3;
-                        var captureOptions = ["region", "window", "screen", "portal"];
-                        if (captureIndex >= 0 && captureIndex < captureOptions.length) {
-                            screenrecordPopup.currentMode = captureOptions[captureIndex];
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    visible: screenrecordPopup.replayMode
+                    spacing: 8
+
+                    Text {
+                        text: "Buffer"
+                        color: Colors.outline
+                        font.family: Config.theme.font
+                        font.pixelSize: Styling.fontSize(-1)
+                    }
+
+                    Repeater {
+                        model: {
+                            var durations = screenrecordPopup.replayDurations.slice();
+                            if (durations.indexOf(screenrecordPopup.replaySeconds) === -1)
+                                durations.push(screenrecordPopup.replaySeconds);
+                            durations.sort((a, b) => a - b);
+                            return durations;
+                        }
+
+                        StyledRect {
+                            id: durationPill
+                            required property int modelData
+
+                            readonly property bool selected: screenrecordPopup.replaySeconds === modelData
+
+                            variant: selected ? "primary" : (durationMouse.containsMouse ? "focus" : "common")
+                            radius: Styling.radius(0)
+                            implicitWidth: durationLabel.implicitWidth + 20
+                            implicitHeight: 28
+
+                            Text {
+                                id: durationLabel
+                                anchors.centerIn: parent
+                                text: screenrecordPopup.formatDuration(durationPill.modelData)
+                                font.family: Config.theme.font
+                                font.pixelSize: Styling.fontSize(-1)
+                                font.weight: durationPill.selected ? Font.Bold : Font.Normal
+                                color: durationPill.selected ? Styling.srItem("primary") : Colors.overBackground
+                            }
+
+                            MouseArea {
+                                id: durationMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: screenrecordPopup.replaySeconds = durationPill.modelData
+                            }
                         }
                     }
                 }
 
-                onActionTriggered: action => {
-                    if (action.tooltip === "Toggle Audio Output") {
-                        screenrecordPopup.recordAudioOutput = !screenrecordPopup.recordAudioOutput;
-                    } else if (action.tooltip === "Toggle Microphone") {
-                        screenrecordPopup.recordAudioInput = !screenrecordPopup.recordAudioInput;
-                    } else {
-                        screenrecordPopup.executeCapture();
+                ActionGrid {
+                    id: modeGrid
+                    Layout.alignment: Qt.AlignHCenter
+                    actions: screenrecordPopup.getModes()
+                    buttonSize: 48
+                    iconSize: 24
+                    spacing: 10
+
+                    onCurrentIndexChanged: {
+                        if (currentIndex > 4) {
+                            var captureIndex = currentIndex - 5;
+                            var captureOptions = ["region", "window", "screen", "portal"];
+                            if (captureIndex >= 0 && captureIndex < captureOptions.length) {
+                                screenrecordPopup.currentMode = captureOptions[captureIndex];
+                            }
+                        }
+                    }
+
+                    onActionTriggered: action => {
+                        if (action.name === "modeswitch") {
+                            screenrecordPopup.replayMode = !screenrecordPopup.replayMode;
+                            if (screenrecordPopup.replayMode && screenrecordPopup.currentMode === "portal") {
+                                screenrecordPopup.currentMode = "region";
+                                modeGrid.currentIndex = 5;
+                            }
+                        } else if (action.tooltip === "Toggle Audio Output") {
+                            screenrecordPopup.recordAudioOutput = !screenrecordPopup.recordAudioOutput;
+                        } else if (action.tooltip === "Toggle Microphone") {
+                            screenrecordPopup.recordAudioInput = !screenrecordPopup.recordAudioInput;
+                        } else {
+                            screenrecordPopup.executeCapture();
+                        }
                     }
                 }
             }

@@ -134,7 +134,16 @@ Singleton {
     property var popupList: list.filter(notif => notif.popup)
     property bool popupInhibited: silent
     property var latestTimeForApp: ({})
-    property var totalCounts: ({})  // Conteo total independiente del almacenamiento: {appName: {summary: count}}
+    property var totalCounts: ({})
+
+    onSilentChanged: if (StateService.initialized) StateService.set("dnd", root.silent)
+
+    Connections {
+        target: StateService
+        function onStateLoaded() {
+            root.silent = StateService.get("dnd", false);
+        }
+    }
 
     Component {
         id: notifComponent
@@ -159,12 +168,10 @@ Singleton {
         return notifComponent.createObject(root, {
             "id": json.id,
             "actions": json.actions,
-            "appIcon": json.cachedAppIcon || json.appIcon  // Usar cached si disponible
-            ,
+            "appIcon": json.cachedAppIcon || json.appIcon,
             "appName": json.appName,
             "body": json.body,
-            "image": json.cachedImage || json.image  // Usar cached si disponible
-            ,
+            "image": json.cachedImage || json.image,
             "summary": json.summary,
             "time": json.time,
             "urgency": json.urgency,
@@ -172,9 +179,8 @@ Singleton {
             "replaceKey": json.replaceKey || "",
             "cachedAppIcon": json.cachedAppIcon || "",
             "cachedImage": json.cachedImage || "",
-            "isCached": json.isCached || true  // Default to true for loaded notifications
-            ,
-            "popup": false  // No popup para notificaciones cargadas
+            "isCached": json.isCached || true,
+            "popup": false
         });
     }
 
@@ -259,7 +265,7 @@ Singleton {
                     notifications: [],
                     time: 0,
                     historyPriority: 0,
-                    totalCount: 0  // Conteo independiente del almacenamiento
+                    totalCount: 0
                 };
             }
             groups[notif.appName].notifications.push(notif);
@@ -316,7 +322,7 @@ Singleton {
                 newNotifObject.popup = true;
                 newNotifObject.timer = notifTimerComponent.createObject(root, {
                     "id": newNotifObject.id,
-                    "interval": notification.expireTimeout < 0 ? 5000 : notification.expireTimeout // Aumentado para notch
+                    "interval": notification.expireTimeout < 0 ? 5000 : notification.expireTimeout
                 });
             }
 
@@ -559,12 +565,12 @@ Singleton {
                 try {
                     var arrayBuffer = xhr.response;
                     var bytes = new Uint8Array(arrayBuffer);
-                    var binary = '';
                     var len = Math.min(bytes.byteLength, 1024 * 1024);
-                    for (var i = 0; i < len; i++) {
-                        binary += String.fromCharCode(bytes[i]);
+                    var chunks = [];
+                    for (var i = 0; i < len; i += 32768) {
+                        chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + 32768, len))));
                     }
-                    var base64 = btoa(binary);
+                    var base64 = btoa(chunks.join(''));
 
                     var mimeType = "image/png";
                     var lowerUrl = imageUrl.toLowerCase();
@@ -600,6 +606,8 @@ Singleton {
     }
 
     Component.onCompleted: {
+        if (StateService.initialized)
+            root.silent = StateService.get("dnd", false);
         notifFileView.reload();
         root.initDone();
     }

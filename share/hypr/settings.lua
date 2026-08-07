@@ -49,17 +49,7 @@ hl.config({
   },
 })
 
-for _, curve in ipairs({
-  { "easeOutQuint", { type = "bezier", points = { { 0.23, 1.0 }, { 0.32, 1.0 } } } },
-  { "easeInOutQuint", { type = "bezier", points = { { 0.83, 0.0 }, { 0.17, 1.0 } } } },
-  { "sharpBounce", { type = "bezier", points = { { 0.76, 0.0 }, { 0.24, 1.1 } } } },
-  { "easeInOutElastic", { type = "bezier", points = { { 0.68, -0.55 }, { 0.265, 1.55 } } } },
-  { "easeInBounce", { type = "bezier", points = { { 0.42, 0.0 }, { 0.58, 1.0 } } } },
-  { "easeOutCubic", { type = "bezier", points = { { 0.215, 0.61 }, { 0.355, 1.0 } } } },
-  { "easeInOutCubic", { type = "bezier", points = { { 0.65, 0.05 }, { 0.36, 1.0 } } } },
-}) do
-  hl.curve(curve[1], curve[2])
-end
+hl.curve("easeInOutQuint", { type = "bezier", points = { { 0.83, 0.0 }, { 0.17, 1.0 } } })
 
 for _, animation in ipairs({
   { leaf = "windows", style = "slide" },

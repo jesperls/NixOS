@@ -1,6 +1,13 @@
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
+  cfg = config.mySystem.programs.lutris;
+
   lutrisWithDeps = pkgs.lutris.override {
     extraLibraries =
       pkgs: with pkgs; [
@@ -82,5 +89,10 @@ let
   };
 in
 {
-  environment.systemPackages = [ lutrisWrapped ];
+  options.mySystem.programs.lutris.enable =
+    lib.mkEnableOption "Lutris with bundled Wine runtime libraries";
+
+  config = lib.mkIf cfg.enable {
+    environment.systemPackages = [ lutrisWrapped ];
+  };
 }

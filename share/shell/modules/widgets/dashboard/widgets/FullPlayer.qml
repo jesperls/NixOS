@@ -178,6 +178,28 @@ StyledRect {
         }
     }
 
+    AudioVisualizer {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 24
+        anchors.rightMargin: 24
+        anchors.bottomMargin: 16
+        height: 36
+        mirrored: true
+        barSpacing: 3
+        active: Config.performance.audioVisualizer && player.isPlaying
+        opacity: active ? 0.45 : 0.0
+        visible: opacity > 0
+        Behavior on opacity {
+            enabled: Config.animDuration > 0
+            NumberAnimation {
+                duration: Config.animDuration
+                easing.type: Easing.OutQuart
+            }
+        }
+    }
+
     ColumnLayout {
         anchors.centerIn: parent
         spacing: 8

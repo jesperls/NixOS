@@ -270,9 +270,10 @@ local ratio_off = false
 
 local function update_single_ratio()
   local off = false
+  local keep = false
   for _, mon in ipairs(hl.get_monitors()) do
     local ws = mon.active_workspace
-    if ws and not ws.special and ws.tiled_layout == "lua:centered" then
+    if ws and not ws.special then
       local tiled = 0
       for _, window in ipairs(hl.get_workspace_windows(ws.id)) do
         if not window.floating then
@@ -280,11 +281,15 @@ local function update_single_ratio()
         end
       end
       if tiled == 1 then
-        off = true
-        break
+        if ws.tiled_layout == "lua:centered" then
+          off = true
+        else
+          keep = true
+        end
       end
     end
   end
+  off = off and not keep
   if off ~= ratio_off then
     ratio_off = off
     hl.config({
@@ -400,6 +405,11 @@ local function drag_tick()
     end
     return
   end
+  if drag.super and not (hl.is_key_down("Super_L") or hl.is_key_down("Super_R")) then
+    drag = nil
+    drag_timer:set_enabled(false)
+    return
+  end
   local pos = hl.get_cursor_pos()
   if not pos then
     return
@@ -454,6 +464,7 @@ function M.start_drag()
     x = pos.x,
     y = pos.y,
     grab_top = at and size and pos.y < at.y + size.y / 2 or false,
+    super = hl.is_key_down("Super_L") or hl.is_key_down("Super_R"),
   }
 
   if drag_timer then
@@ -470,13 +481,6 @@ function M.end_drag()
   end
 end
 
--- Releasing SUPER ends a drag; the button-release bind never fires when the
--- modifier goes up first. 133/134 are the Super keycodes.
-hl.on("input.keyboard.key", function(keycode, _, state)
-  if drag and state == 0 and (keycode == 133 or keycode == 134) then
-    M.end_drag()
-  end
-end)
 
 hl.layout.register("centered", {
   recalculate = function(ctx)

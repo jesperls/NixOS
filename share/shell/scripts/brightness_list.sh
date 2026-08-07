@@ -27,7 +27,7 @@ if command -v ddcutil &> /dev/null; then
             CURRENT_CONNECTOR="${BASH_REMATCH[1]}"
         elif [[ "$line" =~ ^$ ]] && [ -n "$CURRENT_BUS" ] && [ -n "$CURRENT_CONNECTOR" ]; then
             BRIGHTNESS=$(ddcutil -b "$CURRENT_BUS" getvcp 10 --brief 2>/dev/null | awk '{print $4}')
-            if [ -n "$BRIGHTNESS" ]; then
+            if [[ "$BRIGHTNESS" =~ ^[0-9]+$ ]]; then
                 echo "${CURRENT_CONNECTOR}:${BRIGHTNESS}"
             fi
             CURRENT_BUS=""

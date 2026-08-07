@@ -25,7 +25,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    hyprpolkitagent
     pamixer
     brightnessctl
   ];

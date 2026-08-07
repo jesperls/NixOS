@@ -59,10 +59,8 @@ Rectangle {
                         Layout.preferredHeight: width
                     }
 
-                    StyledRect {
-                        variant: "pane"
+                    MoreControls {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 150
                     }
                 }
             }

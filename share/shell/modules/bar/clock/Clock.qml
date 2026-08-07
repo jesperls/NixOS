@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.config
 import qs.modules.theme
 import qs.modules.components
@@ -317,7 +318,7 @@ Item {
                         id: weatherWidget
                         width: 300
                         height: 140
-                        showDebugControls: true
+                        showDebugControls: Quickshell.env("PANGU_WEATHER_DEBUG") === "1"
                         animationsEnabled: clockPopup.isOpen
                     }
 

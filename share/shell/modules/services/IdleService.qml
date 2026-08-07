@@ -135,8 +135,34 @@ Singleton {
         }
     }
 
+    readonly property var effectiveListeners: {
+        const idle = Config.system.idle;
+        if (idle.enabled !== true)
+            return [];
+        const composed = [];
+        if (idle.lock.enabled && idle.lock.timeout > 0)
+            composed.push({
+                timeout: idle.lock.timeout,
+                onTimeout: "loginctl lock-session"
+            });
+        if (idle.screenOff.enabled && idle.screenOff.timeout > 0)
+            composed.push({
+                timeout: idle.screenOff.timeout,
+                onTimeout: "pangu screen off",
+                onResume: "pangu screen on"
+            });
+        if (idle.suspend.enabled && idle.suspend.timeout > 0)
+            composed.push({
+                timeout: idle.suspend.timeout,
+                onTimeout: "pangu suspend"
+            });
+        return composed.concat(idle.listeners || []);
+    }
+
+    onEffectiveListenersChanged: resetIdleState()
+
     function checkListeners() {
-        let listeners = Config.system.idle.listeners;
+        let listeners = root.effectiveListeners;
         for (let i = 0; i < listeners.length; i++) {
             let listener = listeners[i];
             let tVal = listener.timeout || 60;
@@ -152,7 +178,7 @@ Singleton {
     }
 
     function resetIdleState() {
-        let listeners = Config.system.idle.listeners;
+        let listeners = root.effectiveListeners;
 
         for (let i = root.triggeredListeners.length - 1; i >= 0; i--) {
             let idx = root.triggeredListeners[i];

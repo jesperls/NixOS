@@ -7,7 +7,6 @@
 
 let
   toLua = lib.generators.toLua { };
-  lockscreen = osConfig.mySystem.desktop.lockscreen;
   theme = osConfig.mySystem.theme;
   hyprSettings = import ./settings.nix {
     inherit
@@ -51,10 +50,6 @@ let
     render = {
       direct_scanout = osConfig.mySystem.desktop.render.directScanout;
     };
-    lockscreen = {
-      enable = lockscreen.enable;
-      lock_on_boot = lockscreen.enable && lockscreen.lockOnBoot;
-    };
     apps = {
       terminal = apps.terminal.command;
       browser = apps.browser.command;
@@ -79,7 +74,10 @@ let
     auto_fake_fullscreen = {
       enable = autoFakeFullscreen.enable;
       classes =
-        if autoFakeFullscreen.classes == [ ] then [ apps.browser.command ] else autoFakeFullscreen.classes;
+        if autoFakeFullscreen.classes == [ ] then
+          [ (lib.removeSuffix ".desktop" apps.browser.desktopFile) ]
+        else
+          autoFakeFullscreen.classes;
     };
     theme = {
       animations = {

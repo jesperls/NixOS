@@ -59,10 +59,7 @@ let
             bottom = special.verticalGap;
           };
         })
-        [
-          "special:magic"
-          "special:scratchpad"
-        ]
+        [ "special:scratchpad" ]
     );
 in
 {

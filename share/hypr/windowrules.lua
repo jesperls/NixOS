@@ -1,4 +1,5 @@
 local state = require("pangu.generated")
+local popout = require("pangu.popout")
 
 for _, class in ipairs({
   "pavucontrol",
@@ -30,9 +31,6 @@ for _, title in ipairs({
   hl.window_rule({ match = { title = title }, float = true })
 end
 
-hl.window_rule({ match = { title = "^(JSST Subtitles)$" }, float = true, pin = true })
-hl.window_rule({ match = { title = "^(Quickshell Package Manager)$" }, float = true, center = true })
-
 hl.window_rule({
   match = { title = "^(Picture-in-Picture)$" },
   float = true,
@@ -45,7 +43,7 @@ hl.window_rule({
   match = { workspace = "special:scratchpad" },
   float = true,
   center = true,
-  size = { 900, 700 },
+  size = { popout.scratchpad_size.x, popout.scratchpad_size.y },
 })
 
 local translucent = string.format("%.2f %.2f", state.theme.translucent_opacity, state.theme.translucent_opacity)

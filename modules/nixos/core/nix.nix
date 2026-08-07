@@ -2,11 +2,16 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
 {
   nix = {
+    registry.nixpkgs.flake = inputs.nixpkgs;
+    nixPath = [ "nixpkgs=flake:nixpkgs" ];
+    channel.enable = false;
+
     settings = {
       experimental-features = [
         "nix-command"
@@ -55,7 +60,7 @@
   programs.nh = {
     enable = true;
     clean.enable = true;
-    clean.extraArgs = "--keep-since 4d --keep 5";
+    clean.extraArgs = "--keep-since 4d --keep ${toString config.mySystem.system.keepGenerations}";
     flake = config.mySystem.paths.repoRoot;
   };
 

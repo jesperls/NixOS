@@ -11,6 +11,7 @@
 
   bash,
   brightnessctl,
+  cava,
   coreutils,
   curl,
   ddcutil,
@@ -24,6 +25,7 @@
   inetutils,
   jq,
   libnotify,
+  libqalculate,
   matugen,
   mpvpaper,
   power-profiles-daemon,
@@ -32,6 +34,7 @@
   slurp,
   socat,
   sqlite,
+  swappy,
   systemd,
   tesseract,
   tmux,
@@ -112,7 +115,10 @@ let
       qt6.qtimageformats
       qt6.qtsvg
     ];
-    pathsToLink = [ "/lib/qt-6/qml" ];
+    pathsToLink = [
+      "/lib/qt-6/qml"
+      "/lib/qt-6/plugins"
+    ];
   };
 in
 writeShellApplication {
@@ -123,6 +129,7 @@ writeShellApplication {
 
     bash # the shell spawns `bash -c` constantly and gets a bare systemd PATH
     brightnessctl
+    cava
     coreutils
     curl
     ddcutil
@@ -130,12 +137,13 @@ writeShellApplication {
     gawk
     glib # gsettings
     gnugrep
-    gpu-screen-recorder
+    (gpu-screen-recorder.override { wrapperDir = "/run/wrappers/bin"; }) # execs the setcap gsr-kms-server for promptless capture
     grim
     imagemagick
     inetutils # hostname
     jq
     libnotify
+    libqalculate
     matugen
     mpvpaper
     power-profiles-daemon
@@ -144,6 +152,7 @@ writeShellApplication {
     slurp
     socat # mpv IPC sockets for animated wallpapers
     sqlite
+    swappy
     systemd # systemctl, loginctl
     (tesseract.override { enableLanguages = ocrLanguages; })
     tmux # the dashboard's tmux tab drives real sessions
@@ -164,6 +173,7 @@ writeShellApplication {
 
     export QML2_IMPORT_PATH="${qmlEnv}/lib/qt-6/qml''${QML2_IMPORT_PATH:+:$QML2_IMPORT_PATH}"
     export QML_IMPORT_PATH="$QML2_IMPORT_PATH"
+    export QT_PLUGIN_PATH="${qmlEnv}/lib/qt-6/plugins''${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
 
     if [ -d /run/wrappers/bin ]; then
       # Wrappers first so the setuid gpu-screen-recorder wins over our

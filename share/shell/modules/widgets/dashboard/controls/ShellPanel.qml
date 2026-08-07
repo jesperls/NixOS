@@ -243,6 +243,32 @@ Item {
             Layout.preferredHeight: 32
             radius: Styling.radius(-2)
 
+
+            Rectangle {
+                id: rejectOverlay
+                anchors.fill: parent
+                radius: parent.radius
+                color: Colors.error
+                opacity: 0
+            }
+
+            SequentialAnimation {
+                id: rejectFlash
+                loops: 2
+                NumberAnimation {
+                    target: rejectOverlay
+                    property: "opacity"
+                    to: 0.4
+                    duration: 90
+                }
+                NumberAnimation {
+                    target: rejectOverlay
+                    property: "opacity"
+                    to: 0
+                    duration: 140
+                }
+            }
+
             TextInput {
                 id: numberTextInput
                 anchors.fill: parent
@@ -266,6 +292,27 @@ Item {
                     }
                 }
                 Component.onCompleted: text = configValue.toString()
+
+                Keys.onReturnPressed: event => {
+                    if (acceptableInput) {
+                        event.accepted = false;
+                    } else {
+                        rejectFlash.restart();
+                    }
+                }
+                Keys.onEnterPressed: event => {
+                    if (acceptableInput) {
+                        event.accepted = false;
+                    } else {
+                        rejectFlash.restart();
+                    }
+                }
+                onActiveFocusChanged: {
+                    if (!activeFocus && !acceptableInput) {
+                        rejectFlash.restart();
+                        text = configValue.toString();
+                    }
+                }
 
                 onEditingFinished: {
                     let newVal = parseInt(text);
@@ -647,10 +694,15 @@ Item {
                             text: "System"
                             sectionId: "system"
                         }
+                        SectionButton {
+                            text: "About"
+                            sectionId: "about"
+                        }
                     }
 
                     ColumnLayout {
                         visible: root.currentSection === "bar"
+                        property string settingsSection: "bar"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -801,6 +853,31 @@ Item {
                             }
                         }
 
+                        ToggleRow {
+                            label: "Split on Centered Layout"
+                            checked: Config.bar.splitOnCenteredLayout ?? true
+                            onToggled: value => {
+                                if (value !== Config.bar.splitOnCenteredLayout) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.splitOnCenteredLayout = value;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Split Gap Padding"
+                            value: Config.bar.splitGapPadding ?? 4
+                            minValue: 0
+                            maxValue: 64
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.bar.splitGapPadding) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.splitGapPadding = newValue;
+                                }
+                            }
+                        }
+
                         Separator {
                             Layout.fillWidth: true
                         }
@@ -884,6 +961,7 @@ Item {
 
                     ColumnLayout {
                         visible: root.currentSection === "frame"
+                        property string settingsSection: "frame"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -964,6 +1042,7 @@ Item {
 
                     ColumnLayout {
                         visible: root.currentSection === "notch"
+                        property string settingsSection: "notch"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -1016,6 +1095,29 @@ Item {
                                 if (newValue !== Config.notch.theme) {
                                     GlobalStates.markShellChanged();
                                     Config.notch.theme = newValue;
+                                }
+                            }
+                        }
+
+                        SelectorRow {
+                            label: "Split Side"
+                            options: [
+                                {
+                                    label: "Left",
+                                    value: "left",
+                                    icon: Icons.arrowLeft
+                                },
+                                {
+                                    label: "Right",
+                                    value: "right",
+                                    icon: Icons.arrowRight
+                                }
+                            ]
+                            value: Config.notch.splitSide ?? "left"
+                            onValueSelected: newValue => {
+                                if (newValue !== Config.notch.splitSide) {
+                                    GlobalStates.markShellChanged();
+                                    Config.notch.splitSide = newValue;
                                 }
                             }
                         }
@@ -1118,6 +1220,7 @@ Item {
 
                     ColumnLayout {
                         visible: root.currentSection === "workspaces"
+                        property string settingsSection: "workspaces"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -1195,6 +1298,7 @@ Item {
 
                     ColumnLayout {
                         visible: root.currentSection === "overview"
+                        property string settingsSection: "overview"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -1306,6 +1410,7 @@ Item {
 
                     ColumnLayout {
                         visible: root.currentSection === "dock"
+                        property string settingsSection: "dock"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -1564,6 +1669,7 @@ Item {
 
                     ColumnLayout {
                         visible: root.currentSection === "lockscreen"
+                        property string settingsSection: "lockscreen"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -1577,7 +1683,7 @@ Item {
                         }
 
                         SelectorRow {
-                            label: ""
+                            label: "Position"
                             options: [
                                 {
                                     label: "Top",
@@ -1598,6 +1704,75 @@ Item {
                                 }
                             }
                         }
+
+                        ToggleRow {
+                            label: "Lock on Boot"
+                            checked: Config.lockscreen.lockOnBoot ?? false
+                            onToggled: value => {
+                                if (value !== Config.lockscreen.lockOnBoot) {
+                                    GlobalStates.markShellChanged();
+                                    Config.lockscreen.lockOnBoot = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Clock"
+                            checked: Config.lockscreen.showClock ?? true
+                            onToggled: value => {
+                                if (value !== Config.lockscreen.showClock) {
+                                    GlobalStates.markShellChanged();
+                                    Config.lockscreen.showClock = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Media Player"
+                            checked: Config.lockscreen.showMediaPlayer ?? true
+                            onToggled: value => {
+                                if (value !== Config.lockscreen.showMediaPlayer) {
+                                    GlobalStates.markShellChanged();
+                                    Config.lockscreen.showMediaPlayer = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Avatar"
+                            checked: Config.lockscreen.showAvatar ?? true
+                            onToggled: value => {
+                                if (value !== Config.lockscreen.showAvatar) {
+                                    GlobalStates.markShellChanged();
+                                    Config.lockscreen.showAvatar = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Blur Wallpaper"
+                            checked: Config.lockscreen.blurWallpaper ?? true
+                            onToggled: value => {
+                                if (value !== Config.lockscreen.blurWallpaper) {
+                                    GlobalStates.markShellChanged();
+                                    Config.lockscreen.blurWallpaper = value;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Dim Strength"
+                            value: Config.lockscreen.dimOpacity ?? 25
+                            minValue: 0
+                            maxValue: 100
+                            suffix: "%"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.lockscreen.dimOpacity) {
+                                    GlobalStates.markShellChanged();
+                                    Config.lockscreen.dimOpacity = newValue;
+                                }
+                            }
+                        }
                     }
 
                     Separator {
@@ -1607,6 +1782,7 @@ Item {
 
                     ColumnLayout {
                         visible: root.currentSection === "desktop"
+                        property string settingsSection: "desktop"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -1698,6 +1874,7 @@ Item {
 
                     ColumnLayout {
                         visible: root.currentSection === "system"
+                        property string settingsSection: "system"
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -1792,6 +1969,90 @@ Item {
                                 if (value !== Config.system.ocr.kor) {
                                     GlobalStates.markShellChanged();
                                     Config.system.ocr.kor = value;
+                                }
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "about"
+                        property string settingsSection: "about"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "About"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        StyledRect {
+                            variant: "pane"
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: aboutColumn.implicitHeight + 32
+                            radius: Styling.radius(0)
+
+                            ColumnLayout {
+                                id: aboutColumn
+                                anchors.fill: parent
+                                anchors.margins: 16
+                                spacing: 8
+
+                                Text {
+                                    text: "Pangu"
+                                    font.family: Config.theme.font
+                                    font.pixelSize: Styling.fontSize(4)
+                                    font.bold: true
+                                    color: Colors.overBackground
+                                }
+
+                                Text {
+                                    text: "The desktop shell for this configuration"
+                                    font.family: Config.theme.font
+                                    font.pixelSize: Styling.fontSize(-1)
+                                    color: Colors.overSurfaceVariant
+                                }
+
+                                RowLayout {
+                                    Layout.topMargin: 8
+                                    spacing: 8
+
+                                    Text {
+                                        text: "Version"
+                                        font.family: Config.theme.font
+                                        font.pixelSize: Styling.fontSize(-1)
+                                        color: Colors.overBackground
+                                        Layout.fillWidth: true
+                                    }
+
+                                    Text {
+                                        text: Config.version !== "" ? Config.version : "dev"
+                                        font.family: Config.theme.monoFont
+                                        font.pixelSize: Styling.fontSize(-1)
+                                        color: Styling.srItem("overprimary")
+                                    }
+                                }
+
+                                RowLayout {
+                                    spacing: 8
+
+                                    Text {
+                                        text: "License"
+                                        font.family: Config.theme.font
+                                        font.pixelSize: Styling.fontSize(-1)
+                                        color: Colors.overBackground
+                                        Layout.fillWidth: true
+                                    }
+
+                                    Text {
+                                        text: "AGPL-3.0"
+                                        font.family: Config.theme.monoFont
+                                        font.pixelSize: Styling.fontSize(-1)
+                                        color: Styling.srItem("overprimary")
+                                    }
                                 }
                             }
                         }

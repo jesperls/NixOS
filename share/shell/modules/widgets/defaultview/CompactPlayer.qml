@@ -200,6 +200,24 @@ Item {
                     }
                 }
             }
+
+            AudioVisualizer {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                height: 14
+                active: Config.performance.audioVisualizer && compactPlayer.isPlaying
+                opacity: active ? ((compactPlayer.notchHovered && compactPlayer.player) ? 0.25 : 0.5) : 0.0
+                Behavior on opacity {
+                    enabled: Config.animDuration > 0
+                    NumberAnimation {
+                        duration: Config.animDuration
+                        easing.type: Easing.OutQuart
+                    }
+                }
+            }
         }
 
         RowLayout {

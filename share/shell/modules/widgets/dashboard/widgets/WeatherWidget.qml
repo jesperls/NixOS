@@ -11,7 +11,7 @@ import qs.config
 ClippingRectangle {
     id: root
 
-    property bool showDebugControls: true
+    property bool showDebugControls: false
     
     property bool animationsEnabled: true
 

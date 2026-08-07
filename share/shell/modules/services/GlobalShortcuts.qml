@@ -16,7 +16,6 @@ QtObject {
     readonly property real mediaSeekStep: 5
 
     function run(command) {
-        console.log("IPC run command received:", command);
         switch (command) {
             case "launcher": toggleLauncher(); break;
             case "clipboard": toggleLauncherWithPrefix(1, Config.prefix.clipboard + " "); break;
@@ -28,7 +27,7 @@ QtObject {
             case "wallpapers": toggleDashboardTab(1); break;
             case "dashboard-widgets": toggleDashboardTab(0); break;
             case "dashboard-wallpapers": toggleDashboardTab(1); break;
-            case "dashboard-kanban": toggleDashboardTab(2); break;
+            case "dashboard-metrics": toggleDashboardTab(2); break;
             case "dashboard-controls": toggleSettings(); break;
 
             case "overview": toggleSimpleModule("overview"); break;
@@ -36,14 +35,33 @@ QtObject {
             case "tools": toggleSimpleModule("tools"); break;
             case "config": toggleSettings(); break;
             case "screenshot": Screenshot.initialize(); GlobalStates.screenshotToolVisible = true; break;
-            case "screenrecord": ScreenRecorder.initialize(); GlobalStates.screenRecordToolVisible = true; break;
+            case "screenrecord": ScreenRecorder.initialize(); GlobalStates.screenRecordReplayMode = false; GlobalStates.screenRecordToolVisible = true; break;
             case "lens": 
                 Screenshot.initialize();
                 Screenshot.captureMode = "lens";
                 GlobalStates.screenshotToolVisible = true;
                 break;
+            case "mirror": GlobalStates.mirrorWindowVisible = !GlobalStates.mirrorWindowVisible; break;
+            case "cheatsheet": GlobalStates.cheatsheetVisible = !GlobalStates.cheatsheetVisible; break;
             case "lockscreen": GlobalStates.lockscreenVisible = true; break;
             case "gamemode": GameModeService.toggle(); break;
+            case "dnd": Notifications.silent = !Notifications.silent; break;
+            case "caffeine": CaffeineService.toggleInhibit(); break;
+            case "nightlight": NightLightService.toggle(); break;
+            case "slideshow": WallpaperSlideshowService.toggle(); break;
+            case "wallpaper-next": WallpaperSlideshowService.next(); break;
+            case "autotheme": AutoThemeService.toggle(); break;
+            case "replay":
+                if (ReplayService.active) {
+                    ReplayService.stop();
+                } else {
+                    ScreenRecorder.initialize();
+                    GlobalStates.screenRecordReplayMode = true;
+                    GlobalStates.screenRecordToolVisible = true;
+                }
+                break;
+            case "replay-quick": ReplayService.toggle(); break;
+            case "replay-save": ReplayService.saveClip(); break;
             case "screen-on": Compositor.dispatch("dpms on"); break;
             case "screen-off": Compositor.dispatch("dpms off"); break;
             

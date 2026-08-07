@@ -25,7 +25,7 @@ QtObject {
 
     property Process checkCapabilitiesProcess: Process {
         id: checkCapabilitiesProcess
-        command: ["bash", "-c", "if [ -f /run/current-system/sw/bin/nixos-version ]; then if [[ \"$(type -p gpu-screen-recorder)\" == *\"/run/wrappers/bin/\"* ]]; then echo true; else echo false; fi; else echo true; fi"]
+        command: ["bash", "-c", "if [ -f /run/current-system/sw/bin/nixos-version ]; then if [ -x /run/wrappers/bin/gsr-kms-server ]; then echo true; else echo false; fi; else echo true; fi"]
         running: false
         stdout: StdioCollector {
             onTextChanged: {
@@ -68,7 +68,7 @@ QtObject {
 
     property Process checkProcess: Process {
         id: checkProcess
-        command: ["bash", "-c", "pgrep -f 'gpu-screen-recorder' | grep -v $$ > /dev/null"]
+        command: ["bash", "-c", "pgrep -fa gpu-screen-recorder | grep -v \"^$$ \" | grep -v ' -r ' | grep -q ."]
         onExited: exitCode => {
             var wasRecording = root.isRecording;
             root.isRecording = (exitCode === 0);
@@ -87,7 +87,7 @@ QtObject {
 
     property Process timeProcess: Process {
         id: timeProcess
-        command: ["bash", "-c", "pid=$(pgrep -f 'gpu-screen-recorder' | head -n 1); if [ -n \"$pid\" ]; then ps -o etime= -p \"$pid\"; fi"]
+        command: ["bash", "-c", "pid=$(pgrep -fa gpu-screen-recorder | grep -v \"^$$ \" | grep -v ' -r ' | awk 'NR==1 {print $1}'); if [ -n \"$pid\" ]; then ps -o etime= -p \"$pid\"; fi"]
         stdout: StdioCollector {
             onTextChanged: {
                 root.duration = text.trim();
@@ -202,6 +202,6 @@ QtObject {
 
     property Process stopProcess: Process {
         id: stopProcess
-        command: ["pkill", "-SIGINT", "-f", "gpu-screen-recorder"]
+        command: ["bash", "-c", "pgrep -fa gpu-screen-recorder | grep -v \"^$$ \" | grep -v ' -r ' | awk '{print $1}' | xargs -r kill -INT"]
     }
 }

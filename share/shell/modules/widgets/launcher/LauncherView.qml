@@ -157,12 +157,74 @@ Rectangle {
             }
         }
 
-        function updateFilteredApps() {
-            if (searchText.length > 0) {
-                filteredApps = AppSearch.fuzzyQuery(searchText);
-            } else {
-                filteredApps = AppSearch.getAllApps();
+        property string calcExpr: ""
+        property string calcResult: ""
+
+        function calcExprFor(text) {
+            const t = text.trim();
+            if (t.startsWith("="))
+                return t.slice(1).trim();
+            if (/^[0-9(][0-9+\-*\/^%.,()!\s]*$/.test(t) && /[+\-*\/^%!]/.test(t))
+                return t;
+            return "";
+        }
+
+        function calcEntry() {
+            const result = calcResult;
+            return {
+                id: "calc:" + calcExpr,
+                name: result,
+                icon: "font:" + Icons.sparkle,
+                comment: calcExpr + "  =  " + result + "   (Enter copies)",
+                execString: "",
+                categories: [],
+                runInTerminal: false,
+                isAction: true,
+                execute: () => Quickshell.execDetached(["wl-copy", result])
+            };
+        }
+
+        Timer {
+            id: calcDebounce
+            interval: 150
+            onTriggered: {
+                calcProcess.running = false;
+                calcProcess.command = ["qalc", "-t", appLauncher.calcExpr];
+                calcProcess.running = true;
             }
+        }
+
+        Process {
+            id: calcProcess
+            stdout: StdioCollector {
+                onStreamFinished: {
+                    const result = text.trim();
+                    if (result.length > 0 && result.length < 120 && result !== appLauncher.calcExpr && !result.startsWith("error")) {
+                        appLauncher.calcResult = result;
+                        appLauncher.updateFilteredApps();
+                    }
+                }
+            }
+        }
+
+        function updateFilteredApps() {
+            if (searchText.startsWith(">")) {
+                filteredApps = LauncherActions.query(searchText.slice(1));
+                return;
+            }
+
+            const expr = calcExprFor(searchText);
+            if (expr !== calcExpr) {
+                calcExpr = expr;
+                calcResult = "";
+                if (expr.length > 0)
+                    calcDebounce.restart();
+            }
+
+            let apps = searchText.length > 0 ? AppSearch.fuzzyQuery(searchText) : AppSearch.getAllApps();
+            if (calcExpr.length > 0 && calcResult.length > 0)
+                apps = [calcEntry()].concat(apps);
+            filteredApps = apps;
         }
 
         onFilteredAppsChanged: {
@@ -210,9 +272,16 @@ Rectangle {
 
         function executeApp(appId) {
             let app = appsById[appId];
-            if (app && app.execute) {
+            if (!app || !app.execute)
+                return;
+            if (app.isAction) {
+                const run = app.execute;
+                Visibilities.setActiveModule("");
+                Qt.callLater(run);
+            } else {
                 app.execute();
                 UsageTracker.recordUsage(appId);
+                Visibilities.setActiveModule("");
             }
         }
 
@@ -245,6 +314,11 @@ Rectangle {
         }
 
         onSearchTextChanged: {
+            if (searchText === Config.prefix.wallpapers + " ") {
+                GlobalStates.clearLauncherState();
+                GlobalShortcuts.toggleDashboardTab(1);
+                return;
+            }
             updateFilteredApps();
             let detectedTab = detectPrefix(searchText);
             if (detectedTab !== currentTab) {
@@ -359,7 +433,7 @@ Rectangle {
                 width: parent.width
                 anchors.top: parent.top
                 text: GlobalStates.launcherSearchText
-                placeholderText: "Search applications..."
+                placeholderText: "Search apps  ·  > commands  ·  = math"
                 iconText: ""
 
                 onSearchTextChanged: text => {
@@ -393,7 +467,6 @@ Rectangle {
                         if (selectedApp) {
                             let options = [function () {
                                     appLauncher.executeApp(selectedApp.appId);
-                                    Visibilities.setActiveModule("");
                                 }, function () {
                                     TaskbarApps.togglePin(selectedApp.appId);
                                     appLauncher.expandedItemIndex = -1;
@@ -420,7 +493,6 @@ Rectangle {
                             let selectedApp = appsModel.get(appLauncher.selectedIndex);
                             if (selectedApp) {
                                 appLauncher.executeApp(selectedApp.appId);
-                                Visibilities.setActiveModule("");
                             }
                         }
                     }
@@ -428,6 +500,9 @@ Rectangle {
 
                 onShiftAccepted: {
                     if (appLauncher.selectedIndex >= 0 && appLauncher.selectedIndex < resultsList.count) {
+                        const selected = appsModel.get(appLauncher.selectedIndex);
+                        if (selected && (appLauncher.appsById[selected.appId] || {}).isAction)
+                            return;
                         if (appLauncher.expandedItemIndex === appLauncher.selectedIndex) {
                             appLauncher.expandedItemIndex = -1;
                             appLauncher.selectedOptionIndex = 0;
@@ -646,9 +721,10 @@ Rectangle {
                             if (mouse.button === Qt.LeftButton) {
                                 if (!isExpanded) {
                                     appLauncher.executeApp(appId);
-                                    Visibilities.setActiveModule("");
                                 }
                             } else if (mouse.button === Qt.RightButton) {
+                                if ((appLauncher.appsById[appId] || {}).isAction)
+                                    return;
                                 if (appLauncher.expandedItemIndex === index) {
                                     appLauncher.expandedItemIndex = -1;
                                     appLauncher.selectedOptionIndex = 0;
@@ -680,13 +756,16 @@ Rectangle {
                             Layout.preferredWidth: 32
                             Layout.preferredHeight: 32
 
+                            readonly property bool isFontIcon: appIcon.startsWith("font:")
+
                             Image {
                                 mipmap: true
                                 id: appIconImage
                                 anchors.fill: parent
-                                source: "image://icon/" + appIcon
+                                visible: !parent.isFontIcon
+                                source: parent.isFontIcon ? "" : "image://icon/" + appIcon
                                 fillMode: Image.PreserveAspectFit
-                                
+
                                 onStatusChanged: {
                                     if (status === Image.Error) {
                                         source = "image://icon/image-missing";
@@ -696,7 +775,25 @@ Rectangle {
 
                             Tinted {
                                 anchors.fill: parent
+                                visible: !parent.isFontIcon
                                 sourceItem: appIconImage
+                            }
+
+                            Text {
+                                anchors.centerIn: parent
+                                visible: parent.isFontIcon
+                                text: parent.isFontIcon ? appIcon.slice(5) : ""
+                                font.family: Icons.font
+                                font.pixelSize: 22
+                                color: appLauncher.selectedIndex === index ? Styling.srItem("primary") : Colors.overBackground
+
+                                Behavior on color {
+                                    enabled: Config.animDuration > 0
+                                    ColorAnimation {
+                                        duration: Config.animDuration / 2
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
                             }
                         }
 
@@ -797,7 +894,6 @@ Rectangle {
                                         textColor: Styling.srItem("primary"),
                                         action: function () {
                                             appLauncher.executeApp(appId);
-                                            Visibilities.setActiveModule("");
                                         }
                                     },
                                     {
@@ -1043,7 +1139,6 @@ Rectangle {
                         root.focusSearchInput();
                     }
                     onRequestOpenItem: (itemId, items, currentContent, filePathGetter, urlChecker) => {
-                        console.log("DEBUG: Received requestOpenItem signal for:", itemId);
                         openItemInternal(itemId, items, currentContent, filePathGetter, urlChecker);
                     }
                 }
@@ -1133,45 +1228,26 @@ Rectangle {
     Process {
         id: globalOpenProcess
         running: false
-
-        onStarted: function () {
-            console.log("DEBUG: globalOpenProcess started with command:", globalOpenProcess.command);
-        }
-
-        onExited: function (code, status) {
-            if (code === 0) {
-                console.log("DEBUG: globalOpenProcess completed successfully");
-            } else {
-                console.warn("DEBUG: globalOpenProcess failed with exit code:", code, "status:", status);
-            }
-        }
     }
 
     function openItemInternal(itemId, items, currentContent, getFilePathFromUri, isUrl) {
-        console.log("DEBUG: LauncherView.openItemInternal called for itemId:", itemId);
         for (var i = 0; i < items.length; i++) {
             if (items[i].id === itemId) {
                 var item = items[i];
                 var content = currentContent || item.preview;
-                console.log("DEBUG: item found - isFile:", item.isFile, "isImage:", item.isImage, "content:", content);
 
                 if (item.isFile) {
                     var filePath = getFilePathFromUri(content);
-                    console.log("DEBUG: Opening file with path:", filePath);
                     if (filePath) {
                         globalOpenProcess.command = ["xdg-open", filePath];
                         globalOpenProcess.running = true;
                     }
                 } else if (item.isImage && item.binaryPath) {
-                    console.log("DEBUG: Opening image with binaryPath:", item.binaryPath);
                     globalOpenProcess.command = ["xdg-open", item.binaryPath];
                     globalOpenProcess.running = true;
                 } else if (isUrl(content)) {
-                    console.log("DEBUG: Opening URL:", content.trim());
                     globalOpenProcess.command = ["xdg-open", content.trim()];
                     globalOpenProcess.running = true;
-                } else {
-                    console.warn("DEBUG: Item does not match any openable type");
                 }
                 break;
             }

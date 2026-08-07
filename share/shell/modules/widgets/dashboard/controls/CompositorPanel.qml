@@ -192,6 +192,32 @@ Item {
             Layout.preferredHeight: 32
             radius: Styling.radius(-2)
 
+
+            Rectangle {
+                id: rejectOverlay
+                anchors.fill: parent
+                radius: parent.radius
+                color: Colors.error
+                opacity: 0
+            }
+
+            SequentialAnimation {
+                id: rejectFlash
+                loops: 2
+                NumberAnimation {
+                    target: rejectOverlay
+                    property: "opacity"
+                    to: 0.4
+                    duration: 90
+                }
+                NumberAnimation {
+                    target: rejectOverlay
+                    property: "opacity"
+                    to: 0
+                    duration: 140
+                }
+            }
+
             TextInput {
                 id: numberTextInput
                 anchors.fill: parent
@@ -215,6 +241,27 @@ Item {
                     }
                 }
                 Component.onCompleted: text = configValue.toString()
+
+                Keys.onReturnPressed: event => {
+                    if (acceptableInput) {
+                        event.accepted = false;
+                    } else {
+                        rejectFlash.restart();
+                    }
+                }
+                Keys.onEnterPressed: event => {
+                    if (acceptableInput) {
+                        event.accepted = false;
+                    } else {
+                        rejectFlash.restart();
+                    }
+                }
+                onActiveFocusChanged: {
+                    if (!activeFocus && !acceptableInput) {
+                        rejectFlash.restart();
+                        text = configValue.toString();
+                    }
+                }
 
                 onEditingFinished: {
                     let newVal = parseInt(text);
@@ -262,6 +309,32 @@ Item {
             Layout.preferredHeight: 32
             radius: Styling.radius(-2)
 
+
+            Rectangle {
+                id: rejectOverlay
+                anchors.fill: parent
+                radius: parent.radius
+                color: Colors.error
+                opacity: 0
+            }
+
+            SequentialAnimation {
+                id: rejectFlash
+                loops: 2
+                NumberAnimation {
+                    target: rejectOverlay
+                    property: "opacity"
+                    to: 0.4
+                    duration: 90
+                }
+                NumberAnimation {
+                    target: rejectOverlay
+                    property: "opacity"
+                    to: 0
+                    duration: 140
+                }
+            }
+
             TextInput {
                 id: decimalTextInput
                 anchors.fill: parent
@@ -287,6 +360,27 @@ Item {
                     }
                 }
                 Component.onCompleted: text = configValue.toFixed(1)
+
+                Keys.onReturnPressed: event => {
+                    if (acceptableInput) {
+                        event.accepted = false;
+                    } else {
+                        rejectFlash.restart();
+                    }
+                }
+                Keys.onEnterPressed: event => {
+                    if (acceptableInput) {
+                        event.accepted = false;
+                    } else {
+                        rejectFlash.restart();
+                    }
+                }
+                onActiveFocusChanged: {
+                    if (!activeFocus && !acceptableInput) {
+                        rejectFlash.restart();
+                        text = configValue.toFixed(1);
+                    }
+                }
 
                 onEditingFinished: {
                     let newVal = parseFloat(text);
@@ -623,6 +717,7 @@ Item {
 
                         ColumnLayout {
                             visible: root.currentSection === "general"
+                            property string settingsSection: "general"
                             Layout.fillWidth: true
                             spacing: 8
 
@@ -735,6 +830,7 @@ Item {
 
                         ColumnLayout {
                             visible: root.currentSection === "colors"
+                            property string settingsSection: "colors"
                             Layout.fillWidth: true
                             spacing: 8
 
@@ -785,6 +881,7 @@ Item {
 
                         ColumnLayout {
                             visible: root.currentSection === "shadows"
+                            property string settingsSection: "shadows"
                             Layout.fillWidth: true
                             spacing: 8
 
@@ -915,6 +1012,7 @@ Item {
 
                         ColumnLayout {
                             visible: root.currentSection === "blur"
+                            property string settingsSection: "blur"
                             Layout.fillWidth: true
                             spacing: 8
 
@@ -973,6 +1071,24 @@ Item {
                                 onToggled: value => {
                                     GlobalStates.markCompositorChanged();
                                     Config.compositor.blurNewOptimizations = value;
+                                }
+                            }
+
+                            ToggleRow {
+                                label: "Blur Special Workspaces"
+                                checked: Config.compositor.blurSpecial ?? true
+                                onToggled: value => {
+                                    GlobalStates.markCompositorChanged();
+                                    Config.compositor.blurSpecial = value;
+                                }
+                            }
+
+                            ToggleRow {
+                                label: "Blur Popups"
+                                checked: Config.compositor.blurPopups ?? false
+                                onToggled: value => {
+                                    GlobalStates.markCompositorChanged();
+                                    Config.compositor.blurPopups = value;
                                 }
                             }
 

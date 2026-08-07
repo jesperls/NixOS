@@ -60,11 +60,29 @@ QtObject {
         { label: "Window Preview", keywords: "thumbnail overview alt-tab", section: "system", subSection: "performance", subLabel: "System > Performance", icon: Icons.windowsLogo, isIcon: true },
         { label: "Wavy Line", keywords: "animated wave effect performance", section: "system", subSection: "performance", subLabel: "System > Performance", icon: Icons.lightning, isIcon: true },
         
-        { label: "System Resources", keywords: "cpu ram memory usage monitor", section: "system", subSection: "resources", subLabel: "System > Resources", icon: Icons.circuitry, isIcon: true },
-        
+        { label: "System Resources", keywords: "cpu ram memory usage monitor", section: "system", subSection: "system", subLabel: "System > Resources", icon: Icons.circuitry, isIcon: true },
+
+        { label: "Audio Visualizer", keywords: "cava bars media player performance", section: "system", subSection: "performance", subLabel: "System > Performance", icon: Icons.waveform, isIcon: true },
+
+        { label: "Replay Buffer Length", keywords: "recording clip instant replay seconds", section: "system", subSection: "recording", subLabel: "System > Recording", icon: Icons.recordScreen, isIcon: true },
+
+        { label: "Slideshow", keywords: "wallpaper cycle rotate shuffle background", section: "system", subSection: "wallpaper", subLabel: "System > Wallpaper", icon: Icons.image, isIcon: true },
+        { label: "Wallpaper Interval", keywords: "slideshow minutes timer background", section: "system", subSection: "wallpaper", subLabel: "System > Wallpaper", icon: Icons.clock, isIcon: true },
+
+        { label: "Auto Theme", keywords: "day night light dark schedule", section: "system", subSection: "daynight", subLabel: "System > Day & Night", icon: Icons.sun, isIcon: true },
+        { label: "Night Light Temperature", keywords: "blue light filter warm kelvin", section: "system", subSection: "daynight", subLabel: "System > Day & Night", icon: Icons.nightLight, isIcon: true },
+
+        { label: "Do Not Disturb", keywords: "dnd silent notifications popups mute", section: "system", subSection: "notifications", subLabel: "System > Notifications", icon: Icons.bellSlash, isIcon: true },
+
+        { label: "Pomodoro", keywords: "timer work rest session focus spotify", section: "system", subSection: "pomodoro", subLabel: "System > Pomodoro", icon: Icons.timer, isIcon: true },
+
         { label: "Idle Settings", keywords: "screen lock timeout sleep suspend", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.moon, isIcon: true },
+        { label: "Idle Actions", keywords: "master enable dim lock suspend timers", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.moon, isIcon: true },
+        { label: "Lock on Boot", keywords: "lockscreen session start login", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.lock, isIcon: true },
+        { label: "Lock on Sleep", keywords: "lockscreen suspend before sleep", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.lock, isIcon: true },
+        { label: "Lock After", keywords: "idle timeout lockscreen minutes", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.lock, isIcon: true },
+        { label: "Suspend After", keywords: "idle timeout sleep minutes", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.moon, isIcon: true },
         { label: "Lock Command", keywords: "pangu lock screen idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.moon, isIcon: true },
-        { label: "Before Sleep", keywords: "loginctl lock-session idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.moon, isIcon: true },
         { label: "After Sleep", keywords: "screen on resume idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.moon, isIcon: true },
         { label: "Idle Listener", keywords: "timeout brightness screen off suspend", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.moon, isIcon: true },
         
@@ -96,7 +114,8 @@ QtObject {
         { label: "Blur Brightness", keywords: "light dark level", section: "compositor", subSection: "blur", subLabel: "Compositor > Hyprland", icon: Icons.drop, isIcon: true },
         { label: "Blur Vibrancy", keywords: "saturation color", section: "compositor", subSection: "blur", subLabel: "Compositor > Hyprland", icon: Icons.drop, isIcon: true },
 
-        { label: "Shell", keywords: "about info credits version shell", section: "shell", subSection: "", subLabel: "", icon: Icons.cube, isIcon: true },
+        { label: "Shell", keywords: "shell panels modules", section: "shell", subSection: "", subLabel: "", icon: Icons.cube, isIcon: true },
+        { label: "About", keywords: "about info credits version license pangu", section: "shell", subSection: "about", subLabel: "Shell > About", icon: Icons.cube, isIcon: true },
         
         { label: "Bar", keywords: "panel taskbar top bottom", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
         { label: "Bar Position", keywords: "top bottom left right edge", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
@@ -116,6 +135,8 @@ QtObject {
         { label: "Show Overview Button", keywords: "workspace switcher", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
         { label: "Bar Screens", keywords: "monitor display eDP", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
         
+        { label: "Frame", keywords: "border screen edge thickness contain bar", section: "shell", subSection: "frame", subLabel: "Shell > Frame", icon: Icons.frameCorners, isIcon: true },
+
         { label: "Notch", keywords: "island dynamic island center", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.layout, isIcon: true },
         
         { label: "Workspaces", keywords: "virtual desktop spaces", section: "shell", subSection: "workspaces", subLabel: "Shell > Workspaces", icon: Icons.squaresFour, isIcon: true },

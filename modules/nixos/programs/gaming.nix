@@ -1,9 +1,13 @@
 {
+  config,
+  lib,
   pkgs,
   ...
 }:
 
 let
+  cfg = config.mySystem.programs.gaming;
+
   # nixpkgs snes9x-gtk 1.63 misses minizip's headers, which moved to
   # include/minizip/.
   snes9x-gtk-fixed = pkgs.snes9x-gtk.overrideAttrs (old: {
@@ -13,63 +17,68 @@ let
   });
 in
 {
-  programs.steam = {
-    enable = true;
-    protontricks.enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-    extraCompatPackages = with pkgs; [ proton-ge-bin ];
+  options.mySystem.programs.gaming.enable =
+    lib.mkEnableOption "Steam, gamemode, gamescope and emulators";
 
-    gamescopeSession.enable = true;
+  config = lib.mkIf cfg.enable {
+    programs.steam = {
+      enable = true;
+      protontricks.enable = true;
+      remotePlay.openFirewall = true;
+      dedicatedServer.openFirewall = true;
+      extraCompatPackages = with pkgs; [ proton-ge-bin ];
 
-    package = pkgs.steam.override {
-      extraPkgs =
-        pkgs: with pkgs; [
-          libxcursor
-          libxi
-          libxinerama
-          libxscrnsaver
-          libpng
-          libpulseaudio
-          libvorbis
-          stdenv.cc.cc.lib
-          libkrb5
-          keyutils
-          wayland
-          libxkbcommon
-          vulkan-loader
-          vulkan-validation-layers
-        ];
+      gamescopeSession.enable = true;
+
+      package = pkgs.steam.override {
+        extraPkgs =
+          pkgs: with pkgs; [
+            libxcursor
+            libxi
+            libxinerama
+            libxscrnsaver
+            libpng
+            libpulseaudio
+            libvorbis
+            stdenv.cc.cc.lib
+            libkrb5
+            keyutils
+            wayland
+            libxkbcommon
+            vulkan-loader
+            vulkan-validation-layers
+          ];
+      };
+
+      extraPackages = with pkgs; [
+        mangohud
+        gamemode
+      ];
     };
 
-    extraPackages = with pkgs; [
-      mangohud
-      gamemode
+    environment.systemPackages = with pkgs; [
+      mgba
+      ryubing
+      snes9x-gtk-fixed
     ];
-  };
 
-  environment.systemPackages = with pkgs; [
-    mgba
-    ryubing
-    snes9x-gtk-fixed
-  ];
-
-  programs.gamemode = {
-    enable = true;
-    enableRenice = true;
-    settings = {
-      general = {
-        renice = 10;
-        ioprio = 0;
-        inhibit_screensaver = 1;
+    programs.gamemode = {
+      enable = true;
+      enableRenice = true;
+      settings = {
+        general = {
+          renice = 10;
+          ioprio = 0;
+          inhibit_screensaver = 1;
+        };
       };
     };
-  };
 
-  programs.gamescope = {
-    enable = true;
-    capSysNice = true;
-  };
+    programs.gamescope = {
+      enable = true;
+      capSysNice = true;
+    };
 
-  hardware.xpadneo.enable = true;
+    hardware.xpadneo.enable = true;
+  };
 }

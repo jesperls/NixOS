@@ -3,14 +3,14 @@
 {
   programs.ssh.settings = {
     oracle = {
-      HostName = "132.145.48.11";
+      HostName = osConfig.mySystem.network.hosts.oracle;
       User = "ubuntu";
       IdentityFile = "~/.ssh/id_rsa";
       SetEnv.TERM = "xterm-256color";
     };
 
     nuwa = {
-      HostName = "192.168.1.49";
+      HostName = osConfig.mySystem.network.hosts.nuwa;
       User = "jesper";
       SetEnv.TERM = "xterm-256color";
     };

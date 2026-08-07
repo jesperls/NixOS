@@ -22,12 +22,30 @@ ActionGrid {
         property string type: "button"
     }
 
+    QtObject {
+        id: replayAction
+        property string icon: Icons.rewind
+        property string tooltip: ReplayService.active ? "Stop Replay Buffer" : "Replay Buffer"
+        property string command: ""
+        property string variant: ReplayService.active ? "tertiary" : "primary"
+        property string type: "button"
+    }
+
+    QtObject {
+        id: saveReplayAction
+        property string icon: Icons.clip
+        property string tooltip: "Save Replay"
+        property string command: ""
+        property string variant: "tertiary"
+        property string type: "button"
+    }
+
     layout: "row"
     buttonSize: 48
     iconSize: 20
     spacing: 8
 
-    actions: [
+    property var allActions: [
         {
             icon: Icons.camera,
             tooltip: "Screenshot",
@@ -42,6 +60,8 @@ ActionGrid {
             type: "separator"
         },
         recordAction,
+        replayAction,
+        saveReplayAction,
         {
             icon: Icons.recordings,
             tooltip: "Open Recordings",
@@ -77,6 +97,8 @@ ActionGrid {
         }
     ]
 
+    actions: allActions.filter(action => action !== saveReplayAction || ReplayService.active)
+
     Process {
         id: colorPickerProc
     }
@@ -95,8 +117,6 @@ ActionGrid {
     }
 
     onActionTriggered: action => {
-        console.log("Tools action triggered:", action.tooltip);
-
         if (action.tooltip === "Screenshot") {
             Screenshot.initialize();
             GlobalStates.screenshotToolVisible = true;
@@ -107,6 +127,18 @@ ActionGrid {
             root.itemSelected();
         } else if (action.tooltip === "Stop Recording") {
             ScreenRecorder.toggleRecording();
+            root.itemSelected();
+        } else if (action.tooltip === "Replay Buffer" || action.tooltip === "Stop Replay Buffer") {
+            if (ReplayService.active) {
+                ReplayService.stop();
+            } else {
+                ScreenRecorder.initialize();
+                GlobalStates.screenRecordReplayMode = true;
+                GlobalStates.screenRecordToolVisible = true;
+            }
+            root.itemSelected();
+        } else if (action.tooltip === "Save Replay") {
+            ReplayService.saveClip();
             root.itemSelected();
         } else if (action.tooltip === "Open Screenshots") {
             var cmd = "dir=\"$(xdg-user-dir PICTURES)/Screenshots\"; mkdir -p \"$dir\"; nohup xdg-open \"$dir\" > /dev/null 2>&1 &";

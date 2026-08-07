@@ -3,14 +3,29 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
 
 Singleton {
     id: root
 
     property bool active: StateService.get("nightLight", false)
-    
+
+    readonly property int temperature: Config.system.nightLight?.temperature ?? 4500
+
+    onTemperatureChanged: {
+        if (active) {
+            killProcess.running = true;
+            restartTimer.restart();
+        }
+    }
+
+    property Timer restartTimer: Timer {
+        interval: 300
+        onTriggered: wlsunsetProcess.running = true
+    }
+
     property Process wlsunsetProcess: Process {
-        command: ["wlsunset", "-t", "4499", "-T", "4500"]
+        command: ["wlsunset", "-t", String(root.temperature - 1), "-T", String(root.temperature)]
         running: false
         stdout: SplitParser {
             onRead: (data) => {

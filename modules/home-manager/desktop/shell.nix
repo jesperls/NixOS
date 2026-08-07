@@ -8,37 +8,8 @@
 
 let
   cfg = osConfig.mySystem.desktop.shell;
-  lock = osConfig.mySystem.desktop.lockscreen;
-  idle = osConfig.mySystem.desktop.idle;
 
-  mkListener =
-    timeout: onTimeout: onResume:
-    { inherit timeout onTimeout; } // lib.optionalAttrs (onResume != null) { inherit onResume; };
-
-  listeners = lib.optionals idle.enable (
-    lib.optional (idle.dimTimeout > 0) (
-      mkListener idle.dimTimeout "pangu brightness ${toString idle.dimBrightness} -s"
-        "pangu brightness -r"
-    )
-    ++ lib.optional (lock.enable && idle.lockTimeout > 0) (
-      mkListener idle.lockTimeout "loginctl lock-session" null
-    )
-    ++ lib.optional (idle.screenOffTimeout > 0) (
-      mkListener idle.screenOffTimeout "pangu screen off" "pangu screen on"
-    )
-    ++ lib.optional (idle.suspendTimeout > 0) (mkListener idle.suspendTimeout "pangu suspend" null)
-  );
-
-  settings = lib.recursiveUpdate {
-    system.idle = {
-      general = {
-        lock_cmd = "pangu lock";
-        before_sleep_cmd = lib.optionalString (lock.enable && lock.lockOnSleep) "loginctl lock-session";
-        after_sleep_cmd = "pangu screen on";
-      };
-      inherit listeners;
-    };
-  } cfg.settings;
+  settings = cfg.settings;
 
   mkPatch = name: value: ''
     file="$conf/${name}.json"

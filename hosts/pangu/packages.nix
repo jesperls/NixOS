@@ -63,5 +63,7 @@
     fastfetch
     helix
     lazygit
+    opencode
+    pear-desktop
   ];
 }

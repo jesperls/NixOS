@@ -50,7 +50,7 @@ WlSessionLockSurface {
             }
         }
 
-        layer.enabled: true
+        layer.enabled: Config.lockscreen.blurWallpaper ?? true
         layer.effect: MultiEffect {
             blurEnabled: true
             blur: startAnim ? 1 : 0
@@ -105,7 +105,7 @@ WlSessionLockSurface {
         id: dimOverlay
         anchors.fill: parent
         color: "black"
-        opacity: startAnim ? 0.25 : 0
+        opacity: startAnim ? (Config.lockscreen.dimOpacity ?? 25) / 100 : 0
         z: 3
 
         property real zoomScale: startAnim ? 1.1 : 1.0
@@ -140,6 +140,7 @@ WlSessionLockSurface {
         width: clockRow.width
         height: hoursText.height + (hoursText.height * 0.5)
         z: 10
+        visible: Config.lockscreen.showClock ?? true
 
         property date currentTime: new Date()
 
@@ -271,6 +272,7 @@ WlSessionLockSurface {
     Item {
         id: playerContainer
         z: 10
+        visible: Config.lockscreen.showMediaPlayer ?? true
 
         property bool isTopPosition: Config.lockscreen.position === "top"
 
@@ -389,6 +391,7 @@ WlSessionLockSurface {
                     radius: Config.roundness > 0 ? (height / 2) * (Config.roundness / 16) : 0
                     color: "transparent"
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: Config.lockscreen.showAvatar ?? true
 
                     Image {
                         mipmap: true
@@ -427,7 +430,7 @@ WlSessionLockSurface {
 
                 StyledRect {
                     id: passwordFieldBg
-                    width: parent.width - avatarContainer.width - parent.spacing
+                    width: parent.width - (avatarContainer.visible ? avatarContainer.width + parent.spacing : 0)
                     height: 48
                     anchors.verticalCenter: parent.verticalCenter
                     variant: passwordInputBox.showError ? "error" : "common"

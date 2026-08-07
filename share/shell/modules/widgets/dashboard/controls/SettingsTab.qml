@@ -21,7 +21,13 @@ Rectangle {
     property int selectedIndex: GlobalStates.settingsCurrentTab
     property string searchQuery: ""
 
-    onFilteredSectionsChanged: selectedIndex = 0
+    onFilteredSectionsChanged: {
+        if (searchQuery.length > 0) {
+            selectedIndex = 0;
+        } else if (selectedIndex >= filteredSections.length) {
+            selectedIndex = 0;
+        }
+    }
 
     Timer {
         id: focusRestoreTimer

@@ -149,9 +149,7 @@ PanelWindow {
 
     property string colorPresetsDir: Paths.configPath("colors")
     property string officialColorPresetsDir: Paths.asset("colors")
-    onColorPresetsDirChanged: console.log("Color Presets Directory:", colorPresetsDir)
     property list<string> colorPresets: []
-    onColorPresetsChanged: console.log("Color Presets Updated:", colorPresets)
     property string activeColorPreset: wallpaperConfig.adapter.activeColorPreset || ""
 
     property bool isLightMode: Config.theme.lightMode
@@ -159,7 +157,7 @@ PanelWindow {
         if (activeColorPreset) {
             applyColorPreset();
         } else {
-            runMatugenForCurrentWallpaper();
+            runMatugenForCurrentWallpaper(true);
         }
     }
 
@@ -167,7 +165,7 @@ PanelWindow {
         if (activeColorPreset) {
             applyColorPreset();
         } else {
-            runMatugenForCurrentWallpaper();
+            runMatugenForCurrentWallpaper(true);
         }
     }
 
@@ -452,15 +450,20 @@ PanelWindow {
             console.log("Switching to Matugen scheme, clearing preset");
             wallpaperConfig.adapter.activeColorPreset = "";
         } else {
-            runMatugenForCurrentWallpaper();
+            runMatugenForCurrentWallpaper(true);
         }
     }
 
     property string mpvSocket: Paths.runtimePath("mpv-" + (currentScreenName ? currentScreenName : "ALL") + ".sock")
 
-    function runMatugenForCurrentWallpaper() {
+    function runMatugenForCurrentWallpaper(force) {
         if (activeColorPreset) {
             console.log("Skipping Matugen because color preset is active:", activeColorPreset);
+            return;
+        }
+
+        if (!force && !(Config.theme.dynamicColors ?? true)) {
+            console.log("Skipping Matugen because dynamic colors are disabled");
             return;
         }
 

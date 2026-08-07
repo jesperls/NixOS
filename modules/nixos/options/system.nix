@@ -73,6 +73,17 @@
         default = false;
         description = "Let wheel members run sudo without entering a password.";
       };
+      keepGenerations = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 5;
+        description = "Generations kept by both the boot menu and nh clean.";
+      };
+    };
+
+    network.hosts = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+      description = "Named machine addresses shared between system and HM config.";
     };
 
     home = {

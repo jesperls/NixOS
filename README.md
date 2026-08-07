@@ -3,7 +3,8 @@
 Flake-based NixOS + Home Manager configuration. Single host for now (`pangu`),
 but everything host-specific is parameterized through the `mySystem` options
 layer, so a new host is a `hosts/<name>/` directory plus one entry in the
-`hosts` list in `flake.nix`.
+`hosts` attrset in `flake.nix` (which can override `system` and inject extra
+modules per host).
 
 ## Layout
 
@@ -11,25 +12,29 @@ layer, so a new host is a `hosts/<name>/` directory plus one entry in the
 flake.nix                  Inputs + mkHost. `checks` is derived from
                            nixosConfigurations, so every host is CI-built.
 hosts/pangu/
-  configuration.nix        Entry point: mySystem settings only.
-  modules.nix              Host-specific NixOS modules (hardware, gaming...).
+  configuration.nix        Entry point: mySystem settings only, including the
+                           enable flags for hardware/gaming/service modules.
   home.nix                 HM bundle + host-specific HM modules.
   theme.nix                Theme preset + structural overrides.
   monitors.nix             Monitor list (resolution, refresh, vrr, ...).
-  packages.nix             Flat home.packages list. ⚠ Machine-edited by
-                           quickshell-package-manager — keep it a flat list.
+  packages.nix             Flat home.packages list.
 modules/nixos/
-  options/                 The whole `mySystem.*` API:
-    system.nix             user, system, paths, monitors
-    theme.nix              palette/preset, gaps, blur, fonts, gtk/qt
+  options/                 The shared `mySystem.*` API:
+    system.nix             user, system, paths, network.hosts, monitors
+    theme.nix              palette/preset, fonts, gtk/qt, animations, opacity
     theme-presets.nix      named palettes (obsidian-mocha, catppuccin, ...)
-    desktop.nix            shell, lockscreen, idle, layouts, special
-                           workspaces, gaming, input, render (GPU pick,
-                           direct scanout)
+    desktop.nix            shell, layouts, special workspaces, gaming,
+                           input, render (direct scanout), autoFakeFullscreen
     apps.nix               defaultApps — single source of truth for
                            terminal/browser/editor/viewers
-    performance.nix        sched_ext scheduler, ananicy, irqbalance
-  bundle.nix               Common imports shared by all desktop hosts.
+    performance.nix        sched_ext scheduler, ananicy, irqbalance, zram,
+                           earlyoom
+    assertions.nix         cross-option sanity checks
+                           (module-specific options like hardware.nvidia.enable
+                           or services.sunshine.enable are declared next to
+                           their implementation module instead)
+  bundle.nix               Every shared module; host-shaped ones are off
+                           until their mySystem enable flag is set.
   home-manager.nix         Generic HM wiring (rotating activation backups).
   core/ services/ ...      Implementation modules reading mySystem.*.
 modules/home-manager/
@@ -41,23 +46,23 @@ modules/home-manager/
   ...                      HM modules; read system config via osConfig.
 pkgs/                      Packages this config builds itself, exposed as
                            `overlays.default`. Nothing here comes from a
-                           flake input; vendored source lives in `src/`.
+                           flake input.
   pangu/                   Launcher + CLI wrapping share/shell.
   ttf-phosphor-icons/      The shell's icon font.
 share/                     Source trees deployed verbatim — no nix in here.
   shell/                   The Quickshell desktop shell (QML). See below.
   hypr/                    Hyprland's Lua config, deployed to
-                           ~/.config/hypr/jesperls/.
+                           ~/.config/hypr/pangu/.
                            shell.lua sources what Pangu generates.
 ```
 
 ## Adding a host
 
-A new `hosts/<name>/` needs `configuration.nix`, `hardware-configuration.nix`,
-`modules.nix` and `monitors.nix`. Nothing in the shared layer has to be
-configured — hardware-shaped options default to null/off rather than to
-pangu's hardware, and `performance.cpuVendor` is read from
-`hardware-configuration.nix`.
+A new `hosts/<name>/` needs `configuration.nix`, `hardware-configuration.nix`
+and `monitors.nix`. Nothing in the shared layer has to be configured —
+hardware-shaped modules (`mySystem.hardware.*`, `programs.gaming`,
+`services.sunshine`, ...) default to off and are switched on per host, and
+`performance.cpuVendor` is read from `hardware-configuration.nix`.
 
 Overriding the baseline per host:
 
@@ -159,37 +164,23 @@ individually) flows into:
 - kitty, fzf, starship colors
 - GTK (adw-gtk3 + accent CSS), Qt (qt5ct/qt6ct palette + Fusion; the custom
   palette is only wired up when the shell is there to generate it)
-- quickshell-package-manager via its `baseColors` option (derived into a
-  full M3 palette at build time)
-
-## Subproject development
-
-The remaining quickshell apps (qs-vpets, nix-quickshell-package-manager) are
-checked out inside this directory (gitignored) and consumed as flake inputs
-from GitHub. For local iteration without pushing, rebuild with inputs
-overridden to the local checkouts:
-
-```
-snil qs-vpets                   # any combination of inputs works
-```
-
-Thanks to the `follows` graph this only rebuilds the app itself, not
-quickshell or a second nixpkgs.
-
 ## Day-to-day
 
 | Alias | Does |
 | ----- | ---- |
 | `snis` / `snub` | `nh os switch` / `boot` |
 | `snus` | switch + update inputs |
-| `snil <input>...` | switch with local subproject checkouts |
 | `snuf` | clean old generations |
+| `nfu` | update flake inputs only |
 
-The lockscreen is scaffolded but disabled by default
-(`mySystem.desktop.lockscreen.enable`) — flip it on when the machine is
-somewhere untrusted. `mySystem.system.autoLogin` and
-`.passwordlessSudo` are the other two knobs that trade security for
-convenience; both default to off and are opted into by `pangu`.
+Every build also produces a `fallback` specialisation (stock nixpkgs kernel,
+no sched_ext) selectable from the boot menu if a CachyOS kernel or scheduler
+update misbehaves.
+
+Locking is `loginctl lock-session` (`SUPER L` / the power menu); idle
+timeouts and lock-on-boot/sleep live in the shell's settings UI under
+System → Idle. `mySystem.system.autoLogin` and `.passwordlessSudo` trade
+security for convenience; both default to off and are opted into by `pangu`.
 
 CI: GitHub Actions evaluates the flake (no builds); garnix builds
 `checks.x86_64-linux.*` and serves results from cache.garnix.io (already in

@@ -52,6 +52,10 @@
 
       mkHost =
         hostName:
+        {
+          system ? "x86_64-linux",
+          modules ? [ ],
+        }:
         lib.nixosSystem {
           inherit system;
           specialArgs = { inherit inputs; };
@@ -61,10 +65,13 @@
             {
               nixpkgs.overlays = [ self.overlays.default ];
             }
-          ];
+          ]
+          ++ modules;
         };
 
-      hosts = lib.genAttrs [ "pangu" ] mkHost;
+      hosts = lib.mapAttrs mkHost {
+        pangu = { };
+      };
     in
     {
       nixosConfigurations = hosts;

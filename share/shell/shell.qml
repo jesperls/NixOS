@@ -13,6 +13,7 @@ import qs.modules.widgets.dashboard.wallpapers
 
 import qs.modules.notch
 import qs.modules.widgets.overview
+import qs.modules.widgets.cheatsheet
 import qs.modules.services
 import qs.modules.corners
 import qs.modules.frame
@@ -206,6 +207,19 @@ ShellRoot {
         source: "modules/tools/MirrorWindow.qml"
     }
 
+    Variants {
+        model: Quickshell.screens
+
+        Loader {
+            id: cheatsheetLoader
+            required property ShellScreen modelData
+            active: GlobalStates.cheatsheetVisible && (Quickshell.screens.length === 1 || Compositor.focusedMonitor?.name === modelData.name)
+            sourceComponent: CheatsheetPopup {
+                screen: cheatsheetLoader.modelData
+            }
+        }
+    }
+
     Loader {
         id: settingsWindowLoader
         active: SuspendManager.wakeReady && GlobalStates.settingsWindowVisible
@@ -225,12 +239,16 @@ ShellRoot {
         }
     }
 
+
     Component.onCompleted: Qt.callLater(() => {
         void CaffeineService.inhibit;
         void IdleService.lockCmd;
         void GlobalShortcuts.appId;
         void ClipboardService.active;
         void CompositorTheme.outputPath;
+        void WallpaperSlideshowService.enabled;
+        void AutoThemeService.enabled;
+        void ReplayService.active;
     })
 
     Timer {
