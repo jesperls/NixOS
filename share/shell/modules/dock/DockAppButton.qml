@@ -22,6 +22,7 @@ Button {
     property string dockPosition: "bottom"
 
     readonly property bool isBottom: dockPosition === "bottom"
+    readonly property bool isTop: dockPosition === "top"
     readonly property bool isLeft: dockPosition === "left"
     readonly property bool isRight: dockPosition === "right"
     readonly property bool isVertical: isLeft || isRight
@@ -110,9 +111,11 @@ Button {
                 }
 
                 Row {
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: -2
+                    anchors.bottom: root.isBottom ? parent.bottom : undefined
+                    anchors.top: root.isTop ? parent.top : undefined
                     anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottomMargin: -2
+                    anchors.topMargin: -2
                     spacing: 3
                     visible: root.showIndicators && !root.isVertical
 

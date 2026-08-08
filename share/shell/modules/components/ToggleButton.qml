@@ -22,10 +22,35 @@ Button {
     property real startRadius: radius
     property real endRadius: radius
 
-    implicitWidth: 36
-    implicitHeight: 36
+    readonly property bool isIconPath: {
+        const s = root.buttonIcon;
+        if (s.length <= 1) return false;
+        if (s.startsWith("<")) return false;              // rich-text glyph
+        if (s.includes("/") || s.includes("\\")) return true;
+        if (/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) return true; // file: http: image://
+        return /\.(png|jpe?g|gif|svgz?|webp|bmp|avif|ico|xpm)$/i.test(s);
+    }
 
-    readonly property bool isIconPath: buttonIcon.length > 1
+    readonly property bool isIconName: {
+        if (root.isIconPath) return false;
+        const s = root.buttonIcon;
+        if (s.length <= 1 || s.startsWith("<")) return false;
+        if (!/^[\w.-]+$/.test(s)) return false;           // plain icon-theme name
+        return Quickshell.iconPath(s, true).length > 0;
+    }
+
+    readonly property string resolvedIconSource: {
+        if (!root.isIconPath) return "";
+        const s = root.buttonIcon;
+        if (s === "~") return Quickshell.env("HOME") || "";
+        if (s.startsWith("~/")) return (Quickshell.env("HOME") || "") + s.slice(1);
+        return s;
+    }
+
+    readonly property bool isIconTinted: root.iconTint || root.iconFullTint
+
+    implicitWidth: Math.max(36, root.iconSize + 12)
+    implicitHeight: Math.max(36, root.iconSize + 12)
 
     background: StyledRect {
         id: bg
@@ -54,20 +79,23 @@ Button {
 
     contentItem: Item {
         Text {
-            visible: !root.isIconPath
+            id: glyphText
+            visible: !root.isIconPath && !root.isIconName
             anchors.fill: parent
             text: root.buttonIcon
             textFormat: Text.RichText
             font.family: Icons.font
-            font.pixelSize: 18
-            color: root.pressed ? Colors.background : (Styling.srItem("overprimary") || Colors.foreground)
+            font.pixelSize: root.iconSize
+            color: root.isIconTinted
+                ? (Styling.srItem("overprimary") || Colors.overBackground)
+                : (root.pressed ? Colors.background : Colors.overBackground)
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
 
         Item {
             id: iconImageContainer
-            visible: root.isIconPath
+            visible: root.isIconPath || root.isIconName
             anchors.centerIn: parent
             width: root.iconSize
             height: root.iconSize
@@ -75,10 +103,11 @@ Button {
             Image {
                 id: iconImage
                 anchors.fill: parent
-                source: root.isIconPath ? root.buttonIcon : ""
-                sourceSize: Qt.size(width * 2, height * 2)
+                source: root.isIconPath ? root.resolvedIconSource : (root.isIconName ? "image://icon/" + root.buttonIcon : "")
+                sourceSize: Qt.size(root.iconSize * 2, root.iconSize * 2)
                 fillMode: Image.PreserveAspectFit
                 smooth: true
+                mipmap: true
                 asynchronous: true
             }
 
@@ -93,7 +122,8 @@ Button {
 
     onClicked: root.onToggle()
 
-    ToolTip.visible: false
-    ToolTip.text: root.tooltipText
-    ToolTip.delay: 1000
+    StyledToolTip {
+        show: root.hovered
+        tooltipText: root.tooltipText
+    }
 }

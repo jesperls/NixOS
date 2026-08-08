@@ -15,8 +15,13 @@
 
     ./programs/firefox.nix
     ./programs/flatpak.nix
+    ./programs/nixcord.nix
+    ./programs/obs.nix
+    ./programs/spicetify.nix
+    ./programs/easyeffects.nix
 
     ./services/desktop-autostarts.nix
+    ./services/deltatune.nix
     ./services/home-assistant.nix
   ];
 

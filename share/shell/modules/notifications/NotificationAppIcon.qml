@@ -101,15 +101,21 @@ Item {
                         mipmap: true
                         id: notifImage
                         anchors.fill: parent
-                        source: status === Image.Error && root.appIcon ? "image://icon/" + root.appIcon : root.image
+                        property bool failed: false
+                        source: failed && root.appIcon ? "image://icon/" + root.appIcon : root.image
                         fillMode: Image.PreserveAspectCrop
                         smooth: true
                         onStatusChanged: {
                             if (status === Image.Error && root.appIcon) {
-                                source = "image://icon/" + root.appIcon;
+                                failed = true;
                                 root.usingAppIconFallback = true;
                             }
                         }
+                    }
+
+                    Connections {
+                        target: root
+                        function onImageChanged() { notifImage.failed = false; }
                     }
                 }
             }

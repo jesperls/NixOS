@@ -14,20 +14,25 @@
   cava,
   coreutils,
   curl,
+  dbus,
   ddcutil,
   ffmpeg,
   gawk,
   glib,
   gnugrep,
+  gnused,
   gpu-screen-recorder,
   grim,
   imagemagick,
   inetutils,
   jq,
+  kitty,
   libnotify,
   libqalculate,
+  linux-wallpaperengine,
   matugen,
   mpvpaper,
+  networkmanagerapplet,
   power-profiles-daemon,
   procps,
   python3,
@@ -92,6 +97,13 @@ let
       fi
       rm -f qmllint.log
 
+      while read -r shader; do
+        [ -f "$shader.qsb" ] || { echo "pangu: $shader has no baked .qsb — run pkgs/pangu/rebake-shaders.sh" >&2; missing_shader=1; }
+      done < <(find . \( -name '*.frag' -o -name '*.vert' \))
+      if [ -n "$missing_shader" ]; then
+        exit 1
+      fi
+
       runHook postCheck
     '';
 
@@ -132,20 +144,25 @@ writeShellApplication {
     cava
     coreutils
     curl
+    dbus # dbus-monitor, used by the loginlock/sleep watchers
     ddcutil
     ffmpeg
     gawk
     glib # gsettings
     gnugrep
+    gnused
     (gpu-screen-recorder.override { wrapperDir = "/run/wrappers/bin"; }) # execs the setcap gsr-kms-server for promptless capture
     grim
     imagemagick
     inetutils # hostname
     jq
+    kitty # the dashboard's tmux tab opens sessions in it
     libnotify
     libqalculate
+    linux-wallpaperengine
     matugen
     mpvpaper
+    networkmanagerapplet # nm-connection-editor for the wifi panel
     power-profiles-daemon
     procps # pgrep/pkill
     python3

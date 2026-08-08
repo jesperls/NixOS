@@ -9,14 +9,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    systems-linux.url = "github:nix-systems/default-linux";
-
-    linux-wallpaper-engine = {
-      url = "github:jagrat7/linux-wallpaper-engine";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.bun2nix.inputs.systems.follows = "systems-linux";
-    };
-
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     nixcord = {
@@ -25,10 +17,6 @@
     };
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    claude-code = {
-      url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     deltatune = {
@@ -50,6 +38,10 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
+      shellVersion = self.shortRev or self.dirtyShortRev or "dev";
+
+      overlays = import ./pkgs { inherit shellVersion; };
+
       mkHost =
         hostName:
         {
@@ -63,7 +55,7 @@
             ./hosts/${hostName}/configuration.nix
             home-manager.nixosModules.home-manager
             {
-              nixpkgs.overlays = [ self.overlays.default ];
+              nixpkgs.overlays = [ overlays ];
             }
           ]
           ++ modules;
@@ -76,10 +68,10 @@
     {
       nixosConfigurations = hosts;
 
-      overlays.default = import ./pkgs;
+      overlays.default = overlays;
 
       packages.${system} = {
-        inherit (pkgs.extend self.overlays.default) pangu ttf-phosphor-icons;
+        inherit (pkgs.extend overlays) pangu ttf-phosphor-icons;
       };
 
       formatter.${system} = pkgs.nixfmt-tree;

@@ -24,11 +24,12 @@ Singleton {
         property string image: ""
         property string summary: ""
         property double time
-        property string urgency: "normal"
+        property int urgency: NotificationUrgency.Normal
         property int historyPriority: 0
         property string replaceKey: ""
         property var localActionHandlers: ({})
         property Timer timer
+        property bool closedConnected: false
 
         property string cachedAppIcon: ""
         property string cachedImage: ""
@@ -42,7 +43,7 @@ Singleton {
                 body = notification.body ?? "";
                 image = notification.image ?? "";
                 summary = notification.summary ?? "";
-                urgency = notification.urgency.toString() ?? "normal";
+                urgency = notification.urgency ?? NotificationUrgency.Normal;
 
                 if (appIcon && !appIcon.startsWith("data:")) {
                     root.cacheImageAsBase64(appIcon, function (cachedData) {
@@ -55,11 +56,14 @@ Singleton {
                     });
                 }
 
-                notification.closed.connect(function (reason) {
-                    if (reason === 3) {
-                        root.discardNotification(id);
-                    }
-                });
+                if (!closedConnected) {
+                    notification.closed.connect(function (reason) {
+                        if (reason === 3) {
+                            root.discardNotification(id);
+                        }
+                    });
+                    closedConnected = true;
+                }
             }
         }
 
@@ -377,9 +381,11 @@ Singleton {
         const index = root.list.findIndex(notif => notif.id === id);
         const notifServerIndex = notifServer.trackedNotifications.values.findIndex(notif => notif.id + root.idOffset === id);
         if (index !== -1) {
+            const removed = root.list[index];
             root.list.splice(index, 1);
             triggerListChange();
             saveNotifications();
+            root.scheduleDestroy(removed);
         }
         if (notifServerIndex !== -1) {
             notifServer.trackedNotifications.values[notifServerIndex].dismiss();
@@ -400,9 +406,11 @@ Singleton {
         const removedCount = root.list.length - newList.length;
 
         if (removedCount > 0) {
+            const removed = root.list.filter(notif => idsMap[notif.id]);
             root.list = newList;
             triggerListChange();
             saveNotifications();
+            removed.forEach(notif => root.scheduleDestroy(notif));
         }
 
         ids.forEach(id => {
@@ -415,9 +423,11 @@ Singleton {
     }
 
     function discardAllNotifications() {
+        const removed = root.list.slice(0);
         root.list = [];
         triggerListChange();
         saveNotifications();
+        removed.forEach(notif => root.scheduleDestroy(notif));
         notifServer.trackedNotifications.values.forEach(notif => {
             notif.dismiss();
         });
@@ -434,8 +444,15 @@ Singleton {
         property int notificationId: -1
         onTriggered: {
             const index = root.list.findIndex(notif => notif.id === notificationId);
-            if (index !== -1 && root.list[index] != null)
-                root.list[index].popup = false;
+            if (index !== -1 && root.list[index] != null) {
+                const notif = root.list[index];
+                notif.popup = false;
+                if (notif.timer) {
+                    notif.timer.stop();
+                    notif.timer.destroy();
+                    notif.timer = null;
+                }
+            }
             root.timeout(notificationId);
         }
     }
@@ -449,9 +466,12 @@ Singleton {
     function timeoutAll() {
         root.popupList.forEach(notif => {
             root.timeout(notif.id);
-        });
-        root.popupList.forEach(notif => {
             notif.popup = false;
+            if (notif.timer) {
+                notif.timer.stop();
+                notif.timer.destroy();
+                notif.timer = null;
+            }
         });
     }
 
@@ -523,6 +543,24 @@ Singleton {
 
     function triggerListChange() {
         root.list = root.list.slice(0);
+    }
+
+    property var pendingDestroys: []
+
+    Timer {
+        id: destroyTimer
+        interval: 300
+        repeat: false
+        onTriggered: {
+            root.pendingDestroys.forEach(notif => notif.destroy());
+            root.pendingDestroys = [];
+        }
+    }
+
+    function scheduleDestroy(notif) {
+        if (!notif) return;
+        root.pendingDestroys = [...root.pendingDestroys, notif];
+        destroyTimer.restart();
     }
 
     property int activeXhrCount: 0

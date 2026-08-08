@@ -26,6 +26,19 @@ in
         default = 61208;
         description = "Port the Glances web server listens on.";
       };
+
+      bind = lib.mkOption {
+        type = lib.types.str;
+        default = "127.0.0.1";
+        example = "0.0.0.0";
+        description = "Address the Glances web server binds to. Localhost unless the API must be reachable off-box.";
+      };
+
+      password = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Password protecting the web API, for off-box binds.";
+      };
     };
 
     mqtt = {
@@ -70,7 +83,16 @@ in
     services.glances = lib.mkIf cfg.glances.enable {
       enable = true;
       port = cfg.glances.port;
-      openFirewall = true;
+      openFirewall = cfg.glances.bind != "127.0.0.1";
+      extraArgs = [
+        "--webserver"
+        "--bind"
+        cfg.glances.bind
+      ]
+      ++ lib.optionals (cfg.glances.password != null) [
+        "--password"
+        cfg.glances.password
+      ];
     };
 
     security.wrappers.go-hass-agent = lib.mkIf cfg.privileged {

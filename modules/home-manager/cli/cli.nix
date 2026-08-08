@@ -172,6 +172,13 @@ in
       push.autoSetupRemote = true;
       merge.conflictstyle = "diff3";
       diff.colorMoved = "default";
+
+      "credential \"https://github.com\"" = {
+        helper = [
+          ""
+          "!gh auth git-credential"
+        ];
+      };
     };
   };
 

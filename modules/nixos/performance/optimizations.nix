@@ -36,8 +36,7 @@ in
     "fs.inotify.max_user_watches" = 1048576;
     "fs.file-max" = 2097152;
 
-    "kernel.nmi_watchdog" = 0;
-    "kernel.split_lock_mitigate" = 0;
+    "kernel.split_lock_mitigate" = 0; # 0 only warns, games that trip split locks would otherwise get SIGBUS'd
   };
 
   services.journald.extraConfig = lib.mkDefault ''

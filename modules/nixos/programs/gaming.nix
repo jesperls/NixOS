@@ -8,6 +8,8 @@
 let
   cfg = config.mySystem.programs.gaming;
 
+  shared = import ../lib/gaming.nix { inherit pkgs; };
+
   # nixpkgs snes9x-gtk 1.63 misses minizip's headers, which moved to
   # include/minizip/.
   snes9x-gtk-fixed = pkgs.snes9x-gtk.overrideAttrs (old: {
@@ -32,28 +34,18 @@ in
 
       package = pkgs.steam.override {
         extraPkgs =
-          pkgs: with pkgs; [
-            libxcursor
-            libxi
-            libxinerama
-            libxscrnsaver
-            libpng
-            libpulseaudio
-            libvorbis
+          pkgs:
+          with pkgs;
+          shared.wineRuntimeLibs
+          ++ [
             stdenv.cc.cc.lib
             libkrb5
             keyutils
-            wayland
-            libxkbcommon
             vulkan-loader
-            vulkan-validation-layers
           ];
       };
 
-      extraPackages = with pkgs; [
-        mangohud
-        gamemode
-      ];
+      extraPackages = with pkgs; shared.gamingTools;
     };
 
     environment.systemPackages = with pkgs; [

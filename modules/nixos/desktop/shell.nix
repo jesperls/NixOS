@@ -10,8 +10,6 @@ lib.mkIf config.mySystem.desktop.shell.enable {
 
   services.power-profiles-daemon.enable = true;
 
-  hardware.i2c.enable = true;
-
   fonts.packages = with pkgs; [
     ttf-phosphor-icons
     roboto

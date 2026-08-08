@@ -14,6 +14,7 @@
     ./services/flatpak.nix
     ./services/dlna.nix
     ./services/docker.nix
+    ./services/ollama.nix
     ./services/home-assistant.nix
     ./services/sunshine.nix
     ./programs/fonts.nix

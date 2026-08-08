@@ -83,7 +83,7 @@ Singleton {
 
     function getNotchOpen(screenName) {
         let visibilities = Visibilities.getForScreen(screenName);
-        return visibilities.launcher || visibilities.dashboard || visibilities.overview;
+        return visibilities.launcher || visibilities.dashboard || visibilities.overview || visibilities.powermenu || visibilities.tools;
     }
 
     function getActiveLauncher() {
@@ -267,9 +267,9 @@ Singleton {
 
     readonly property var _shellSections: {
         "bar": ["position", "height", "launcherIcon", "launcherIconTint", "launcherIconFullTint", "launcherIconSize", "enableFirefoxPlayer", "screenList", "frameEnabled", "frameThickness", "pinnedOnStartup", "hoverToReveal", "hoverRegionHeight", "showPinButton", "availableOnFullscreen", "pillStyle", "use12hFormat", "containBar", "keepBarShadow", "keepBarBorder", "splitOnCenteredLayout", "splitGapPadding"],
-        "notch": ["theme", "position", "hoverRegionHeight", "keepHidden", "splitSide"],
+        "notch": ["theme", "position", "hoverRegionHeight", "keepHidden", "splitSide", "noMediaDisplay", "customText", "disableHoverExpansion"],
         "workspaces": ["shown", "showAppIcons", "alwaysShowNumbers", "showNumbers", "dynamic"],
-        "overview": ["rows", "columns", "scale", "workspaceSpacing"],
+        "overview": ["enabled", "layout", "rows", "columns", "scale", "workspaceSpacing"],
         "dock": ["enabled", "theme", "position", "height", "iconSize", "spacing", "margin", "hoverRegionHeight", "pinnedOnStartup", "hoverToReveal", "availableOnFullscreen", "showRunningIndicators", "showPinButton", "showOverviewButton", "screenList", "keepHidden"],
         "lockscreen": ["position", "lockOnBoot", "showClock", "showMediaPlayer", "showAvatar", "blurWallpaper", "dimOpacity"],
         "desktop": ["enabled", "iconSize", "spacingVertical", "textColor"],
@@ -375,7 +375,7 @@ Singleton {
         "syncBorderColor", "activeBorderColor", "inactiveBorderColor",
         "shadowEnabled", "syncShadowColor", "syncShadowOpacity",
         "shadowRange", "shadowRenderPower", "shadowScale",
-        "shadowOpacity", "shadowSharp",
+        "shadowOpacity", "shadowSharp", "shadowColor", "shadowColorInactive",
         "blurEnabled", "blurSize", "blurPasses", "blurXray",
         "blurNewOptimizations", "blurIgnoreOpacity",
         "blurNoise", "blurContrast", "blurBrightness", "blurVibrancy",

@@ -563,11 +563,11 @@ QtObject {
         if (!_initialized) return;
         _operationInProgress = true;
         setAliasProcess.itemId = id;
-        var escapedAlias = alias.replace(/'/g, "''");
         if (alias.trim() === "") {
-            setAliasProcess.command = ["sh", "-c", "sqlite3 '" + dbPath + "' '.timeout 5000' 'UPDATE clipboard_items SET alias = NULL WHERE id = " + id + ";'"];
+            setAliasProcess.command = ["sqlite3", dbPath, ".timeout 5000", "UPDATE clipboard_items SET alias = NULL WHERE id = " + id + ";"];
         } else {
-            setAliasProcess.command = ["sh", "-c", "sqlite3 '" + dbPath + "' '.timeout 5000' \"UPDATE clipboard_items SET alias = '" + escapedAlias + "' WHERE id = " + id + ";\""];
+            var escapedAlias = alias.replace(/'/g, "''");
+            setAliasProcess.command = ["sqlite3", dbPath, ".timeout 5000", "UPDATE clipboard_items SET alias = '" + escapedAlias + "' WHERE id = " + id + ";"];
         }
         setAliasProcess.running = true;
     }

@@ -203,7 +203,7 @@ Item {
                             source: (notificationGroup && notificationGroup.appIcon !== "") ? "image://icon/" + notificationGroup.appIcon : ""
                             fillMode: Image.PreserveAspectFit
                             smooth: true
-                            visible: notificationGroup && notificationGroup.appIcon !== "" && root.validNotifications.some(n => n.image !== "")
+                            visible: notificationGroup && notificationGroup.appIcon !== ""
                         }
                         Text {
                             text: Icons.info

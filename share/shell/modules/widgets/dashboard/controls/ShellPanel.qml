@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import qs.modules.theme
 import qs.modules.components
 import qs.modules.globals
@@ -42,6 +43,22 @@ Item {
             colorPickerCallback(color);
         }
         colorPickerCurrentColor = color;
+    }
+
+    Process {
+        id: launcherIconPicker
+        running: false
+        command: ["zenity", "--file-selection", "--title=Select Launcher Icon", "--file-filter=Images | *.png *.jpg *.jpeg *.svg *.gif *.webp"]
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const path = text.trim();
+                if (path) {
+                    GlobalStates.markShellChanged();
+                    Config.bar.launcherIcon = path;
+                }
+            }
+        }
     }
 
     property string currentSection: ""
@@ -338,7 +355,9 @@ Item {
         property string label: ""
         property string value: ""
         property string placeholder: ""
+        property string actionText: ""
         signal valueEdited(string newValue)
+        signal actionClicked()
 
         Layout.fillWidth: true
         spacing: 8
@@ -389,6 +408,31 @@ Item {
                 onEditingFinished: {
                     textInputRowRoot.valueEdited(text);
                 }
+            }
+        }
+
+        StyledRect {
+            variant: textInputRowRoot.actionText === "" ? "common" : "primary"
+            Layout.preferredWidth: actionLabel.implicitWidth + 20
+            Layout.preferredHeight: 32
+            radius: Styling.radius(-2)
+            visible: textInputRowRoot.actionText !== ""
+
+            Text {
+                id: actionLabel
+                anchors.centerIn: parent
+                text: textInputRowRoot.actionText
+                font.family: Config.theme.font
+                font.pixelSize: Styling.fontSize(0)
+                font.bold: true
+                color: parent.item
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: textInputRowRoot.actionClicked()
             }
         }
     }
@@ -765,13 +809,15 @@ Item {
                         TextInputRow {
                             label: "Launcher Icon"
                             value: Config.bar.launcherIcon ?? ""
-                            placeholder: "Symbol or path to icon..."
+                            placeholder: "Symbol, icon name, or path..."
+                            actionText: "Browse"
                             onValueEdited: newValue => {
                                 if (newValue !== Config.bar.launcherIcon) {
                                     GlobalStates.markShellChanged();
                                     Config.bar.launcherIcon = newValue;
                                 }
                             }
+                            onActionClicked: launcherIconPicker.running = true
                         }
 
                         ToggleRow {
@@ -1311,6 +1357,38 @@ Item {
                             Layout.bottomMargin: -4
                         }
 
+                        ToggleRow {
+                            label: "Enabled"
+                            checked: Config.overview.enabled ?? true
+                            onToggled: value => {
+                                if (value !== Config.overview.enabled) {
+                                    GlobalStates.markShellChanged();
+                                    Config.overview.enabled = value;
+                                }
+                            }
+                        }
+
+                        SelectorRow {
+                            label: "Layout"
+                            options: [
+                                {
+                                    label: "Standard",
+                                    value: "standard"
+                                },
+                                {
+                                    label: "Scrolling",
+                                    value: "scrolling"
+                                }
+                            ]
+                            value: Config.overview.layout ?? "standard"
+                            onValueSelected: newValue => {
+                                if (newValue !== Config.overview.layout) {
+                                    GlobalStates.markShellChanged();
+                                    Config.overview.layout = newValue;
+                                }
+                            }
+                        }
+
                         NumberInputRow {
                             label: "Rows"
                             value: Config.overview.rows ?? 2
@@ -1359,7 +1437,7 @@ Item {
                                 stepSize: 0.05  // 0.05 * 0.2 = 0.01 scale steps
                                 snapMode: "always"
 
-                                readonly property real configValue: (Config.overview.scale ?? 0.15) / 0.2
+                                readonly property real configValue: (Config.overview.scale ?? 0.1) / 0.2
 
                                 onConfigValueChanged: {
                                     if (Math.abs(value - configValue) > 0.001) {
@@ -1371,7 +1449,7 @@ Item {
 
                                 onValueChanged: {
                                     let newScale = Math.round(value * 0.2 * 100) / 100;  // Round to 2 decimals
-                                    if (Math.abs(newScale - (Config.overview.scale ?? 0.15)) > 0.001) {
+                                    if (Math.abs(newScale - (Config.overview.scale ?? 0.1)) > 0.001) {
                                         GlobalStates.markShellChanged();
                                         Config.overview.scale = newScale;
                                     }
@@ -1379,7 +1457,7 @@ Item {
                             }
 
                             Text {
-                                text: ((Config.overview.scale ?? 0.15)).toFixed(2)
+                                text: ((Config.overview.scale ?? 0.1)).toFixed(2)
                                 font.family: Config.theme.font
                                 font.pixelSize: Styling.fontSize(0)
                                 color: Colors.overBackground
@@ -1495,7 +1573,7 @@ Item {
                         NumberInputRow {
                             label: "Height"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
-                            value: Config.dock.height ?? 48
+                            value: Config.dock.height ?? 56
                             minValue: 32
                             maxValue: 128
                             suffix: "px"
@@ -1525,7 +1603,7 @@ Item {
                         NumberInputRow {
                             label: "Spacing"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
-                            value: Config.dock.spacing ?? 10
+                            value: Config.dock.spacing ?? 4
                             minValue: 0
                             maxValue: 32
                             suffix: "px"

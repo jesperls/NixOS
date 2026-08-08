@@ -28,7 +28,7 @@ QtObject {
 
             const escape = (str) => {
                 if (!str) return ""
-                return str.toString().replace(/\\/g, "\\\\").replace(/"/g, '\\"')
+                return str.toString().replace(/[\\`$"]/g, (m) => "\\" + m)
             }
             
             const darken = (c, percent) => {
@@ -114,9 +114,9 @@ QtObject {
                 echo "${escape(colorsContent)}" > "${walDir}/colors"
                 echo "${escape(jsonContent)}" > "${walDir}/colors.json"
                 echo "${escape(shContent)}" > "${walDir}/colors.sh"
-                echo "${image}" > "${walDir}/wal"
-                pywalfox update &
-                walogram -B > /dev/null 2>&1 &
+                echo "${escape(image)}" > "${walDir}/wal"
+                command -v pywalfox >/dev/null 2>&1 && pywalfox update &
+                command -v walogram >/dev/null 2>&1 && walogram -B > /dev/null 2>&1 &
             `
             
             writerProcess.command = ["sh", "-c", cmd]

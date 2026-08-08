@@ -610,19 +610,21 @@ Item {
         scheduleNextDayUpdate();
     }
 
+    function updateTime() {
+        var now = new Date();
+        var format = Config.bar.use12hFormat ? "h:mm ap" : "hh:mm";
+        var formatted = Qt.formatDateTime(now, format);
+        var parts = formatted.split(":");
+        root.currentTime = formatted;
+        root.currentHours = parts[0];
+        root.currentMinutes = parts[1].split(" ")[0];
+    }
+
     Timer {
         interval: 1000
         running: !SuspendManager.isSuspending
         repeat: true
-        onTriggered: {
-            var now = new Date();
-            var format = Config.bar.use12hFormat ? "h:mm ap" : "hh:mm";
-            var formatted = Qt.formatDateTime(now, format);
-            var parts = formatted.split(":");
-            root.currentTime = formatted;
-            root.currentHours = parts[0];
-            root.currentMinutes = parts[1];
-        }
+        onTriggered: root.updateTime()
     }
 
     Timer {
@@ -633,13 +635,7 @@ Item {
     }
 
     Component.onCompleted: {
-        var now = new Date();
-        var format = Config.bar.use12hFormat ? "h:mm ap" : "hh:mm";
-        var formatted = Qt.formatDateTime(now, format);
-        var parts = formatted.split(":");
-        root.currentTime = formatted;
-        root.currentHours = parts[0];
-        root.currentMinutes = parts[1];
+        root.updateTime();
         updateDay();
     }
 }

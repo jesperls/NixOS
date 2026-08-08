@@ -14,6 +14,10 @@ Item {
     id: root
     focus: true
 
+    function shq(s) {
+        return "'" + String(s).replace(/'/g, "'\\''") + "'";
+    }
+
     property string prefixIcon: ""
     signal backspaceOnEmpty
 
@@ -299,7 +303,7 @@ Item {
 
     function createTmuxSession(sessionName) {
         if (sessionName) {
-            createProcess.command = ["bash", "-c", `cd "$HOME" && setsid kitty -e tmux new -s "${sessionName}" < /dev/null > /dev/null 2>&1 &`];
+            createProcess.command = ["bash", "-c", `cd "$HOME" && setsid kitty -e tmux new -s ${root.shq(sessionName)} < /dev/null > /dev/null 2>&1 &`];
         } else {
             createProcess.command = ["bash", "-c", `cd "$HOME" && setsid kitty -e tmux < /dev/null > /dev/null 2>&1 &`];
         }
@@ -308,7 +312,7 @@ Item {
     }
 
     function attachToSession(sessionName) {
-        attachProcess.command = ["bash", "-c", `cd "$HOME" && setsid kitty -e tmux attach-session -t "${sessionName}" < /dev/null > /dev/null 2>&1 &`];
+        attachProcess.command = ["bash", "-c", `cd "$HOME" && setsid kitty -e tmux attach-session -t ${root.shq(sessionName)} < /dev/null > /dev/null 2>&1 &`];
         attachProcess.running = true;
     }
 

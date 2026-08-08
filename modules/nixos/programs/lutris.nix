@@ -8,30 +8,25 @@
 let
   cfg = config.mySystem.programs.lutris;
 
+  shared = import ../lib/gaming.nix { inherit pkgs; };
+
   lutrisWithDeps = pkgs.lutris.override {
     extraLibraries =
-      pkgs: with pkgs; [
-        libpulseaudio
+      pkgs:
+      with pkgs;
+      shared.wineRuntimeLibs
+      ++ [
         pipewire
         openal
-        libvorbis
         libogg
-        libxkbcommon
-        wayland
         SDL2
         SDL2_image
         SDL2_mixer
         SDL2_ttf
         v4l-utils
         libgudev
-        libpng
         libjpeg
-        libGL
         libglvnd
-        libxcursor
-        libxi
-        libxinerama
-        libxscrnsaver
         libxext
         libxrandr
         libxxf86vm
@@ -62,11 +57,12 @@ let
       ];
 
     extraPkgs =
-      pkgs: with pkgs; [
+      pkgs:
+      with pkgs;
+      shared.gamingTools
+      ++ [
         winetricks
         gamescope
-        mangohud
-        gamemode
         dxvk
         vkd3d
         cabextract

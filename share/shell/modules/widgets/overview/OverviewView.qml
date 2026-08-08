@@ -8,7 +8,7 @@ Item {
     id: root
     property var currentScreen
 
-    readonly property bool isScrollingLayout: GlobalStates.compositorLayout === "scrolling"
+    readonly property bool isScrollingLayout: Config.overview.layout === "scrolling"
 
     implicitWidth: overviewLoader.item ? overviewLoader.item.implicitWidth : 400
     implicitHeight: overviewLoader.item ? overviewLoader.item.implicitHeight : 300

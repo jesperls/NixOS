@@ -431,8 +431,8 @@ Singleton {
             property string position: "top"
             property int height: 0
             property string launcherIcon: ""
-            property bool launcherIconTint: true
-            property bool launcherIconFullTint: true
+            property bool launcherIconTint: false
+            property bool launcherIconFullTint: false
             property int launcherIconSize: 24
             property string pillStyle: "default"
             property list<string> screenList: []
@@ -471,6 +471,8 @@ Singleton {
         name: "overview"
 
         adapter: JsonAdapter {
+            property bool enabled: true
+            property string layout: "standard"
             property int rows: 2
             property int columns: 5
             property real scale: 0.1

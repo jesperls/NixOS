@@ -27,7 +27,7 @@ in
     terminal = mkApp "terminal emulator" "kitty" "kitty.desktop";
     browser = mkApp "web browser" "firefox" "firefox.desktop";
     fileManager = mkApp "file manager" "thunar" "thunar.desktop";
-    editor = mkApp "code editor" "code" "code.desktop";
+    editor = mkApp "code editor" "zeditor" "dev.zed.Zed.desktop";
     textEditor = mkApp "plain text editor" "gedit" "gedit.desktop";
     imageViewer = mkApp "image viewer" "imv" "imv.desktop";
     videoPlayer = mkApp "video player" "mpv" "mpv.desktop";

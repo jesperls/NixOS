@@ -9,6 +9,7 @@
       position = "0x0";
       vrr = 1;
       bitdepth = 10;
+      cm = "auto";
     }
   ];
 }

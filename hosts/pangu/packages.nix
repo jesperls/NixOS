@@ -4,8 +4,8 @@
 }:
 {
   home.packages = with pkgs; [
-    nixfmt
     nil
+    nixd
     vscode
     uv
     python314
@@ -35,6 +35,7 @@
     wl-clipboard
     cliphist
     gsettings-desktop-schemas
+    gh
     networkmanagerapplet
     mission-center
     pavucontrol
@@ -64,6 +65,8 @@
     helix
     lazygit
     opencode
+    linux-wallpaperengine
     pear-desktop
+    zed-editor
   ];
 }

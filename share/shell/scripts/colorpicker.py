@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import colorsys
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -12,7 +13,7 @@ def cmd(*args, input=None):
 
 
 for dep in ("grim", "slurp", "magick", "wl-copy", "notify-send"):
-    if subprocess.call(["which", dep], stdout=subprocess.DEVNULL) != 0:
+    if shutil.which(dep) is None:
         subprocess.call(
             [
                 "notify-send",

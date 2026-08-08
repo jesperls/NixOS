@@ -443,7 +443,7 @@ Item {
                         required property var modelData
                         appToplevel: modelData
                         Layout.alignment: Qt.AlignVCenter
-                        dockPosition: "bottom"
+                        dockPosition: root.position
                     }
                 }
 

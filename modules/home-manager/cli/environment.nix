@@ -34,7 +34,7 @@ in
   };
 
   home.sessionPath = [
-    "$HOME/.local/bin"
+    "${config.home.homeDirectory}/.local/bin"
   ];
 
   xdg.systemDirs.data = [

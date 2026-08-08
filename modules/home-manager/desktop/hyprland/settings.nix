@@ -49,17 +49,15 @@ let
       sideGap = (width - special.maxWidth) / 2;
     in
     lib.optionals (numMonitors > 0 && special.maxWidth > 0 && width > special.maxWidth) (
-      map
-        (workspace: {
-          inherit workspace;
-          gaps_out = {
-            left = sideGap;
-            right = sideGap;
-            top = special.verticalGap;
-            bottom = special.verticalGap;
-          };
-        })
-        [ "special:scratchpad" ]
+      map (workspace: {
+        inherit workspace;
+        gaps_out = {
+          left = sideGap;
+          right = sideGap;
+          top = special.verticalGap;
+          bottom = special.verticalGap;
+        };
+      }) [ "special:scratchpad" ]
     );
 in
 {

@@ -36,5 +36,11 @@ in
         TimeoutStopSec = "5sec";
       };
     };
+
+    networkmanagerapplet = mkAutostart {
+      description = "nm-applet — NetworkManager tray applet";
+      execStart = "${pkgs.networkmanagerapplet}/bin/nm-applet";
+      unit.ConditionEnvironment = "WAYLAND_DISPLAY";
+    };
   };
 }

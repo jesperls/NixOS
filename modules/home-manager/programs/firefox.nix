@@ -1,8 +1,13 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  ...
+}:
 
 {
   programs.firefox = {
     enable = true;
+
+    configPath = ".mozilla/firefox";
 
     nativeMessagingHosts = [ pkgs.fx-cast-bridge ];
 
@@ -24,6 +29,7 @@
     profiles.default = {
       id = 0;
       name = "default";
+      path = "main";
       isDefault = true;
 
       settings = {
@@ -45,6 +51,8 @@
         "extensions.pocket.enabled" = false;
 
         "general.smoothScroll" = true;
+
+        "browser.sessionstore.resume_from_crash" = false;
       };
     };
   };

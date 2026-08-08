@@ -66,6 +66,8 @@ Item {
                 sourceItem: root.sourceItem
                 hideSource: true
                 live: false  // Static content - use scheduleUpdate() when source changes
+
+                Component.onCompleted: scheduleUpdate()
             }
             
             Connections {

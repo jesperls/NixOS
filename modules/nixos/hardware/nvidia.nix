@@ -43,8 +43,6 @@ in
       options nvidia NVreg_UsePageAttributeTable=1
     '';
 
-    boot.kernelParams = [ "pcie_aspm=off" ];
-
     environment.sessionVariables = {
       LIBVA_DRIVER_NAME = "nvidia";
       __GLX_VENDOR_LIBRARY_NAME = "nvidia";

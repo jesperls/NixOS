@@ -42,16 +42,26 @@
     performance.scheduler = "scx_lavd";
     performance.transparentHugepages = "always";
     performance.zram.memoryPercent = 25;
+    performance.cpuVendor = "amd";
 
     hardware.nvidia.enable = true;
     hardware.vial.enable = true;
     hardware.webcam.enable = true;
-    hardware.sensors.enable = true;
+    hardware.sensors = {
+      enable = true;
+      modules = [
+        "k10temp"
+        "nct6775"
+      ];
+    };
 
     programs.gaming.enable = true;
     programs.lutris.enable = true;
+    programs.fileManager.enable = true;
 
+    services.flatpak.enable = true;
     services.sunshine.enable = true;
+    services.ollama.enable = true;
 
     services.homeAssistant = {
       enable = false;

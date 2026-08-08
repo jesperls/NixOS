@@ -5,7 +5,6 @@
     oracle = {
       HostName = osConfig.mySystem.network.hosts.oracle;
       User = "ubuntu";
-      IdentityFile = "~/.ssh/id_rsa";
       SetEnv.TERM = "xterm-256color";
     };
 
