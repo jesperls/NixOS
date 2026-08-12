@@ -21,6 +21,7 @@
     ./programs/filemanager.nix
     ./programs/gaming.nix
     ./programs/lutris.nix
+    ./programs/coolercontrol.nix
 
     ./hardware/nvidia.nix
     ./hardware/vial.nix
@@ -33,6 +34,7 @@
 
     ./performance/optimizations.nix
     ./performance/scheduling.nix
+    ./performance/autofdo.nix
 
     ./home-manager.nix
     ./users.nix

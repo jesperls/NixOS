@@ -67,6 +67,7 @@
     opencode
     linux-wallpaperengine
     pear-desktop
+    phoronix-test-suite
     zed-editor
   ];
 }

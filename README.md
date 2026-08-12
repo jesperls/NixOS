@@ -177,6 +177,9 @@ Every build also produces a `fallback` specialisation (stock nixpkgs kernel,
 no sched_ext) selectable from the boot menu if a CachyOS kernel or scheduler
 update misbehaves.
 
+Manual kernel AutoFDO (profile collection → merge → rebuild) is documented in
+[docs/autofdo.md](docs/autofdo.md).
+
 Locking is `loginctl lock-session` (`SUPER L` / the power menu); idle
 timeouts and lock-on-boot/sleep live in the shell's settings UI under
 System → Idle. `mySystem.system.autoLogin` and `.passwordlessSudo` trade

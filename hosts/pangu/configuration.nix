@@ -43,6 +43,17 @@
     performance.transparentHugepages = "always";
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";
+    # Tuned kernel — re-enable once you have a merged profile (docs/autofdo.md):
+    #   performance.kernel = {
+    #     processorOpt = "zen4";
+    #     autofdo = ./profiles/merged.afdo;
+    #     performanceGovernor = true;
+    #     bbr3 = true;
+    #   };
+    performance.autofdo = {
+      enable = true;
+      minCpuLoad = 0.1;
+    };
 
     hardware.nvidia.enable = true;
     hardware.vial.enable = true;
@@ -55,13 +66,17 @@
       ];
     };
 
+    programs.coolercontrol = {
+      enable = true;
+    };
+
     programs.gaming.enable = true;
     programs.lutris.enable = true;
     programs.fileManager.enable = true;
 
     services.flatpak.enable = true;
     services.sunshine.enable = true;
-    services.ollama.enable = true;
+    services.ollama.enable = false;
 
     services.homeAssistant = {
       enable = false;

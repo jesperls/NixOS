@@ -52,6 +52,39 @@
       description = "transparent_hugepage= kernel parameter; null keeps the kernel default.";
     };
 
+    kernel = {
+      processorOpt = lib.mkOption {
+        type = lib.types.nullOr (
+          lib.types.enum [
+            "x86_64-v2"
+            "x86_64-v3"
+            "x86_64-v4"
+            "zen4"
+          ]
+        );
+        default = null;
+        description = "Microarchitecture the CachyOS kernel is compiled for; zen4 also covers Zen 5.";
+      };
+
+      autofdo = lib.mkOption {
+        type = lib.types.nullOr (lib.types.either lib.types.bool lib.types.path);
+        default = false;
+        description = "Clang AutoFDO: true enables the profiling config, a profile path applies it.";
+      };
+
+      performanceGovernor = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Pin the default cpufreq governor to performance.";
+      };
+
+      bbr3 = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Build BBRv3 and make it the default TCP congestion control.";
+      };
+    };
+
     ananicy = lib.mkOption {
       type = lib.types.bool;
       default = true;
