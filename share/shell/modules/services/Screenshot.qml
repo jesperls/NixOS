@@ -9,16 +9,14 @@ import qs.config
 QtObject {
     id: root
 
-    signal screenshotCaptured(string path)  // Generic signal (maybe unused now for per-monitor)
-    signal monitorScreenshotReady(string monitorName, string path)  // NEW: Signal for per-monitor readiness
+    signal monitorScreenshotReady(string monitorName, string path)
     signal errorOccurred(string message)
     signal windowListReady(var windows)
     signal monitorsListReady(var monitors)
     signal lensImageReady(string path)
-    signal imageSaved(string path)  // New signal for Overlay
+    signal imageSaved(string path)
 
     property string tempPathBase: Paths.runtimePath("freeze")
-    property string cropPath: Paths.runtimePath("crop.png")
     property string lensPath: Paths.runtimePath("lens.png")
     
     property string captureMode: "normal"
@@ -46,10 +44,7 @@ QtObject {
     property Process xdgProcess: Process {
         id: xdgProcess
         command: ["bash", "-c", "xdg-user-dir PICTURES"]
-        stdout: StdioCollector {
-             onTextChanged: {
-             }
-        }
+        stdout: StdioCollector {}
         running: false
         onExited: exitCode => {
             if (exitCode === 0) {
@@ -79,7 +74,6 @@ QtObject {
                     var path = root.tempPathBase + "_" + m.name + ".png";
                     root.monitorScreenshotReady(m.name, path);
                 }
-                root.screenshotCaptured(root.tempPathBase + "_ALL.png") // Dummy path?
             } else {
                 root.errorOccurred("Failed to capture screen (grim)")
                 root._freezing = false;
@@ -261,22 +255,6 @@ QtObject {
         cropProcess.running = true;
     }
 
-    function processFullscreen() {
-        if (root.captureMode === "lens") {
-            root.finalPath = root.lensPath;
-        } else {
-            if (root.screenshotsDir === "") {
-                root.screenshotsDir = Paths.picturesDir + "/Screenshots"
-            }
-            var filename = "Screenshot_" + getTimestamp() + ".png"
-            root.finalPath = root.screenshotsDir + "/" + filename
-        }
-
-        var cmd = ["grim", root.finalPath];
-        cropProcess.command = cmd;
-        cropProcess.running = true;
-    }
-    
     function processMonitorScreen(monitorName) {
          if (root.captureMode === "lens") {
             root.finalPath = root.lensPath;
@@ -291,20 +269,6 @@ QtObject {
         var srcPath = root.tempPathBase + "_" + monitorName + ".png";
         cropProcess.command = ["cp", srcPath, root.finalPath];
         cropProcess.running = true;
-    }
-
-    property Process openScreenshotsProcess: Process {
-        id: openScreenshotsProcess
-        command: ["xdg-open", root.screenshotsDir]
-    }
-
-    function openScreenshotsFolder() {
-        if (root.screenshotsDir === "") {
-             openScreenshotsProcess.command = ["xdg-open", Paths.picturesDir + "/Screenshots"];
-        } else {
-             openScreenshotsProcess.command = ["xdg-open", root.screenshotsDir];
-        }
-        openScreenshotsProcess.running = true;
     }
 
     function runLensScript() {

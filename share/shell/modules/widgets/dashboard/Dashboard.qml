@@ -20,30 +20,71 @@ NotchAnimationBehavior {
     property string screenName: ""
 
     property var state: QtObject {
-        property int currentTab: GlobalStates.dashboardCurrentTab
+        property int currentTab: 0
     }
 
-    readonly property var tabModel: [Icons.widgets, Icons.wallpapers, Icons.heartbeat]
-    readonly property int tabCount: tabModel.length
+    readonly property var tabDefs: [
+        { icon: Icons.widgets },
+        { icon: Icons.wallpapers },
+        { icon: Icons.heartbeat }
+    ]
+
+    readonly property var tabIndices: {
+        const out = [];
+        if ((Config.dashboard.showWidgets ?? true)) out.push(0);
+        if ((Config.dashboard.showWallpapers ?? true)) out.push(1);
+        if ((Config.dashboard.showMetrics ?? true)) out.push(2);
+        return out;
+    }
+
+    readonly property int tabCount: tabIndices.length
     readonly property int tabSpacing: 8
 
     readonly property int tabWidth: 48
-    readonly property real nonAnimWidth: (state.currentTab === 0 ? 600 : 400) + tabWidth + 16  // unified launcher tab is wider
+    readonly property string tabPosition: Config.dashboard.tabPosition ?? "left"
+    readonly property bool railVertical: tabPosition === "left" || tabPosition === "right"
+    readonly property bool railFirst: tabPosition === "left" || tabPosition === "top"
 
-    implicitWidth: nonAnimWidth
-    implicitHeight: 430
+    function componentIndexOf(visibleIndex) {
+        return (visibleIndex >= 0 && visibleIndex < tabIndices.length) ? tabIndices[visibleIndex] : 0;
+    }
 
-    property var loadedTabs: ({0: true})  // Tab 0 (widgets) loaded by default
+    function visibleIndexOf(componentIndex) {
+        return tabIndices.indexOf(componentIndex);
+    }
 
-    property var lruAccessOrder: [0]  // Tracks access order: [0] means tab 0 is most recent
-    property var lruTabsLoaded: ({0: true})  // Reflects which tabs are actually loaded
+    readonly property var tabModel: tabIndices.map(i => tabDefs[i].icon)
 
-    function updateLRUAccess(tabIndex) {
-        const idx = lruAccessOrder.indexOf(tabIndex);
+    readonly property int baseContentWidth: {
+        const item = stack.currentItem;
+        if (item && item.implicitWidth > 0)
+            return item.implicitWidth;
+        const idx = componentIndexOf(state.currentTab);
+        return idx === 0 ? 760 : (idx === 1 ? 800 : 700);
+    }
+    readonly property int baseContentHeight: 430
+
+    readonly property bool showTabRail: Config.dashboard.showTabRail ?? true
+    readonly property int configWidth: Config.dashboard.width ?? 0
+    readonly property int configHeight: Config.dashboard.height ?? 0
+    readonly property int tabRailWidth: showTabRail ? tabWidth : 0
+    readonly property int separatorWidth: showTabRail ? 2 : 0
+    readonly property int layoutSpacing: showTabRail ? 16 : 0
+    readonly property int railBlockSize: tabRailWidth + separatorWidth + layoutSpacing
+
+    implicitWidth: configWidth > 0 ? configWidth : (railVertical ? baseContentWidth + railBlockSize : baseContentWidth)
+    implicitHeight: configHeight > 0 ? configHeight : (railVertical ? baseContentHeight : baseContentHeight + railBlockSize)
+
+    property var lruAccessOrder: [0]
+    property var lruTabsLoaded: ({0: true})
+
+    function updateLRUAccess(visibleIndex) {
+        const cIdx = componentIndexOf(visibleIndex);
+        const idx = lruAccessOrder.indexOf(cIdx);
         if (idx !== -1) {
             lruAccessOrder.splice(idx, 1);
         }
-        lruAccessOrder.push(tabIndex);
+        lruAccessOrder.push(cIdx);
         updateLoadedTabs();
     }
 
@@ -52,7 +93,7 @@ NotchAnimationBehavior {
         
         newLoadedTabs[0] = true;
         
-        newLoadedTabs[root.state.currentTab] = true;
+        newLoadedTabs[componentIndexOf(root.state.currentTab)] = true;
 
         if (Config.performance.dashboardPersistTabs) {
             const maxTabs = Math.max(1, Config.performance.dashboardMaxPersistentTabs);
@@ -65,22 +106,36 @@ NotchAnimationBehavior {
         lruTabsLoaded = newLoadedTabs;
     }
 
-    function shouldTabBeLoaded(tabIndex) {
-        if (tabIndex === 0) return true;  // Always load WidgetsTab (Tab 0)
+    function shouldTabBeLoaded(componentIndex) {
+        if (componentIndex === 0) return true;
 
         if (Config.performance.dashboardPersistTabs) {
-            return lruTabsLoaded[tabIndex] === true;
+            return lruTabsLoaded[componentIndex] === true;
         } else {
-            return root.state.currentTab === tabIndex;
+            return componentIndex === componentIndexOf(root.state.currentTab);
         }
     }
 
     focus: true
 
-    isVisible: GlobalStates.dashboardOpen
+    isVisible: screenName ? (Visibilities.getForScreen(screenName)?.dashboard ?? false) : false
 
     Component.onCompleted: {
-        root.state.currentTab = GlobalStates.dashboardCurrentTab;
+        root.state.currentTab = root.visibleIndexOf(GlobalStates.dashboardCurrentTab);
+        root.clampCurrentTab();
+    }
+
+    onTabCountChanged: {
+        root.clampCurrentTab();
+    }
+
+    function clampCurrentTab() {
+        if (root.state.currentTab < 0)
+            root.state.currentTab = 0;
+        if (root.state.currentTab >= root.tabCount) {
+            root.state.currentTab = Math.max(0, root.tabCount - 1);
+        }
+        GlobalStates.dashboardCurrentTab = root.componentIndexOf(root.state.currentTab);
     }
 
     onIsVisibleChanged: {
@@ -110,9 +165,7 @@ NotchAnimationBehavior {
     Connections {
         target: GlobalStates
         function onDashboardCurrentTabChanged() {
-            if (GlobalStates.dashboardCurrentTab !== root.state.currentTab) {
-                stack.navigateToTab(GlobalStates.dashboardCurrentTab);
-            }
+            stack.navigateToTab(root.visibleIndexOf(GlobalStates.dashboardCurrentTab));
         }
 
         function onLauncherSearchTextChanged() {
@@ -122,15 +175,17 @@ NotchAnimationBehavior {
         }
     }
 
-    Row {
+    Item {
         id: mainLayout
         anchors.fill: parent
-        spacing: 8
 
         Item {
             id: tabsContainer
-            width: root.tabWidth
-            height: parent.height
+            visible: root.showTabRail
+            x: root.railVertical ? (root.railFirst ? 0 : parent.width - root.tabWidth) : 0
+            y: root.railVertical ? 0 : (root.railFirst ? 0 : parent.height - root.tabWidth)
+            width: root.railVertical ? root.tabWidth : parent.width
+            height: root.railVertical ? parent.height : root.tabWidth
 
             WheelHandler {
                 id: wheelHandler
@@ -155,35 +210,35 @@ NotchAnimationBehavior {
             StyledRect {
                 id: tabHighlight
                 variant: "primary"
-                width: parent.width
                 radius: Styling.radius(4)
                 z: 0
 
                 property real idx1: root.state.currentTab
                 property real idx2: root.state.currentTab
 
-                function getYForIndex(idx) {
-                    return idx * (width + root.tabSpacing);
+                function getOffsetForIndex(idx) {
+                    return idx * (root.tabWidth + root.tabSpacing);
                 }
 
-                property real targetY1: getYForIndex(idx1)
-                property real targetY2: getYForIndex(idx2)
+                property real target1: getOffsetForIndex(idx1)
+                property real target2: getOffsetForIndex(idx2)
 
-                property real animatedY1: targetY1
-                property real animatedY2: targetY2
+                property real animated1: target1
+                property real animated2: target2
 
-                x: 0
-                y: Math.min(animatedY1, animatedY2)
-                height: Math.abs(animatedY2 - animatedY1) + width
+                x: root.railVertical ? 0 : Math.min(animated1, animated2)
+                y: root.railVertical ? Math.min(animated1, animated2) : 0
+                width: root.railVertical ? parent.width : (Math.abs(animated2 - animated1) + root.tabWidth)
+                height: root.railVertical ? (Math.abs(animated2 - animated1) + root.tabWidth) : parent.height
 
-                Behavior on animatedY1 {
+                Behavior on animated1 {
                     enabled: Config.animDuration > 0
                     NumberAnimation {
                         duration: Config.animDuration / 3
                         easing.type: Easing.OutSine
                     }
                 }
-                Behavior on animatedY2 {
+                Behavior on animated2 {
                     enabled: Config.animDuration > 0
                     NumberAnimation {
                         duration: Config.animDuration
@@ -191,12 +246,13 @@ NotchAnimationBehavior {
                     }
                 }
 
-                onTargetY1Changed: animatedY1 = targetY1
-                onTargetY2Changed: animatedY2 = targetY2
+                onTarget1Changed: animated1 = target1
+                onTarget2Changed: animated2 = target2
             }
 
             Column {
-                id: tabs
+                id: tabsColumn
+                visible: root.railVertical
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -204,51 +260,30 @@ NotchAnimationBehavior {
 
                 Repeater {
                     model: root.tabModel
+                    delegate: tabButtonComponent
+                }
+            }
 
-                    Button {
-                        required property int index
-                        required property string modelData
+            Row {
+                id: tabsRow
+                visible: !root.railVertical
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.bottom: parent.bottom
+                spacing: root.tabSpacing
 
-                        text: modelData
-                        flat: true
-                        width: tabsContainer.width
-                        height: width
-
-                        background: Rectangle {
-                            color: "transparent"
-                            radius: Styling.radius(4)
-                        }
-
-                        contentItem: Text {
-                            text: parent.text
-                            textFormat: Text.RichText
-                            color: root.state.currentTab === index ? Styling.srItem("primary") : Colors.overBackground
-                            font.family: Icons.font
-                            font.pixelSize: 20
-                            font.weight: Font.Medium
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-
-                            Behavior on color {
-                                enabled: Config.animDuration > 0
-                                ColorAnimation {
-                                    duration: Config.animDuration
-                                    easing.type: Easing.OutCubic
-                                }
-                            }
-                        }
-
-                        onClicked: stack.navigateToTab(index)
-                    }
+                Repeater {
+                    model: root.tabModel
+                    delegate: tabButtonComponent
                 }
             }
 
             StyledRect {
                 id: controlsButtonContainer
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: width
+                x: root.railVertical ? 0 : parent.width - root.tabWidth
+                y: root.railVertical ? parent.height - root.tabWidth : 0
+                width: root.tabWidth
+                height: root.tabWidth
                 radius: Styling.radius(4)
                 variant: controlsButton.hovered ? "focus" : "common"
                 z: -1
@@ -266,10 +301,10 @@ NotchAnimationBehavior {
 
             Button {
                 id: controlsButton
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: width
+                x: root.railVertical ? 0 : parent.width - root.tabWidth
+                y: root.railVertical ? parent.height - root.tabWidth : 0
+                width: root.tabWidth
+                height: root.tabWidth
                 flat: true
                 hoverEnabled: true
                 z: 1
@@ -301,9 +336,13 @@ NotchAnimationBehavior {
         }
 
         Separator {
-            width: 2
-            height: parent.height
-            vert: true
+            id: railSeparator
+            visible: root.showTabRail
+            vert: root.railVertical
+            x: root.railVertical ? (root.railFirst ? (root.tabWidth + 8) : (parent.width - root.tabWidth - 2 - 8)) : 0
+            y: root.railVertical ? 0 : (root.railFirst ? (root.tabWidth + 8) : (parent.height - root.tabWidth - 2 - 8))
+            width: root.railVertical ? 2 : parent.width
+            height: root.railVertical ? parent.height : 2
         }
 
         Rectangle {
@@ -311,8 +350,10 @@ NotchAnimationBehavior {
 
             color: "transparent"
 
-            width: parent.width - root.tabWidth - 2 - 16  // Ancho total menos tabs, separador y spacings
-            height: parent.height
+            x: root.railVertical ? (root.railFirst ? root.railBlockSize : 0) : 0
+            y: root.railVertical ? 0 : (root.railFirst ? root.railBlockSize : 0)
+            width: root.railVertical ? (parent.width - root.railBlockSize) : parent.width
+            height: root.railVertical ? parent.height : (parent.height - root.railBlockSize)
 
             clip: true
 
@@ -320,27 +361,27 @@ NotchAnimationBehavior {
                 id: stack
                 anchors.fill: parent
 
-                property int currentIndex: GlobalStates.dashboardCurrentTab
+                property int currentIndex: root.state.currentTab
 
                 Connections {
                     target: GlobalStates
                     function onDashboardCurrentTabChanged() {
-                        stack.navigateToTab(GlobalStates.dashboardCurrentTab);
+                        stack.navigateToTab(root.visibleIndexOf(GlobalStates.dashboardCurrentTab));
                     }
                 }
 
                 function navigateToTab(index) {
                     if (index >= 0 && index < root.tabCount && index !== root.state.currentTab) {
-                        if (root.state.currentTab === 0 && index !== 0) {
+                        if (root.componentIndexOf(root.state.currentTab) === 0 && root.componentIndexOf(index) !== 0) {
                             GlobalStates.clearLauncherState();
                         }
 
                         root.state.currentTab = index;
-                        GlobalStates.dashboardCurrentTab = index;
+                        GlobalStates.dashboardCurrentTab = root.componentIndexOf(index);
                         
                         root.updateLRUAccess(index);
 
-                        if (index === 0) {
+                        if (root.componentIndexOf(index) === 0) {
                             Notifications.hideAllPopups();
                             focusUnifiedLauncherTimer.restart();
                         }
@@ -349,13 +390,13 @@ NotchAnimationBehavior {
 
                 component TabLoader : Loader {
                     anchors.fill: parent
-                    active: root.shouldTabBeLoaded(index) || root.state.currentTab === index
+                    active: root.shouldTabBeLoaded(index) || root.state.currentTab === root.visibleIndexOf(index)
                     
-                    visible: root.state.currentTab === index
+                    visible: root.state.currentTab === root.visibleIndexOf(index)
                     
                     opacity: visible ? 1 : 0
                     transform: Translate {
-                        y: visible ? 0 : (root.state.currentTab > index ? -20 : 20)
+                        y: visible ? 0 : (root.state.currentTab > root.visibleIndexOf(index) ? -20 : 20)
                         Behavior on y {
                              enabled: Config.animDuration > 0
                              NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart } 
@@ -399,7 +440,7 @@ NotchAnimationBehavior {
                 }
                 
                 property var currentItem: {
-                    switch(root.state.currentTab) {
+                    switch(root.componentIndexOf(root.state.currentTab)) {
                         case 0: return children[0].item;
                         case 1: return children[1].item;
                         case 2: return children[2].item;
@@ -500,6 +541,45 @@ NotchAnimationBehavior {
             duration: Config.animDuration
             easing.type: Easing.OutBack
             easing.overshoot: 1.1
+        }
+    }
+
+    Component {
+        id: tabButtonComponent
+        Button {
+            required property int index
+            required property string modelData
+
+            text: modelData
+            flat: true
+            width: root.tabWidth
+            height: root.tabWidth
+
+            background: Rectangle {
+                color: "transparent"
+                radius: Styling.radius(4)
+            }
+
+            contentItem: Text {
+                text: parent.text
+                textFormat: Text.RichText
+                color: root.state.currentTab === index ? Styling.srItem("primary") : Colors.overBackground
+                font.family: Icons.font
+                font.pixelSize: 20
+                font.weight: Font.Medium
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                Behavior on color {
+                    enabled: Config.animDuration > 0
+                    ColorAnimation {
+                        duration: Config.animDuration
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
+
+            onClicked: stack.navigateToTab(index)
         }
     }
 

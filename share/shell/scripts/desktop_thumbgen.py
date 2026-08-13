@@ -61,7 +61,7 @@ class DesktopThumbnailGenerator:
             return [], []
     
     def get_thumbnail_path(self, file_path: Path) -> Path:
-        thumbnail_name = file_path.name.replace(file_path.suffix, '') + file_path.suffix + '.jpg'
+        thumbnail_name = file_path.name + '.jpg'
         return self.cache_dir / thumbnail_name
     
     def needs_thumbnail(self, file_path: Path) -> bool:
@@ -83,8 +83,8 @@ class DesktopThumbnailGenerator:
         try:
             cmd = [
                 'ffmpeg', '-y',
-                '-i', str(video_path),
                 '-ss', '00:00:01',
+                '-i', str(video_path),
                 '-vframes', '1',
                 '-vf', f'scale=64:64:force_original_aspect_ratio=increase,crop=64:64',
                 '-q:v', '2',

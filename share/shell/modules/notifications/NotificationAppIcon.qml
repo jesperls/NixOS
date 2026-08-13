@@ -5,7 +5,6 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Services.Notifications
 import qs.modules.theme
-import qs.config
 
 Item {
     id: root
@@ -18,7 +17,6 @@ Item {
     property real size: 48 * scale
     property real appIconScale: scale
     property real smallAppIconScale: 0.4
-    property real appIconSize: size * appIconScale
     property real smallAppIconSize: size * smallAppIconScale
     property bool usingAppIconFallback: false
 

@@ -77,15 +77,6 @@ Singleton {
 
     property int wallpaperSelectedIndex: -1
 
-    function clearWallpaperState() {
-        wallpaperSelectedIndex = -1;
-    }
-
-    function getNotchOpen(screenName) {
-        let visibilities = Visibilities.getForScreen(screenName);
-        return visibilities.launcher || visibilities.dashboard || visibilities.overview || visibilities.powermenu || visibilities.tools;
-    }
-
     function getActiveLauncher() {
         let active = Visibilities.getForActive();
         return active ? active.launcher : false;
@@ -101,13 +92,6 @@ Singleton {
         return active ? active.overview : false;
     }
 
-
-    function getActiveNotchOpen() {
-        let active = Visibilities.getForActive();
-        return active ? (active.launcher || active.dashboard || active.overview) : false;
-    }
-
-    readonly property bool notchOpen: getActiveNotchOpen()
     readonly property bool overviewOpen: getActiveOverview()
     readonly property bool launcherOpen: getActiveLauncher()
     readonly property bool dashboardOpen: getActiveDashboard()
@@ -156,6 +140,31 @@ Singleton {
         "halftoneDotColor", "halftoneBackgroundColor", "itemColor", "opacity"
     ]
 
+    // Deep-copies plain objects, QML lists and JS arrays. JSON.stringify can't
+    // round-trip a QML list<...>, so those are walked element by element.
+    function _cloneValue(value) {
+        if (value === null || value === undefined)
+            return value;
+        if (Array.isArray(value))
+            return value.map(_cloneValue);
+        if (typeof value === 'object') {
+            if (typeof value.slice === 'function') {
+                const out = [];
+                for (let i = 0; i < value.length; i++)
+                    out.push(_cloneValue(value[i]));
+                return out;
+            }
+            const out = {};
+            for (const k in value) {
+                if (k.endsWith("Changed") || k === "objectName")
+                    continue;
+                out[k] = _cloneValue(value[k]);
+            }
+            return out;
+        }
+        return value;
+    }
+
     function _copySrVariant(src) {
         var copy = {};
         for (var i = 0; i < _srVariantProps.length; i++) {
@@ -163,20 +172,8 @@ Singleton {
                 copy[_srVariantProps[i]] = src[_srVariantProps[i]];
             }
         }
-        try {
-            copy.gradient = (src.gradient !== undefined) ? JSON.parse(JSON.stringify(src.gradient)) : [];
-        } catch (e) {
-            console.warn("GlobalStates: Error cloning gradient: " + e);
-            copy.gradient = [];
-        }
-        
-        try {
-            copy.border = (src.border !== undefined) ? JSON.parse(JSON.stringify(src.border)) : [];
-        } catch (e) {
-            console.warn("GlobalStates: Error cloning border: " + e);
-            copy.border = [];
-        }
-        
+        copy.gradient = (src.gradient !== undefined) ? _cloneValue(src.gradient) : [];
+        copy.border = (src.border !== undefined) ? _cloneValue(src.border) : [];
         return copy;
     }
 
@@ -187,15 +184,10 @@ Singleton {
             }
         }
         if (src.gradient !== undefined) {
-            try {
-                dest.gradient = JSON.parse(JSON.stringify(src.gradient));
-            } catch (e) { console.warn("GlobalStates: Error restoring gradient: " + e); }
+            dest.gradient = _cloneValue(src.gradient);
         }
-        
         if (src.border !== undefined) {
-            try {
-                dest.border = JSON.parse(JSON.stringify(src.border));
-            } catch (e) { console.warn("GlobalStates: Error restoring border: " + e); }
+            dest.border = _cloneValue(src.border);
         }
     }
 
@@ -266,14 +258,16 @@ Singleton {
     property var shellSnapshot: null
 
     readonly property var _shellSections: {
-        "bar": ["position", "height", "launcherIcon", "launcherIconTint", "launcherIconFullTint", "launcherIconSize", "enableFirefoxPlayer", "screenList", "frameEnabled", "frameThickness", "pinnedOnStartup", "hoverToReveal", "hoverRegionHeight", "showPinButton", "availableOnFullscreen", "pillStyle", "use12hFormat", "containBar", "keepBarShadow", "keepBarBorder", "splitOnCenteredLayout", "splitGapPadding"],
-        "notch": ["theme", "position", "hoverRegionHeight", "keepHidden", "splitSide", "noMediaDisplay", "customText", "disableHoverExpansion"],
+        "bar": ["position", "height", "style", "margin", "spacing", "padding", "launcherIcon", "launcherIconTint", "launcherIconFullTint", "launcherIconSize", "pillStyle", "clockPosition", "launcherPosition", "flatButtons", "showWorkspaces", "enableFirefoxPlayer", "screenList", "frameEnabled", "frameThickness", "pinnedOnStartup", "hoverToReveal", "hoverRegionHeight", "hideDelay", "showPinButton", "availableOnFullscreen", "use12hFormat", "showSeconds", "showDate", "containBar", "keepBarShadow", "keepBarBorder", "splitOnCenteredLayout", "splitGapPadding"],
+        "notch": ["theme", "position", "hoverRegionHeight", "hideDelay", "hoverExpansionDelay", "showUser", "showMedia", "showNotificationIndicator", "keepHidden", "splitSide", "noMediaDisplay", "customText", "disableHoverExpansion"],
         "workspaces": ["shown", "showAppIcons", "alwaysShowNumbers", "showNumbers", "dynamic"],
         "overview": ["enabled", "layout", "rows", "columns", "scale", "workspaceSpacing"],
-        "dock": ["enabled", "theme", "position", "height", "iconSize", "spacing", "margin", "hoverRegionHeight", "pinnedOnStartup", "hoverToReveal", "availableOnFullscreen", "showRunningIndicators", "showPinButton", "showOverviewButton", "screenList", "keepHidden"],
-        "lockscreen": ["position", "lockOnBoot", "showClock", "showMediaPlayer", "showAvatar", "blurWallpaper", "dimOpacity"],
+        "dashboard": ["width", "height", "showTabRail", "tabPosition", "showWidgets", "showWallpapers", "showMetrics", "backgroundOpacity"],
+        "launcher": ["width", "height", "showAppComments", "sortByUsage"],
+        "dock": ["enabled", "theme", "position", "height", "iconSize", "spacing", "margin", "hoverRegionHeight", "hideDelay", "pinnedOnStartup", "hoverToReveal", "availableOnFullscreen", "showRunningIndicators", "showPinButton", "showOverviewButton", "screenList", "keepHidden"],
+        "lockscreen": ["position", "lockOnBoot", "showClock", "showMediaPlayer", "showAvatar", "showUsername", "blurWallpaper", "dimOpacity"],
         "desktop": ["enabled", "iconSize", "spacingVertical", "textColor"],
-        "system": ["idle", "ocr"]
+        "system": ["disks", "idle", "ocr", "pomodoro", "replay", "nightLight", "slideshow", "autoTheme"]
     }
 
     function createShellSnapshot() {
@@ -285,15 +279,29 @@ Singleton {
             snapshot[section] = {};
             for (var j = 0; j < props.length; j++) {
                 var prop = props[j];
-                var val = Config[section][prop];
-                if (typeof val === 'object' && val !== null) {
-                    snapshot[section][prop] = JSON.parse(JSON.stringify(val));
-                } else {
-                    snapshot[section][prop] = val;
-                }
+                snapshot[section][prop] = _cloneValue(Config[section][prop]);
             }
         }
         return snapshot;
+    }
+
+    function _restoreObject(src, dst) {
+        for (const key in src) {
+            const s = src[key];
+            if (s === undefined)
+                continue;
+            if (Array.isArray(s)) {
+                dst[key] = _cloneValue(s);
+            } else if (s !== null && typeof s === 'object') {
+                if (dst[key] === undefined) {
+                    dst[key] = _cloneValue(s);
+                } else {
+                    _restoreObject(s, dst[key]);
+                }
+            } else {
+                dst[key] = s;
+            }
+        }
     }
 
     function restoreShellSnapshot(snapshot) {
@@ -305,30 +313,21 @@ Singleton {
             for (var j = 0; j < props.length; j++) {
                 var prop = props[j];
                 var val = snapshot[section][prop];
-                
-                if (section === "system" && prop === "idle" && val) {
-                    if (val.general) {
-                        var generalProps = ["lock_cmd", "before_sleep_cmd", "after_sleep_cmd"];
-                        for (var k = 0; k < generalProps.length; k++) {
-                            var gp = generalProps[k];
-                            if (val.general[gp] !== undefined) {
-                                Config.system.idle.general[gp] = val.general[gp];
-                            }
-                        }
-                    }
-                    if (val.listeners) {
-                        Config.system.idle.listeners = JSON.parse(JSON.stringify(val.listeners));
-                    }
-                }
-                else if (section === "system" && prop === "ocr" && val) {
-                    var keys = Object.keys(val);
-                    for (var k = 0; k < keys.length; k++) {
-                        var key = keys[k];
-                        Config.system.ocr[key] = val[key];
+
+                if (section === "system") {
+                    var dst = Config.system[prop];
+                    if (dst === undefined || val === undefined || val === null)
+                        continue;
+                    if (Array.isArray(val)) {
+                        Config.system[prop] = _cloneValue(val);
+                    } else if (typeof val === 'object') {
+                        _restoreObject(val, dst);
+                    } else {
+                        Config.system[prop] = val;
                     }
                 }
                 else if (typeof val === 'object' && val !== null) {
-                    Config[section][prop] = JSON.parse(JSON.stringify(val));
+                    Config[section][prop] = _cloneValue(val);
                 } else {
                     Config[section][prop] = val;
                 }
@@ -346,7 +345,7 @@ Singleton {
 
     function applyShellChanges() {
         if (shellHasChanges) {
-            for (const name of ["bar", "notch", "workspaces", "overview", "dock", "lockscreen", "desktop", "system"])
+            for (const name of ["bar", "notch", "workspaces", "overview", "dashboard", "launcher", "dock", "lockscreen", "desktop", "system"])
                 Config.save(name);
 
             shellHasChanges = false;
@@ -438,6 +437,16 @@ Singleton {
             compositorSnapshot = null;
             Config.pauseAutoSave = false;
         }
+    }
+
+    function resetChangeTracking() {
+        themeHasChanges = false;
+        themeSnapshot = null;
+        shellHasChanges = false;
+        shellSnapshot = null;
+        compositorHasChanges = false;
+        compositorSnapshot = null;
+        Config.pauseAutoSave = false;
     }
 
     property int settingsCurrentTab: 0

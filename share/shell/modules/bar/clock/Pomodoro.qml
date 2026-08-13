@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import Quickshell
 import Quickshell.Io
 import qs.modules.theme
 import qs.modules.components
@@ -17,17 +16,6 @@ Item {
     property bool isRunning: false
     property bool isWorkSession: true
     property bool alarmActive: false
-    
-    IpcHandler {
-        target: "pomodoro"
-        function check() {
-            root.requestPopupOpen();
-        }
-        function stop() {
-            root.stopAlarm();
-            root.isRunning = false;
-        }
-    }
 
     signal requestPopupOpen()
 
@@ -100,18 +88,8 @@ Item {
         }
     }
 
-    NumberAnimation {
-        id: progressAnim
-        target: root
-        property: "visualProgress"
-        from: root.totalTime > 0 ? root.timeLeft / root.totalTime : 0
-        to: 0
-        duration: root.timeLeft * 1000
-        running: root.isRunning && root.timeLeft > 0
-    }
-
     onTimeLeftChanged: {
-        if (!isRunning && !alarmActive) {
+        if (!alarmActive) {
             visualProgress = totalTime > 0 ? timeLeft / totalTime : 0;
         }
     }
@@ -129,7 +107,7 @@ Item {
         let finishedSession = isWorkSession ? "Work" : "Rest";
         isRunning = false;
         alarmActive = true;
-        visualProgress = 0;  // Ensure it's exactly 0
+        visualProgress = 0;
         
         if (alarmSoundLoader.item) {
             alarmSoundLoader.item.loops = Config.system.pomodoro.autoStart ? 2 : 255;  // Infinite approx

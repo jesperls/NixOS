@@ -1,9 +1,8 @@
-local dir = os.getenv("XDG_RUNTIME_DIR") or "/tmp"
-local instance = os.getenv("HYPRLAND_INSTANCE_SIGNATURE")
-if instance then
-  dir = dir .. "/hypr/" .. instance
-end
-local path = dir .. "/pangu-layout-state.lua"
+-- Layout state lives under XDG_DATA_HOME so layout_modes survive relogin;
+-- stale slots/weights are pruned on each scan (layouts.lua).
+local data = os.getenv("XDG_DATA_HOME") or (os.getenv("HOME") .. "/.local/share")
+local dir = data .. "/pangu"
+local path = dir .. "/hypr-layout-state.lua"
 
 local M = { data = {} }
 
@@ -66,6 +65,10 @@ function M.save()
 
   local tmp = path .. ".tmp"
   local file = io.open(tmp, "w")
+  if not file then
+    os.execute("mkdir -p '" .. dir:gsub("'", "'\\''") .. "'")
+    file = io.open(tmp, "w")
+  end
   if not file then
     return
   end

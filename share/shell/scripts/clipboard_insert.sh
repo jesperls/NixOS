@@ -9,6 +9,12 @@ IS_IMAGE="$4"
 BINARY_PATH="$5"
 SIZE="${6:-0}"
 
+# MIME type comes from the Wayland clipboard owner (untrusted); it is interpolated
+# into SQL below, so anything outside the media-type charset is discarded.
+if [[ ! "$MIME_TYPE" =~ ^[a-zA-Z0-9.+-]+/[a-zA-Z0-9.+-]+$ ]]; then
+	MIME_TYPE="application/octet-stream"
+fi
+
 CONTENT_FILE=$(mktemp)
 trap 'rm -f "$CONTENT_FILE"' EXIT
 cat | tr -d '\r' >"$CONTENT_FILE"

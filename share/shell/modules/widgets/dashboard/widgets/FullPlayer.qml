@@ -420,7 +420,7 @@ StyledRect {
             spacing: 8
 
         MediaIconButton {
-            icon: player.getPlayerIcon(MprisController.activePlayer)
+            icon: MprisController.getPlayerIcon(MprisController.activePlayer)
             opacity: player.hasActivePlayer ? 1.0 : 0.5
             onClicked: mouse => {
                 if (mouse.button === Qt.LeftButton) {
@@ -506,7 +506,7 @@ StyledRect {
                     return Icons.repeatOnce;
                 if (MprisController.loopState === MprisLoopState.Playlist)
                     return Icons.repeat;
-                return Icons.shuffle;
+                return Icons.repeat;
             }
             opacity: player.hasActivePlayer ? ((MprisController.shuffleSupported || MprisController.loopSupported) ? 1.0 : 0.3) : 0.5
             onClicked: {
@@ -585,7 +585,7 @@ StyledRect {
                         spacing: 8
 
                         Text {
-                            text: player.getPlayerIcon(modelData)
+                            text: MprisController.getPlayerIcon(modelData)
                             font.family: Icons.font
                             font.pixelSize: 18
                             color: Colors.overBackground
@@ -639,23 +639,5 @@ StyledRect {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => parent.clicked(mouse)
         }
-    }
-
-    function getPlayerIcon(player) {
-        if (!player)
-            return Icons.player;
-        const dbusName = (player.dbusName || "").toLowerCase();
-        const desktopEntry = (player.desktopEntry || "").toLowerCase();
-        const identity = (player.identity || "").toLowerCase();
-
-        if (dbusName.includes("spotify") || desktopEntry.includes("spotify") || identity.includes("spotify"))
-            return Icons.spotify;
-        if (dbusName.includes("chromium") || dbusName.includes("chrome") || desktopEntry.includes("chromium") || desktopEntry.includes("chrome"))
-            return Icons.chromium;
-        if (dbusName.includes("firefox") || desktopEntry.includes("firefox"))
-            return Icons.firefox;
-        if (dbusName.includes("telegram") || desktopEntry.includes("telegram") || identity.includes("telegram"))
-            return Icons.telegram;
-        return Icons.player;
     }
 }

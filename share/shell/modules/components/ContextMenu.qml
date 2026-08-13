@@ -6,7 +6,6 @@ import Quickshell.Io
 import qs.modules.theme
 import qs.modules.components
 import qs.modules.services
-import qs.config
 
 PanelWindow {
     id: contextWindow
@@ -192,15 +191,6 @@ PanelWindow {
         });
     }
 
-    function openMenu(handle) {
-        menuHandle = handle;
-        customItems = [];
-        menuType = "";
-        visible = true;
-        WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
-        root.placeAtCursor();
-    }
-
     function openCustomMenu(items, width, height, type) {
         menuHandle = null;
         customItems = items;
@@ -212,7 +202,7 @@ PanelWindow {
         if (menuType === "player") {
             Visibilities.playerMenuOpen = true;
         }
-        root.placeAtCursor();
+        contextWindow.placeAtCursor();
     }
 
     function close() {

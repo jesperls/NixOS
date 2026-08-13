@@ -25,7 +25,6 @@ Item {
 
     readonly property bool isMuted: root.node?.audio?.muted ?? false
     readonly property real volume: root.node?.audio?.volume ?? 0
-    property real lastSetVolume: volume
 
     ColumnLayout {
         anchors.fill: parent

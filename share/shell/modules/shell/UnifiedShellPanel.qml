@@ -41,22 +41,17 @@ PanelWindow {
 
     readonly property bool barEnabled: {
         if (!Config.barReady) return false;
-        const list = Config.bar.screenList;
-        return (!list || list.length === 0 || list.indexOf(targetScreen.name) !== -1);
+        return Config.enabledForScreen(Config.bar.screenList, targetScreen.name);
     }
 
     readonly property bool dockEnabled: {
-        if (!Config.dockReady) return false;
-        if (!(Config.dock.enabled ?? false) || (Config.dock.theme ?? "default") === "integrated")
-            return false;
-        const list = Config.dock.screenList;
-        return (!list || list.length === 0 || list.indexOf(targetScreen.name) !== -1);
+        if (!Config.dockReady || !Config.dockPanelEnabled) return false;
+        return Config.enabledForScreen(Config.dock.screenList, targetScreen.name);
     }
 
     readonly property alias barPosition: barContent.barPosition
     readonly property alias barPinned: barContent.pinned
     readonly property alias barHoverActive: barContent.hoverActive
-    readonly property alias barFullscreen: barContent.activeWindowFullscreen
     readonly property bool barReveal: barEnabled && barContent.reveal
     readonly property alias barTargetWidth: barContent.barTargetWidth
     readonly property alias barTargetHeight: barContent.barTargetHeight
@@ -65,7 +60,6 @@ PanelWindow {
     readonly property alias dockPosition: dockContent.position
     readonly property alias dockPinned: dockContent.pinned
     readonly property bool dockReveal: dockEnabled && dockContent.reveal
-    readonly property alias dockFullscreen: dockContent.activeWindowFullscreen
     readonly property int dockHeight: dockContent.dockSize + dockContent.totalMargin
 
     readonly property alias notchHoverActive: notchContent.hoverActive
@@ -74,21 +68,18 @@ PanelWindow {
 
     readonly property alias pinned: barContent.pinned
     readonly property bool reveal: barEnabled ? barContent.reveal : false
-    readonly property alias hoverActive: barContent.hoverActive  // Default hoverActive points to bar
-    readonly property alias notch_hoverActive: notchContent.hoverActive  // Used by bar to check notch
-
-    readonly property bool unifiedEffectActive: false  // Flag to notify children to disable internal borders
+    readonly property alias hoverActive: barContent.hoverActive
 
     readonly property var compositorMonitor: Compositor.monitorFor(targetScreen)
     readonly property bool hasFullscreenWindow: {
-        if (!compositorMonitor)
+        if (!compositorMonitor || !compositorMonitor.activeWorkspace)
             return false;
 
         const activeWorkspaceId = compositorMonitor.activeWorkspace.id;
         const monId = compositorMonitor.id;
 
         const toplevel = ToplevelManager.activeToplevel;
-        if (toplevel && toplevel.fullscreen && Compositor.focusedMonitor.id === monId) {
+        if (toplevel && toplevel.fullscreen && Compositor.focusedMonitor && Compositor.focusedMonitor.id === monId) {
             return true;
         }
 
@@ -109,18 +100,14 @@ PanelWindow {
         Visibilities.registerBarPanel(screen.name, unifiedPanel);
         Visibilities.registerNotchPanel(screen.name, unifiedPanel);
         Visibilities.registerDockPanel(screen.name, dockContent);
-        Visibilities.registerBar(screen.name, barContent);
         Visibilities.registerNotch(screen.name, notchContent.notchContainerRef);
-        Visibilities.registerDock(screen.name, dockContent);
     }
 
     Component.onDestruction: {
         Visibilities.unregisterBarPanel(screen.name);
         Visibilities.unregisterNotchPanel(screen.name);
         Visibilities.unregisterDockPanel(screen.name);
-        Visibilities.unregisterBar(screen.name);
         Visibilities.unregisterNotch(screen.name);
-        Visibilities.unregisterDock(screen.name);
     }
 
     Item {
@@ -192,7 +179,6 @@ PanelWindow {
 
         DockContent {
             id: dockContent
-            unifiedEffectActive: unifiedPanel.unifiedEffectActive
             anchors.fill: parent
             screen: unifiedPanel.targetScreen
             z: 3
@@ -201,7 +187,6 @@ PanelWindow {
 
         NotchContent {
             id: notchContent
-            unifiedEffectActive: unifiedPanel.unifiedEffectActive
             anchors.fill: parent
             screen: unifiedPanel.targetScreen
             z: 4

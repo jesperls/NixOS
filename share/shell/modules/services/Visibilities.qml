@@ -8,18 +8,19 @@ Singleton {
     id: root
 
     property var screens: ({})
-    property var panels: ({})
-    property var bars: ({})
     property var barPanels: ({})
     property var notches: ({})
     property var notchPanels: ({})
-    property var docks: ({})
     property var dockPanels: ({})
     property string currentActiveModule: ""
     property string lastFocusedScreen: ""
     property var contextMenu: null
     property bool playerMenuOpen: false
     readonly property var moduleNames: ["launcher", "dashboard", "overview", "powermenu", "tools"]
+
+    function isNotchOpen(screenProps) {
+        return screenProps ? (screenProps.launcher || screenProps.dashboard || screenProps.powermenu || screenProps.tools) : false;
+    }
 
     function setContextMenu(menu) {
         contextMenu = menu;
@@ -54,26 +55,6 @@ Singleton {
         return newMap;
     }
 
-    function registerPanel(screenName, panel) {
-        panels = _updateMap(panels, screenName, panel);
-    }
-
-    function unregisterPanel(screenName) {
-        panels = _updateMap(panels, screenName, null);
-    }
-
-    function registerBar(screenName, barContainer) {
-        bars = _updateMap(bars, screenName, barContainer);
-    }
-
-    function unregisterBar(screenName) {
-        bars = _updateMap(bars, screenName, null);
-    }
-
-    function getBarForScreen(screenName) {
-        return bars[screenName] || null;
-    }
-
     function registerBarPanel(screenName, barPanel) {
         barPanels = _updateMap(barPanels, screenName, barPanel);
     }
@@ -106,32 +87,12 @@ Singleton {
         notchPanels = _updateMap(notchPanels, screenName, null);
     }
 
-    function getNotchPanelForScreen(screenName) {
-        return notchPanels[screenName] || null;
-    }
-
-    function registerDock(screenName, dockContainer) {
-        docks = _updateMap(docks, screenName, dockContainer);
-    }
-
-    function unregisterDock(screenName) {
-        docks = _updateMap(docks, screenName, null);
-    }
-
-    function getDockForScreen(screenName) {
-        return docks[screenName] || null;
-    }
-
     function registerDockPanel(screenName, dockPanel) {
         dockPanels = _updateMap(dockPanels, screenName, dockPanel);
     }
 
     function unregisterDockPanel(screenName) {
         dockPanels = _updateMap(dockPanels, screenName, null);
-    }
-
-    function getDockPanelForScreen(screenName) {
-        return dockPanels[screenName] || null;
     }
 
     function setActiveModule(moduleName) {
@@ -202,6 +163,19 @@ Singleton {
         target: Compositor
         function onFocusedMonitorChanged() {
             moveActiveModuleToFocusedScreen();
+        }
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            const names = Quickshell.screens.map(s => s.name);
+            const next = {};
+            for (const name in root.screens) {
+                if (names.indexOf(name) !== -1)
+                    next[name] = root.screens[name];
+            }
+            root.screens = next;
         }
     }
 }

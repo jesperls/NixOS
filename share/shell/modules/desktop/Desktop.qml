@@ -11,7 +11,6 @@ PanelWindow {
     id: desktop
 
     property int barSize: Config.showBackground ? 44 : 40
-    property int bottomTextMargin: 32
     property string barPosition: ["top", "bottom", "left", "right"].includes(Config.bar.position) ? Config.bar.position : "top"
 
     anchors {
@@ -97,12 +96,7 @@ PanelWindow {
                     itemIcon: delegateRoot.icon
                     isDesktopFile: delegateRoot.isDesktopFile
 
-                    onActivated: {
-                        console.log("Activated:", itemName);
-                    }
-
                     onContextMenuRequested: {
-                        console.log("Context menu requested for:", itemName);
                         Visibilities.contextMenu.openCustomMenu([
                             {
                                 text: "Open",
@@ -150,11 +144,8 @@ PanelWindow {
                             if (!active) {
                                 var targetIndex = delegateRoot.index;
 
-                                console.log("Drop - Drag.target:", dragPreview.Drag.target);
-
                                 if (dragPreview.Drag.target && dragPreview.Drag.target.visualIndex !== undefined) {
                                     targetIndex = dragPreview.Drag.target.visualIndex;
-                                    console.log("Using Drag.target visualIndex:", targetIndex);
                                 } else {
                                     var gridPos = iconContainer.mapFromItem(dragPreview.parent, dragPreview.x, dragPreview.y);
                                     var dropX = gridPos.x + dragPreview.width / 2;
@@ -168,12 +159,10 @@ PanelWindow {
                                         row = Math.max(0, Math.min(row, iconContainer.maxRows - 1));
 
                                         targetIndex = col * iconContainer.maxRows + row;
-                                        console.log("Calculated targetIndex:", targetIndex, "col:", col, "row:", row);
                                     }
                                 }
 
                                 if (targetIndex !== delegateRoot.index) {
-                                    console.log("Moving from", delegateRoot.index, "to", targetIndex);
                                     DesktopService.moveItem(delegateRoot.index, targetIndex);
                                 }
 

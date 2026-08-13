@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell.Widgets
 import qs.modules.theme
-import qs.config
 
 ClippingRectangle {
     id: root

@@ -10,7 +10,7 @@ if FILE_CONTENT=$(wl-paste --type text/uri-list 2>/dev/null); then
 	HASH=$(echo -n "$FILE_CONTENT" | tr -d '\r' | md5sum | cut -d' ' -f1)
 
 	FILE_SIZE=0
-	FILE_PATH=$(echo -n "$FILE_CONTENT" | tr -d '\r' | sed 's|^file://||')
+	FILE_PATH=$(echo -n "$FILE_CONTENT" | tr -d '\r' | sed 's|^file://||' | python3 -c 'import sys, urllib.parse; print(urllib.parse.unquote(sys.stdin.read().strip()))')
 	if [ -f "$FILE_PATH" ]; then
 		FILE_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null || echo 0)
 	fi
@@ -37,7 +37,7 @@ if IMAGE_MIME=$(wl-paste --list-types 2>/dev/null | grep '^image/' | head -1); t
 			*) EXT="img" ;;
 			esac
 
-			TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+			TIMESTAMP=$(date +%Y%m%d_%H%M%S_%N)
 			FILENAME="clipboard_${TIMESTAMP}.${EXT}"
 			BINARY_PATH="$DATA_DIR/$FILENAME"
 

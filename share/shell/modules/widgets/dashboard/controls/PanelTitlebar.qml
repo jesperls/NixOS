@@ -18,7 +18,6 @@ RowLayout {
 
     property var actions: []
 
-    default property alias customContent: customContentContainer.data
 
     signal toggleChanged(bool checked)
 
@@ -44,13 +43,6 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-    }
-
-    Item {
-        id: customContentContainer
-        Layout.preferredWidth: childrenRect.width
-        Layout.preferredHeight: childrenRect.height
-        visible: children.length > 0
     }
 
     Repeater {

@@ -15,7 +15,6 @@ ClippingRectangle {
     
     property bool animationsEnabled: true
 
-    readonly property alias celestialBodyItem: celestialBody
 
     radius: Styling.radius(0)
     clip: true
@@ -692,7 +691,7 @@ ClippingRectangle {
                 ctx.beginPath();
                 var steps = 60;
                 for (var i = 0; i <= steps; i++) {
-                    var angle = Math.PI - (Math.PI * i / steps);  // PI to 0
+                    var angle = Math.PI - (Math.PI * i / steps);
                     var x = cx + rx * Math.cos(angle);
                     var y = cy - ry * Math.sin(angle);
 
@@ -731,7 +730,7 @@ ClippingRectangle {
 
             property real progress: WeatherService.effectiveSunProgress
 
-            property real angle: Math.PI * (1 - progress)  // PI to 0
+            property real angle: Math.PI * (1 - progress)
             property real posX: arcContainer.arcCenterX + (arcContainer.arcWidth / 2) * Math.cos(angle) - width / 2
             property real posY: arcContainer.arcCenterY - arcContainer.arcHeight * Math.sin(angle) - height / 2
 

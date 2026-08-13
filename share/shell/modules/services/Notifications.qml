@@ -98,7 +98,6 @@ Singleton {
     component NotifTimer: Timer {
         required property int id
         property bool isPaused: false
-        property real startTime: Date.now()
 
         property var suspendConnections: Connections {
             target: SuspendManager
@@ -138,7 +137,6 @@ Singleton {
     property var popupList: list.filter(notif => notif.popup)
     property bool popupInhibited: silent
     property var latestTimeForApp: ({})
-    property var totalCounts: ({})
 
     onSilentChanged: if (StateService.initialized) StateService.set("dnd", root.silent)
 
@@ -164,6 +162,13 @@ Singleton {
         onLoaded: loadNotifications()
     }
 
+    function appendNotification(notif) {
+        root.list = [...root.list, notif];
+        if (root.list.length > 200) {
+            root.list = root.list.slice(root.list.length - 200);
+        }
+    }
+
     function stringifyList(list) {
         return JSON.stringify(list.map(notif => notifToJSON(notif)), null, 2);
     }
@@ -183,7 +188,7 @@ Singleton {
             "replaceKey": json.replaceKey || "",
             "cachedAppIcon": json.cachedAppIcon || "",
             "cachedImage": json.cachedImage || "",
-            "isCached": json.isCached || true,
+            "isCached": json.isCached === true,
             "popup": false
         });
     }
@@ -282,9 +287,7 @@ Singleton {
     }
 
     property var groupsByAppName: groupsForList(root.list)
-    property var popupGroupsByAppName: groupsForList(root.popupList)
     property var appNameList: appNameListForGroups(root.groupsByAppName)
-    property var popupAppNameList: appNameListForGroups(root.popupGroupsByAppName)
 
     property int idOffset
     property int internalIdCounter: 1
@@ -318,7 +321,7 @@ Singleton {
             });
 
             Qt.callLater(() => {
-                root.list = [...root.list, newNotifObject];
+                root.appendNotification(newNotifObject);
                 saveNotifications();
             });
 
@@ -326,7 +329,7 @@ Singleton {
                 newNotifObject.popup = true;
                 newNotifObject.timer = notifTimerComponent.createObject(root, {
                     "id": newNotifObject.id,
-                    "interval": notification.expireTimeout < 0 ? 5000 : notification.expireTimeout
+                    "interval": notification.expireTimeout === -1 ? 0 : (notification.expireTimeout || 5000)
                 });
             }
 
@@ -367,11 +370,11 @@ Singleton {
         if (newNotifObject.popup) {
             newNotifObject.timer = notifTimerComponent.createObject(root, {
                 "id": newNotifObject.id,
-                "interval": options.expireTimeout || 5000
+                "interval": options.expireTimeout === -1 ? 0 : (options.expireTimeout || 5000)
             });
         }
 
-        root.list = [...root.list, newNotifObject];
+        root.appendNotification(newNotifObject);
         saveNotifications();
         root.notify(newNotifObject);
         return newNotifObject;
@@ -461,18 +464,6 @@ Singleton {
         root.timeoutWithAnimation(id);
         timeoutAnimationTimer.notificationId = id;
         timeoutAnimationTimer.restart();
-    }
-
-    function timeoutAll() {
-        root.popupList.forEach(notif => {
-            root.timeout(notif.id);
-            notif.popup = false;
-            if (notif.timer) {
-                notif.timer.stop();
-                notif.timer.destroy();
-                notif.timer = null;
-            }
-        });
     }
 
     function attemptInvokeAction(id, notifIdentifier, autoDiscard = true) {

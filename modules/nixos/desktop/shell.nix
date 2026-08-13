@@ -12,6 +12,7 @@ lib.mkIf config.mySystem.desktop.shell.enable {
 
   fonts.packages = with pkgs; [
     ttf-phosphor-icons
+    inter
     roboto
     roboto-mono
     terminus_font_ttf

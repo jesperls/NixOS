@@ -1,5 +1,4 @@
 {
-  pkgs,
   osConfig,
   ...
 }:
@@ -52,7 +51,6 @@ in
 
   programs.fzf = {
     enable = true;
-    enableZshIntegration = true;
     defaultOptions = [
       "--height 40%"
       "--layout=reverse"
@@ -76,12 +74,10 @@ in
 
   programs.zoxide = {
     enable = true;
-    enableZshIntegration = true;
   };
 
   programs.direnv = {
     enable = true;
-    enableZshIntegration = true;
     nix-direnv.enable = true;
     config = {
       global = {

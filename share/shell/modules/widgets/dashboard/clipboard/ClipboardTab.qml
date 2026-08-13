@@ -100,7 +100,6 @@ Item {
         }
     }
 
-    property int previewImageSize: 200
 
     property string currentItemId: ""
     property string currentFullContent: ""
@@ -752,9 +751,9 @@ Item {
                         if (root.expandedItemIndex >= 0) {
                             let item = root.allItems[root.expandedItemIndex];
                             if (item) {
-                                let maxOptions = 4;  // Base: Copy, Pin, Alias, Delete
+                                let maxOptions = 4;
                                 if (item.isFile || item.isImage || ClipboardUtils.isUrl(item.preview)) {
-                                    maxOptions++;  // Add Open
+                                    maxOptions++;
                                 }
                                 if (root.selectedOptionIndex < maxOptions - 1) {
                                     root.selectedOptionIndex++;
@@ -1060,12 +1059,12 @@ Item {
                         height: {
                             let baseHeight = 48;
                             if (index === root.expandedItemIndex && !isInDeleteMode && !isInAliasMode) {
-                                var optionsCount = 4;  // Base: Copy, Pin, Alias, Delete
+                                var optionsCount = 4;
                                 if (modelData.isFile || modelData.isImage || ClipboardUtils.isUrl(modelData.preview)) {
-                                    optionsCount++;  // Add Open
+                                    optionsCount++;
                                 }
                                 var listHeight = 36 * Math.min(3, optionsCount);
-                                return baseHeight + 4 + listHeight + 8;  // base + spacing + list + bottom margin
+                                return baseHeight + 4 + listHeight + 8;
                             }
                             return baseHeight;
                         }
@@ -1608,7 +1607,7 @@ Item {
                                 Layout.preferredHeight: {
                                     var count = 4;  // Copy, Pin, Alias, Delete
                                     if (modelData.isFile || ClipboardUtils.isUrl(modelData.preview)) {
-                                        count++;  // Add Open
+                                        count++;
                                     }
                                     return 36 * Math.min(3, count);
                                 }

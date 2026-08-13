@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   osConfig,
   ...
@@ -7,13 +8,7 @@
 let
   mkAutostart = args: import ../lib/autostart.nix args;
 
-  cursorTheme = osConfig.mySystem.theme.gtk.cursorTheme;
-  cursorEnv = [
-    "XCURSOR_THEME=${cursorTheme.name}"
-    "XCURSOR_SIZE=${toString cursorTheme.size}"
-    "HYPRCURSOR_THEME=${cursorTheme.name}"
-    "HYPRCURSOR_SIZE=${toString cursorTheme.size}"
-  ];
+  cursorEnv = (import ../lib/cursor.nix { inherit lib osConfig; }).env;
 in
 {
   systemd.user.services = {

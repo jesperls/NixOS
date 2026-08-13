@@ -11,7 +11,8 @@ Singleton {
 
     property string lockCmd: Config.system.idle.general.lock_cmd ?? "pangu lock"
     property string beforeSleepCmd: Config.system.idle.general.before_sleep_cmd ?? "loginctl lock-session"
-    property string afterSleepCmd: Config.system.idle.general.after_sleep_cmd ?? "pangu screen on"
+
+    property int loginLockRestarts: 0
 
     property var loginLockProc: Process {
         id: loginLockProc
@@ -20,6 +21,8 @@ Singleton {
         onExited: exitCode => {
             if (exitCode !== 0) {
                 console.warn("loginlock.sh exited with code " + exitCode + ". Restarting...");
+                root.loginLockRestarts++;
+                loginLockRestartTimer.interval = Math.min(30000, 1000 * root.loginLockRestarts);
                 loginLockRestartTimer.start();
             }
         }
@@ -31,6 +34,8 @@ Singleton {
         repeat: false
         onTriggered: loginLockProc.running = true
     }
+
+    property int sleepMonitorRestarts: 0
 
     property var sleepMonitorProc: Process {
         id: sleepMonitorProc
@@ -52,6 +57,8 @@ Singleton {
         onExited: exitCode => {
             if (exitCode !== 0) {
                 console.warn("sleep_monitor.sh exited with code " + exitCode + ". Restarting...");
+                root.sleepMonitorRestarts++;
+                sleepMonitorRestartTimer.interval = Math.min(30000, 1000 * root.sleepMonitorRestarts);
                 sleepMonitorRestartTimer.start();
             }
         }
@@ -65,7 +72,7 @@ Singleton {
     }
 
     property int elapsedIdleTime: 0
-    property var triggeredListeners: []  // Keeps track of indices that have fired
+    property var triggeredListeners: []
 
     property var masterMonitor: IdleMonitor {
         id: masterMonitor
@@ -85,7 +92,7 @@ Singleton {
 
     property var idleTimer: Timer {
         id: idleTimer
-        interval: 1000  // 1 second tick
+        interval: 1000
         repeat: true
         onTriggered: {
             root.elapsedIdleTime += 1;
@@ -143,7 +150,7 @@ Singleton {
         if (idle.lock.enabled && idle.lock.timeout > 0)
             composed.push({
                 timeout: idle.lock.timeout,
-                onTimeout: "loginctl lock-session"
+                onTimeout: root.lockCmd
             });
         if (idle.screenOff.enabled && idle.screenOff.timeout > 0)
             composed.push({

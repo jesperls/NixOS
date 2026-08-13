@@ -130,48 +130,6 @@ Singleton {
         onTriggered: root.protectionTriggered = false
     }
 
-    function toggleMute() {
-        if (sink?.audio) {
-            sink.audio.muted = !sink.audio.muted;
-        }
-    }
-
-    function toggleMicMute() {
-        if (source?.audio) {
-            source.audio.muted = !source.audio.muted;
-        }
-    }
-
-    function incrementVolume() {
-        if (sink?.audio) {
-            const currentVolume = sink.audio.volume;
-            const step = currentVolume < 0.1 ? 0.01 : 0.02;
-            sink.audio.volume = Math.min(1, sink.audio.volume + step);
-        }
-    }
-
-    function decrementVolume() {
-        if (sink?.audio) {
-            const currentVolume = sink.audio.volume;
-            const step = currentVolume < 0.1 ? 0.01 : 0.02;
-            sink.audio.volume = Math.max(0, sink.audio.volume - step);
-        }
-    }
-
-    function setVolume(volume: real) {
-        if (sink?.audio) {
-            const current = sink.audio.volume;
-            const safeVolume = protectedSetVolume(sink, volume, current);
-            sink.audio.volume = Math.max(0, Math.min(hardMaxValue, safeVolume));
-        }
-    }
-
-    function setMicVolume(volume: real) {
-        if (source?.audio) {
-            source.audio.volume = Math.max(0, Math.min(hardMaxValue, volume));
-        }
-    }
-
     function setNodeVolume(node, volume: real) {
         if (node?.audio) {
             const current = node.audio.volume;

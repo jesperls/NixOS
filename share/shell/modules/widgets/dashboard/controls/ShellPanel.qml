@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import qs.modules.theme
 import qs.modules.components
+import qs.modules.services
 import qs.modules.globals
 import qs.config
 
@@ -703,6 +704,10 @@ Item {
                         spacing: 8
 
                         SectionButton {
+                            text: "Layout Presets"
+                            sectionId: "presets"
+                        }
+                        SectionButton {
                             text: "Bar"
                             sectionId: "bar"
                         }
@@ -723,6 +728,14 @@ Item {
                             sectionId: "overview"
                         }
                         SectionButton {
+                            text: "Dashboard"
+                            sectionId: "dashboard"
+                        }
+                        SectionButton {
+                            text: "Launcher"
+                            sectionId: "launcher"
+                        }
+                        SectionButton {
                             text: "Dock"
                             sectionId: "dock"
                         }
@@ -735,12 +748,356 @@ Item {
                             sectionId: "desktop"
                         }
                         SectionButton {
+                            text: "OSD"
+                            sectionId: "osd"
+                        }
+                        SectionButton {
                             text: "System"
                             sectionId: "system"
                         }
                         SectionButton {
                             text: "About"
                             sectionId: "about"
+                        }
+                    }
+
+                    ColumnLayout {
+                        id: presetsSection
+                        visible: root.currentSection === "presets"
+                        property string settingsSection: "presets"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        property bool saveVisible: false
+                        property string presetName: ""
+                        property string presetDescription: ""
+                        property string saveMessage: ""
+
+                        Text {
+                            text: "Layout Presets"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: "Overhaul the shell in one click. Apply a preset to restyle everything, or save your current layout as a new preset."
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            color: Colors.overSurfaceVariant
+                            wrapMode: Text.WordWrap
+                        }
+
+                        StyledRect {
+                            id: savePresetCard
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 44
+                            radius: Styling.radius(0)
+                            variant: savePresetCard.isHovered ? "focus" : "primary"
+
+                            property bool isHovered: false
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: 16
+                                spacing: 12
+
+                                Text {
+                                    text: presetsSection.saveVisible ? Icons.caretUp : Icons.plus
+                                    font.family: Icons.font
+                                    font.pixelSize: 18
+                                    color: savePresetCard.item
+                                }
+
+                                Text {
+                                    text: "Save current layout"
+                                    font.family: Config.theme.font
+                                    font.pixelSize: Styling.fontSize(0)
+                                    font.bold: true
+                                    color: savePresetCard.item
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onEntered: savePresetCard.isHovered = true
+                                onExited: savePresetCard.isHovered = false
+                                onClicked: {
+                                    presetsSection.saveVisible = !presetsSection.saveVisible;
+                                    presetsSection.saveMessage = "";
+                                }
+                            }
+                        }
+
+                        StyledRect {
+                            visible: presetsSection.saveVisible
+                            variant: "pane"
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: saveForm.implicitHeight + 24
+                            radius: Styling.radius(0)
+
+                            ColumnLayout {
+                                id: saveForm
+                                anchors.fill: parent
+                                anchors.margins: 16
+                                spacing: 8
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: "New preset"
+                                    font.family: Config.theme.font
+                                    font.pixelSize: Styling.fontSize(-1)
+                                    font.weight: Font.Medium
+                                    color: Colors.overSurfaceVariant
+                                }
+
+                                StyledRect {
+                                    variant: "common"
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 32
+                                    radius: Styling.radius(-2)
+
+                                    TextInput {
+                                        id: presetNameInput
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        font.family: Config.theme.font
+                                        font.pixelSize: Styling.fontSize(0)
+                                        color: Colors.overBackground
+                                        selectByMouse: true
+                                        clip: true
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        text: presetsSection.presetName
+                                        onTextChanged: presetsSection.presetName = text
+
+                                        Text {
+                                            anchors.fill: parent
+                                            verticalAlignment: Text.AlignVCenter
+                                            text: "Name"
+                                            font: parent.font
+                                            color: Colors.overSurfaceVariant
+                                            visible: !parent.text && !parent.activeFocus
+                                        }
+                                    }
+                                }
+
+                                StyledRect {
+                                    variant: "common"
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 32
+                                    radius: Styling.radius(-2)
+
+                                    TextInput {
+                                        id: presetDescriptionInput
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        font.family: Config.theme.font
+                                        font.pixelSize: Styling.fontSize(0)
+                                        color: Colors.overBackground
+                                        selectByMouse: true
+                                        clip: true
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        text: presetsSection.presetDescription
+                                        onTextChanged: presetsSection.presetDescription = text
+
+                                        Text {
+                                            anchors.fill: parent
+                                            verticalAlignment: Text.AlignVCenter
+                                            text: "Description (optional)"
+                                            font: parent.font
+                                            color: Colors.overSurfaceVariant
+                                            visible: !parent.text && !parent.activeFocus
+                                        }
+                                    }
+                                }
+
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 8
+
+                                    StyledRect {
+                                        variant: isHovered ? "primaryfocus" : "primary"
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 36
+                                        radius: Styling.radius(0)
+
+                                        property bool isHovered: false
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Save"
+                                            font.family: Config.theme.font
+                                            font.pixelSize: Styling.fontSize(0)
+                                            font.bold: true
+                                            color: parent.item
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onEntered: parent.isHovered = true
+                                            onExited: parent.isHovered = false
+                                            onClicked: {
+                                                const id = LayoutPresets.saveCurrent(presetsSection.presetName, presetsSection.presetDescription);
+                                                if (id) {
+                                                    const savedName = presetsSection.presetName;
+                                                    presetsSection.presetName = "";
+                                                    presetsSection.presetDescription = "";
+                                                    presetsSection.saveMessage = "Saved \"" + savedName + "\"";
+                                                    presetsSection.saveVisible = false;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    StyledRect {
+                                        variant: isHovered ? "focus" : "common"
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 36
+                                        radius: Styling.radius(0)
+
+                                        property bool isHovered: false
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Cancel"
+                                            font.family: Config.theme.font
+                                            font.pixelSize: Styling.fontSize(0)
+                                            color: parent.item
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onEntered: parent.isHovered = true
+                                            onExited: parent.isHovered = false
+                                            onClicked: presetsSection.saveVisible = false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: presetsSection.saveMessage
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            color: Colors.success
+                            visible: presetsSection.saveMessage !== ""
+                        }
+
+                        Repeater {
+                            model: LayoutPresets.presets
+
+                            delegate: StyledRect {
+                                id: presetCard
+                                required property var modelData
+                                required property int index
+
+                                property bool isHovered: false
+                                readonly property bool isUserPreset: !LayoutPresets.isBuiltin(presetCard.modelData.id)
+
+                                variant: isHovered ? "focus" : "pane"
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: presetContent.implicitHeight + 24
+                                radius: Styling.radius(0)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onEntered: presetCard.isHovered = true
+                                    onExited: presetCard.isHovered = false
+                                    onClicked: LayoutPresets.apply(presetCard.modelData.id)
+                                }
+
+                                RowLayout {
+                                    id: presetContent
+                                    anchors.fill: parent
+                                    anchors.margins: 16
+                                    spacing: 16
+
+                                    Text {
+                                        text: presetCard.modelData.icon
+                                        font.family: Icons.font
+                                        font.pixelSize: 24
+                                        color: Styling.srItem("overprimary")
+                                        Layout.alignment: Qt.AlignVCenter
+                                    }
+
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 2
+
+                                        RowLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 8
+
+                                            Text {
+                                                text: presetCard.modelData.name
+                                                font.family: Config.theme.font
+                                                font.pixelSize: Styling.fontSize(0)
+                                                font.bold: true
+                                                color: Colors.overBackground
+                                            }
+
+                                            Text {
+                                                text: "User"
+                                                font.family: Config.theme.font
+                                                font.pixelSize: Styling.fontSize(-3)
+                                                color: Styling.srItem("overprimary")
+                                                visible: presetCard.isUserPreset
+                                            }
+                                        }
+
+                                        Text {
+                                            Layout.fillWidth: true
+                                            text: presetCard.modelData.description
+                                            font.family: Config.theme.font
+                                            font.pixelSize: Styling.fontSize(-1)
+                                            color: Colors.overSurfaceVariant
+                                            wrapMode: Text.WordWrap
+                                        }
+                                    }
+
+                                    StyledRect {
+                                        id: deleteButton
+                                        visible: presetCard.isUserPreset
+                                        Layout.alignment: Qt.AlignVCenter
+                                        Layout.preferredWidth: 32
+                                        Layout.preferredHeight: 32
+                                        radius: Styling.radius(-4)
+                                        variant: deleteButton.isHovered ? "errorfocus" : "common"
+
+                                        property bool isHovered: false
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: Icons.trash
+                                            font.family: Icons.font
+                                            font.pixelSize: 16
+                                            color: deleteButton.item
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onEntered: deleteButton.isHovered = true
+                                            onExited: deleteButton.isHovered = false
+                                            onClicked: LayoutPresets.deletePreset(presetCard.modelData.id)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -802,6 +1159,69 @@ Item {
                                 if (newValue !== Config.bar.height) {
                                     GlobalStates.markShellChanged();
                                     Config.bar.height = newValue;
+                                }
+                            }
+                        }
+
+                        SelectorRow {
+                            label: "Bar Style"
+                            options: [
+                                {
+                                    label: "Floating",
+                                    value: "floating"
+                                },
+                                {
+                                    label: "Docked",
+                                    value: "docked"
+                                }
+                            ]
+                            value: Config.bar.style ?? "floating"
+                            onValueSelected: newValue => {
+                                if (newValue !== Config.bar.style) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.style = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Bar Margin"
+                            value: Config.bar.margin ?? 4
+                            minValue: 0
+                            maxValue: 64
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.bar.margin) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.margin = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Bar Spacing"
+                            value: Config.bar.spacing ?? 4
+                            minValue: 0
+                            maxValue: 32
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.bar.spacing) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.spacing = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Bar Padding"
+                            value: Config.bar.padding ?? 4
+                            minValue: 0
+                            maxValue: 32
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.bar.padding) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.padding = newValue;
                                 }
                             }
                         }
@@ -877,6 +1297,74 @@ Item {
                             }
                         }
 
+                        SelectorRow {
+                            label: "Clock Position"
+                            options: [
+                                {
+                                    label: "Right",
+                                    value: "right",
+                                    icon: Icons.arrowRight
+                                },
+                                {
+                                    label: "Center",
+                                    value: "center",
+                                    icon: Icons.alignCenter
+                                }
+                            ]
+                            value: Config.bar.clockPosition ?? "right"
+                            onValueSelected: newValue => {
+                                if (newValue !== Config.bar.clockPosition) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.clockPosition = newValue;
+                                }
+                            }
+                        }
+
+                        SelectorRow {
+                            label: "Launcher Position"
+                            options: [
+                                {
+                                    label: "Start",
+                                    value: "start",
+                                    icon: Icons.alignLeft
+                                },
+                                {
+                                    label: "End",
+                                    value: "end",
+                                    icon: Icons.alignRight
+                                }
+                            ]
+                            value: Config.bar.launcherPosition ?? "start"
+                            onValueSelected: newValue => {
+                                if (newValue !== Config.bar.launcherPosition) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.launcherPosition = newValue;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Flat Buttons"
+                            checked: Config.bar.flatButtons ?? false
+                            onToggled: value => {
+                                if (value !== Config.bar.flatButtons) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.flatButtons = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Workspaces"
+                            checked: Config.bar.showWorkspaces ?? true
+                            onToggled: value => {
+                                if (value !== Config.bar.showWorkspaces) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.showWorkspaces = value;
+                                }
+                            }
+                        }
+
                         ToggleRow {
                             label: "Use 12h Format"
                             checked: Config.bar.use12hFormat ?? false
@@ -884,6 +1372,28 @@ Item {
                                 if (value !== Config.bar.use12hFormat) {
                                     GlobalStates.markShellChanged();
                                     Config.bar.use12hFormat = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Seconds"
+                            checked: Config.bar.showSeconds ?? false
+                            onToggled: value => {
+                                if (value !== Config.bar.showSeconds) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.showSeconds = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Date"
+                            checked: Config.bar.showDate ?? false
+                            onToggled: value => {
+                                if (value !== Config.bar.showDate) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.showDate = value;
                                 }
                             }
                         }
@@ -969,6 +1479,20 @@ Item {
                                 if (newValue !== Config.bar.hoverRegionHeight) {
                                     GlobalStates.markShellChanged();
                                     Config.bar.hoverRegionHeight = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Hide Delay"
+                            value: Config.bar.hideDelay ?? 1000
+                            minValue: 0
+                            maxValue: 5000
+                            suffix: "ms"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.bar.hideDelay) {
+                                    GlobalStates.markShellChanged();
+                                    Config.bar.hideDelay = newValue;
                                 }
                             }
                         }
@@ -1182,6 +1706,34 @@ Item {
                             }
                         }
 
+                        NumberInputRow {
+                            label: "Hide Delay"
+                            value: Config.notch.hideDelay ?? 1000
+                            minValue: 0
+                            maxValue: 5000
+                            suffix: "ms"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.notch.hideDelay) {
+                                    GlobalStates.markShellChanged();
+                                    Config.notch.hideDelay = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Hover Expansion Delay"
+                            value: Config.notch.hoverExpansionDelay ?? 400
+                            minValue: 0
+                            maxValue: 5000
+                            suffix: "ms"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.notch.hoverExpansionDelay) {
+                                    GlobalStates.markShellChanged();
+                                    Config.notch.hoverExpansionDelay = newValue;
+                                }
+                            }
+                        }
+
                         ToggleRow {
                             label: "Keep Hidden"
                             checked: Config.notch.keepHidden ?? false
@@ -1195,11 +1747,57 @@ Item {
 
                         ToggleRow {
                             label: "Disable Hover Expansion"
-                            checked: Config.notch.disableHoverExpansion ?? true
+                            checked: Config.notch.disableHoverExpansion ?? false
                             onToggled: value => {
                                 if (value !== Config.notch.disableHoverExpansion) {
                                     GlobalStates.markShellChanged();
                                     Config.notch.disableHoverExpansion = value;
+                                }
+                            }
+                        }
+
+                        Separator {
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            text: "Collapsed Content"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        ToggleRow {
+                            label: "Show User"
+                            checked: Config.notch.showUser ?? true
+                            onToggled: value => {
+                                if (value !== Config.notch.showUser) {
+                                    GlobalStates.markShellChanged();
+                                    Config.notch.showUser = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Media Player"
+                            checked: Config.notch.showMedia ?? true
+                            onToggled: value => {
+                                if (value !== Config.notch.showMedia) {
+                                    GlobalStates.markShellChanged();
+                                    Config.notch.showMedia = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Notification Indicator"
+                            checked: Config.notch.showNotificationIndicator ?? true
+                            onToggled: value => {
+                                if (value !== Config.notch.showNotificationIndicator) {
+                                    GlobalStates.markShellChanged();
+                                    Config.notch.showNotificationIndicator = value;
                                 }
                             }
                         }
@@ -1434,7 +2032,7 @@ Item {
                                 progressColor: Styling.srItem("overprimary")
                                 tooltipText: `${(value * 0.2).toFixed(2)}`
                                 scroll: true
-                                stepSize: 0.05  // 0.05 * 0.2 = 0.01 scale steps
+                                stepSize: 0.05
                                 snapMode: "always"
 
                                 readonly property real configValue: (Config.overview.scale ?? 0.1) / 0.2
@@ -1476,6 +2074,234 @@ Item {
                                 if (newValue !== Config.overview.workspaceSpacing) {
                                     GlobalStates.markShellChanged();
                                     Config.overview.workspaceSpacing = newValue;
+                                }
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "dashboard"
+                        property string settingsSection: "dashboard"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "Dashboard"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        NumberInputRow {
+                            label: "Dashboard Width (0 = auto)"
+                            value: Config.dashboard.width ?? 0
+                            minValue: 0
+                            maxValue: 2000
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.dashboard.width) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dashboard.width = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Dashboard Height (0 = auto)"
+                            value: Config.dashboard.height ?? 0
+                            minValue: 0
+                            maxValue: 2000
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.dashboard.height) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dashboard.height = newValue;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Tab Rail"
+                            checked: Config.dashboard.showTabRail ?? true
+                            onToggled: value => {
+                                if (value !== Config.dashboard.showTabRail) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dashboard.showTabRail = value;
+                                }
+                            }
+                        }
+
+                        SelectorRow {
+                            label: "Tab Rail Position"
+                            options: [
+                                {
+                                    label: "Left",
+                                    value: "left",
+                                    icon: Icons.arrowLeft
+                                },
+                                {
+                                    label: "Right",
+                                    value: "right",
+                                    icon: Icons.arrowRight
+                                },
+                                {
+                                    label: "Top",
+                                    value: "top",
+                                    icon: Icons.arrowUp
+                                },
+                                {
+                                    label: "Bottom",
+                                    value: "bottom",
+                                    icon: Icons.arrowDown
+                                }
+                            ]
+                            value: Config.dashboard.tabPosition ?? "left"
+                            onValueSelected: newValue => {
+                                if (newValue !== Config.dashboard.tabPosition) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dashboard.tabPosition = newValue;
+                                }
+                            }
+                        }
+
+                        Separator {
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            text: "Tabs"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        ToggleRow {
+                            label: "Show Widgets Tab"
+                            checked: Config.dashboard.showWidgets ?? true
+                            onToggled: value => {
+                                if (value !== Config.dashboard.showWidgets) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dashboard.showWidgets = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Wallpapers Tab"
+                            checked: Config.dashboard.showWallpapers ?? true
+                            onToggled: value => {
+                                if (value !== Config.dashboard.showWallpapers) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dashboard.showWallpapers = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Metrics Tab"
+                            checked: Config.dashboard.showMetrics ?? true
+                            onToggled: value => {
+                                if (value !== Config.dashboard.showMetrics) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dashboard.showMetrics = value;
+                                }
+                            }
+                        }
+
+                        Separator {
+                            Layout.fillWidth: true
+                        }
+
+                        Text {
+                            text: "Background"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        NumberInputRow {
+                            label: "Background Opacity"
+                            value: Math.round((Config.dashboard.backgroundOpacity ?? 1.0) * 100)
+                            minValue: 0
+                            maxValue: 100
+                            suffix: "%"
+                            onValueEdited: newValue => {
+                                const v = newValue / 100;
+                                if (v !== Config.dashboard.backgroundOpacity) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dashboard.backgroundOpacity = v;
+                                }
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "launcher"
+                        property string settingsSection: "launcher"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "Launcher"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        NumberInputRow {
+                            label: "Launcher Width (0 = auto)"
+                            value: Config.launcher.width ?? 0
+                            minValue: 0
+                            maxValue: 2000
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.launcher.width) {
+                                    GlobalStates.markShellChanged();
+                                    Config.launcher.width = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Launcher Height (0 = auto)"
+                            value: Config.launcher.height ?? 0
+                            minValue: 0
+                            maxValue: 2000
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.launcher.height) {
+                                    GlobalStates.markShellChanged();
+                                    Config.launcher.height = newValue;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show App Comments"
+                            checked: Config.launcher.showAppComments ?? true
+                            onToggled: value => {
+                                if (value !== Config.launcher.showAppComments) {
+                                    GlobalStates.markShellChanged();
+                                    Config.launcher.showAppComments = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Sort by Usage"
+                            checked: Config.launcher.sortByUsage ?? true
+                            onToggled: value => {
+                                if (value !== Config.launcher.sortByUsage) {
+                                    GlobalStates.markShellChanged();
+                                    Config.launcher.sortByUsage = value;
                                 }
                             }
                         }
@@ -1657,6 +2483,21 @@ Item {
                             }
                         }
 
+                        NumberInputRow {
+                            label: "Hide Delay"
+                            visible: (Config.dock.theme ?? "default") !== "integrated"
+                            value: Config.dock.hideDelay ?? 1000
+                            minValue: 0
+                            maxValue: 5000
+                            suffix: "ms"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.dock.hideDelay) {
+                                    GlobalStates.markShellChanged();
+                                    Config.dock.hideDelay = newValue;
+                                }
+                            }
+                        }
+
                         ToggleRow {
                             label: "Pinned on Startup"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
@@ -1806,6 +2647,17 @@ Item {
                         }
 
                         ToggleRow {
+                            label: "Show Date"
+                            checked: Config.lockscreen.showDate ?? true
+                            onToggled: value => {
+                                if (value !== Config.lockscreen.showDate) {
+                                    GlobalStates.markShellChanged();
+                                    Config.lockscreen.showDate = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
                             label: "Show Media Player"
                             checked: Config.lockscreen.showMediaPlayer ?? true
                             onToggled: value => {
@@ -1823,6 +2675,17 @@ Item {
                                 if (value !== Config.lockscreen.showAvatar) {
                                     GlobalStates.markShellChanged();
                                     Config.lockscreen.showAvatar = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Username"
+                            checked: Config.lockscreen.showUsername ?? true
+                            onToggled: value => {
+                                if (value !== Config.lockscreen.showUsername) {
+                                    GlobalStates.markShellChanged();
+                                    Config.lockscreen.showUsername = value;
                                 }
                             }
                         }
@@ -1940,6 +2803,107 @@ Item {
                                             Config.desktop.textColor = color;
                                         }
                                     });
+                                }
+                            }
+                        }
+                    }
+
+                    Separator {
+                        Layout.fillWidth: true
+                        visible: false
+                    }
+
+                    ColumnLayout {
+                        visible: root.currentSection === "osd"
+                        property string settingsSection: "osd"
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "OSD"
+                            font.family: Config.theme.font
+                            font.pixelSize: Styling.fontSize(-1)
+                            font.weight: Font.Medium
+                            color: Colors.overSurfaceVariant
+                            Layout.bottomMargin: -4
+                        }
+
+                        SelectorRow {
+                            label: "Position"
+                            options: [
+                                {
+                                    label: "Bottom",
+                                    value: "bottom",
+                                    icon: Icons.arrowDown
+                                },
+                                {
+                                    label: "Top",
+                                    value: "top",
+                                    icon: Icons.arrowUp
+                                }
+                            ]
+                            value: Config.osd.position ?? "bottom"
+                            onValueSelected: newValue => {
+                                if (newValue !== Config.osd.position) {
+                                    GlobalStates.markShellChanged();
+                                    Config.osd.position = newValue;
+                                }
+                            }
+                        }
+
+                        NumberInputRow {
+                            label: "Width"
+                            value: Config.osd.width ?? 260
+                            minValue: 180
+                            maxValue: 480
+                            suffix: "px"
+                            onValueEdited: newValue => {
+                                if (newValue !== Config.osd.width) {
+                                    GlobalStates.markShellChanged();
+                                    Config.osd.width = newValue;
+                                }
+                            }
+                        }
+
+                        SelectorRow {
+                            label: "Icon Style"
+                            options: [
+                                {
+                                    label: "Chip",
+                                    value: "chip"
+                                },
+                                {
+                                    label: "Plain",
+                                    value: "plain"
+                                }
+                            ]
+                            value: Config.osd.iconStyle ?? "chip"
+                            onValueSelected: newValue => {
+                                if (newValue !== Config.osd.iconStyle) {
+                                    GlobalStates.markShellChanged();
+                                    Config.osd.iconStyle = newValue;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Percentage"
+                            checked: Config.osd.showPercentage ?? true
+                            onToggled: value => {
+                                if (value !== Config.osd.showPercentage) {
+                                    GlobalStates.markShellChanged();
+                                    Config.osd.showPercentage = value;
+                                }
+                            }
+                        }
+
+                        ToggleRow {
+                            label: "Show Slider"
+                            checked: Config.osd.showSlider ?? true
+                            onToggled: value => {
+                                if (value !== Config.osd.showSlider) {
+                                    GlobalStates.markShellChanged();
+                                    Config.osd.showSlider = value;
                                 }
                             }
                         }

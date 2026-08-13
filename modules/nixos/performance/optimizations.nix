@@ -5,7 +5,7 @@ let
   mkBase = lib.mkOverride 500; # beats nixpkgs' mkDefault sysctls, loses to a host's plain assignment
 in
 {
-  fileSystems."/".options = lib.mkIf cfg.noatime [ "noatime" ]; # mkIf, not optional: the option is a non-empty list
+  fileSystems."/".options = lib.mkIf cfg.noatime.enable [ "noatime" ]; # mkIf, not optional: the option is a non-empty list
 
   zramSwap = lib.mkIf cfg.zram.enable {
     enable = true;

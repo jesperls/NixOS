@@ -17,10 +17,15 @@ Item {
     id: root
 
     required property ShellScreen screen
-    property bool unifiedEffectActive: false
-    
+
     readonly property bool keepHidden: Config.dock?.keepHidden ?? false
     property bool pinned: Config.dock?.pinnedOnStartup ?? false
+
+    onPinnedChanged: {
+        if (Config.dock && Config.dock.pinnedOnStartup !== pinned) {
+            Config.dock.pinnedOnStartup = pinned;
+        }
+    }
 
     readonly property string theme: Config.dock?.theme ?? "default"
     readonly property bool isFloating: theme === "floating"
@@ -78,15 +83,19 @@ Item {
 
     readonly property bool hasWindows: toplevels.length > 0
 
-    readonly property bool activeWindowFullscreen: {
-        if (!compositorMonitor || !toplevels) return false;
+    readonly property bool activeWindowFullscreen: Compositor.hasFullscreenWindow(screen)
 
-        for (var i = 0; i < toplevels.length; i++) {
-            if (toplevels[i].fullscreen == true) {
-               return true;
+    property bool hoverActive: false
+
+    Timer {
+        id: hideDelayTimer
+        interval: Config.dock?.hideDelay ?? 1000
+        repeat: false
+        onTriggered: {
+            if (!dockMouseArea.containsMouse) {
+                root.hoverActive = false;
             }
         }
-        return false;
     }
 
     property bool reveal: {
@@ -95,10 +104,10 @@ Item {
         }
 
         if (keepHidden) {
-            return (Config.dock?.hoverToReveal && dockMouseArea.containsMouse);
+            return (Config.dock?.hoverToReveal && (dockMouseArea.containsMouse || root.hoverActive));
         }
 
-        return root.pinned || (Config.dock?.hoverToReveal && dockMouseArea.containsMouse) || !hasWindows
+        return root.pinned || (Config.dock?.hoverToReveal && (dockMouseArea.containsMouse || root.hoverActive)) || !hasWindows
     }
 
     readonly property int totalMargin: root.windowSideMargin + root.edgeSideMargin
@@ -122,8 +131,20 @@ Item {
         id: dockMouseArea
         hoverEnabled: true
 
-        width: root.isVertical ? (root.reveal ? root.dockSize + root.totalMargin + root.shadowSpace : (Config.dock?.hoverRegionHeight ?? 4) + root.frameOffset) : dockContent.implicitWidth + 20
-        height: root.isVertical ? dockContent.implicitHeight + 20 : (root.reveal ? root.dockSize + root.totalMargin + root.shadowSpace : (Config.dock?.hoverRegionHeight ?? 4) + root.frameOffset)
+        onEntered: {
+            hideDelayTimer.stop();
+            root.hoverActive = true;
+        }
+        onExited: {
+            if (!root.pinned && root.hasWindows) {
+                hideDelayTimer.restart();
+            } else {
+                root.hoverActive = false;
+            }
+        }
+
+        width: root.isVertical ? (root.reveal ? root.dockSize + root.totalMargin + root.shadowSpace : (Config.dock?.hoverRegionHeight ?? 8) + root.frameOffset) : dockContent.implicitWidth + 20
+        height: root.isVertical ? dockContent.implicitHeight + 20 : (root.reveal ? root.dockSize + root.totalMargin + root.shadowSpace : (Config.dock?.hoverRegionHeight ?? 8) + root.frameOffset)
 
         x: {
             const base = root.isBottom ? (parent.width - width) / 2 : (root.isLeft ? 0 : parent.width - width);
@@ -363,7 +384,7 @@ Item {
                 anchors.fill: parent
                 variant: "bg"
                 radius: Styling.radius(4)
-                enableBorder: !root.unifiedEffectActive
+                enableBorder: true
             }
 
             RowLayout {
@@ -643,7 +664,7 @@ Item {
                 readonly property int borderWidth: borderData[1]
                 readonly property color borderColor: Config.resolveColor(borderData[0])
 
-                visible: root.isDefault && borderWidth > 0 && !root.unifiedEffectActive
+                visible: root.isDefault && borderWidth > 0
 
                 onPaint: {
                     if (!root.isDefault) return;

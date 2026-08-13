@@ -33,38 +33,6 @@ function formatTimestamp(isoTimestamp) {
     }
 }
 
-function sanitizeFilename(title) {
-    return title
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .substring(0, 50);
-}
-
-function getPreview(content, maxLength) {
-    if (!content) return "";
-    maxLength = maxLength || 100;
-    
-    var lines = content.split('\n');
-    var preview = "";
-    
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        if (line && !line.startsWith('#')) {
-            preview = line;
-            break;
-        }
-        if (line.startsWith('#') && !preview) {
-            preview = line.replace(/^#+\s*/, '');
-        }
-    }
-    
-    if (preview.length > maxLength) {
-        return preview.substring(0, maxLength) + "...";
-    }
-    return preview;
-}
-
 function parseIndex(jsonString) {
     try {
         var data = JSON.parse(jsonString);
@@ -82,15 +50,6 @@ function parseIndex(jsonString) {
 
 function serializeIndex(indexData) {
     return JSON.stringify(indexData, null, 2);
-}
-
-function createNoteEntry(title) {
-    var now = getCurrentTimestamp();
-    return {
-        title: title || "Untitled Note",
-        created: now,
-        modified: now
-    };
 }
 
 function filterNotes(notes, searchText) {

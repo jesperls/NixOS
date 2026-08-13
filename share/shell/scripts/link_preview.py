@@ -7,6 +7,7 @@ Includes special support for YouTube, Twitter, and other oEmbed services.
 
 import json
 import re
+import socket
 import sys
 import urllib.error
 import urllib.request
@@ -232,6 +233,17 @@ def fetch_preview(url, timeout=5):
         if not parsed.scheme or not parsed.netloc:
             return {"error": "Invalid URL"}
 
+        if parsed.scheme not in ("http", "https"):
+            return {"error": "Unsupported scheme"}
+
+        try:
+            for addr in socket.getaddrinfo(parsed.hostname, None):
+                ip = addr[4][0]
+                if ip.startswith(("127.", "10.", "192.168.", "169.254.", "0.", "::1", "fe80", "fc", "fd")):
+                    return {"error": "Blocked address"}
+        except OSError:
+            return {"error": "Invalid host"}
+
         if is_youtube_url(url):
             result = fetch_youtube_metadata(url, timeout)
             if result:
@@ -255,6 +267,14 @@ def fetch_preview(url, timeout=5):
         with urllib.request.urlopen(req, timeout=timeout) as response:
             final_url = response.geturl()
             final_parsed = urlparse(final_url)
+
+            try:
+                for addr in socket.getaddrinfo(final_parsed.hostname, None):
+                    ip = addr[4][0]
+                    if ip.startswith(("127.", "10.", "192.168.", "169.254.", "0.", "::1", "fe80", "fc", "fd")):
+                        return {"error": "Blocked address"}
+            except OSError:
+                return {"error": "Invalid host"}
 
             content_type = response.headers.get("Content-Type", "")
             if "text/html" not in content_type:

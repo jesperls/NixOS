@@ -4,8 +4,6 @@
   networking = {
     hostName = config.mySystem.system.hostName;
     networkmanager.enable = true;
-
-    firewall.enable = true;
   };
 
   services.openssh = {

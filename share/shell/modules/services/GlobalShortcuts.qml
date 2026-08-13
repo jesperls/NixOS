@@ -169,27 +169,6 @@ QtObject {
         }
     }
 
-    function toggleDashboardWithPrefix(prefix) {
-        const isActive = Visibilities.currentActiveModule === "dashboard";
-        
-        if (isActive && GlobalStates.dashboardCurrentTab === 0 && GlobalStates.launcherSearchText === prefix) {
-            Visibilities.setActiveModule("");
-            GlobalStates.clearLauncherState();
-            return;
-        }
-
-        GlobalStates.dashboardCurrentTab = 0;
-        
-        if (!isActive) {
-            Visibilities.setActiveModule("dashboard");
-            Qt.callLater(() => {
-                GlobalStates.launcherSearchText = prefix;
-            });
-        } else {
-            GlobalStates.launcherSearchText = prefix;
-        }
-    }
-
     function seekActivePlayer(offset) {
         const player = MprisController.activePlayer;
         if (!player || !player.canSeek) {

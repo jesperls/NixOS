@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ lib, ... }:
 
 {
   options.mySystem.performance = {
@@ -9,15 +9,8 @@
           "intel"
         ]
       );
-      default =
-        if config.hardware.cpu.amd.updateMicrocode then
-          "amd"
-        else if config.hardware.cpu.intel.updateMicrocode then
-          "intel"
-        else
-          null;
-      defaultText = lib.literalMD "detected from `hardware-configuration.nix`";
-      description = "Which vendor's pstate driver to request on the kernel command line.";
+      default = null;
+      description = "Which vendor's pstate driver to request on the kernel command line; null keeps the kernel default.";
     };
 
     scheduler = lib.mkOption {
@@ -85,22 +78,28 @@
       };
     };
 
-    ananicy = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Auto-nice daemon with the CachyOS rule set, so background jobs cannot starve the compositor.";
+    ananicy = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Auto-nice daemon with the CachyOS rule set, so background jobs cannot starve the compositor.";
+      };
     };
 
-    irqbalance = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Spread hardware interrupts across cores instead of leaving them on CPU0.";
+    irqbalance = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Spread hardware interrupts across cores instead of leaving them on CPU0.";
+      };
     };
 
-    noatime = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Mount the root filesystem noatime.";
+    noatime = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Mount the root filesystem noatime.";
+      };
     };
 
     zram = {

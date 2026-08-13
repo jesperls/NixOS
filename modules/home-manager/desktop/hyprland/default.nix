@@ -8,21 +8,18 @@
 let
   toLua = lib.generators.toLua { };
   theme = osConfig.mySystem.theme;
-  hyprSettings = import ./settings.nix {
+  hyprlandConfig = import ./settings.nix {
     inherit
       lib
       osConfig
       ;
   };
   apps = osConfig.mySystem.defaultApps;
-  gaming = osConfig.mySystem.desktop.gaming;
+  tearing = osConfig.mySystem.desktop.tearing;
   layouts = osConfig.mySystem.desktop.layouts;
   autoFakeFullscreen = osConfig.mySystem.desktop.autoFakeFullscreen;
   primaryMonitor =
-    let
-      enabled = builtins.filter (m: !m.disabled) osConfig.mySystem.monitors;
-    in
-    if enabled != [ ] then lib.head enabled else null;
+    if hyprlandConfig.activeMonitors == [ ] then null else lib.head hyprlandConfig.activeMonitors;
   singleWindowRatio =
     if primaryMonitor == null then
       [
@@ -30,12 +27,9 @@ let
         9
       ]
     else
-      let
-        parts = lib.splitString "x" primaryMonitor.resolution;
-      in
       [
-        (layouts.centered.masterWidth * (lib.toInt (lib.elemAt parts 0)))
-        (lib.toInt (lib.elemAt parts 1))
+        (layouts.centered.masterWidth * hyprlandConfig.monitorWidth primaryMonitor)
+        (lib.toInt (lib.elemAt (lib.splitString "x" primaryMonitor.resolution) 1))
       ];
   input = osConfig.mySystem.desktop.input;
   generatedState = {
@@ -56,9 +50,9 @@ let
       file_manager = apps.fileManager.command;
       editor = apps.editor.command;
     };
-    gaming = {
-      tearing = gaming.tearing.enable;
-      tearing_class_patterns = gaming.tearing.classPatterns;
+    tearing = {
+      enable = tearing.enable;
+      class_patterns = tearing.classPatterns;
     };
     layouts = {
       default = layouts.default;
@@ -93,10 +87,8 @@ in
 {
   wayland.windowManager.hyprland = {
     enable = true;
-    package = null;
-    portalPackage = null;
     configType = "lua";
-    settings = hyprSettings;
+    settings = hyprlandConfig.settings;
     extraConfig = ''
       require("pangu.init")
     '';

@@ -18,7 +18,7 @@ Item {
 
     property bool expanded: false
 
-    implicitHeight: contentColumn.implicitHeight + 16  // 8px margins top + bottom
+    implicitHeight: contentColumn.implicitHeight + 16
 
     Behavior on implicitHeight {
         enabled: Config.animDuration > 0

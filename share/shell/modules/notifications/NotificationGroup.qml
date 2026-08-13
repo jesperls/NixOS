@@ -36,9 +36,7 @@ Item {
                 }));
     }
 
-    onNotificationGroupChanged: {}
 
-    onValidNotificationsChanged: {}
     property bool expanded: false
 
     onNotificationCountChanged: {
@@ -60,7 +58,6 @@ Item {
     function destroyWithAnimation(isDiscardAll = false) {
         if (root.qmlParent && root.qmlParent.resetDrag)
             root.qmlParent.resetDrag();
-        background.anchors.leftMargin = background.anchors.leftMargin;
         notificationAnimation.isDiscardAll = isDiscardAll;
         notificationAnimation.startDestroy();
     }
@@ -218,7 +215,7 @@ Item {
                             id: appName
                             elide: Text.ElideRight
                             Layout.fillWidth: true
-                            text: (topRow.showAppName ? notificationGroup?.appName : (root.validNotifications.length > 0 ? root.validNotifications[0]?.summary ?? "" : "")) || ""
+                            text: (topRow.showAppName ? notificationGroup?.appName : root.validNotifications[0]?.summary) || ""
                             font.family: Config.theme.font
                             font.pixelSize: Config.theme.fontSize
                             font.weight: Font.Bold
@@ -286,7 +283,6 @@ Item {
                         anchors.left: parent?.left
                         anchors.right: parent?.right
 
-                        Component.onCompleted: {}
 
                         onDestroyRequested: {
                             root.destroyWithAnimation();

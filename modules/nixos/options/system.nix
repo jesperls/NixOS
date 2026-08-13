@@ -155,12 +155,12 @@
               default = null;
               description = "Color management preset (auto picks wide gamut for 10-bit outputs).";
             };
-            sdrbrightness = lib.mkOption {
+            sdrBrightness = lib.mkOption {
               type = lib.types.nullOr lib.types.float;
               default = null;
               description = "SDR content brightness multiplier in HDR mode.";
             };
-            sdrsaturation = lib.mkOption {
+            sdrSaturation = lib.mkOption {
               type = lib.types.nullOr lib.types.float;
               default = null;
               description = "SDR content saturation multiplier in HDR mode.";

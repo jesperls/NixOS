@@ -1,50 +1,4 @@
 
-function getIconForMime(mimeType, content) {
-    if (!mimeType) return "";
-    
-    if (mimeType === "text/plain" && content) {
-        var urlMatch = content.match(/^https?:\/\/[^\s]+/);
-        if (urlMatch) {
-            try {
-                var url = new URL(content.trim());
-                return url.origin + "/favicon.ico";
-            } catch (e) {
-            }
-        }
-    }
-    
-    if (mimeType.startsWith("image/")) {
-        return "image";
-    }
-    
-    if (mimeType.startsWith("text/") || mimeType === "application/json" || 
-        mimeType === "application/xml" || mimeType === "application/javascript") {
-        return "text";
-    }
-    
-    if (mimeType === "text/uri-list") {
-        return "file";
-    }
-    
-    if (mimeType.startsWith("video/")) {
-        return "video";
-    }
-    
-    if (mimeType.startsWith("audio/")) {
-        return "audio";
-    }
-    
-    if (mimeType.match(/zip|tar|gz|bz2|xz|7z|rar/)) {
-        return "archive";
-    }
-    
-    if (mimeType === "application/pdf") {
-        return "pdf";
-    }
-    
-    return "file";
-}
-
 function isUrl(text) {
     if (!text) return false;
     var trimmed = text.trim();
@@ -76,49 +30,6 @@ function getFaviconFallbackUrl(text) {
     } catch (e) {
         return "";
     }
-}
-
-function getNerdFontIconForExtension(filePath) {
-    if (!filePath) return "";
-    
-    var ext = filePath.split('.').pop().toLowerCase();
-    
-    if (ext === "js" || ext === "mjs") return "󰌞"; // JavaScript
-    if (ext === "ts") return "󰛦"; // TypeScript
-    if (ext === "py") return "󰌠"; // Python
-    if (ext === "java") return "󰬷"; // Java
-    if (ext === "cpp" || ext === "cc" || ext === "cxx") return "󰙲"; // C++
-    if (ext === "c") return "󰙱"; // C
-    if (ext === "rs") return "󱘗"; // Rust
-    if (ext === "go") return "󰟓"; // Go
-    if (ext === "php") return "󰌟"; // PHP
-    if (ext === "rb") return "󰴭"; // Ruby
-    
-    if (ext === "html" || ext === "htm") return "󰌝"; // HTML
-    if (ext === "css") return "󰌜"; // CSS
-    if (ext === "json") return "󰘦"; // JSON
-    if (ext === "xml") return "󰗀"; // XML
-    
-    if (ext === "pdf") return "󰈦"; // PDF
-    if (ext === "doc" || ext === "docx") return "󰈬"; // Word
-    if (ext === "xls" || ext === "xlsx") return "󰈛"; // Excel
-    if (ext === "ppt" || ext === "pptx") return "󰈧"; // PowerPoint
-    if (ext === "txt") return "󰈙"; // Text
-    if (ext === "md") return "󰍔"; // Markdown
-    
-    if (ext === "png" || ext === "jpg" || ext === "jpeg" || ext === "gif" || 
-        ext === "bmp" || ext === "webp" || ext === "svg" || ext === "ico") return "󰈟"; // Image
-    
-    if (ext === "mp4" || ext === "mkv" || ext === "avi" || ext === "mov" || 
-        ext === "wmv" || ext === "flv" || ext === "webm") return "󰈫"; // Video
-    
-    if (ext === "mp3" || ext === "wav" || ext === "flac" || ext === "ogg" || 
-        ext === "m4a" || ext === "wma") return "󰈣"; // Audio
-    
-    if (ext === "zip" || ext === "tar" || ext === "gz" || ext === "bz2" || 
-        ext === "xz" || ext === "7z" || ext === "rar") return "󰛫"; // Archive
-    
-    return "󰈔";
 }
 
 function escapeShellArg(arg) {

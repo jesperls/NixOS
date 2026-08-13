@@ -356,7 +356,7 @@ Item {
                 onConfigValueChanged: {
                     if (!activeFocus) {
                         if (Math.abs(parseFloat(text) - configValue) > 0.001 || text === "")
-                            text = configValue.toFixed(1);  // Default format
+                            text = configValue.toFixed(1);
                     }
                 }
                 Component.onCompleted: text = configValue.toFixed(1)

@@ -570,7 +570,7 @@ Item {
                                     progressColor: Styling.srItem("overprimary")
                                     tooltipText: `${Math.round(value * 1000)}ms`
                                     scroll: true
-                                    stepSize: 0.01  // 10ms steps (1/100 of 1000ms)
+                                    stepSize: 0.01
                                     snapMode: "always"
 
                                     readonly property real configValue: Config.theme.animDuration / 1000
@@ -633,31 +633,15 @@ Item {
                                     Layout.preferredHeight: 32
                                     radius: Styling.radius(-2)
 
-                                    TextInput {
-                                        id: fontInput
+                                    FontComboBox {
                                         anchors.fill: parent
-                                        anchors.margins: 8
-                                        font.family: Config.theme.font
-                                        font.pixelSize: Styling.fontSize(0)
-                                        color: Colors.overBackground
-                                        selectByMouse: true
-                                        clip: true
-                                        verticalAlignment: TextInput.AlignVCenter
-
-                                        readonly property string configValue: Config.theme.font
-
-                                        onConfigValueChanged: {
-                                            if (text !== configValue) {
-                                                text = configValue;
-                                            }
-                                        }
-
-                                        Component.onCompleted: text = configValue
-
-                                        onEditingFinished: {
-                                            if (text !== Config.theme.font && text.trim() !== "") {
+                                        anchors.leftMargin: 8
+                                        anchors.rightMargin: 8
+                                        selectedFont: Config.theme.font
+                                        onFontSelected: font => {
+                                            if (font !== Config.theme.font) {
                                                 GlobalStates.markThemeChanged();
-                                                Config.theme.font = text.trim();
+                                                Config.theme.font = font;
                                             }
                                         }
                                     }
@@ -731,31 +715,15 @@ Item {
                                     Layout.preferredHeight: 32
                                     radius: Styling.radius(-2)
 
-                                    TextInput {
-                                        id: monoFontInput
+                                    FontComboBox {
                                         anchors.fill: parent
-                                        anchors.margins: 8
-                                        font.family: Config.theme.monoFont
-                                        font.pixelSize: Styling.monoFontSize(0)
-                                        color: Colors.overBackground
-                                        selectByMouse: true
-                                        clip: true
-                                        verticalAlignment: TextInput.AlignVCenter
-
-                                        readonly property string configValue: Config.theme.monoFont
-
-                                        onConfigValueChanged: {
-                                            if (text !== configValue) {
-                                                text = configValue;
-                                            }
-                                        }
-
-                                        Component.onCompleted: text = configValue
-
-                                        onEditingFinished: {
-                                            if (text !== Config.theme.monoFont && text.trim() !== "") {
+                                        anchors.leftMargin: 8
+                                        anchors.rightMargin: 8
+                                        selectedFont: Config.theme.monoFont
+                                        onFontSelected: font => {
+                                            if (font !== Config.theme.monoFont) {
                                                 GlobalStates.markThemeChanged();
-                                                Config.theme.monoFont = text.trim();
+                                                Config.theme.monoFont = font;
                                             }
                                         }
                                     }
@@ -835,7 +803,7 @@ Item {
                                     progressColor: Styling.srItem("overprimary")
                                     tooltipText: `${Math.round(value * 20)}`
                                     scroll: true
-                                    stepSize: 0.05  // 1/20 = 0.05 for integer steps in 0-20 range
+                                    stepSize: 0.05
                                     snapMode: "always"
 
                                     readonly property real configValue: Config.theme.roundness / 20
@@ -1011,7 +979,7 @@ Item {
                                     progressColor: Styling.srItem("overprimary")
                                     tooltipText: `${Math.round((value - 0.5) * 40)}`
                                     scroll: true
-                                    stepSize: 0.025  // 1/40 for integer steps in -20 to +20 range
+                                    stepSize: 0.025
                                     snapMode: "always"
 
                                     readonly property real configValue: (Config.theme.shadowXOffset + 20) / 40
@@ -1062,7 +1030,7 @@ Item {
                                     progressColor: Styling.srItem("overprimary")
                                     tooltipText: `${Math.round((value - 0.5) * 40)}`
                                     scroll: true
-                                    stepSize: 0.025  // 1/40 for integer steps in -20 to +20 range
+                                    stepSize: 0.025
                                     snapMode: "always"
 
                                     readonly property real configValue: (Config.theme.shadowYOffset + 20) / 40
@@ -1572,7 +1540,6 @@ Item {
                             VariantEditor {
                                 Layout.fillWidth: true
                                 variantId: root.selectedVariant
-                                onClose: {}
                                 onOpenColorPickerRequested: (colorNames, currentColor, dialogTitle, callback) => {
                                     root.openColorPicker(colorNames, currentColor, dialogTitle, callback);
                                 }

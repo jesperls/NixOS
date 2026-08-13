@@ -196,10 +196,10 @@ Singleton {
         id: daemonProcess
         running: false
         stdout: StdioCollector {
-            onTextChanged: console.log("[Replay] OUT: " + text)
+            onStreamFinished: console.log("[Replay] OUT: " + text)
         }
         stderr: StdioCollector {
-            onTextChanged: console.warn("[Replay] ERR: " + text)
+            onStreamFinished: console.warn("[Replay] ERR: " + text)
         }
         onStarted: {
             root.daemonPid = daemonProcess.processId;

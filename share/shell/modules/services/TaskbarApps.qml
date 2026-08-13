@@ -85,7 +85,14 @@ Singleton {
 
         const pinnedApps = Config.pinnedApps?.apps ?? [];
         const ignoredRegexStrings = Config.dock?.ignoredAppRegexes ?? [];
-        const ignoredRegexes = ignoredRegexStrings.map(pattern => new RegExp(pattern, "i"));
+        const ignoredRegexes = ignoredRegexStrings.map(pattern => {
+            try {
+                return new RegExp(pattern, "i");
+            } catch (e) {
+                console.warn("TaskbarApps: invalid ignored app regex:", pattern);
+                return null;
+            }
+        }).filter(re => re !== null);
 
         for (const appId of pinnedApps) {
             const key = appId.toLowerCase();

@@ -19,24 +19,17 @@
 
     system = {
       hostName = "pangu";
-      timeZone = "Europe/Stockholm";
-      locale = "en_US.UTF-8";
       regionalLocale = "sv_SE.UTF-8";
-      keyboardLayout = "se";
-      consoleKeyMap = "sv-latin1";
-      stateVersion = "26.05";
       autoLogin = true;
       passwordlessSudo = true;
     };
-
-    home.stateVersion = "26.05";
 
     network.hosts = {
       nuwa = "192.168.1.49";
       oracle = "132.145.48.11";
     };
 
-    desktop.gaming.tearing.enable = true;
+    desktop.tearing.enable = true;
     desktop.layouts.centered.fullHeight = true;
     desktop.input.accelProfile = "flat";
     performance.scheduler = "scx_lavd";
@@ -76,16 +69,6 @@
 
     services.flatpak.enable = true;
     services.sunshine.enable = true;
-    services.ollama.enable = false;
-
-    services.homeAssistant = {
-      enable = false;
-      privileged = true;
-      mqtt = {
-        enable = true;
-        server = "tcp://${config.mySystem.network.hosts.nuwa}:1883";
-      };
-    };
 
     services.dlna = {
       enable = true;

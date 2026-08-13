@@ -25,9 +25,8 @@ Item {
     property bool onlyNotification: false
     property bool appNameAlreadyShown: false
 
-    property var sortedNotifications: notifications.slice().sort((a, b) => a.time - b.time)  // antiguo a reciente
+    property var sortedNotifications: notifications.slice().sort((a, b) => a.time - b.time)
     property var latestNotification: sortedNotifications.length > 0 ? sortedNotifications[sortedNotifications.length - 1] : notificationObject
-    property var earliestNotification: sortedNotifications.length > 0 ? sortedNotifications[0] : notificationObject
     property bool multipleNotifications: notifications.length > 1
     property bool isValid: latestNotification && (latestNotification.summary || latestNotification.body)
 

@@ -50,6 +50,8 @@ Singleton {
     }
 
     function increaseBrightness(): void {
+        if (!Compositor.focusedMonitor)
+            return;
         const focusedName = Compositor.focusedMonitor.name;
         const monitor = monitors.find(m => focusedName === m.screen.name);
         if (monitor)
@@ -57,6 +59,8 @@ Singleton {
     }
 
     function decreaseBrightness(): void {
+        if (!Compositor.focusedMonitor)
+            return;
         const focusedName = Compositor.focusedMonitor.name;
         const monitor = monitors.find(m => focusedName === m.screen.name);
         if (monitor)
@@ -256,14 +260,6 @@ Singleton {
 
     IpcHandler {
         target: "brightness"
-
-        function increment() {
-            onPressed: root.increaseBrightness();
-        }
-
-        function decrement() {
-            onPressed: root.decreaseBrightness();
-        }
 
         function set(value: real, monitorName: string) {
             if (!monitorName || monitorName === "") {

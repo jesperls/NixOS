@@ -144,8 +144,6 @@ PopupWindow {
         if (visible)
             return;
 
-        console.log("BarPopup OPEN - position:", barPosition, "anchorItem:", anchorItem.width, "x", anchorItem.height, "rect.x:", anchor.rect.x, "rect.y:", anchor.rect.y);
-
         isOpen = true;
 
         popupOpacity = 0;

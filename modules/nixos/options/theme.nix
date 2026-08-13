@@ -29,12 +29,6 @@ in
             description = "Named palette preset. Individual colors can still be overridden.";
           };
 
-          name = lib.mkOption {
-            type = lib.types.str;
-            default = preset.name;
-            description = "Human-friendly theme name.";
-          };
-
           colors = {
             accent = lib.mkOption {
               type = hexColor;
@@ -82,12 +76,6 @@ in
               type = hexColor;
               default = preset.colors.border;
               description = "Border and divider color.";
-            };
-
-            shadow = lib.mkOption {
-              type = hexColor;
-              default = preset.colors.shadow;
-              description = "Shadow color used in CSS tweaks.";
             };
           };
 

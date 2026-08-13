@@ -7,6 +7,7 @@ if [ -e "$LOCKFILE" ]; then
 		exit 0
 	fi
 fi
+mkdir -p "$(dirname "$LOCKFILE")"
 echo $$ >"$LOCKFILE"
 
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/pangu/config/system.json"
@@ -35,13 +36,13 @@ dbus-monitor --system "type='signal',interface='org.freedesktop.login1.Manager',
 			echo "SUSPEND"
 			CMD=$(get_cmd "before")
 			if [ -n "$CMD" ]; then
-				eval "$CMD" &
+				sh -c "$CMD" &
 			fi
 		elif echo "$line" | grep -q "false"; then
 			echo "WAKE"
 			CMD=$(get_cmd "after")
 			if [ -n "$CMD" ]; then
-				eval "$CMD" &
+				sh -c "$CMD" &
 			fi
 		fi
 	done

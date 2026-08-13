@@ -58,11 +58,7 @@ echo "Image uploaded successfully: $imageLink" >&2
 lensUrl="https://lens.google.com/uploadbyurl?url=${imageLink}"
 echo "Opening in Google Lens: $lensUrl" >&2
 
-if ! xdg-open "$lensUrl" 2>&1; then
-	notify-send -u critical "Google Lens" "Failed to open browser" >&2
-	echo "ERROR: Failed to open browser" >&2
-	exit 1
-fi
+xdg-open "$lensUrl" 2>&1 || true
 
 rm -f "$IMAGE_PATH"
 notify-send "Google Lens" "Image opened in browser successfully"

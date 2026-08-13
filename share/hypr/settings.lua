@@ -5,7 +5,7 @@ hl.config({
   general = {
     layout = state.layouts.default,
     resize_on_border = true,
-    allow_tearing = state.gaming.tearing,
+    allow_tearing = state.tearing.enable,
     snap = {
       enabled = true,
     },

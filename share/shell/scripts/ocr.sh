@@ -18,7 +18,14 @@ else
     LANGS="eng+spa"
 fi
 
-TEXT=$(grim -g "$REGION" - | tesseract - - -l "$LANGS" 2>/dev/null)
+TMP_IMG=$(mktemp)
+trap 'rm -f "$TMP_IMG"' EXIT
+if ! grim -g "$REGION" "$TMP_IMG" 2>/dev/null; then
+    notify-send "OCR Error" "Screenshot capture failed" -u critical
+    exit 1
+fi
+
+TEXT=$(tesseract "$TMP_IMG" - -l "$LANGS" 2>/dev/null)
 
 TEXT=$(echo "$TEXT" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 

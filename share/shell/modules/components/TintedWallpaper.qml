@@ -1,13 +1,13 @@
 import QtQuick
 import QtQuick.Effects
 import qs.modules.theme
-import qs.config
 
 Item {
     id: root
     property string source: ""
     property real radius: 0
     property bool tintEnabled: false
+    property size sourceSize: Qt.size(0, 0)
     
     readonly property var optimizedPalette: [
         "background", "overBackground", "shadow",
@@ -72,6 +72,7 @@ Item {
             id: rawImage
             anchors.fill: parent
             source: root.source
+            sourceSize: root.sourceSize
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             smooth: true

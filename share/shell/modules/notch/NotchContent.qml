@@ -20,10 +20,8 @@ Item {
     id: root
 
     required property ShellScreen screen
-    property bool unifiedEffectActive: false
 
     readonly property var screenVisibilities: Visibilities.getForScreen(screen.name)
-    readonly property bool isScreenFocused: Compositor.focusedMonitor && Compositor.focusedMonitor.name === screen.name
 
     readonly property var compositorMonitor: Compositor.monitorFor(screen)
     readonly property var toplevels: (!compositorMonitor || !compositorMonitor.activeWorkspace || !Compositor.clients.values) ? [] : Compositor.clients.values.filter(c => c.workspace.id === compositorMonitor.activeWorkspace.id)
@@ -69,9 +67,8 @@ Item {
         return !barPinned || activeWindowFullscreen;
     }
 
-    readonly property bool isBarVertical: barPosition === "left" || barPosition === "right"
 
-    readonly property bool screenNotchOpen: screenVisibilities ? (screenVisibilities.launcher || screenVisibilities.dashboard || screenVisibilities.powermenu || screenVisibilities.tools) : false
+    readonly property bool screenNotchOpen: Visibilities.isNotchOpen(screenVisibilities)
     readonly property bool hasActiveNotifications: Notifications.popupList.length > 0
 
     property bool hoverActive: false
@@ -79,7 +76,7 @@ Item {
     readonly property bool isMouseOverNotch: notchMouseAreaHover.hovered || notchRegionHover.hovered
 
     readonly property bool reveal: {
-        if (((Config.notch && Config.notch.keepHidden !== undefined) ? Config.notch.keepHidden : false) && barPosition !== notchPosition) {
+        if ((Config.notch && Config.notch.keepHidden !== undefined) ? Config.notch.keepHidden : false) {
             return (screenNotchOpen || hasActiveNotifications || hoverActive || barHoverActive);
         }
 
@@ -98,7 +95,7 @@ Item {
 
     Timer {
         id: hideDelayTimer
-        interval: 1000
+        interval: (Config.notch && Config.notch.hideDelay !== undefined ? Config.notch.hideDelay : 1000)
         repeat: false
         onTriggered: {
             if (!root.isMouseOverNotch) {
@@ -166,11 +163,6 @@ Item {
         id: persistentToolsMenuViewLoader
         active: false
         sourceComponent: Component { ToolsMenuView { visible: false } }
-    }
-
-    Component {
-        id: notificationViewComponent
-        NotchNotificationView {}
     }
 
     Item {
@@ -247,7 +239,6 @@ Item {
 
             Notch {
                 id: notchContainer
-                unifiedEffectActive: root.unifiedEffectActive
                 parentHovered: root.isMouseOverNotch
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: root.notchPosition === "top" ? parent.top : undefined
@@ -259,11 +250,6 @@ Item {
                 anchors.bottomMargin: (root.notchPosition === "bottom" ? (Config.notchTheme === "default" ? 0 : (Config.notchTheme === "island" ? 4 : 0)) : 0) + (root.notchPosition === "bottom" ? frameOffset : 0)
 
                 defaultViewComponent: defaultViewComponent
-                launcherViewComponent: null
-                dashboardViewComponent: null
-                powermenuViewComponent: null
-                toolsMenuViewComponent: null
-                notificationViewComponent: notificationViewComponent
                 visibilities: root.screenVisibilities
 
                 Keys.onPressed: event => {
@@ -285,7 +271,7 @@ Item {
             anchors.bottomMargin: root.notchPosition === "bottom" ? 4 : 0
             
             width: Math.round(popupHovered ? 420 + 48 : 320 + 48)
-            height: shouldShowNotificationPopup ? (popupHovered ? notificationPopup.implicitHeight + 32 : notificationPopup.implicitHeight + 32) : 0
+            height: shouldShowNotificationPopup ? (notificationPopup.implicitHeight + 32) : 0
             clip: false
             visible: height > 0
             z: 999
@@ -385,10 +371,10 @@ Item {
             if (screenVisibilities.launcher) {
                 persistentLauncherViewLoader.active = true;
                 Qt.callLater(() => {
-                    if (persistentLauncherViewLoader.item) {
+                    if (screenVisibilities.launcher && persistentLauncherViewLoader.item) {
                         notchContainer.stackView.push(persistentLauncherViewLoader.item);
                         Qt.callLater(() => {
-                            if (notchContainer.stackView.currentItem) {
+                            if (screenVisibilities.launcher && notchContainer.stackView.currentItem) {
                                 notchContainer.stackView.currentItem.forceActiveFocus();
                             }
                         });
@@ -397,8 +383,6 @@ Item {
             } else {
                 if (notchContainer.stackView.depth > 1) {
                     notchContainer.stackView.pop();
-                    notchContainer.isShowingDefault = true;
-                    notchContainer.isShowingNotifications = false;
                 }
             }
         }
@@ -407,10 +391,10 @@ Item {
             if (screenVisibilities.dashboard) {
                 persistentDashboardViewLoader.active = true;
                 Qt.callLater(() => {
-                    if (persistentDashboardViewLoader.item) {
+                    if (screenVisibilities.dashboard && persistentDashboardViewLoader.item) {
                         notchContainer.stackView.push(persistentDashboardViewLoader.item);
                         Qt.callLater(() => {
-                            if (notchContainer.stackView.currentItem) {
+                            if (screenVisibilities.dashboard && notchContainer.stackView.currentItem) {
                                 notchContainer.stackView.currentItem.forceActiveFocus();
                             }
                         });
@@ -419,8 +403,6 @@ Item {
             } else {
                 if (notchContainer.stackView.depth > 1) {
                     notchContainer.stackView.pop();
-                    notchContainer.isShowingDefault = true;
-                    notchContainer.isShowingNotifications = false;
                 }
             }
         }
@@ -429,10 +411,10 @@ Item {
             if (screenVisibilities.powermenu) {
                 persistentPowerMenuViewLoader.active = true;
                 Qt.callLater(() => {
-                    if (persistentPowerMenuViewLoader.item) {
+                    if (screenVisibilities.powermenu && persistentPowerMenuViewLoader.item) {
                         notchContainer.stackView.push(persistentPowerMenuViewLoader.item);
                         Qt.callLater(() => {
-                            if (notchContainer.stackView.currentItem) {
+                            if (screenVisibilities.powermenu && notchContainer.stackView.currentItem) {
                                 notchContainer.stackView.currentItem.forceActiveFocus();
                             }
                         });
@@ -441,8 +423,6 @@ Item {
             } else {
                 if (notchContainer.stackView.depth > 1) {
                     notchContainer.stackView.pop();
-                    notchContainer.isShowingDefault = true;
-                    notchContainer.isShowingNotifications = false;
                 }
             }
         }
@@ -451,10 +431,10 @@ Item {
             if (screenVisibilities.tools) {
                 persistentToolsMenuViewLoader.active = true;
                 Qt.callLater(() => {
-                    if (persistentToolsMenuViewLoader.item) {
+                    if (screenVisibilities.tools && persistentToolsMenuViewLoader.item) {
                         notchContainer.stackView.push(persistentToolsMenuViewLoader.item);
                         Qt.callLater(() => {
-                            if (notchContainer.stackView.currentItem) {
+                            if (screenVisibilities.tools && notchContainer.stackView.currentItem) {
                                 notchContainer.stackView.currentItem.forceActiveFocus();
                             }
                         });
@@ -463,8 +443,6 @@ Item {
             } else {
                 if (notchContainer.stackView.depth > 1) {
                     notchContainer.stackView.pop();
-                    notchContainer.isShowingDefault = true;
-                    notchContainer.isShowingNotifications = false;
                 }
             }
         }

@@ -13,7 +13,6 @@ ClippingRectangle {
 
     required property string variant
 
-    property string gradientOrientation: "vertical"
     property bool enableShadow: false
     property bool enableBorder: true
     property bool animateRadius: true

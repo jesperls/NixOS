@@ -1,10 +1,10 @@
 pragma Singleton
+pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.config
 import qs.modules.globals
-pragma ComponentBehavior: Bound
 
 Singleton {
     id: root
@@ -25,9 +25,6 @@ Singleton {
     property bool gpuDetected: false
     property var gpuTemps: []
     
-    property real gpuUsage: gpuUsages.length > 0 ? gpuUsages[0] : 0.0
-    property string gpuVendor: gpuVendors.length > 0 ? gpuVendors[0] : "unknown"
-    property int gpuTemp: gpuTemps.length > 0 ? gpuTemps[0] : -1
 
     property var diskUsage: ({})
     property var diskTypes: ({})
@@ -45,7 +42,7 @@ Singleton {
 
     property Process monitorProcess: Process {
         id: monitorProcess
-        running: GlobalStates.dashboardOpen && GlobalStates.dashboardCurrentTab === 2 && root.validDisks.length > 0
+        running: GlobalStates.dashboardOpen && GlobalStates.dashboardCurrentTab === 2 && Config.dashboard.showMetrics !== false && root.validDisks.length > 0
         
         command: {
             let cmd = ["python3", Paths.script("system_monitor.py"), root.updateInterval.toString()];

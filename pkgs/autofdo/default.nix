@@ -1,4 +1,10 @@
-{ lib, stdenv, fetchurl, unzip, version ? "0.30.1" }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  unzip,
+  version ? "0.30.1",
+}:
 
 stdenv.mkDerivation {
   pname = "autofdo";

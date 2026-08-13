@@ -19,6 +19,7 @@ else
     done
 fi
 SOCKET="${XDG_RUNTIME_DIR:-/tmp}/pangu/mpv-${MONITOR}.sock"
+mkdir -p "$(dirname "$SOCKET")"
 
 MPV_OPTS="no-audio loop hwdec=auto scale=bilinear interpolation=no video-sync=display-resample panscan=1.0 video-scale-x=1.0 video-scale-y=1.0 load-scripts=no input-ipc-server=$SOCKET"
 

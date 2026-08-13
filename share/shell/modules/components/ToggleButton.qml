@@ -17,6 +17,7 @@ Button {
     property bool iconFullTint: false
     property int iconSize: 18
     property bool enableShadow: true
+    property bool flatStyle: false
     property real radius: 0
     property bool vertical: false  // Set by parent if needed, or inferred? ToggleButton doesn't know orientation usually.
     property real startRadius: radius
@@ -52,15 +53,25 @@ Button {
     implicitWidth: Math.max(36, root.iconSize + 12)
     implicitHeight: Math.max(36, root.iconSize + 12)
 
+    scale: root.pressed ? 0.97 : (root.hovered ? 1.03 : 1.0)
+
+    Behavior on scale {
+        enabled: (Config.animDuration ?? 0) > 0
+        NumberAnimation {
+            duration: (Config.animDuration ?? 0) / 3
+            easing.type: Easing.OutCubic
+        }
+    }
+
     background: StyledRect {
         id: bg
-        variant: "bg"
-        enableShadow: root.enableShadow && Config.showBackground
+        variant: root.flatStyle ? "transparent" : "bg"
+        enableShadow: !root.flatStyle && root.enableShadow && Config.showBackground
 
-        topLeftRadius: root.vertical ? root.startRadius : root.startRadius
+        topLeftRadius: root.startRadius
         topRightRadius: root.vertical ? root.startRadius : root.endRadius
         bottomLeftRadius: root.vertical ? root.endRadius : root.startRadius
-        bottomRightRadius: root.vertical ? root.endRadius : root.endRadius
+        bottomRightRadius: root.endRadius
 
         Rectangle {
             anchors.fill: parent

@@ -32,7 +32,7 @@ ShellRoot {
 
     ContextMenu {
         id: contextMenu
-        screen: Quickshell.screens[0]
+        screen: Quickshell.screens.find(s => Compositor.focusedMonitor && s.name === Compositor.focusedMonitor.name) ?? Quickshell.screens[0]
         Component.onCompleted: Visibilities.setContextMenu(contextMenu)
     }
 
@@ -94,13 +94,9 @@ ShellRoot {
                 barOuterMargin: unifiedPanel.barOuterMargin
 
                 dockEnabled: {
-                    if (!((Config.dock && Config.dock.enabled !== undefined ? Config.dock.enabled : false)) || (Config.dock && Config.dock.theme !== undefined ? Config.dock.theme : "default") === "integrated")
+                    if (!Config.dockPanelEnabled)
                         return false;
-
-                    const list = (Config.dock && Config.dock.screenList !== undefined ? Config.dock.screenList : []);
-                    if (!list || list.length === 0)
-                        return true;
-                    return list.indexOf(screenShellContainer.modelData.name) !== -1;
+                    return Config.enabledForScreen(Config.dock?.screenList, screenShellContainer.modelData.name);
                 }
                 dockPosition: unifiedPanel.dockPosition
                 dockPinned: unifiedPanel.dockPinned
@@ -125,7 +121,7 @@ ShellRoot {
 
         Loader {
             id: overviewLoader
-            active: ((Config.overview && Config.overview.enabled !== undefined ? Config.overview.enabled : true)) && SuspendManager.wakeReady && (Visibilities.getForScreen(modelData.name) ? Visibilities.getForScreen(modelData.name).overview : false)
+            active: ((Config.overview && Config.overview.enabled !== undefined ? Config.overview.enabled : true)) && SuspendManager.wakeReady && overviewEnabledFor(modelData.name)
             required property ShellScreen modelData
             sourceComponent: OverviewPopup {
                 screen: overviewLoader.modelData
@@ -251,9 +247,8 @@ ShellRoot {
         void ReplayService.active;
     })
 
-    Timer {
-        interval: 2000
-        running: true
-        onTriggered: void NightLightService.active
+    function overviewEnabledFor(screenName) {
+        const v = Visibilities.getForScreen(screenName);
+        return v ? v.overview : false;
     }
 }

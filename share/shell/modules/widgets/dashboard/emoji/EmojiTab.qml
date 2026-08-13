@@ -310,7 +310,7 @@ Rectangle {
         }
     }
 
-    implicitWidth: 464  // 8 emojis (8 * 56) + padding (2 * 8)
+    implicitWidth: 464
     implicitHeight: 296
     color: "transparent"
 

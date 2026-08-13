@@ -14,6 +14,8 @@ FileView {
         generationTimer.restart();
     }
 
+    // FileView's default property is its adapter, so live objects are held
+    // as named properties instead of bare children.
     property Connections oledWatcher: Connections {
         target: Config
         function onOledModeChanged() {

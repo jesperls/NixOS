@@ -271,9 +271,12 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         try:
             interval_ms = int(sys.argv[1])
+            if interval_ms < 100:
+                interval_ms = 2000
             disks = sys.argv[2:] if len(sys.argv) > 2 else ["/"]
         except ValueError:
-            disks = sys.argv[1:]
+            print(json.dumps({"error": "invalid interval"}), flush=True)
+            sys.exit(1)
 
     monitor = SystemMonitor(disks)
     interval_sec = max(0.1, interval_ms / 1000.0)

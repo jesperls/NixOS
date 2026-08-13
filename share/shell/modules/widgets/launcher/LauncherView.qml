@@ -19,8 +19,10 @@ Rectangle {
     color: "transparent"
     
     readonly property bool isCompact: currentTab === 0 || currentTab === 2
-    implicitWidth: isCompact ? 464 : 900
-    implicitHeight: isCompact ? 296 : 392
+    readonly property int configWidth: Config.launcher.width ?? 0
+    readonly property int configHeight: Config.launcher.height ?? 0
+    implicitWidth: configWidth > 0 ? configWidth : (isCompact ? 464 : 900)
+    implicitHeight: configHeight > 0 ? configHeight : (isCompact ? 296 : 392)
     
     focus: true
 
@@ -842,7 +844,7 @@ Rectangle {
                                 font.family: Config.theme.font
                                 font.pixelSize: Styling.fontSize(-2)
                                 elide: Text.ElideRight
-                                visible: text !== ""
+                                visible: (Config.launcher.showAppComments ?? true) && text !== ""
 
                                 Behavior on color {
                                     enabled: Config.animDuration > 0
@@ -876,7 +878,7 @@ Rectangle {
 
                         ClippingRectangle {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 36 * 3  // Always 3 options
+                            Layout.preferredHeight: 36 * 3
                             color: Colors.background
                             radius: Styling.radius(0)
 

@@ -1,5 +1,4 @@
-var weekDays = [  // MONDAY IS THE FIRST DAY OF THE WEEK :HESRIGHTYOUKNOW:
-    { day: 'Mo', today: 0 },
+var weekDays = [      { day: 'Mo', today: 0 },
     { day: 'Tu', today: 0 },
     { day: 'We', today: 0 },
     { day: 'Th', today: 0 },
@@ -41,11 +40,11 @@ function getPrevMonthDays(month, year) {
 }
 
 function getDateInXMonthsTime(x, baseDate) {
-    var currentDate = baseDate || new Date();  // Get the current date
-    if (x == 0) return currentDate;  // If x is 0, return the current date
+    var currentDate = baseDate || new Date();
+    if (x == 0) return currentDate;
 
-    var targetMonth = currentDate.getMonth() + x;  // Calculate the target month
-    var targetYear = currentDate.getFullYear();  // Get the current year
+    var targetMonth = currentDate.getMonth() + x;
+    var targetYear = currentDate.getFullYear();
 
     targetYear += Math.floor(targetMonth / 12);
     targetMonth = (targetMonth % 12 + 12) % 12;
@@ -57,7 +56,7 @@ function getDateInXMonthsTime(x, baseDate) {
 
 function getCalendarLayout(dateObject, highlight) {
     if (!dateObject) dateObject = new Date();
-    const weekday = (dateObject.getDay() + 6) % 7;  // MONDAY IS THE FIRST DAY OF THE WEEK
+    const weekday = (dateObject.getDay() + 6) % 7;
     const day = dateObject.getDate();
     const month = dateObject.getMonth() + 1;
     const year = dateObject.getFullYear();
@@ -91,7 +90,7 @@ function getCalendarLayout(dateObject, highlight) {
             currentWeekRow = i;
         }
         toFill++;
-        if (toFill > dim) {  // Next month?
+        if (toFill > dim) {
             monthDiff++;
             if (monthDiff == 0)
                 dim = daysInMonth;

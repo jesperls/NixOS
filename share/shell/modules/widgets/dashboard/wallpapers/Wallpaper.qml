@@ -226,17 +226,6 @@ PanelWindow {
         return thumbnailPath;
     }
 
-    function getDisplaySource(filePath) {
-        var fileType = getFileType(filePath);
-
-        if (fileType === 'video' || fileType === 'image' || fileType === 'gif') {
-            var thumbnailPath = getThumbnailPath(filePath);
-            return thumbnailPath;
-        }
-
-        return filePath;
-    }
-
     function getColorSource(filePath) {
         var fileType = getFileType(filePath);
 
@@ -514,7 +503,7 @@ PanelWindow {
 
     Timer {
         id: videoSyncTimer
-        interval: 1200  // give mpvpaper processes time to spawn and initialize
+        interval: 1200
         repeat: false
         onTriggered: {
             console.log("Broadcasting video sync to all mpvpaper sockets...");
@@ -920,7 +909,7 @@ PanelWindow {
 
     Timer {
         id: delayedThumbnailGen
-        interval: 2000  // Delay 2 seconds after change to not block
+        interval: 2000
         repeat: false
         onTriggered: thumbnailGeneratorScript.running = true
     }
@@ -982,7 +971,7 @@ PanelWindow {
 
                 topLevelFolders.sort();
                 subfolderFilters = topLevelFolders;
-                subfolderFiltersChanged();  // Emitir señal manualmente
+                subfolderFiltersChanged();  // emitted manually: the list itself didn't change
                 console.log("Updated subfolderFilters:", subfolderFilters);
             }
         }
@@ -1373,7 +1362,7 @@ PanelWindow {
                     visible: true
                     width: staticImageRoot.optimizedPalette.length
                     height: 1
-                    opacity: 0  // Make invisible to eye but maintain presence for capture if needed (though hideSource usually handles this)
+                    opacity: 0
 
                     Row {
                         anchors.fill: parent
@@ -1392,7 +1381,7 @@ PanelWindow {
                     id: paletteTextureSource
                     sourceItem: paletteSourceItem
                     hideSource: true
-                    visible: false  // The source object itself doesn't need to be visible in the scene graph
+                    visible: false
                     smooth: false
                     recursive: false
                 }

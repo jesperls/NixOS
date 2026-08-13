@@ -15,6 +15,7 @@ Item {
     property bool vertical: bar.orientation === "vertical"
     property bool isHovered: false
     property bool layerEnabled: true
+    property bool flatStyle: false
 
     property real radius: 0
     property real startRadius: radius
@@ -38,14 +39,14 @@ Item {
 
     StyledRect {
         id: buttonBg
-        variant: root.popupOpen ? "primary" : "bg"
+        variant: root.popupOpen ? "primary" : (root.flatStyle ? "transparent" : "bg")
         anchors.fill: parent
-        enableShadow: root.layerEnabled
+        enableShadow: !root.flatStyle && root.layerEnabled
 
-        topLeftRadius: root.vertical ? root.startRadius : root.startRadius
+        topLeftRadius: root.startRadius
         topRightRadius: root.vertical ? root.startRadius : root.endRadius
         bottomLeftRadius: root.vertical ? root.endRadius : root.startRadius
-        bottomRightRadius: root.vertical ? root.endRadius : root.endRadius
+        bottomRightRadius: root.endRadius
 
         Rectangle {
             anchors.fill: parent

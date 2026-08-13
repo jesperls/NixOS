@@ -7,7 +7,6 @@ import Quickshell.Widgets
 import qs.modules.theme
 import qs.modules.services
 import qs.modules.components
-import qs.config
 
 MouseArea {
     id: root
@@ -168,7 +167,7 @@ MouseArea {
     StyledToolTip {
         show: root.isHovered
         tooltipText: root.item.tooltipTitle || root.item.title
-        desciription: root.item.tooltipDescription || ""
+        description: root.item.tooltipDescription || ""
     }
 
     HoverHandler {

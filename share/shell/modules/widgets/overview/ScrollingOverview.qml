@@ -15,7 +15,6 @@ Item {
 
     readonly property real scale: Config.overview.scale
     readonly property int totalWorkspaces: Config.overview.rows * Config.overview.columns
-    readonly property int visibleWorkspaces: 3  // Show 3 workspaces at a time in viewport
     readonly property real workspaceSpacing: Config.overview.workspaceSpacing
     readonly property real workspacePadding: 4
     readonly property color activeBorderColor: Styling.srItem("overprimary")

@@ -100,18 +100,16 @@
       };
     };
 
-    gaming = {
-      tearing = {
-        enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = "Allow tearing (immediate page flips) for matching fullscreen games to minimize latency.";
-        };
-        classPatterns = lib.mkOption {
-          type = lib.types.listOf lib.types.str;
-          default = [ "^(steam_app_\\d+)$" ];
-          description = "Window class regexes that get the immediate (tearing) window rule.";
-        };
+    tearing = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Allow tearing (immediate page flips) for matching fullscreen games to minimize latency.";
+      };
+      classPatterns = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "^(steam_app_\\d+)$" ];
+        description = "Window class regexes that get the immediate (tearing) window rule.";
       };
     };
 

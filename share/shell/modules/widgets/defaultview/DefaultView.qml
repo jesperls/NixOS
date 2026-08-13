@@ -24,6 +24,13 @@ Item {
     readonly property string notchPosition: Config.notchPosition ?? "top"
     readonly property bool isBottom: notchPosition === "bottom"
 
+    readonly property bool showUser: Config.notch.showUser ?? true
+    readonly property bool showMedia: Config.notch.showMedia ?? true
+    readonly property bool showNotifIndicator: Config.notch.showNotificationIndicator ?? true
+    readonly property bool showSep1: showUser && showMedia
+    readonly property bool showSep2: showMedia && showNotifIndicator
+    readonly property int visibleChildCount: (showUser ? 1 : 0) + (showMedia ? 1 : 0) + (showNotifIndicator ? 1 : 0) + (showSep1 ? 1 : 0) + (showSep2 ? 1 : 0)
+
     HoverHandler {
         id: contentHoverHandler
     }
@@ -34,7 +41,7 @@ Item {
 
     Timer {
         id: mediaHoverTimer
-        interval: 1000
+        interval: Config.notch.hoverExpansionDelay ?? 400
         running: expandedState && activePlayer !== null && !hasActiveNotifications && !mediaHoverExpanded && !(Config.notch.disableHoverExpansion ?? true)
         onTriggered: mediaHoverExpanded = true
     }
@@ -62,7 +69,14 @@ Item {
         }
     }
 
-    readonly property real mainRowContentWidth: 200 + userInfo.width + separator1.width + separator2.width + notifIndicator.width + (mainRow.spacing * 4) + mainRowMargin
+    readonly property real userW: showUser ? userInfo.width : 0
+    readonly property real mediaW: showMedia ? 200 : 0
+    readonly property real notifW: showNotifIndicator ? notifIndicator.width : 0
+    readonly property real sep1W: showSep1 ? separator1.width : 0
+    readonly property real sep2W: showSep2 ? separator2.width : 0
+    readonly property int rowSpacingCount: Math.max(0, visibleChildCount - 1)
+
+    readonly property real mainRowContentWidth: userW + sep1W + mediaW + sep2W + notifW + (mainRow.spacing * rowSpacingCount) + mainRowMargin
     readonly property real mainRowHeight: Config.showBackground ? (Config.notchTheme === "island" ? 36 : 44) : (Config.notchTheme === "island" ? 36 : 40)
     readonly property real notificationMinWidth: expandedState ? 420 : 320
     readonly property real notificationContainerHeight: notificationView.implicitHeight + notificationPaddingTop + notificationPaddingBottom
@@ -118,22 +132,25 @@ Item {
             width: parent.width - mainRowMargin
             height: mainRowHeight
             spacing: 4
-            z: 2  // Ensure it stays above notifications if overlap occurs (though they shouldn't)
+            z: 2
 
             UserInfo {
                 id: userInfo
+                visible: root.showUser
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             Separator {
                 id: separator1
+                visible: root.showSep1
                 vert: true
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             CompactPlayer {
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - userInfo.width - separator1.width - separator2.width - notifIndicator.width - (parent.spacing * 4)
+                visible: root.showMedia
+                width: parent.width - root.userW - root.sep1W - root.sep2W - root.notifW - (parent.spacing * root.rowSpacingCount)
                 height: 32
                 player: activePlayer
                 notchHovered: expandedState
@@ -141,12 +158,14 @@ Item {
 
             Separator {
                 id: separator2
+                visible: root.showSep2
                 vert: true
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             NotificationIndicator {
                 id: notifIndicator
+                visible: root.showNotifIndicator
                 anchors.verticalCenter: parent.verticalCenter
             }
         }

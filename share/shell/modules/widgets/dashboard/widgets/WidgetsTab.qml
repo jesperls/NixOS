@@ -14,7 +14,7 @@ import "calendar"
 
 Rectangle {
     color: "transparent"
-    implicitWidth: 600
+    implicitWidth: 760
     implicitHeight: 750
 
     property int leftPanelWidth: 0

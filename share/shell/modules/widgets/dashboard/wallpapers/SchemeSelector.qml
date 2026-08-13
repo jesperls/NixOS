@@ -13,7 +13,7 @@ Item {
     property var presets: GlobalStates.wallpaperManager ? GlobalStates.wallpaperManager.colorPresets : []
 
     property var combinedModel: {
-        var currentPresets = presets;  // Explicit dependency
+        var currentPresets = presets;
         var list = [];
         for (var i = 0; i < matugenSchemes.length; i++) {
             list.push({
@@ -62,12 +62,6 @@ Item {
         onTriggered: {
             positionAtSelectedScheme();
         }
-    }
-
-    function closeAndSignal() {
-        keyboardNavigationActive = false;
-        schemeListExpanded = false;
-        schemeSelectorClosed();
     }
 
     Connections {

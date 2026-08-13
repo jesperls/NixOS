@@ -40,7 +40,7 @@ Item {
 
     Timer {
         id: timestampUpdateTimer
-        interval: 60000  // 1 minuto
+        interval: 60000
         repeat: true
         running: root.visible && currentNotification !== null
         triggeredOnStart: false
@@ -103,12 +103,6 @@ Item {
             navigationHoverTimer.restart();
             const prevIndex = currentIndex > 0 ? currentIndex - 1 : Notifications.popupList.length - 1;
             notificationStack.navigateToNotification(prevIndex);
-        }
-    }
-
-    function updateNotificationStack() {
-        if (Notifications.popupList.length > 0 && notificationStack) {
-            notificationStack.navigateToNotification(currentIndex);
         }
     }
 
@@ -237,10 +231,10 @@ Item {
 
                             if (currentNotificationId && newNotification && currentNotificationId !== newNotification.id) {
                                 if (oldIndex > 0 && root.currentIndex < oldIndex) {
-                                    forceDirection = StackView.PopTransition;  // Aparece desde arriba (hacia abajo)
+                                    forceDirection = StackView.PopTransition;  // slide in from the top
                                 } else
                                 if (root.currentIndex === oldIndex) {
-                                    forceDirection = StackView.PushTransition;  // Aparece desde abajo (hacia arriba)
+                                    forceDirection = StackView.PushTransition;  // slide in from the bottom
                                 }
                             }
 
@@ -723,7 +717,7 @@ Item {
                             return 0;
 
                         const totalNotifications = Notifications.popupList.length;
-                        const dotHeight = 8 + 4;  // altura del punto + spacing
+                        const dotHeight = 8 + 4;  // dot height + spacing
                         const maxY = -(totalNotifications - 3) * dotHeight;
                         const currentIndex = root.currentIndex;
 

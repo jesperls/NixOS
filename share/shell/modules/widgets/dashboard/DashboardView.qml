@@ -5,15 +5,14 @@ import qs.modules.services
 Item {
     id: root
 
-    implicitWidth: 900
-    implicitHeight: 56 + 48 * 6
+    implicitWidth: dashboardItem.implicitWidth
+    implicitHeight: dashboardItem.implicitHeight
     property string screenName: ""
 
     readonly property int leftPanelWidth: 270
 
     Dashboard {
         id: dashboardItem
-        anchors.fill: parent
         leftPanelWidth: root.leftPanelWidth
         screenName: root.screenName
 

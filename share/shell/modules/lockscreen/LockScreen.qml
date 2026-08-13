@@ -81,7 +81,7 @@ WlSessionLockSurface {
         live: false
         paintCursor: false
         visible: startAnim  // Visible solo cuando startAnim es true
-        z: 0  // Capa más baja - fondo absoluto
+        z: 0
 
         property real zoomScale: startAnim ? 1.25 : 1.0
 
@@ -137,73 +137,158 @@ WlSessionLockSurface {
     Item {
         id: clockContainer
         anchors.centerIn: parent
-        width: clockRow.width
-        height: hoursText.height + (hoursText.height * 0.5)
+        width: clockColumn.width
+        height: clockColumn.height
         z: 10
         visible: Config.lockscreen.showClock ?? true
 
         property date currentTime: new Date()
 
-        Row {
-            id: clockRow
-            spacing: 0
-            anchors.top: parent.top
+        Column {
+            id: clockColumn
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 6
 
-            Text {
-                id: hoursText
-                text: Config.bar.use12hFormat ? (clockContainer.currentTime.getHours() % 12 || 12).toString() : Qt.formatTime(clockContainer.currentTime, "hh")
-                font.family: "League Gothic"
-                font.pixelSize: 240
-                color: Colors.primaryFixed
-                antialiasing: true
-                opacity: startAnim ? 1 : 0
+            Item {
+                id: clockWrapper
+                width: clockRow.width
+                height: hoursText.height * 1.5
 
-                property real slideOffset: startAnim ? 0 : -150
+                Row {
+                    id: clockRow
+                    spacing: 0
 
-                transform: Translate {
-                    y: hoursText.slideOffset
-                }
+                    Text {
+                        id: hoursText
+                        text: Config.bar.use12hFormat ? (clockContainer.currentTime.getHours() % 12 || 12).toString() : Qt.formatTime(clockContainer.currentTime, "hh")
+                        font.family: "League Gothic"
+                        font.pixelSize: 240
+                        color: Colors.primaryFixed
+                        antialiasing: true
+                        opacity: startAnim ? 1 : 0
 
-                layer.enabled: true
-                layer.effect: BgShadow {}
+                        property real slideOffset: startAnim ? 0 : -150
 
-                Behavior on opacity {
-                    enabled: Config.animDuration > 0
-                    NumberAnimation {
-                        duration: Config.animDuration * 2
-                        easing.type: Easing.OutExpo
+                        transform: Translate {
+                            y: hoursText.slideOffset
+                        }
+
+                        layer.enabled: true
+                        layer.effect: BgShadow {}
+
+                        Behavior on opacity {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation {
+                                duration: Config.animDuration * 2
+                                easing.type: Easing.OutExpo
+                            }
+                        }
+
+                        Behavior on slideOffset {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation {
+                                duration: Config.animDuration * 2
+                                easing.type: Easing.OutExpo
+                            }
+                        }
+                    }
+
+                    Text {
+                        id: minutesText
+                        text: Qt.formatTime(clockContainer.currentTime, "mm")
+                        font.family: "League Gothic"
+                        font.pixelSize: 240
+                        color: Colors.primaryFixedDim
+                        antialiasing: true
+                        anchors.verticalCenter: undefined
+                        anchors.top: hoursText.top
+                        anchors.topMargin: hoursText.height * 0.5
+                        opacity: startAnim ? 1 : 0
+
+                        property real slideOffset: startAnim ? 0 : 150
+
+                        transform: Translate {
+                            y: minutesText.slideOffset
+                        }
+
+                        layer.enabled: true
+                        layer.effect: BgShadow {}
+
+                        Behavior on opacity {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation {
+                                duration: Config.animDuration * 2
+                                easing.type: Easing.OutExpo
+                            }
+                        }
+
+                        Behavior on slideOffset {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation {
+                                duration: Config.animDuration * 2
+                                easing.type: Easing.OutExpo
+                            }
+                        }
+                    }
+
+                    Text {
+                        id: amPmText
+                        text: Config.bar.use12hFormat ? Qt.formatTime(clockContainer.currentTime, "ap").toLowerCase() : ""
+                        font.family: "League Gothic"
+                        font.pixelSize: 100
+                        color: hoursText.color
+                        antialiasing: true
+                        anchors.top: hoursText.top
+                        anchors.topMargin: hoursText.height * 0.35 
+                        visible: Config.bar.use12hFormat
+                        opacity: startAnim ? 1 : 0
+
+                        property real slideOffset: startAnim ? 0 : -150
+
+                        transform: Translate {
+                            y: amPmText.slideOffset
+                        }
+
+                        layer.enabled: true
+                        layer.effect: BgShadow {}
+
+                        Behavior on opacity {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation {
+                                duration: Config.animDuration * 2
+                                easing.type: Easing.OutExpo
+                            }
+                        }
+
+                        Behavior on slideOffset {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation {
+                                duration: Config.animDuration * 2
+                                easing.type: Easing.OutExpo
+                            }
+                        }
                     }
                 }
 
-                Behavior on slideOffset {
-                    enabled: Config.animDuration > 0
-                    NumberAnimation {
-                        duration: Config.animDuration * 2
-                        easing.type: Easing.OutExpo
-                    }
-                }
             }
 
             Text {
-                id: minutesText
-                text: Qt.formatTime(clockContainer.currentTime, "mm")
-                font.family: "League Gothic"
-                font.pixelSize: 240
+                id: dateText
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: Qt.formatDateTime(clockContainer.currentTime, "dddd, MMMM d")
+                font.family: Config.theme.font
+                font.pixelSize: 30
+                font.weight: Font.Medium
                 color: Colors.primaryFixedDim
                 antialiasing: true
-                anchors.verticalCenter: undefined
-                anchors.top: hoursText.top
-                anchors.topMargin: hoursText.height * 0.5
                 opacity: startAnim ? 1 : 0
+                visible: Config.lockscreen.showDate ?? true
 
-                property real slideOffset: startAnim ? 0 : 150
+                property real slideOffset: startAnim ? 0 : 40
 
                 transform: Translate {
-                    y: minutesText.slideOffset
+                    y: dateText.slideOffset
                 }
-
-                layer.enabled: true
-                layer.effect: BgShadow {}
 
                 Behavior on opacity {
                     enabled: Config.animDuration > 0
@@ -223,35 +308,18 @@ WlSessionLockSurface {
             }
 
             Text {
-                id: amPmText
-                text: Config.bar.use12hFormat ? Qt.formatTime(clockContainer.currentTime, "ap").toLowerCase() : ""
-                font.family: "League Gothic"
-                font.pixelSize: 100
-                color: hoursText.color
+                id: usernameText
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: usernameCollector.text.trim()
+                font.family: Config.theme.font
+                font.pixelSize: Styling.fontSize(2)
+                font.weight: Font.Normal
+                color: Colors.overSurfaceVariant
                 antialiasing: true
-                anchors.top: hoursText.top
-                anchors.topMargin: hoursText.height * 0.35 
-                visible: Config.bar.use12hFormat
                 opacity: startAnim ? 1 : 0
-
-                property real slideOffset: startAnim ? 0 : -150
-
-                transform: Translate {
-                    y: amPmText.slideOffset
-                }
-
-                layer.enabled: true
-                layer.effect: BgShadow {}
+                visible: (Config.lockscreen.showUsername ?? true) && usernameCollector.text.trim() !== ""
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
-                    NumberAnimation {
-                        duration: Config.animDuration * 2
-                        easing.type: Easing.OutExpo
-                    }
-                }
-
-                Behavior on slideOffset {
                     enabled: Config.animDuration > 0
                     NumberAnimation {
                         duration: Config.animDuration * 2
@@ -263,7 +331,7 @@ WlSessionLockSurface {
 
         Timer {
             interval: 1000
-            running: true
+            running: GlobalStates.lockscreenVisible
             repeat: true
             onTriggered: clockContainer.currentTime = new Date()
         }

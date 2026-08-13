@@ -33,7 +33,6 @@
     swappy
     libnotify
     wl-clipboard
-    cliphist
     gsettings-desktop-schemas
     gh
     networkmanagerapplet

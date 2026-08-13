@@ -4,7 +4,7 @@
   ...
 }:
 let
-  cursorTheme = osConfig.mySystem.theme.gtk.cursorTheme;
+  cursor = import ../../lib/cursor.nix { inherit lib osConfig; };
   special = osConfig.mySystem.desktop.specialWorkspaces;
 
   mkCall = args: { _args = args; };
@@ -27,8 +27,8 @@ let
           transform
           bitdepth
           cm
-          sdrbrightness
-          sdrsaturation
+          sdrBrightness
+          sdrSaturation
           ;
       }
       // lib.optionalAttrs (monitor.vrr != 0) { inherit (monitor) vrr; }
@@ -59,31 +59,30 @@ let
         };
       }) [ "special:scratchpad" ]
     );
+
 in
 {
-  env =
-    lib.mapAttrsToList
-      (
-        name: value:
-        mkCall [
-          name
-          value
-        ]
-      )
+  inherit activeMonitors monitorWidth;
+
+  settings = {
+    env = lib.mapAttrsToList (
+      name: value:
+      mkCall [
+        name
+        value
+      ]
+    ) (lib.filterAttrs (name: _: lib.hasPrefix "HYPRCURSOR" name) cursor.vars);
+
+    monitor = (map renderMonitor osConfig.mySystem.monitors) ++ [
       {
-        HYPRCURSOR_THEME = cursorTheme.name;
-        HYPRCURSOR_SIZE = toString cursorTheme.size;
-      };
+        output = "";
+        mode = "preferred";
+        position = "auto";
+        scale = 1;
+      }
+    ];
 
-  monitor = (map renderMonitor osConfig.mySystem.monitors) ++ [
-    {
-      output = "";
-      mode = "preferred";
-      position = "auto";
-      scale = 1;
-    }
-  ];
-
-  workspace_rule =
-    lib.optionals (numMonitors > 0) (lib.genList mkWorkspaceRule 10) ++ specialWorkspaceRules;
+    workspace_rule =
+      lib.optionals (numMonitors > 0) (lib.genList mkWorkspaceRule 10) ++ specialWorkspaceRules;
+  };
 }

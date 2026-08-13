@@ -27,6 +27,11 @@ Item {
     property string barPosition: (Config.bar && Config.bar.position !== undefined && ["top", "bottom", "left", "right"].includes(Config.bar.position) ? Config.bar.position : "top")
     property string orientation: barPosition === "left" || barPosition === "right" ? "vertical" : "horizontal"
 
+    readonly property bool flatButtons: (Config.bar && Config.bar.flatButtons !== undefined ? Config.bar.flatButtons : false)
+    readonly property string clockPosition: (Config.bar && Config.bar.clockPosition === "center" ? "center" : "right")
+    readonly property bool showWorkspaces: (Config.bar && Config.bar.showWorkspaces !== undefined ? Config.bar.showWorkspaces : true)
+    readonly property string launcherPosition: (Config.bar && Config.bar.launcherPosition === "end" ? "end" : "start")
+
     onPinnedChanged: {
         if (Config.bar && Config.bar.pinnedOnStartup !== pinned) {
             Config.bar.pinnedOnStartup = pinned;
@@ -38,12 +43,7 @@ Item {
     readonly property var compositorMonitor: Compositor.monitorFor(screen)
     readonly property var toplevels: (!compositorMonitor || !compositorMonitor.activeWorkspace || !Compositor.clients.values) ? [] : Compositor.clients.values.filter(c => c.workspace.id === compositorMonitor.activeWorkspace.id)
 
-    readonly property bool activeWindowFullscreen: {
-        const toplevel = ToplevelManager.activeToplevel;
-        if (!toplevel || !toplevel.activated)
-            return false;
-        return toplevel.fullscreen === true;
-    }
+    readonly property bool activeWindowFullscreen: Compositor.hasFullscreenWindow(screen)
 
 
     readonly property bool shouldAutoHide: !pinned || activeWindowFullscreen
@@ -77,11 +77,10 @@ Item {
     }
 
     readonly property var screenVisibilities: Visibilities.getForScreen(screen.name)
-    readonly property bool notchOpen: screenVisibilities ? (screenVisibilities.launcher || screenVisibilities.dashboard || screenVisibilities.powermenu || screenVisibilities.tools) : false
+    readonly property bool notchOpen: Visibilities.isNotchOpen(screenVisibilities)
 
     readonly property real outerRadius: Styling.radius(0)
     readonly property real innerRadius: (Config.bar && Config.bar.pillStyle === "squished") ? Styling.radius(0) / 2 : Styling.radius(0)
-    readonly property bool pinButtonVisible: (Config.bar && Config.bar.showPinButton !== undefined ? Config.bar.showPinButton : true)
 
     readonly property bool reveal: {
         if (!shouldAutoHide)
@@ -91,12 +90,16 @@ Item {
             return false;
         }
 
-        return isMouseOverBar || hoverActive || notchHoverActive || notchOpen;
+        const hoverReveal = (Config.bar && Config.bar.hoverToReveal !== undefined ? Config.bar.hoverToReveal : true);
+        if (hoverReveal && (isMouseOverBar || hoverActive || notchHoverActive))
+            return true;
+
+        return notchOpen;
     }
 
     Timer {
         id: hideDelayTimer
-        interval: 1000
+        interval: (Config.bar && Config.bar.hideDelay !== undefined ? Config.bar.hideDelay : 1000)
         repeat: false
         onTriggered: {
             if (!root.isMouseOverBar) {
@@ -118,7 +121,7 @@ Item {
         }
     }
 
-    readonly property bool integratedDockEnabled: (Config.dock && Config.dock.enabled !== undefined ? Config.dock.enabled : false) && (Config.dock && Config.dock.theme !== undefined ? Config.dock.theme : "default") === "integrated"
+    readonly property bool integratedDockEnabled: Config.integratedDockEnabled
     readonly property string integratedDockPosition: {
         const pos = (Config.dock && Config.dock.position !== undefined ? Config.dock.position : "center");
 
@@ -139,6 +142,7 @@ Item {
     readonly property int frameOffset: (Config.bar && Config.bar.frameEnabled !== undefined ? Config.bar.frameEnabled : false) ? (Config.bar && Config.bar.frameThickness !== undefined ? Config.bar.frameThickness : 6) : 0
 
     readonly property int barPadding: barBg.padding
+    readonly property int barSpacing: (Config.bar && Config.bar.spacing !== undefined) ? Config.bar.spacing : 4
     readonly property int topOuterMargin: (orientation === "vertical" || barPosition === "top") ? barBg.outerMargin : 0
     readonly property int bottomOuterMargin: (orientation === "vertical" || barPosition === "bottom") ? barBg.outerMargin : 0
     readonly property int leftOuterMargin: (orientation === "horizontal" || barPosition === "left") ? barBg.outerMargin : 0
@@ -344,18 +348,21 @@ Item {
                     active: root.orientation === "horizontal"
                     anchors.fill: parent
                     sourceComponent: RowLayout {
-                        spacing: 4
+                        spacing: root.barSpacing
 
                         readonly property var notchContainer: Visibilities.getNotchForScreen(root.screen.name)
 
                         LauncherButton {
                             id: launcherButton
+                            visible: root.launcherPosition !== "end"
                             startRadius: root.outerRadius
                             endRadius: root.innerRadius
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                         }
 
                         Workspaces {
+                            visible: root.showWorkspaces
                             orientation: root.orientation
                             bar: QtObject {
                                 property var screen: root.screen
@@ -457,10 +464,10 @@ Item {
 
                                     if (root.splitActive) {
                                         const segEnd = root.splitStart - (root.frameOffset + root.leftOuterMargin);
-                                        return (segEnd - width) / 2 - (parent.x + 4);
+                                        return (segEnd - width) / 2 - (parent.x + root.barSpacing);
                                     }
 
-                                    return (bar.width - width) / 2 - (parent.x + 4);
+                                    return (bar.width - width) / 2 - (parent.x + root.barSpacing);
                                 }
 
                                 x: Math.max(0, Math.min(parent.width - width, targetX))
@@ -480,11 +487,13 @@ Item {
                             startRadius: root.dockAtEnd ? root.innerRadius : root.outerRadius
                             endRadius: root.innerRadius
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                         }
 
                         SysTray {
                             bar: root
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                         }
@@ -493,12 +502,14 @@ Item {
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                         }
 
                         ControlsButton {
                             id: controlsButton
                             bar: root
                             layerEnabled: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                         }
@@ -507,6 +518,7 @@ Item {
                             id: batteryIndicator
                             bar: root
                             layerEnabled: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                         }
@@ -515,6 +527,8 @@ Item {
                             id: clockComponent
                             bar: root
                             layerEnabled: root.shadowsEnabled
+                            flatStyle: root.flatButtons
+                            visible: root.clockPosition !== "center"
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                         }
@@ -524,6 +538,16 @@ Item {
                             startRadius: root.innerRadius
                             endRadius: root.outerRadius
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
+                        }
+
+                        LauncherButton {
+                            id: launcherButtonEnd
+                            visible: root.launcherPosition === "end"
+                            startRadius: root.innerRadius
+                            endRadius: root.outerRadius
+                            enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                         }
                     }
                 }
@@ -533,20 +557,23 @@ Item {
                     active: root.orientation === "vertical"
                     anchors.fill: parent
                     sourceComponent: ColumnLayout {
-                        spacing: 4
+                        spacing: root.barSpacing
 
                         LauncherButton {
                             id: launcherButtonVert
+                            visible: root.launcherPosition !== "end"
                             Layout.preferredHeight: 36
                             startRadius: root.outerRadius
                             endRadius: root.innerRadius
                             vertical: true
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                         }
 
                         SysTray {
                             bar: root
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                         }
@@ -556,6 +583,7 @@ Item {
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                         }
 
                         ToolsButton {
@@ -564,6 +592,7 @@ Item {
                             endRadius: root.outerRadius
                             vertical: true
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                         }
 
                         Item {
@@ -587,10 +616,11 @@ Item {
 
                                 height: Math.min(parent.height, implicitHeight)
                                 width: parent.width
-                                spacing: 4
+                                spacing: root.barSpacing
 
                                 Workspaces {
                                     id: workspacesVert
+                                    visible: root.showWorkspaces
                                     orientation: root.orientation
                                     bar: QtObject {
                                         property var screen: root.screen
@@ -689,6 +719,7 @@ Item {
                             id: controlsButtonVert
                             bar: root
                             layerEnabled: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                             startRadius: root.outerRadius
                             endRadius: root.innerRadius
                         }
@@ -697,6 +728,7 @@ Item {
                             id: batteryIndicatorVert
                             bar: root
                             layerEnabled: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                         }
@@ -705,6 +737,7 @@ Item {
                             id: clockComponentVert
                             bar: root
                             layerEnabled: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                             startRadius: root.innerRadius
                             endRadius: root.innerRadius
                         }
@@ -716,9 +749,32 @@ Item {
                             endRadius: root.outerRadius
                             vertical: true
                             enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
+                        }
+
+                        LauncherButton {
+                            id: launcherButtonVertEnd
+                            visible: root.launcherPosition === "end"
+                            Layout.preferredHeight: 36
+                            startRadius: root.innerRadius
+                            endRadius: root.outerRadius
+                            vertical: true
+                            enableShadow: root.shadowsEnabled
+                            flatStyle: root.flatButtons
                         }
                     }
                 }
+            }
+
+            Clock {
+                id: clockComponentCenter
+                visible: root.orientation === "horizontal" && root.clockPosition === "center"
+                bar: root
+                flatStyle: root.flatButtons
+                layerEnabled: root.shadowsEnabled
+                anchors.centerIn: parent
+                startRadius: root.innerRadius
+                endRadius: root.innerRadius
             }
         }
     }

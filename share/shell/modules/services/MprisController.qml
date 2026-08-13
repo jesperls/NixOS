@@ -6,6 +6,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Mpris
 import qs.config
+import qs.modules.theme
 
 Singleton {
     id: root
@@ -31,7 +32,6 @@ Singleton {
     property bool canTogglePlaying: activePlayer ? activePlayer.canTogglePlaying : false
     property bool canGoPrevious: activePlayer ? activePlayer.canGoPrevious : false
     property bool canGoNext: activePlayer ? activePlayer.canGoNext : false
-    property bool canChangeVolume: activePlayer && activePlayer.volumeSupported && activePlayer.canControl
     property bool loopSupported: activePlayer && activePlayer.loopSupported && activePlayer.canControl
     property var loopState: activePlayer ? activePlayer.loopState : (typeof MprisLoopState !== 'undefined' ? MprisLoopState.None : 0)
     property bool shuffleSupported: activePlayer && activePlayer.shuffleSupported && activePlayer.canControl
@@ -39,6 +39,23 @@ Singleton {
 
     function playerBaseName(name) {
         return (name || "").toLowerCase().replace(/\.instance[-_a-z0-9]*$/, "");
+    }
+
+    function getPlayerIcon(player) {
+        if (!player)
+            return Icons.player;
+        const dbusName = (player.dbusName || "").toLowerCase();
+        const desktopEntry = (player.desktopEntry || "").toLowerCase();
+        const identity = (player.identity || "").toLowerCase();
+        if (dbusName.includes("spotify") || desktopEntry.includes("spotify") || identity.includes("spotify"))
+            return Icons.spotify;
+        if (dbusName.includes("chromium") || dbusName.includes("chrome") || desktopEntry.includes("chromium") || desktopEntry.includes("chrome"))
+            return Icons.chromium;
+        if (dbusName.includes("firefox") || desktopEntry.includes("firefox"))
+            return Icons.firefox;
+        if (dbusName.includes("telegram") || desktopEntry.includes("telegram") || identity.includes("telegram"))
+            return Icons.telegram;
+        return Icons.player;
     }
 
     onFilteredPlayersChanged: {

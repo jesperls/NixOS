@@ -14,10 +14,10 @@ StyledRect {
     property string prefixText: ""  // Prefix indicator (e.g., "clip ")
     property string prefixIcon: ""  // Prefix icon (e.g., Icons.clipboard)
     property bool clearOnEscape: true
-    property bool handleTabNavigation: false  // Si true, captura Tab y emite señales. Si false, usa navegación normal.
-    property bool passwordMode: false  // Si true, muestra círculos en lugar del texto
-    property bool centerText: false  // Si true, centra el texto horizontalmente
-    property bool disableCursorNavigation: false  // Si true, Left/Right siempre emiten señales sin mover el cursor
+    property bool handleTabNavigation: false  // When true, Tab is captured and emitted as signals instead of navigating.
+    property bool passwordMode: false  // Show dots instead of the text.
+    property bool centerText: false  // Center the text horizontally.
+    property bool disableCursorNavigation: false  // Left/Right always emit signals without moving the cursor.
 
     signal searchTextChanged(string text)
     signal accepted

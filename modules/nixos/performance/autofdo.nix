@@ -82,8 +82,8 @@ in
         vmlinux=${config.boot.kernelPackages.kernel.dev}/vmlinux
 
         if [ ! -f "$vmlinux" ]; then
-          echo "autofdo: vmlinux not found at $vmlinux" >&2
-          exit 1
+          echo "autofdo: vmlinux not found at $vmlinux; kernel package doesn't ship it" >&2
+          exit 0
         fi
 
         # AMD Zen5 (amd_lbr_v2): taken-branch sampling + branch stack. The kernel

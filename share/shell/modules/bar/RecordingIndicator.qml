@@ -11,6 +11,7 @@ Item {
     property real endRadius: 0
     property bool vertical: false
     property bool enableShadow: true
+    property bool flatStyle: false
 
     property bool recording: ScreenRecorder.isRecording
 
@@ -20,8 +21,8 @@ Item {
 
     StyledRect {
         anchors.fill: parent
-        variant: "bg"
-        enableShadow: root.enableShadow && Config.showBackground
+        variant: root.flatStyle ? "transparent" : "bg"
+        enableShadow: !root.flatStyle && root.enableShadow && Config.showBackground
         topLeftRadius: root.startRadius
         topRightRadius: root.vertical ? root.startRadius : root.endRadius
         bottomLeftRadius: root.vertical ? root.endRadius : root.startRadius

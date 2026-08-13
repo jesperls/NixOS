@@ -24,7 +24,7 @@ StyledRect {
         return frame ? "file://" + frame : "";
     }
 
-    visible: MprisController.activePlayer !== null
+    visible: MprisController.activePlayer !== null || wallpaperPath !== ""
     height: 96
     radius: Config.roundness > 0 ? (height / 2) * (Config.roundness / 16) : 0
     backgroundOpacity: (MprisController.activePlayer || wallpaperPath !== "") ? 0.0 : 1.0
@@ -98,42 +98,7 @@ StyledRect {
         }
     }
 
-    Item {
-        id: noPlayerContainer
-        anchors.fill: parent
-        anchors.margins: 16
-        visible: !MprisController.activePlayer && wallpaperPath === ""
-
-        Loader {
-            active: noPlayerContainer.visible
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            height: 24
-            sourceComponent: CarouselProgress {
-                anchors.fill: parent
-                frequency: 4
-                color: Colors.surfaceBright
-                amplitudeMultiplier: 4
-                lineWidth: 2
-                fullLength: width
-                opacity: 1.0
-                animationsEnabled: true
-                active: true
-
-                Behavior on color {
-                    enabled: Config.animDuration > 0
-                    ColorAnimation {
-                        duration: Config.animDuration
-                        easing.type: Easing.OutQuart
-                    }
-                }
-            }
-        }
-    }
-
     RowLayout {
-        id: contentLayout
         anchors.fill: parent
         anchors.margins: 16
         anchors.rightMargin: 28
@@ -245,7 +210,7 @@ StyledRect {
 
                 Text {
                     Layout.fillWidth: true
-                    text: MprisController.activePlayer?.trackTitle ?? "No hay reproducción activa"
+                    text: MprisController.activePlayer?.trackTitle ?? "No active playback"
                     textFormat: Text.PlainText
                     color: Colors.overBackground
                     font.pixelSize: Config.theme.fontSize
@@ -403,23 +368,7 @@ StyledRect {
 
                 Text {
                     id: playerIcon
-                    text: {
-                        if (!MprisController.activePlayer)
-                            return Icons.player;
-                        const dbusName = (MprisController.activePlayer.dbusName || "").toLowerCase();
-                        const desktopEntry = (MprisController.activePlayer.desktopEntry || "").toLowerCase();
-                        const identity = (MprisController.activePlayer.identity || "").toLowerCase();
-
-                        if (dbusName.includes("spotify") || desktopEntry.includes("spotify") || identity.includes("spotify"))
-                            return Icons.spotify;
-                        if (dbusName.includes("chromium") || dbusName.includes("chrome") || desktopEntry.includes("chromium") || desktopEntry.includes("chrome"))
-                            return Icons.chromium;
-                        if (dbusName.includes("firefox") || desktopEntry.includes("firefox"))
-                            return Icons.firefox;
-                        if (dbusName.includes("telegram") || desktopEntry.includes("telegram") || identity.includes("telegram"))
-                            return Icons.telegram;
-                        return Icons.player;
-                    }
+                    text: MprisController.getPlayerIcon(MprisController.activePlayer)
                     textFormat: Text.RichText
                     color: playerIconHover.hovered ? Styling.srItem("overprimary") : Colors.overBackground
                     font.pixelSize: 20
@@ -473,24 +422,6 @@ StyledRect {
                     OptionsMenu {
                         id: playersMenu
 
-                        function getPlayerIcon(player) {
-                            if (!player)
-                                return Icons.player;
-                            const dbusName = (player.dbusName || "").toLowerCase();
-                            const desktopEntry = (player.desktopEntry || "").toLowerCase();
-                            const identity = (player.identity || "").toLowerCase();
-
-                            if (dbusName.includes("spotify") || desktopEntry.includes("spotify") || identity.includes("spotify"))
-                                return Icons.spotify;
-                            if (dbusName.includes("chromium") || dbusName.includes("chrome") || desktopEntry.includes("chromium") || desktopEntry.includes("chrome"))
-                                return Icons.chromium;
-                            if (dbusName.includes("firefox") || desktopEntry.includes("firefox"))
-                                return Icons.firefox;
-                            if (dbusName.includes("telegram") || desktopEntry.includes("telegram") || identity.includes("telegram"))
-                                return Icons.telegram;
-                            return Icons.player;
-                        }
-
                         function updateMenuItems() {
                             const players = MprisController.filteredPlayers;
                             const menuItems = [];
@@ -501,7 +432,7 @@ StyledRect {
 
                                 menuItems.push({
                                     text: player.trackTitle || player.identity || "Unknown Player",
-                                    icon: getPlayerIcon(player),
+                                    icon: MprisController.getPlayerIcon(player),
                                     highlightColor: Styling.srItem("overprimary"),
                                     textColor: Colors.overPrimary,
                                     onTriggered: () => {

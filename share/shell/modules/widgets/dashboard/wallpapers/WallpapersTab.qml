@@ -11,6 +11,8 @@ import qs.config
 FocusScope {
     id: wallpapersTabRoot
 
+    implicitWidth: 800
+
     property string searchText: ""
     property int selectedIndex: GlobalStates.wallpaperSelectedIndex
 
@@ -98,8 +100,8 @@ FocusScope {
     }
 
     function focusFilters() {
-        currentFocusIndex = 2;
-        focusableElements[2].focusFunc();
+        currentFocusIndex = 4;
+        focusableElements[4].focusFunc();
     }
 
     function focusNextElement() {
@@ -222,7 +224,7 @@ FocusScope {
             Layout.fillWidth: true
             Layout.preferredHeight: 48
             spacing: 8
-            z: 1000  // Asegurar que el menú desplegable se dibuje por encima del resto del contenido
+            z: 1000  // keep the dropdown above the grid
 
             SearchInput {
                 id: wallpaperSearchInput
@@ -313,7 +315,7 @@ FocusScope {
 
             Item {
                 id: perScreenCheckboxContainer
-                Layout.preferredWidth: 120  // un poco mas ancho para que quepa el nombre monitor si es largo
+                Layout.preferredWidth: 120  // wider for long monitor names
                 Layout.preferredHeight: 48
 
                 property bool keyboardNavigationActive: false
@@ -345,7 +347,7 @@ FocusScope {
 
                             Text {
                                 anchors.fill: parent
-                                text: currentScreenName  // Get the monitor name!
+                                text: currentScreenName
                                 color: Colors.overSurface
                                 font.family: Config.theme.font
                                 font.pixelSize: Config.theme.fontSize
@@ -1124,15 +1126,6 @@ FocusScope {
     }
 
     Component {
-        id: wallpaperComponent
-
-        Loader {
-            sourceComponent: staticImageComponent  // All thumbnails are now static images
-            property string sourceFile: parent.sourceFile
-        }
-    }
-
-    Component {
         id: staticImageComponent
         Image {
             mipmap: true
@@ -1147,7 +1140,7 @@ FocusScope {
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             smooth: true
-            cache: false  // Deshabilitar cache para reducir uso de RAM
+            cache: false  // skip image caching to save RAM
             sourceSize.width: wallpaperGridContainer.cellSize
             sourceSize.height: wallpaperGridContainer.cellSize
 

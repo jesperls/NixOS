@@ -14,7 +14,7 @@ FocusScope {
     property int buttonSize: 48
     property int iconSize: 20
     property int spacing: 4
-    property int columns: 3  // para layout grid
+    property int columns: 3
     property int textSpacing: 8
 
     signal actionTriggered(var action)
@@ -97,7 +97,7 @@ FocusScope {
             id: highlight
             variant: (repeater.count > 0 && repeater.itemAt(root.currentIndex) && repeater.itemAt(root.currentIndex).actionModel.variant) ? repeater.itemAt(root.currentIndex).actionModel.variant : "primary"
             radius: Styling.radius(4)
-            z: 0  // Por debajo de los botones
+            z: 0
             visible: repeater.count > 0
 
             property Item targetItem: repeater.count > 0 ? repeater.itemAt(root.currentIndex) : null
@@ -276,7 +276,7 @@ FocusScope {
                                 visible: delegateWrapper.hasText
                                 text: visible ? modelData.text : ""
                                 anchors.left: parent.left
-                                anchors.leftMargin: root.buttonSize  // Empieza justo después del área del icono
+                                anchors.leftMargin: root.buttonSize
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 font.family: Config.defaultFont

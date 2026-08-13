@@ -300,6 +300,28 @@ local function update_single_ratio()
   end
 end
 
+local function prune_session()
+  local live_ws = {}
+  local live_windows = {}
+  for _, ws in ipairs(hl.get_workspaces()) do
+    live_ws[ws.id] = true
+    for _, window in ipairs(hl.get_workspace_windows(ws.id)) do
+      live_windows[window.stable_id] = true
+    end
+  end
+
+  for id in pairs(slots) do
+    if not live_ws[id] then
+      slots[id] = nil
+    end
+  end
+  for id in pairs(weights) do
+    if not live_windows[id] then
+      weights[id] = nil
+    end
+  end
+end
+
 local function scan()
   update_single_ratio()
   if full_height then
@@ -307,6 +329,7 @@ local function scan()
       update_gap(mon)
     end
   end
+  prune_session()
   session.save()
 end
 

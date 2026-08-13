@@ -72,7 +72,7 @@ Singleton {
             render_power = ${c.shadowRenderPower},
             sharp = ${c.shadowSharp},
             color = "${shadowSpec(Config.compositorShadowColor)}",
-            color_inactive = "${shadowSpec(c.shadowColorInactive)}",
+            color_inactive = "${shadowSpec(Config.compositorShadowColorInactive)}",
             offset = "${c.shadowOffset}",
             scale = ${c.shadowScale.toFixed(2)},
         },

@@ -160,10 +160,8 @@ Singleton {
     }
 
     readonly property real effectiveSunProgress: debugMode ? debugSunProgress : realSunProgress
-    readonly property string effectiveTimeOfDay: debugMode ? debugTimeOfDay : timeOfDay
     readonly property bool effectiveIsDay: debugMode ? debugIsDay : realIsDay
     readonly property int effectiveWeatherCode: debugMode ? debugWeatherCode : weatherCode
-    readonly property string effectiveWeatherSymbol: debugMode ? getWeatherCodeEmoji(debugWeatherCode) : weatherSymbol
     readonly property string effectiveWeatherDescription: debugMode ? getWeatherDescription(debugWeatherCode) : weatherDescription
 
     readonly property string effectiveWeatherEffect: getWeatherEffect(effectiveWeatherCode)

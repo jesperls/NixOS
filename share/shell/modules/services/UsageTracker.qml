@@ -110,42 +110,4 @@ Singleton {
         return timeBoost + frequencyScore;
     }
 
-    function getTopApps(limit) {
-        if (!limit)
-            limit = 10;
-
-        var apps = [];
-        for (var appId in usageData) {
-            apps.push({
-                appId: appId,
-                score: getUsageScore(appId),
-                count: usageData[appId].count,
-                lastUsed: usageData[appId].lastUsed
-            });
-        }
-
-        apps.sort(function (a, b) {
-            return b.score - a.score;
-        });
-
-        return apps.slice(0, limit);
-    }
-
-    function pruneOldEntries() {
-        var now = Date.now();
-        var ninetyDaysInMs = dayInMs * 90;
-        var changed = false;
-
-        for (var appId in usageData) {
-            if (now - usageData[appId].lastUsed > ninetyDaysInMs) {
-                delete usageData[appId];
-                changed = true;
-            }
-        }
-
-        if (changed) {
-            usageData = usageData;
-            saveUsageData();
-        }
-    }
 }

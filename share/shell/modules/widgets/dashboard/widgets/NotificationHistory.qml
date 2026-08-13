@@ -45,7 +45,7 @@ Item {
 
     Timer {
         id: cascadeTimer
-        interval: 100  // 0.1 seconds delay between each animation
+        interval: 100
         repeat: true
         onTriggered: {
             if (cascadeIndex >= 0) {
@@ -66,7 +66,7 @@ Item {
 
     Timer {
         id: discardAllTimer
-        interval: Config.animDuration + 50  // Animation duration + small buffer
+        interval: Config.animDuration + 50
         repeat: false
         onTriggered: Notifications.discardAllNotifications()
     }

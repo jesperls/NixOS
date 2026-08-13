@@ -13,14 +13,19 @@ Item {
 
     property string currentTime: ""
     property string currentDayAbbrev: ""
+    property string currentDate: ""
     property string currentHours: ""
     property string currentMinutes: ""
-    property string currentFullDate: ""
+
+    readonly property bool showDate: (Config.bar && Config.bar.showDate !== undefined) ? Config.bar.showDate : false
+    readonly property bool showSeconds: (Config.bar && Config.bar.showSeconds !== undefined) ? Config.bar.showSeconds : false
+    readonly property bool dayIsSymbol: !root.showDate && root.weatherAvailable
 
     required property var bar
     property bool vertical: bar.orientation === "vertical"
     property bool isHovered: false
     property bool layerEnabled: true
+    property bool flatStyle: false
     
     property real radius: 0
     property real startRadius: radius
@@ -33,20 +38,23 @@ Item {
     Layout.preferredWidth: vertical ? 36 : buttonBg.implicitWidth
     Layout.preferredHeight: vertical ? buttonBg.implicitHeight : 36
 
+    implicitWidth: vertical ? 36 : buttonBg.implicitWidth
+    implicitHeight: vertical ? buttonBg.implicitHeight : 36
+
     HoverHandler {
         onHoveredChanged: root.isHovered = hovered
     }
 
     StyledRect {
         id: buttonBg
-        variant: root.popupOpen ? "primary" : "bg"
+        variant: root.popupOpen ? "primary" : (root.flatStyle ? "transparent" : "bg")
         anchors.fill: parent
-        enableShadow: root.layerEnabled
+        enableShadow: !root.flatStyle && root.layerEnabled
 
-        topLeftRadius: root.vertical ? root.startRadius : root.startRadius
+        topLeftRadius: root.startRadius
         topRightRadius: root.vertical ? root.startRadius : root.endRadius
         bottomLeftRadius: root.vertical ? root.endRadius : root.startRadius
-        bottomRightRadius: root.vertical ? root.endRadius : root.endRadius
+        bottomRightRadius: root.endRadius
 
         implicitWidth: vertical ? 36 : rowLayout.implicitWidth + 24
         implicitHeight: vertical ? columnLayout.implicitHeight + 24 : 36
@@ -73,11 +81,11 @@ Item {
 
             Text {
                 id: dayDisplay
-                text: root.weatherAvailable ? WeatherService.weatherSymbol : root.currentDayAbbrev
+                text: root.showDate ? root.currentDate : (root.weatherAvailable ? WeatherService.weatherSymbol : root.currentDayAbbrev)
                 color: root.popupOpen ? buttonBg.item : Colors.overBackground
-                font.pixelSize: root.weatherAvailable ? 16 : Config.theme.fontSize
-                font.family: root.weatherAvailable ? Config.theme.font : Config.theme.font
-                font.bold: !root.weatherAvailable
+                font.pixelSize: root.dayIsSymbol ? 16 : Config.theme.fontSize
+                font.family: Config.theme.font
+                font.bold: !root.dayIsSymbol
             }
 
             Separator {
@@ -104,11 +112,11 @@ Item {
 
             Text {
                 id: dayDisplayV
-                text: root.weatherAvailable ? WeatherService.weatherSymbol : root.currentDayAbbrev
+                text: root.showDate ? root.currentDate : (root.weatherAvailable ? WeatherService.weatherSymbol : root.currentDayAbbrev)
                 color: root.popupOpen ? buttonBg.item : Colors.overBackground
-                font.pixelSize: root.weatherAvailable ? 16 : Config.theme.fontSize
+                font.pixelSize: root.dayIsSymbol ? 16 : Config.theme.fontSize
                 font.family: Config.theme.font
-                font.bold: !root.weatherAvailable
+                font.bold: !root.dayIsSymbol
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.NoWrap
                 Layout.alignment: Qt.AlignHCenter
@@ -183,7 +191,6 @@ Item {
 
                 property date currentDate: new Date()
                 property int currentDayOfWeek: (currentDate.getDay() + 6) % 7  // Monday = 0
-                property int currentDayOfMonth: currentDate.getDate()
 
                 function getWeekStart(date) {
                     var d = new Date(date);
@@ -196,8 +203,9 @@ Item {
 
                 Timer {
                     interval: 60000
-                    running: !SuspendManager.isSuspending
+                    running: clockPopup.isOpen
                     repeat: true
+                    triggeredOnStart: true
                     onTriggered: calendarWrapper.currentDate = new Date()
                 }
 
@@ -606,24 +614,34 @@ Item {
         var now = new Date();
         var day = Qt.formatDateTime(now, Qt.locale(), "ddd");
         root.currentDayAbbrev = day.slice(0, 3).charAt(0).toUpperCase() + day.slice(1, 3);
-        root.currentFullDate = Qt.formatDateTime(now, Qt.locale(), "dddd, MMMM d, yyyy");
+        var date = Qt.formatDateTime(now, Qt.locale(), "d MMM");
+        root.currentDate = date.charAt(0).toUpperCase() + date.slice(1);
         scheduleNextDayUpdate();
     }
 
     function updateTime() {
         var now = new Date();
-        var format = Config.bar.use12hFormat ? "h:mm ap" : "hh:mm";
+        var use12h = Config.bar.use12hFormat;
+        var format = use12h ? (root.showSeconds ? "h:mm:ss ap" : "h:mm ap") : (root.showSeconds ? "hh:mm:ss" : "hh:mm");
         var formatted = Qt.formatDateTime(now, format);
-        var parts = formatted.split(":");
         root.currentTime = formatted;
-        root.currentHours = parts[0];
-        root.currentMinutes = parts[1].split(" ")[0];
+
+        if (use12h) {
+            var match = formatted.match(/^(\d+):(\d+)(?::(\d+))?\s*(AM|PM)$/i);
+            root.currentHours = match ? match[1] + " " + match[4] : formatted;
+            root.currentMinutes = match ? match[2] + (match[3] ? ":" + match[3] : "") : "";
+        } else {
+            var parts = formatted.split(":");
+            root.currentHours = parts[0];
+            root.currentMinutes = parts.length > 2 ? parts[1] + ":" + parts[2] : parts[1];
+        }
     }
 
     Timer {
         interval: 1000
-        running: !SuspendManager.isSuspending
+        running: root.visible && root.bar.reveal
         repeat: true
+        triggeredOnStart: true
         onTriggered: root.updateTime()
     }
 

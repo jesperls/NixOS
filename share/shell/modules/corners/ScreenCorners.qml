@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.modules.services
 import qs.config
-import qs.modules.bar.workspaces  // For CompositorData
+import qs.modules.bar.workspaces
 
 PanelWindow {
     id: screenCorners
@@ -17,7 +17,7 @@ PanelWindow {
             monitor = mon;
         }
 
-        if (!monitor) {
+        if (!monitor || !monitor.activeWorkspace) {
             activeWindowFullscreen = false;
             return;
         }

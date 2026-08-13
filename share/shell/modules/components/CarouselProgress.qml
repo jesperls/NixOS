@@ -1,5 +1,4 @@
 import QtQuick
-import qs.config
 import qs.modules.theme
 
 WavyLine {
@@ -9,6 +8,8 @@ WavyLine {
     property real spacing: 6
     property real targetSpacing: 6
     property bool active: true
+
+    animationsEnabled: root.active
 
     lineWidth: dotSize
     

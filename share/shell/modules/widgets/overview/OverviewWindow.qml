@@ -15,6 +15,7 @@ Item {
     property var windowData
     property var toplevel
     property var monitorData: null
+    property Item overviewRoot: null
     property real scale
     property real availableWorkspaceWidth
     property real availableWorkspaceHeight
@@ -139,7 +140,7 @@ Item {
         anchors.fill: parent
         radius: root.calculatedRadius
         color: pressed ? Colors.surfaceBright : hovered ? Colors.surface : Colors.background
-        border.color: root.isSearchSelected ? Colors.tertiary : root.isSearchMatch ? Styling.srItem("overprimary") : Styling.srItem("overprimary")
+        border.color: root.isSearchSelected ? Colors.tertiary : Styling.srItem("overprimary")
         border.width: root.isSearchSelected ? 3 : root.isSearchMatch ? 2 : (hovered ? 2 : 0)
         visible: !windowPreview.hasContent || !Config.performance.windowPreview
 
@@ -177,7 +178,7 @@ Item {
         anchors.fill: parent
         radius: root.calculatedRadius
         color: pressed ? Qt.rgba(Colors.surfaceContainerHighest.r, Colors.surfaceContainerHighest.g, Colors.surfaceContainerHighest.b, 0.5) : hovered ? Qt.rgba(Colors.surfaceContainer.r, Colors.surfaceContainer.g, Colors.surfaceContainer.b, 0.2) : "transparent"
-        border.color: root.isSearchSelected ? Colors.tertiary : root.isSearchMatch ? Styling.srItem("overprimary") : Styling.srItem("overprimary")
+        border.color: root.isSearchSelected ? Colors.tertiary : Styling.srItem("overprimary")
         border.width: root.isSearchSelected ? 3 : root.isSearchMatch ? 2 : (hovered ? 2 : 0)
         visible: windowPreview.hasContent && Config.performance.windowPreview
         z: 5
@@ -257,7 +258,7 @@ Item {
         }
 
         onReleased: mouse => {
-            const overviewRoot = parent.parent.parent.parent;
+            const overviewRoot = root.overviewRoot;
             let targetWorkspace = overviewRoot.draggingTargetWorkspace;
 
             root.pressed = false;

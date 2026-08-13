@@ -159,7 +159,7 @@ Menu {
 
             text: itemData.text || ""
             width: root.menuWidth
-            height: isSeparatorItem ? 10 : root.itemHeight  // 2px separador + 4px margen arriba + 4px margen abajo
+            height: isSeparatorItem ? 10 : root.itemHeight  // 2px separator + 4px margins
             enabled: !isSeparatorItem
 
             background: Rectangle {

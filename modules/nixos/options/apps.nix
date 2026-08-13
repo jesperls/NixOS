@@ -21,6 +21,14 @@ let
       default = { inherit command desktopFile; };
       description = "Default ${description}.";
     };
+
+  mkHandler =
+    description: desktopFile:
+    lib.mkOption {
+      type = lib.types.str;
+      default = desktopFile;
+      description = "Desktop file that handles ${description}, for MIME associations.";
+    };
 in
 {
   options.mySystem.defaultApps = {
@@ -28,10 +36,11 @@ in
     browser = mkApp "web browser" "firefox" "firefox.desktop";
     fileManager = mkApp "file manager" "thunar" "thunar.desktop";
     editor = mkApp "code editor" "zeditor" "dev.zed.Zed.desktop";
-    textEditor = mkApp "plain text editor" "gedit" "gedit.desktop";
-    imageViewer = mkApp "image viewer" "imv" "imv.desktop";
-    videoPlayer = mkApp "video player" "mpv" "mpv.desktop";
-    pdfViewer = mkApp "PDF viewer" "evince" "evince.desktop";
-    archiveManager = mkApp "archive manager" "file-roller" "file-roller.desktop";
+
+    textEditor = mkHandler "plain text files" "gedit.desktop";
+    imageViewer = mkHandler "image files" "imv.desktop";
+    videoPlayer = mkHandler "video and audio files" "mpv.desktop";
+    pdfViewer = mkHandler "PDF documents" "evince.desktop";
+    archiveManager = mkHandler "archives" "file-roller.desktop";
   };
 }

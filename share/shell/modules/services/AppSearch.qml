@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.modules.services
+import qs.config
 
 Singleton {
     id: root
@@ -165,6 +166,13 @@ Singleton {
         allAppsCache = null;
         buildIndex();
     }
+
+    Connections {
+        target: Config.launcher
+        function onSortByUsageChanged() {
+            invalidateCache();
+        }
+    }
     
     Component.onCompleted: {
         buildIndex();
@@ -211,7 +219,7 @@ Singleton {
         
         for (let i = 0; i < list.length; i++) {
             const app = list[i];
-            const usageScore = UsageTracker.getUsageScore(app.id);
+            const usageScore = (Config.launcher.sortByUsage ?? true) ? UsageTracker.getUsageScore(app.id) : 0;
             
             let iconToUse = app.icon || "application-x-executable";
             if (iconCache[iconToUse]) {
@@ -305,7 +313,7 @@ Singleton {
             
             if (matchFound) {
                 const app = entry.original;
-                const usageScore = UsageTracker.getUsageScore(app.id);
+                const usageScore = (Config.launcher.sortByUsage ?? true) ? UsageTracker.getUsageScore(app.id) : 0;
                 let iconToUse = app.icon || "application-x-executable";
                 if (iconCache[iconToUse]) {
                     iconToUse = iconCache[iconToUse];

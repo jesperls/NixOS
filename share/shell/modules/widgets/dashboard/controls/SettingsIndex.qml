@@ -1,7 +1,6 @@
 
 import QtQuick
 import qs.modules.theme
-import qs.config
 
 QtObject {
 
@@ -117,6 +116,8 @@ QtObject {
         { label: "Shell", keywords: "shell panels modules", section: "shell", subSection: "", subLabel: "", icon: Icons.cube, isIcon: true },
         { label: "About", keywords: "about info credits version license pangu", section: "shell", subSection: "about", subLabel: "Shell > About", icon: Icons.cube, isIcon: true },
         
+        { label: "Layout Presets", keywords: "layout preset save apply overhaul restore stock", section: "shell", subSection: "presets", subLabel: "Shell > Layout Presets", icon: Icons.layout, isIcon: true },
+        
         { label: "Bar", keywords: "panel taskbar top bottom", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
         { label: "Bar Position", keywords: "top bottom left right edge", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
         { label: "Launcher Icon", keywords: "logo symbol path", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
@@ -124,6 +125,16 @@ QtObject {
         { label: "Launcher Icon Full Tint", keywords: "monochrome color", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.palette, isIcon: true },
         { label: "Launcher Icon Size", keywords: "width height pixels", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
         { label: "Pill Style", keywords: "squished roundness radius bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
+        { label: "Bar Style", keywords: "floating docked full width edge bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
+        { label: "Bar Margin", keywords: "gap distance edge offset bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
+        { label: "Bar Spacing", keywords: "gap between widgets buttons bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
+        { label: "Bar Padding", keywords: "inner padding content bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
+        { label: "Clock Position", keywords: "center right time bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.clock, isIcon: true },
+        { label: "Clock Seconds", keywords: "time seconds precise bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.clock, isIcon: true },
+        { label: "Clock Date", keywords: "time day month date bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.clock, isIcon: true },
+        { label: "Launcher Position", keywords: "start end left right bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
+        { label: "Flat Buttons", keywords: "flat icons transparent taskbar bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
+        { label: "Show Workspaces", keywords: "workspace dots indicators bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.squaresFour, isIcon: true },
         { label: "Firefox Player", keywords: "browser media music", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
         { label: "Bar Auto-hide", keywords: "autohide hide show reveal", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
         { label: "Pinned on Startup", keywords: "show visible default", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.layout, isIcon: true },
@@ -138,6 +149,10 @@ QtObject {
         { label: "Frame", keywords: "border screen edge thickness contain bar", section: "shell", subSection: "frame", subLabel: "Shell > Frame", icon: Icons.frameCorners, isIcon: true },
 
         { label: "Notch", keywords: "island dynamic island center", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.layout, isIcon: true },
+        { label: "Notch Hover Expansion Delay", keywords: "expand media player hover time", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.layout, isIcon: true },
+        { label: "Notch Show User", keywords: "avatar user host hide", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.user, isIcon: true },
+        { label: "Notch Show Media", keywords: "player music hide", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.layout, isIcon: true },
+        { label: "Notch Show Notification Indicator", keywords: "bell notifications hide", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.bell, isIcon: true },
         
         { label: "Workspaces", keywords: "virtual desktop spaces", section: "shell", subSection: "workspaces", subLabel: "Shell > Workspaces", icon: Icons.squaresFour, isIcon: true },
         { label: "Workspaces Shown", keywords: "number count visible", section: "shell", subSection: "workspaces", subLabel: "Shell > Workspaces", icon: Icons.squaresFour, isIcon: true },
@@ -151,6 +166,22 @@ QtObject {
         { label: "Overview Columns", keywords: "grid layout horizontal", section: "shell", subSection: "overview", subLabel: "Shell > Overview", icon: Icons.squaresFour, isIcon: true },
         { label: "Overview Scale", keywords: "zoom size preview", section: "shell", subSection: "overview", subLabel: "Shell > Overview", icon: Icons.squaresFour, isIcon: true },
         { label: "Overview Workspace Spacing", keywords: "gap margin distance", section: "shell", subSection: "overview", subLabel: "Shell > Overview", icon: Icons.squaresFour, isIcon: true },
+        
+        { label: "Dashboard", keywords: "menu panel widgets dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.layout, isIcon: true },
+        { label: "Dashboard Width", keywords: "size width menu dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.layout, isIcon: true },
+        { label: "Dashboard Height", keywords: "size height menu dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.layout, isIcon: true },
+        { label: "Dashboard Tab Rail", keywords: "tabs show hide rail dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.layout, isIcon: true },
+        { label: "Dashboard Tab Position", keywords: "tabs left right top bottom rail dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.layout, isIcon: true },
+        { label: "Dashboard Widgets Tab", keywords: "show hide widgets tab dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.widgets, isIcon: true },
+        { label: "Dashboard Wallpapers Tab", keywords: "show hide wallpapers tab dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.wallpapers, isIcon: true },
+        { label: "Dashboard Metrics Tab", keywords: "show hide metrics tab dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.heartbeat, isIcon: true },
+        { label: "Dashboard Background Opacity", keywords: "transparency opacity background dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.layout, isIcon: true },
+        
+        { label: "Launcher", keywords: "app drawer search menu launch", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.apps, isIcon: true },
+        { label: "Launcher Width", keywords: "size width app drawer launcher", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.layout, isIcon: true },
+        { label: "Launcher Height", keywords: "size height app drawer launcher", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.layout, isIcon: true },
+        { label: "Launcher App Comments", keywords: "show hide comment subtitle app drawer", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.layout, isIcon: true },
+        { label: "Launcher Sort by Usage", keywords: "sort frequent apps usage launcher", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.layout, isIcon: true },
         
         { label: "Dock", keywords: "taskbar launcher apps favorites", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.layout, isIcon: true },
         { label: "Dock Enabled", keywords: "show hide toggle", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.layout, isIcon: true },

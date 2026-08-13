@@ -30,9 +30,11 @@ Item {
     property real progressRatio: isDragging ? dragPosition : value
     property string tooltipText: `${Math.round(value * 100)}%`
     property color progressColor: Styling.srItem("overprimary")
+    property color progressColor2: progressColor
+    property bool gradientProgress: false
     property color backgroundColor: Colors.surfaceBright
     property bool wavy: false
-    property bool playing: false  // Nuevo estado para controlar la animación
+    property bool playing: false
     property real wavyAmplitude: 0.8
     property real wavyFrequency: 8
     property real heightMultiplier: 8
@@ -96,6 +98,19 @@ Item {
             duration: Config.animDuration
             easing.type: Easing.OutQuart
         }
+    }
+
+    Gradient {
+        id: progressGradient
+        GradientStop { position: 0.0; color: root.progressColor }
+        GradientStop { position: 1.0; color: root.progressColor2 }
+    }
+
+    Gradient {
+        id: progressGradientVertical
+        orientation: Gradient.Vertical
+        GradientStop { position: 0.0; color: root.progressColor }
+        GradientStop { position: 1.0; color: root.progressColor2 }
     }
 
     RowLayout {
@@ -181,7 +196,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 height: root.thickness
                 radius: Styling.radius(0) / 4
-                color: root.progressColor
+                color: root.gradientProgress ? "transparent" : root.progressColor
+                gradient: root.gradientProgress ? progressGradient : null
                 visible: !root.wavy
                 z: 1
             }
@@ -224,7 +240,7 @@ Item {
                 height: root.isDragging ? 2 : 4
                 width: root.isDragging ? Math.max(20, root.thickness + 12) : Math.max(16, root.thickness + 8)
                 radius: Styling.radius(0)
-                color: iconColor
+                color: Colors.overBackground
                 z: 2
                 Behavior on width {
                     enabled: root.smoothDrag
@@ -284,7 +300,8 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: root.thickness
                 radius: Styling.radius(0) / 4
-                color: root.progressColor
+                color: root.gradientProgress ? "transparent" : root.progressColor
+                gradient: root.gradientProgress ? progressGradientVertical : null
                 visible: !root.wavy
                 z: 1
             }

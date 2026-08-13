@@ -9,7 +9,7 @@ import qs.modules.components
 ToolTip {
     id: root
     property string tooltipText: ""
-    property string desciription: ""
+    property string description: ""
     property bool show: false
 
     text: tooltipText
@@ -34,8 +34,8 @@ ToolTip {
         }
 
         Text {
-            text: root.desciription
-            visible: root.desciription.length > 0
+            text: root.description
+            visible: root.description.length > 0
             color: Colors.overBackground
             font.pixelSize: Config.theme.fontSize - 2
             font.family: Config.theme.font

@@ -73,7 +73,6 @@ bind(
 )
 bind(mainMod, "J", hl.dsp.layout("togglesplit"), "Window: toggle split direction")
 bind("ALT", "Tab", hl.dsp.focus({ last = true }), "Window: focus last")
-bind("ALT", "Tab", hl.dsp.window.alter_zorder({ mode = "top" }), "Window: raise")
 
 for key, direction in pairs({ left = "l", right = "r", up = "u", down = "d" }) do
   bind(mainMod, key, hl.dsp.focus({ direction = direction }), "Focus: " .. key)
@@ -103,13 +102,21 @@ end
 
 local layouts = require("pangu.layouts")
 
-bind(mainMod, "mouse:272", hl.dsp.window.drag(), "Mouse: drag window", { mouse = true })
-bind(mainMod, "mouse:273", hl.dsp.window.resize(), "Mouse: resize window", { mouse = true })
+bind(mainMod, "mouse:272", hl.dsp.window.drag(), "Mouse: drag window")
+bind(mainMod, "mouse:273", function()
+  if not in_centered() then
+    hl.dispatch(hl.dsp.window.resize())
+  end
+end, "Mouse: resize window")
 bind(mainMod, "mouse:273", layouts.start_drag, "Centered: start weight drag")
 bind(mainMod, "mouse:273", layouts.end_drag, "Centered: end weight drag", { release = true })
 
-bind("", "mouse:275", hl.dsp.window.drag(), "Mouse: drag window (side button)", { mouse = true })
-bind("", "mouse:276", hl.dsp.window.resize(), "Mouse: resize window (side button)", { mouse = true })
+bind("", "mouse:275", hl.dsp.window.drag(), "Mouse: drag window (side button)")
+bind("", "mouse:276", function()
+  if not in_centered() then
+    hl.dispatch(hl.dsp.window.resize())
+  end
+end, "Mouse: resize window (side button)")
 bind("", "mouse:276", layouts.start_drag, "Centered: start weight drag")
 bind("", "mouse:276", layouts.end_drag, "Centered: end weight drag", { release = true })
 bind("", "mouse:277", hl.dsp.window.close(), "Mouse: close window (side button)")

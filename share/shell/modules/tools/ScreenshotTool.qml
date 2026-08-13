@@ -7,7 +7,6 @@ import qs.modules.theme
 import qs.modules.components
 import qs.modules.services
 import qs.modules.globals
-import qs.config
 
 PanelWindow {
     id: screenshotPopup

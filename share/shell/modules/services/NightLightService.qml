@@ -9,11 +9,14 @@ Singleton {
     id: root
 
     property bool active: StateService.get("nightLight", false)
+    property bool stopping: false
+    property int restartFailures: 0
 
     readonly property int temperature: Config.system.nightLight?.temperature ?? 4500
 
     onTemperatureChanged: {
         if (active) {
+            root.stopping = true;
             killProcess.running = true;
             restartTimer.restart();
         }
@@ -36,9 +39,17 @@ Singleton {
         }
         onStarted: {
             root.active = true
+            root.restartFailures = 0
         }
         onExited: (code) => {
-            root.active = false
+            if (root.stopping) {
+                root.stopping = false
+            } else {
+                root.restartFailures++
+                console.warn("NightLightService: wlsunset exited with code " + code + ". Restarting...")
+                restartTimer.interval = Math.min(30000, 300 * root.restartFailures)
+                restartTimer.start()
+            }
         }
     }
     
@@ -62,6 +73,7 @@ Singleton {
             } 
             else if (!root.active && isRunning) {
                 console.log("NightLightService: Stopping wlsunset (state was inactive but running)")
+                root.stopping = true;
                 killProcess.running = true
             }
         }
@@ -69,6 +81,7 @@ Singleton {
 
     function toggle() {
         if (active) {
+            root.stopping = true;
             killProcess.running = true
         } else {
             wlsunsetProcess.running = true

@@ -12,7 +12,14 @@ if [ -z "$REGION" ]; then
     exit 0  # User cancelled
 fi
 
-RESULT=$(grim -g "$REGION" - | zbarimg -q --raw -)
+TMP_IMG=$(mktemp)
+trap 'rm -f "$TMP_IMG"' EXIT
+if ! grim -g "$REGION" "$TMP_IMG" 2>/dev/null; then
+    notify-send "QR Scan Error" "Screenshot capture failed" -u critical
+    exit 1
+fi
+
+RESULT=$(zbarimg -q --raw "$TMP_IMG" 2>/dev/null)
 
 if [ -n "$RESULT" ]; then
     echo -n "$RESULT" | wl-copy

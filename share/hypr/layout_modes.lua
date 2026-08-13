@@ -10,13 +10,20 @@ local rules = {}
 
 local function apply(id, target)
   local previous = rules[id]
-  if previous then
-    previous:set_enabled(false)
+  if previous and previous.target == target then
+    previous.rule:set_enabled(true)
+    return
   end
-  rules[id] = hl.workspace_rule({
-    workspace = "r[" .. id .. "-" .. id .. "]",
-    layout = target,
-  })
+  if previous then
+    previous.rule:set_enabled(false)
+  end
+  rules[id] = {
+    target = target,
+    rule = hl.workspace_rule({
+      workspace = "r[" .. id .. "-" .. id .. "]",
+      layout = target,
+    }),
+  }
 end
 
 for id, target in pairs(modes) do

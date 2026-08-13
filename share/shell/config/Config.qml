@@ -32,10 +32,13 @@ Singleton {
         prefix: prefixFile,
         system: systemFile,
         dock: dockFile,
-        pinnedapps: pinnedAppsFile
+        pinnedapps: pinnedAppsFile,
+        osd: osdFile,
+        dashboard: dashboardFile,
+        launcher: launcherFile
     })
 
-    readonly property bool initialLoadComplete: themeFile.ready && barFile.ready && workspacesFile.ready && overviewFile.ready && notchFile.ready && compositorFile.ready && performanceFile.ready && weatherFile.ready && desktopFile.ready && lockscreenFile.ready && prefixFile.ready && systemFile.ready && dockFile.ready
+    readonly property bool initialLoadComplete: themeFile.ready && barFile.ready && workspacesFile.ready && overviewFile.ready && notchFile.ready && compositorFile.ready && performanceFile.ready && weatherFile.ready && desktopFile.ready && lockscreenFile.ready && prefixFile.ready && systemFile.ready && dockFile.ready && pinnedAppsFile.ready && osdFile.ready && dashboardFile.ready && launcherFile.ready
 
     readonly property bool barReady: barFile.ready
     readonly property bool dockReady: dockFile.ready
@@ -66,7 +69,7 @@ Singleton {
             property bool lightMode: false
             property bool dynamicColors: true
             property int roundness: 16
-            property string font: "Roboto Condensed"
+            property string font: "Inter"
             property int fontSize: 14
             property string monoFont: "Iosevka Nerd Font Mono"
             property int monoFontSize: 14
@@ -99,7 +102,7 @@ Singleton {
 
             property JsonObject srPopup: JsonObject {
                 property string label: "Popup"
-                property list<var> gradient: [["background", 0.0]]
+                property list<var> gradient: [["surface", 0.0], ["surfaceDim", 1.0]]
                 property string gradientType: "linear"
                 property int gradientAngle: 0
                 property real gradientCenterX: 0.5
@@ -135,7 +138,7 @@ Singleton {
 
             property JsonObject srBarBg: JsonObject {
                 property string label: "Bar BG"
-                property list<var> gradient: [["surfaceDim", 0.0]]
+                property list<var> gradient: [["surfaceDim", 0.0], ["surfaceContainerLow", 1.0]]
                 property string gradientType: "linear"
                 property int gradientAngle: 0
                 property real gradientCenterX: 0.5
@@ -148,12 +151,12 @@ Singleton {
                 property string halftoneBackgroundColor: "surfaceDim"
                 property list<var> border: ["surfaceBright", 0]
                 property string itemColor: "overBackground"
-                property real opacity: 0.0
+                property real opacity: 1.0
             }
 
             property JsonObject srPane: JsonObject {
                 property string label: "Pane"
-                property list<var> gradient: [["surface", 0.0]]
+                property list<var> gradient: [["surface", 0.0], ["surfaceContainerLow", 1.0]]
                 property string gradientType: "linear"
                 property int gradientAngle: 0
                 property real gradientCenterX: 0.5
@@ -430,11 +433,19 @@ Singleton {
         adapter: JsonAdapter {
             property string position: "top"
             property int height: 0
+            property string style: "floating"
+            property int margin: 4
+            property int spacing: 4
+            property int padding: 4
             property string launcherIcon: ""
             property bool launcherIconTint: false
             property bool launcherIconFullTint: false
             property int launcherIconSize: 24
             property string pillStyle: "default"
+            property string clockPosition: "right"
+            property string launcherPosition: "start"
+            property bool flatButtons: false
+            property bool showWorkspaces: true
             property list<string> screenList: []
             property bool enableFirefoxPlayer: false
             property bool frameEnabled: false
@@ -442,9 +453,12 @@ Singleton {
             property bool pinnedOnStartup: true
             property bool hoverToReveal: true
             property int hoverRegionHeight: 8
+            property int hideDelay: 1000
             property bool showPinButton: true
             property bool availableOnFullscreen: false
             property bool use12hFormat: false
+            property bool showSeconds: false
+            property bool showDate: false
             property bool containBar: false
             property bool keepBarShadow: false
             property bool keepBarBorder: false
@@ -488,10 +502,15 @@ Singleton {
             property string theme: "default"
             property string position: "top"
             property int hoverRegionHeight: 8
+            property int hideDelay: 1000
+            property int hoverExpansionDelay: 400
+            property bool showUser: true
+            property bool showMedia: true
+            property bool showNotificationIndicator: true
             property bool keepHidden: false
             property string noMediaDisplay: "userHost"
             property string customText: "Pangu"
-            property bool disableHoverExpansion: true
+            property bool disableHoverExpansion: false
             property string splitSide: "left"
         }
     }
@@ -589,8 +608,10 @@ Singleton {
             property string position: "bottom"
             property bool lockOnBoot: false
             property bool showClock: true
+            property bool showDate: true
             property bool showMediaPlayer: true
             property bool showAvatar: true
+            property bool showUsername: true
             property bool blurWallpaper: true
             property int dimOpacity: 25
         }
@@ -679,7 +700,8 @@ Singleton {
             property int iconSize: 40
             property int spacing: 4
             property int margin: 8
-            property int hoverRegionHeight: 4
+            property int hoverRegionHeight: 8
+            property int hideDelay: 1000
             property bool pinnedOnStartup: false
             property bool hoverToReveal: true
             property bool availableOnFullscreen: false
@@ -702,6 +724,47 @@ Singleton {
         }
     }
 
+    ConfigFile {
+        id: osdFile
+        name: "osd"
+
+        adapter: JsonAdapter {
+            property string position: "bottom"
+            property bool showPercentage: true
+            property bool showSlider: true
+            property string iconStyle: "chip"
+            property int width: 260
+        }
+    }
+
+    ConfigFile {
+        id: dashboardFile
+        name: "dashboard"
+
+        adapter: JsonAdapter {
+            property int width: 0
+            property int height: 0
+            property bool showTabRail: true
+            property string tabPosition: "left"
+            property bool showWidgets: true
+            property bool showWallpapers: true
+            property bool showMetrics: true
+            property real backgroundOpacity: 1.0
+        }
+    }
+
+    ConfigFile {
+        id: launcherFile
+        name: "launcher"
+
+        adapter: JsonAdapter {
+            property int width: 0
+            property int height: 0
+            property bool showAppComments: true
+            property bool sortByUsage: true
+        }
+    }
+
     readonly property QtObject theme: themeFile.adapter
     readonly property QtObject bar: barFile.adapter
     readonly property QtObject workspaces: workspacesFile.adapter
@@ -716,6 +779,9 @@ Singleton {
     readonly property QtObject system: systemFile.adapter
     readonly property QtObject dock: dockFile.adapter
     readonly property QtObject pinnedApps: pinnedAppsFile.adapter
+    readonly property QtObject osd: osdFile.adapter
+    readonly property QtObject dashboard: dashboardFile.adapter
+    readonly property QtObject launcher: launcherFile.adapter
 
     readonly property bool lightMode: theme.lightMode
     readonly property bool oledMode: lightMode ? false : theme.oledMode
@@ -728,11 +794,19 @@ Singleton {
     readonly property string notchTheme: notch.theme
     readonly property string notchPosition: notch.position
 
+    readonly property bool dockPanelEnabled: (dock.enabled ?? false) && (dock.theme ?? "default") !== "integrated"
+    readonly property bool integratedDockEnabled: (dock.enabled ?? false) && (dock.theme ?? "default") === "integrated"
+
+    function enabledForScreen(screenList, screenName) {
+        return !screenList || screenList.length === 0 || screenList.indexOf(screenName) !== -1;
+    }
+
     readonly property int compositorRounding: compositor.syncRoundness ? roundness : compositor.rounding
     readonly property int compositorBorderSize: compositor.syncBorderWidth ? (theme.srBg.border[1] || 0) : compositor.borderSize
     readonly property string compositorBorderColor: compositor.syncBorderColor ? (theme.srBg.border[0] || "primary") : (compositor.activeBorderColor.length > 0 ? compositor.activeBorderColor[0] : "primary")
     readonly property real compositorShadowOpacity: compositor.syncShadowOpacity ? theme.shadowOpacity : compositor.shadowOpacity
     readonly property string compositorShadowColor: compositor.syncShadowColor ? theme.shadowColor : compositor.shadowColor
+    readonly property string compositorShadowColorInactive: compositor.syncShadowColor ? theme.shadowColor : compositor.shadowColorInactive
 
     onLightModeChanged: {
         const manager = GlobalStates.wallpaperManager;
@@ -766,12 +840,5 @@ Singleton {
         if (isHexColor(value))
             return value;
         return Colors[value] || "transparent";
-    }
-
-    function resolveColorWithOpacity(value, opacity) {
-        if (!value)
-            return Qt.rgba(0, 0, 0, 0);
-        const color = isHexColor(value) ? Qt.color(value) : (Colors[value] || Qt.color("transparent"));
-        return Qt.rgba(color.r, color.g, color.b, opacity);
     }
 }

@@ -11,12 +11,11 @@ Canvas {
     property real fullLength: width
     property bool running: true
 
-    property real amplitude: lineWidth * amplitudeMultiplier
-    property real speed: 5  // Not used with Date.now() technique, kept for API compat
     property bool animationsEnabled: true
 
     readonly property bool shouldAnimate: running && animationsEnabled && 
-                                          visible && width > 0 && opacity > 0
+                                          visible && width > 0 && opacity > 0 &&
+                                          root.window !== null && root.window.visible
 
     onPaint: {
         var ctx = getContext("2d");

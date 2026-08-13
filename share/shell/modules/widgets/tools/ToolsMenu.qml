@@ -123,6 +123,7 @@ ActionGrid {
             root.itemSelected();
         } else if (action.tooltip === "Screen Recorder") {
             ScreenRecorder.initialize();
+            GlobalStates.screenRecordReplayMode = false;
             GlobalStates.screenRecordToolVisible = true;
             root.itemSelected();
         } else if (action.tooltip === "Stop Recording") {
@@ -194,6 +195,7 @@ ActionGrid {
             root.itemSelected();
         } else if (action.tooltip === "Mirror") {
             GlobalStates.mirrorWindowVisible = !GlobalStates.mirrorWindowVisible;
+            root.itemSelected();
         }
     }
 }

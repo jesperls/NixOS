@@ -11,15 +11,9 @@ import qs.config
 Item {
     id: notchContainer
 
-    property bool unifiedEffectActive: false
     z: 1000
 
     property Component defaultViewComponent
-    property Component launcherViewComponent
-    property Component dashboardViewComponent
-    property Component powermenuViewComponent
-    property Component toolsMenuViewComponent
-    property Component notificationViewComponent
     property var stackView: stackViewInternal
     property bool isExpanded: stackViewInternal.depth > 1
     property bool parentHovered: false
@@ -41,8 +35,9 @@ Item {
     }
 
     property var visibilities
-    readonly property bool screenNotchOpen: visibilities ? (visibilities.launcher || visibilities.dashboard || visibilities.powermenu || visibilities.tools) : false
+    readonly property bool screenNotchOpen: Visibilities.isNotchOpen(visibilities)
     readonly property bool hasActiveNotifications: Notifications.popupList.length > 0
+    readonly property real dashboardBgOpacity: (visibilities && visibilities.dashboard) ? (Config.dashboard.backgroundOpacity ?? 1.0) : -1
 
     property int defaultHeight: Config.showBackground ? (screenNotchOpen || hasActiveNotifications ? Math.max(stackContainer.height, 44) : 44) : (screenNotchOpen || hasActiveNotifications ? Math.max(stackContainer.height, 40) : 40)
     property int islandHeight: screenNotchOpen || hasActiveNotifications ? Math.max(stackContainer.height, 36) : 36
@@ -80,9 +75,10 @@ Item {
         anchors.centerIn: parent
         width: parent.implicitWidth
         height: parent.implicitHeight
-        enabled: false  // No interactuable
-        enableBorder: false  // No usar border de StyledRect, el Canvas se encarga
-        animateRadius: false  // Custom animation below
+        enabled: false
+        enableBorder: false  // the Canvas below draws the border
+        animateRadius: false
+        backgroundOpacity: notchContainer.dashboardBgOpacity
 
         property int defaultRadius: Config.roundness > 0 ? (screenNotchOpen || hasActiveNotifications ? Config.roundness + 20 : Config.roundness + 4) : 0
 
@@ -208,15 +204,15 @@ Item {
             return stackViewInternal.currentItem && stackViewInternal.depth === 1;
         }
 
-        property int topLeftRadius: Config.notchTheme === "default" ? (notchContainer.position === "bottom" ? defaultRadius : 0) : (Config.notchTheme === "island" && hasActiveNotifications && isActuallyShowingDefault() && notchContainer.position === "top" ? (Config.roundness > 0 ? Config.roundness + 4 : 0)  // Small radius only when in DefaultView with notifications at top
-            : islandRadius)  // Otherwise use dynamic islandRadius
-        property int topRightRadius: Config.notchTheme === "default" ? (notchContainer.position === "bottom" ? defaultRadius : 0) : (Config.notchTheme === "island" && hasActiveNotifications && isActuallyShowingDefault() && notchContainer.position === "top" ? (Config.roundness > 0 ? Config.roundness + 4 : 0)  // Small radius only when in DefaultView with notifications at top
-            : islandRadius)  // Otherwise use dynamic islandRadius
-        property int bottomLeftRadius: Config.notchTheme === "island" ? (hasActiveNotifications && isActuallyShowingDefault() && notchContainer.position === "bottom" ? (Config.roundness > 0 ? Config.roundness + 4 : 0)  // Small radius only when in DefaultView with notifications at bottom
-            : islandRadius)  // Otherwise use dynamic islandRadius
+        property int topLeftRadius: Config.notchTheme === "default" ? (notchContainer.position === "bottom" ? defaultRadius : 0) : (Config.notchTheme === "island" && hasActiveNotifications && isActuallyShowingDefault() && notchContainer.position === "top" ? (Config.roundness > 0 ? Config.roundness + 4 : 0)
+            : islandRadius)
+        property int topRightRadius: Config.notchTheme === "default" ? (notchContainer.position === "bottom" ? defaultRadius : 0) : (Config.notchTheme === "island" && hasActiveNotifications && isActuallyShowingDefault() && notchContainer.position === "top" ? (Config.roundness > 0 ? Config.roundness + 4 : 0)
+            : islandRadius)
+        property int bottomLeftRadius: Config.notchTheme === "island" ? (hasActiveNotifications && isActuallyShowingDefault() && notchContainer.position === "bottom" ? (Config.roundness > 0 ? Config.roundness + 4 : 0)
+            : islandRadius)
         : (notchContainer.position === "top" ? defaultRadius : 0)
-        property int bottomRightRadius: Config.notchTheme === "island" ? (hasActiveNotifications && isActuallyShowingDefault() && notchContainer.position === "bottom" ? (Config.roundness > 0 ? Config.roundness + 4 : 0)  // Small radius only when in DefaultView with notifications at bottom
-            : islandRadius)  // Otherwise use dynamic islandRadius
+        property int bottomRightRadius: Config.notchTheme === "island" ? (hasActiveNotifications && isActuallyShowingDefault() && notchContainer.position === "bottom" ? (Config.roundness > 0 ? Config.roundness + 4 : 0)
+            : islandRadius)
         : (notchContainer.position === "top" ? defaultRadius : 0)
 
         StyledRect {
@@ -225,9 +221,10 @@ Item {
             visible: Config.notchTheme === "island"
             anchors.fill: parent
             layer.enabled: false
-            clip: false  // Desactivar clip para que no corte el border
-            enableBorder: !notchContainer.unifiedEffectActive  // En island sí usar border de StyledRect, a menos que el unified shader esté activo
-            animateRadius: false  // Custom animation below
+            clip: false
+            enableBorder: true
+            animateRadius: false  // custom animation below
+            backgroundOpacity: notchContainer.dashboardBgOpacity
 
             radius: parent.islandRadius
 
@@ -316,11 +313,6 @@ Item {
 
                 onCurrentItemChanged: {
                     notchContainer.updateChildHover();
-                }
-
-                Component.onCompleted: {
-                    isShowingDefault = true;
-                    isShowingNotifications = false;
                 }
 
                 onBusyChanged: {
@@ -437,9 +429,6 @@ Item {
         }
     }
 
-    property bool isShowingNotifications: false
-    property bool isShowingDefault: false
-
     Canvas {
         id: outlineCanvas
         anchors.centerIn: parent
@@ -452,16 +441,16 @@ Item {
         readonly property int borderWidth: borderData[1]
         readonly property color borderColor: Config.resolveColor(borderData[0])
 
-        visible: Config.notchTheme === "default" && borderWidth > 0 && !notchContainer.unifiedEffectActive
+        visible: Config.notchTheme === "default" && borderWidth > 0
 
         onPaint: {
             if (Config.notchTheme !== "default")
-                return;  // Only draw for default theme
+                return;
             var ctx = getContext("2d");
             ctx.clearRect(0, 0, width, height);
 
             if (borderWidth <= 0)
-                return;  // No outline when borderWidth is 0
+                return;
 
             ctx.strokeStyle = borderColor;
             ctx.lineWidth = borderWidth;

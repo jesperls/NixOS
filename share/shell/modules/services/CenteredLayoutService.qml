@@ -17,7 +17,7 @@ Singleton {
         target: Hyprland
 
         function onRawEvent(event) {
-            if (event.name !== "custom")
+            if (event.name !== "custom" || !event.data)
                 return;
             const parts = event.data.split(",");
             if (parts.length < 4 || parts[0] !== "centergap")

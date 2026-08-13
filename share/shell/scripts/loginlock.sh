@@ -7,6 +7,7 @@ if [ -e "$LOCKFILE" ]; then
 		exit 0
 	fi
 fi
+mkdir -p "$(dirname "$LOCKFILE")"
 echo $$ >"$LOCKFILE"
 
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/pangu/config/system.json"
@@ -24,7 +25,7 @@ dbus-monitor --system "type='signal',interface='org.freedesktop.login1.Session',
 		if echo "$line" | grep -q "member=Lock"; then
 			COMMAND=$(get_lock_cmd)
 			if [ -n "$COMMAND" ]; then
-				eval "$COMMAND" &
+				sh -c "$COMMAND" &
 			fi
 		fi
 	done

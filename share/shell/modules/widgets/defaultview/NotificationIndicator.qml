@@ -1,7 +1,6 @@
 import QtQuick
 import qs.modules.theme
 import qs.modules.services
-import qs.config
 
 Item {
     id: root

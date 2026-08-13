@@ -45,17 +45,19 @@ QtObject {
 
     signal listCompleted()
 
+    property int watcherRestarts: 0
+
     property Process clipboardWatcher: Process {
         running: root._initialized && !SuspendManager.isSuspending
         command: [watchScriptPath, checkScriptPath, dbPath, insertScriptPath, binaryDataDir]
+
+        onStarted: root.watcherRestarts = 0
         
-        stdout: StdioCollector {
-            onStreamFinished: {
-                var lines = text.trim().split('\n');
-                for (var i = 0; i < lines.length; i++) {
-                    if (lines[i] === "REFRESH_LIST") {
-                        Qt.callLater(root.list);
-                    }
+        stdout: SplitParser {
+            splitMarker: "\n"
+            onRead: data => {
+                if (data.trim() === "REFRESH_LIST") {
+                    Qt.callLater(root.list);
                 }
             }
         }
@@ -70,12 +72,20 @@ QtObject {
         
         onExited: function(code) {
             if (root._initialized && !SuspendManager.isSuspending) {
+                root.watcherRestarts++;
                 console.warn("ClipboardService: watcher exited with code:", code, "- restarting...");
-                Qt.callLater(function() {
-                    if (root._initialized && !SuspendManager.isSuspending) {
-                        clipboardWatcher.running = true;
-                    }
-                });
+                watcherRestartTimer.interval = Math.min(30000, 1000 * root.watcherRestarts);
+                watcherRestartTimer.start();
+            }
+        }
+    }
+
+    property Timer watcherRestartTimer: Timer {
+        interval: 1000
+        repeat: false
+        onTriggered: {
+            if (root._initialized && !SuspendManager.isSuspending) {
+                clipboardWatcher.running = true;
             }
         }
     }
@@ -462,31 +472,6 @@ QtObject {
         checkAndInsertProcess.running = true;
     }
 
-    function getImageHash(mimeType) {
-    }
-
-    function insertTextItemFromFile(hash, tmpFile) {
-    }
-    
-    function insertFileItemFromFile(hash, tmpFile) {
-    }
-    
-    property Process writeTmpProcess: Process {
-        property string itemHash: ""
-        property string itemContent: ""
-        running: false
-        
-        stdout: StdioCollector {
-            waitForEnd: true
-            
-            onStreamFinished: {
-            }
-        }
-    }
-
-    function insertImageItem(hash, mimeType) {
-    }
-
     function list() {
         if (!_initialized) return;
         _operationInProgress = true;
@@ -611,43 +596,6 @@ QtObject {
         linkPreviewProcess.running = true;
     }
     
-    function reorderItem(itemId, newIndex) {
-        if (!_initialized) return;
-        
-        var item = null;
-        for (var i = 0; i < items.length; i++) {
-            if (items[i].id === itemId) {
-                item = items[i];
-                break;
-            }
-        }
-        
-        if (!item) return;
-        
-        var isPinned = item.pinned ? 1 : 0;
-        
-        if (newIndex < 0) newIndex = 0;
-        
-        reorderProcess.command = ["sh", "-c", 
-            "sqlite3 '" + dbPath + "' <<'EOSQL'\n" +
-            ".timeout 5000\n" +
-            "BEGIN TRANSACTION;\n" +
-            "-- Shift other items to make room\n" +
-            "UPDATE clipboard_items SET display_index = display_index + 1 WHERE pinned = " + isPinned + " AND display_index >= " + newIndex + " AND id != " + itemId + ";\n" +
-            "-- Set new index for target item\n" +
-            "UPDATE clipboard_items SET display_index = " + newIndex + " WHERE id = " + itemId + ";\n" +
-            "-- Compact indices to remove gaps\n" +
-            "WITH reindexed AS (\n" +
-            "  SELECT id, ROW_NUMBER() OVER (ORDER BY display_index ASC, updated_at DESC, id DESC) - 1 AS new_idx\n" +
-            "  FROM clipboard_items WHERE pinned = " + isPinned + "\n" +
-            ")\n" +
-            "UPDATE clipboard_items SET display_index = (SELECT new_idx FROM reindexed WHERE reindexed.id = clipboard_items.id) WHERE pinned = " + isPinned + ";\n" +
-            "COMMIT;\n" +
-            "EOSQL"
-        ];
-        reorderProcess.running = true;
-    }
-    
     function moveItemUp(itemId) {
         var item = null;
         var currentIdx = -1;
@@ -749,25 +697,6 @@ QtObject {
         proc.running = true;
     }
     
-
-    property Process reorderProcess: Process {
-        running: false
-        
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.warn("ClipboardService: reorderProcess stderr:", text);
-                }
-            }
-        }
-        
-        onExited: function(code) {
-            if (code === 0) {
-                Qt.callLater(root.list);
-            }
-        }
-    }
-    
     property Process emojiTypeProcess: Process {
         running: false
         
@@ -795,11 +724,15 @@ QtObject {
         }
     }
     
+    property Process emojiCopyProcess: Process {
+        running: false
+
+        onExited: destroy()
+    }
+
     function copyAndTypeEmoji(emojiText) {
-        var copyCmd = ["bash", "-c", "echo -n '" + emojiText.replace(/'/g, "'\\''") + "' | wl-copy"];
-        var copyProc = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-        copyProc.command = copyCmd;
-        copyProc.running = true;
+        emojiCopyProcess.command = ["bash", "-c", "echo -n '" + emojiText.replace(/'/g, "'\\''") + "' | wl-copy"];
+        emojiCopyProcess.running = true;
         
         emojiTypeTimer.start();
     }

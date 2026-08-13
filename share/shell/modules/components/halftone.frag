@@ -23,10 +23,8 @@ void main() {
     
     float angleRad = radians(ubuf.angle);
     
-    // Tamaño de celda basado en el tamaño máximo de los dots
     float cellSize = ubuf.dotMaxSize * 2.0;
     
-    // Matriz de rotación
     mat2 rotation = mat2(
         cos(angleRad), -sin(angleRad),
         sin(angleRad), cos(angleRad)
@@ -35,10 +33,8 @@ void main() {
     vec2 center = vec2(ubuf.canvasWidth * 0.5, ubuf.canvasHeight * 0.5);
     vec2 relativePos = pixelPos - center;
     
-    // Rotar posición alrededor del centro
     vec2 rotatedPos = rotation * relativePos;
     
-    // Calcular grid en espacio rotado
     vec2 gridPos = rotatedPos / cellSize;
     vec2 cellIndex = floor(gridPos + 0.5);
     vec2 cellCenter = cellIndex * cellSize;
@@ -46,11 +42,10 @@ void main() {
     
     float distToCenter = length(posInCell);
     
-    // Vector del gradiente en dirección Y rotada
-    // angle=0 -> vertical (arriba a abajo), angle=90 -> horizontal (izq a der)
+    // angle=0 -> vertical (top to bottom), angle=90 -> horizontal (left to right)
     vec2 gradientDir = vec2(sin(angleRad), cos(angleRad));
     
-    // Calcular el rango de proyección proyectando las esquinas del canvas
+    // Project the canvas corners onto the gradient axis to get its full range.
     vec2 corners[4];
     corners[0] = vec2(0.0, 0.0) - center;
     corners[1] = vec2(ubuf.canvasWidth, 0.0) - center;
@@ -67,38 +62,30 @@ void main() {
     
     float totalRange = maxProj - minProj;
     
-    // Calcular el rango activo considerando start y end
     float activeStart = minProj + ubuf.gradientStart * totalRange;
     float activeEnd = minProj + ubuf.gradientEnd * totalRange;
     float activeRange = max(activeEnd - activeStart, 0.001);
     
-    // Proyección del pixel en la dirección del gradiente
     float projection = dot(relativePos, gradientDir);
     
-    // Calcular tamaño del dot según la región
     float dotRadius;
     
     if (projection < activeStart) {
-        // Antes del start: los dots crecen proporcionalmente más allá del máximo
+        // Before the start: dots keep growing past the max.
         float distanceBeforeStart = activeStart - projection;
         float growthFactor = distanceBeforeStart / activeRange;
         dotRadius = ubuf.dotMaxSize * (1.0 + growthFactor);
     } else if (projection > activeEnd) {
-        // Después del end: no dibujar dots (radio 0)
         dotRadius = 0.0;
     } else {
-        // Dentro del rango activo: interpolación normal de max a min
         float gradientPos = (projection - activeStart) / activeRange;
         dotRadius = mix(ubuf.dotMaxSize, ubuf.dotMinSize, gradientPos);
     }
     
-    // Antialiasing
     float edgeWidth = length(vec2(dFdx(distToCenter), dFdy(distToCenter))) * 0.5;
     float alpha = 1.0 - smoothstep(dotRadius - edgeWidth, dotRadius + edgeWidth, distToCenter);
     
-    // Mezclar colores
     vec4 finalColor = mix(ubuf.backgroundColor, ubuf.dotColor, alpha);
     
     fragColor = vec4(finalColor.rgb, finalColor.a * ubuf.qt_Opacity);
 }
-

@@ -65,7 +65,7 @@ Rectangle {
 
     Item {
         id: settingsIndexer
-        visible: false  // Headless
+        visible: false
 
         property int currentPanelIndex: 0
         property var aggregatedItems: []
@@ -255,14 +255,6 @@ Rectangle {
                 score: fuzzyScore(query, item.label)
             };
         }).sort((a, b) => b.score - a.score);
-    }
-
-    function getFilteredIndex(sectionId) {
-        for (let i = 0; i < filteredSections.length; i++) {
-            if (filteredSections[i].section === sectionId)
-                return i;
-        }
-        return -1;
     }
 
     RowLayout {

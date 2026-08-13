@@ -1,7 +1,6 @@
 pragma Singleton
 
 import QtQuick
-import Quickshell
 import Quickshell.Io
 import qs.config
 
@@ -10,7 +9,6 @@ QtObject {
 
     property bool isRecording: false
     property string duration: ""
-    property string lastError: ""
     property bool canRecordDirectly: true  // Optimistic default
 
     property bool _initialized: false
@@ -28,7 +26,7 @@ QtObject {
         command: ["bash", "-c", "if [ -f /run/current-system/sw/bin/nixos-version ]; then if [ -x /run/wrappers/bin/gsr-kms-server ]; then echo true; else echo false; fi; else echo true; fi"]
         running: false
         stdout: StdioCollector {
-            onTextChanged: {
+            onStreamFinished: {
                 root.canRecordDirectly = (text.trim() === "true");
             }
         }
@@ -41,8 +39,6 @@ QtObject {
         command: ["bash", "-c", "xdg-user-dir VIDEOS"]
         running: false
         stdout: StdioCollector {
-            onTextChanged: {
-            }
         }
         onExited: exitCode => {
             if (exitCode === 0) {
@@ -89,7 +85,7 @@ QtObject {
         id: timeProcess
         command: ["bash", "-c", "pid=$(pgrep -fa gpu-screen-recorder | grep -v \"^$$ \" | grep -v ' -r ' | awk 'NR==1 {print $1}'); if [ -n \"$pid\" ]; then ps -o etime= -p \"$pid\"; fi"]
         stdout: StdioCollector {
-            onTextChanged: {
+            onStreamFinished: {
                 root.duration = text.trim();
             }
         }
@@ -145,6 +141,10 @@ QtObject {
         id: prepareProcess
         command: ["mkdir", "-p", root.videosDir]
         onExited: exitCode => {
+            if (exitCode !== 0) {
+                console.warn("[ScreenRecorder] failed to create output dir:", root.videosDir);
+                return;
+            }
             notifyStartProcess.running = true;
             startProcess.running = true;
             root.isRecording = true;
@@ -161,11 +161,11 @@ QtObject {
         command: ["bash", "-c", "echo 'Error: Command not set'"]
 
         stdout: StdioCollector {
-            onTextChanged: console.log("[ScreenRecorder] OUT: " + text)
+            onStreamFinished: console.log("[ScreenRecorder] OUT: " + text)
         }
         stderr: StdioCollector {
             id: stderrCollector
-            onTextChanged: {
+            onStreamFinished: {
                 console.warn("[ScreenRecorder] ERR: " + text);
             }
         }
@@ -189,15 +189,6 @@ QtObject {
     property Process notifySavedProcess: Process {
         id: notifySavedProcess
         command: ["notify-send", "Screen Recorder", "Recording saved to " + root.videosDir]
-    }
-
-    property Process openVideosProcess: Process {
-        id: openVideosProcess
-        command: ["xdg-open", root.videosDir]
-    }
-
-    function openRecordingsFolder() {
-        openVideosProcess.running = true;
     }
 
     property Process stopProcess: Process {

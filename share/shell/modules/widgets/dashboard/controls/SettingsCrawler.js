@@ -31,8 +31,8 @@ function crawl(rootItem, sectionId) {
                 keywords: keywords.join(" "),
                 section: sectionId,
                 subSection: subSection || "", // Default to empty if top-level
-                subLabel: "", // Can be enhanced later
-                icon: icon,  // Can be enhanced later
+                subLabel: "",
+                icon: icon,
                 isIcon: true  // Default
             });
         }

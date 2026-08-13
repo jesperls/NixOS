@@ -14,7 +14,7 @@ in
     scheduler = cfg.scheduler;
   };
 
-  services.ananicy = lib.mkIf cfg.ananicy {
+  services.ananicy = lib.mkIf cfg.ananicy.enable {
     enable = true;
     package = pkgs.ananicy-cpp;
     rulesProvider = pkgs.ananicy-rules-cachyos;
@@ -24,5 +24,5 @@ in
     };
   };
 
-  services.irqbalance.enable = cfg.irqbalance;
+  services.irqbalance.enable = cfg.irqbalance.enable;
 }

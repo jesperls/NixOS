@@ -65,7 +65,7 @@ Item {
                 id: internalSource
                 sourceItem: root.sourceItem
                 hideSource: true
-                live: false  // Static content - use scheduleUpdate() when source changes
+                live: false
 
                 Component.onCompleted: scheduleUpdate()
             }

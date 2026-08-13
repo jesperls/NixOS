@@ -29,16 +29,26 @@ coords = cmd("slurp", "-p").decode().strip()
 if not coords:
     sys.exit(0)
 
-raw = subprocess.Popen(["grim", "-g", coords, "-t", "ppm", "-"], stdout=subprocess.PIPE)
+grim = subprocess.Popen(
+    ["grim", "-g", coords, "-t", "ppm", "-"],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.DEVNULL,
+)
 
-rgb_str = cmd(
-    "magick",
-    "-",
-    "-format",
-    "%[fx:int(255*r)] %[fx:int(255*g)] %[fx:int(255*b)]",
-    "info:-",
-    input=raw.stdout.read(),
+rgb_str = subprocess.check_output(
+    [
+        "magick",
+        "-",
+        "-format",
+        "%[fx:int(255*r)] %[fx:int(255*g)] %[fx:int(255*b)]",
+        "info:-",
+    ],
+    stdin=grim.stdout,
 ).decode()
+
+grim.stdout.close()
+if grim.wait() != 0:
+    sys.exit(1)
 
 r, g, b = map(int, rgb_str.split())
 

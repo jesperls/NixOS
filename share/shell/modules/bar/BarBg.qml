@@ -15,24 +15,26 @@ Item {
 
     readonly property bool effectiveContainBar: Config.bar.containBar && (Config.bar.frameEnabled ?? false)
 
+    readonly property string style: (Config.bar && Config.bar.style !== undefined) ? Config.bar.style : "floating"
+    readonly property bool docked: style === "docked"
+
     property real splitStart: -1
     property real splitEnd: -1
     readonly property bool splitActive: isHorizontal && splitStart >= 0 && splitEnd > splitStart
 
-    readonly property int cornerSize: (Config.theme.enableCorners && !effectiveContainBar && root.outerMargin === 0) ? Styling.radius(4) : 0
+    readonly property int cornerSize: (Config.theme.enableCorners && root.outerMargin === 0) ? Styling.radius(4) : 0
     readonly property bool isHorizontal: position === "top" || position === "bottom"
-    readonly property bool cornersVisible: Config.theme.enableCorners && cornerSize > 0
 
     readonly property real bgOpacity: Config.theme.srBarBg.opacity
-    readonly property int padding: bgOpacity < 0.01 ? 0 : 4
+    readonly property int padding: bgOpacity < 0.01 ? 0 : (Config.bar.padding ?? 4)
 
-    readonly property int outerMargin: !effectiveContainBar ? 4 : 0
+    readonly property int outerMargin: effectiveContainBar ? 0 : (docked ? 0 : (Config.bar.margin ?? 4))
 
     StyledRect {
         id: barBackground
         variant: "barbg"
         visible: Config.showBackground
-        radius: Styling.radius(effectiveContainBar ? 4 : 0)
+        radius: docked ? 0 : Styling.radius(effectiveContainBar ? 4 : 0)
         enableBorder: !effectiveContainBar || (Config.bar.keepBarBorder ?? false)
 
         x: (position === "right") ? -cornerSize : 0

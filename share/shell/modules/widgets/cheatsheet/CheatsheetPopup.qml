@@ -307,7 +307,12 @@ PanelWindow {
         }
     }
 
+    property bool openDone: false
+
     function open() {
+        if (openDone)
+            return;
+        openDone = true;
         refresh();
         Qt.callLater(() => {
             searchInput.clear();

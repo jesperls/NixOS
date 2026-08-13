@@ -17,7 +17,6 @@
         "nix-command"
         "flakes"
       ];
-      max-jobs = lib.mkDefault "auto";
       keep-outputs = true;
       trusted-users = [
         "root"

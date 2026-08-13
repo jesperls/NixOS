@@ -58,8 +58,6 @@ Item {
     property bool loadingNote: false
     property bool editorDirty: false
 
-    property bool showCreateMenu: false
-    property int createMenuSelectedIndex: 0
 
     property var preFormatBold: null
     property var preFormatItalic: null
@@ -374,7 +372,6 @@ Item {
         }
     }
 
-    onExpandedItemIndexChanged: {}
 
     function adjustScrollForExpandedItem(index) {
         if (index < 0 || index >= notesModel.count)

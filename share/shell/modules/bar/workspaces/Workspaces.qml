@@ -155,10 +155,10 @@ Item {
         anchors.fill: parent
         enableShadow: Config.showBackground && (!effectiveContainBar || Config.bar.keepBarShadow)
         
-        topLeftRadius: orientation === "vertical" ? workspacesWidget.startRadius : workspacesWidget.startRadius
+        topLeftRadius: workspacesWidget.startRadius
         topRightRadius: orientation === "vertical" ? workspacesWidget.startRadius : workspacesWidget.endRadius
         bottomLeftRadius: orientation === "vertical" ? workspacesWidget.endRadius : workspacesWidget.startRadius
-        bottomRightRadius: orientation === "vertical" ? workspacesWidget.endRadius : workspacesWidget.endRadius
+        bottomRightRadius: workspacesWidget.endRadius
     }
 
     WheelHandler {

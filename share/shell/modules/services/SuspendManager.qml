@@ -35,16 +35,4 @@ Singleton {
         
         wakeReadyTimer.restart();
     }
-
-    property IpcHandler ipc: IpcHandler {
-        target: "suspend"
-
-        function prepare() {
-            root.onPrepareForSleep();
-        }
-
-        function wake() {
-            root.onWakingUp();
-        }
-    }
 }

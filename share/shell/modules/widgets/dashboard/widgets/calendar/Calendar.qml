@@ -22,7 +22,7 @@ Item {
 
     Timer {
         interval: 60000
-        running: true
+        running: root.visible
         repeat: true
         triggeredOnStart: true
         onTriggered: root.currentDate = new Date()

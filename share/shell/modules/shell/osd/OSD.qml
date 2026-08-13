@@ -20,18 +20,23 @@ PanelWindow {
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     exclusionMode: ExclusionMode.Ignore
 
-    anchors.bottom: true
+    readonly property bool onTop: (Config.osd && Config.osd.position === "top")
+
+    anchors.top: onTop
+    anchors.bottom: !onTop
     anchors.left: true
     anchors.right: true
 
-    WlrLayershell.margins.bottom: 100
+    WlrLayershell.margins.top: onTop ? 60 : 0
+    WlrLayershell.margins.bottom: onTop ? 0 : 100
 
     color: "transparent"
 
-    visible: GlobalStates.osdVisible
+    visible: GlobalStates.osdVisible && (Quickshell.screens.length === 1 || (Compositor.focusedMonitor && Compositor.focusedMonitor.name === targetScreen.name))
 
     property real osdValue: 0
     property bool osdMuted: false
+    property bool shown: GlobalStates.osdVisible
 
     Item {
         anchors.fill: parent
@@ -39,11 +44,35 @@ PanelWindow {
         StyledRect {
             id: osdRect
             variant: "popup"
+            enableShadow: true
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            implicitWidth: 220
-            implicitHeight: 52
-            radius: Styling.radius(16)
+            anchors.top: root.onTop ? parent.top : undefined
+            anchors.bottom: root.onTop ? undefined : parent.bottom
+            implicitWidth: (Config.osd && Config.osd.width !== undefined ? Config.osd.width : 260)
+            implicitHeight: 68
+            radius: Styling.radius(12)
+
+            scale: root.shown ? 1 : 0.92
+            opacity: root.shown ? 1 : 0
+
+            transformOrigin: root.onTop ? Item.Top : Item.Bottom
+
+            Behavior on scale {
+                enabled: Config.animDuration > 0
+                NumberAnimation {
+                    duration: Config.animDuration / 2
+                    easing.type: Easing.OutBack
+                    easing.overshoot: 1.2
+                }
+            }
+
+            Behavior on opacity {
+                enabled: Config.animDuration > 0
+                NumberAnimation {
+                    duration: Config.animDuration / 2
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             RowLayout {
                 anchors.fill: parent
@@ -53,8 +82,36 @@ PanelWindow {
                 anchors.bottomMargin: 8
                 spacing: 14
 
+                StyledRect {
+                    id: iconChip
+                    visible: (Config.osd && Config.osd.iconStyle !== "plain")
+                    variant: "primary"
+                    Layout.preferredWidth: 44
+                    Layout.preferredHeight: 44
+                    radius: 22
+                    Layout.alignment: Qt.AlignVCenter
+
+                    Text {
+                        id: chipIcon
+                        anchors.centerIn: parent
+                        text: {
+                            if (GlobalStates.osdIndicator === "volume") {
+                                return Audio.volumeIcon(root.osdValue, root.osdMuted);
+                            } else if (GlobalStates.osdIndicator === "mic") {
+                                return root.osdMuted ? Icons.micSlash : Icons.mic;
+                            } else {
+                                return Icons.sun;
+                            }
+                        }
+                        font.family: Icons.font
+                        font.pixelSize: 22
+                        color: iconChip.item
+                    }
+                }
+
                 Text {
-                    id: iconText
+                    id: plainIcon
+                    visible: !iconChip.visible
                     text: {
                         if (GlobalStates.osdIndicator === "volume") {
                             return Audio.volumeIcon(root.osdValue, root.osdMuted);
@@ -65,34 +122,15 @@ PanelWindow {
                         }
                     }
                     font.family: Icons.font
-                    font.pixelSize: 22
+                    font.pixelSize: 24
                     color: Colors.overBackground
                     Layout.alignment: Qt.AlignVCenter
-
-                    rotation: GlobalStates.osdIndicator === "brightness" ? (root.osdValue * 180) : 0
-                    scale: GlobalStates.osdIndicator === "brightness" ? (0.8 + (root.osdValue * 0.2)) : 1
-
-                    Behavior on rotation {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration
-                            easing.type: Easing.OutQuart
-                        }
-                    }
-
-                    Behavior on scale {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration
-                            easing.type: Easing.OutQuart
-                        }
-                    }
                 }
 
                 ColumnLayout {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
-                    spacing: 0
+                    spacing: 2
 
                     RowLayout {
                         Layout.fillWidth: true
@@ -109,8 +147,8 @@ PanelWindow {
                                 return "";
                             }
                             font.family: Config.theme.font
-                            font.pixelSize: 15
-                            font.bold: false
+                            font.pixelSize: Styling.fontSize(0)
+                            font.weight: Font.DemiBold
                             color: Colors.overBackground
                             Layout.alignment: Qt.AlignBottom
                         }
@@ -120,37 +158,65 @@ PanelWindow {
                         }
 
                         Text {
-                            text: Math.round(root.osdValue * 100)
+                            id: percentText
+                            text: Math.round(root.osdValue * 100) + "%"
                             font.family: Config.theme.font
-                            font.pixelSize: 15
-                            font.bold: false
-                            color: Colors.overBackground
+                            font.pixelSize: Styling.fontSize(0)
+                            font.weight: Font.Bold
+                            color: Styling.srItem("overprimary")
+                            visible: (Config.osd && Config.osd.showPercentage !== false)
                             Layout.alignment: Qt.AlignBottom
+
+                            scale: root.percentPulse
+                            Behavior on scale {
+                                enabled: Config.animDuration > 0
+                                NumberAnimation {
+                                    duration: Config.animDuration / 2
+                                    easing.type: Easing.OutBack
+                                    easing.overshoot: 1.2
+                                }
+                            }
                         }
                     }
 
                     StyledSlider {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 12
+                        Layout.preferredHeight: 10
                         value: root.osdValue
                         wavy: false
                         enabled: false
-                        thickness: 3
+                        thickness: 4
                         handleSpacing: 0
-                        progressColor: root.osdMuted ? Colors.outline : Styling.srItem("overprimary")
-                        backgroundColor: Qt.rgba(Colors.overBackground.r, Colors.overBackground.g, Colors.overBackground.b, 0.2)
+                        gradientProgress: true
+                        progressColor: root.osdMuted ? Colors.outline : Colors.primary
+                        progressColor2: root.osdMuted ? Colors.outline : Colors.tertiary
+                        backgroundColor: Qt.rgba(Colors.overBackground.r, Colors.overBackground.g, Colors.overBackground.b, 0.16)
+                        visible: (Config.osd && Config.osd.showSlider !== false)
                     }
                 }
             }
         }
     }
 
+    property real percentPulse: 1.0
+
+    onOsdValueChanged: {
+        percentPulse = 1.25;
+        percentPulseAnim.restart();
+    }
+
+    NumberAnimation {
+        id: percentPulseAnim
+        target: root
+        property: "percentPulse"
+        to: 1.0
+        duration: 220
+        easing.type: Easing.OutBack
+    }
+
     MouseArea {
         anchors.fill: parent
-        onEntered: {
-            hideTimer.stop();
-            hideTimer.triggered();
-        }
+        onEntered: hideTimer.restart()
         hoverEnabled: true
     }
 

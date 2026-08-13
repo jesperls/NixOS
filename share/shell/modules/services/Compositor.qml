@@ -29,6 +29,21 @@ Singleton {
         return root.monitors.values.find(m => m.name === name) ?? null;
     }
 
+    function hasFullscreenWindow(screen) {
+        const mon = root.monitorFor(screen);
+        if (!mon || !mon.activeWorkspace || !root.clients.values)
+            return false;
+
+        const wsId = mon.activeWorkspace.id;
+        const monId = mon.id;
+        for (let i = 0; i < root.clients.values.length; i++) {
+            const c = root.clients.values[i];
+            if (c.monitor === monId && c.fullscreen && c.workspace.id === wsId)
+                return true;
+        }
+        return false;
+    }
+
     function dispatch(command) {
         if (!command)
             return;
@@ -62,7 +77,22 @@ Singleton {
             const parts = rest.split(",");
             const coords = parts[0].trim().split(/\s+/);
             const window = parts.length > 1 ? `, window = "${target(parts[1])}"` : "";
-            return Hyprland.dispatch(`hl.dsp.window.move({ x = ${parseInt(coords[0])}, y = ${parseInt(coords[1])}${window} })`);
+            const px = parseInt(coords[0]);
+            const py = parseInt(coords[1]);
+            if (isNaN(px) || isNaN(py))
+                return;
+            return Hyprland.dispatch(`hl.dsp.window.move({ x = ${px}, y = ${py}${window} })`);
+        }
+        case "movewindowpixel": {
+            // Overview floating-window drags: "movewindowpixel exact X% Y%, address:..."
+            const m = rest.match(/^(?:exact\s+)?(-?\d+(?:\.\d+)?)%\s+(-?\d+(?:\.\d+)?)%,?\s*(address:[^\s,]+)?/);
+            const mon = root.focusedMonitor;
+            if (!m || !mon)
+                return;
+            const x = mon.x + Math.round(mon.width * parseFloat(m[1]) / 100);
+            const y = mon.y + Math.round(mon.height * parseFloat(m[2]) / 100);
+            const window = m[3] ? `, window = "${target(m[3])}"` : "";
+            return Hyprland.dispatch(`hl.dsp.window.move({ x = ${x}, y = ${y}${window} })`);
         }
         case "dpms":
             return Hyprland.dispatch(`hl.dsp.dpms({ action = "${rest}" })`);

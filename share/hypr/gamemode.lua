@@ -1,4 +1,5 @@
-local path = os.getenv("HOME") .. "/.local/share/pangu/gamemode.lua"
+local data = os.getenv("XDG_DATA_HOME") or (os.getenv("HOME") .. "/.local/share")
+local path = data .. "/pangu/gamemode.lua"
 local interval = 200
 
 local active = {}
@@ -15,6 +16,8 @@ function M.on_change(callback)
   listeners[#listeners + 1] = callback
 end
 
+-- Rules are recreated on every enable: hyprland only re-applies rules when
+-- a new rule object is added; set_enabled alone does not re-evaluate windows.
 local function enable(id)
   active[id] = {
     hl.workspace_rule({
@@ -78,7 +81,6 @@ local function poll()
   if text == last_text then
     return
   end
-  last_text = text
 
   local desired = {}
   local chunk = loadfile(path)
@@ -88,8 +90,13 @@ local function poll()
       for _, id in ipairs(result) do
         desired[id] = true
       end
+    else
+      -- File is mid-write or malformed; keep the current rules and retry.
+      return
     end
   end
+
+  last_text = text
   apply(desired)
 end
 

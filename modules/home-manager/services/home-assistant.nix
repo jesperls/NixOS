@@ -37,7 +37,8 @@ lib.mkIf cfg.enable {
   systemd.user.services.go-hass-agent = import ../lib/autostart.nix {
     description = "Go Hass Agent — Home Assistant desktop agent";
     execStart = "${agent} --no-log-file run";
-    unit.StartLimitIntervalSec = 0;
+    unit.StartLimitIntervalSec = 60;
+    unit.StartLimitBurst = 5;
     service = {
       Restart = "always";
       RestartSec = 10;

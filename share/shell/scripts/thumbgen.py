@@ -147,10 +147,10 @@ class ThumbnailGenerator:
             cmd = [
                 "ffmpeg",
                 "-y",
+                "-ss",
+                "00:00:01",  # Input seeking; fast and skips black first frame
                 "-i",
                 str(video_path),
-                "-ss",
-                "00:00:01",  # Skip first second to avoid black frames
                 "-vframes",
                 "1",  # Extract only 1 frame
                 "-vf",

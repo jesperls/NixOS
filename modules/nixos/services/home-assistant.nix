@@ -78,6 +78,10 @@ in
         assertion = cfg.mqtt.enable -> cfg.mqtt.server != "";
         message = "mySystem.services.homeAssistant.mqtt.server must be set when mqtt is enabled.";
       }
+      {
+        assertion = cfg.glances.bind != "127.0.0.1" -> cfg.glances.password != null;
+        message = "mySystem.services.homeAssistant.glances.password must be set when binding Glances off localhost.";
+      }
     ];
 
     services.glances = lib.mkIf cfg.glances.enable {

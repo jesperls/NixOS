@@ -51,8 +51,8 @@ for _, class in ipairs(state.theme.translucent_apps) do
   hl.window_rule({ match = { class = class }, opacity = translucent })
 end
 
-if state.gaming.tearing then
-  for _, pattern in ipairs(state.gaming.tearing_class_patterns) do
+if state.tearing.enable then
+  for _, pattern in ipairs(state.tearing.class_patterns) do
     hl.window_rule({ match = { class = pattern }, immediate = true })
   end
 end

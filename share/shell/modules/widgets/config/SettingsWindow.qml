@@ -5,7 +5,6 @@ import qs.modules.components
 import qs.modules.globals
 import qs.modules.services
 import qs.modules.theme
-import qs.config
 
 FloatingWindow {
     id: settingsWindow

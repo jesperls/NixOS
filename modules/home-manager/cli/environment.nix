@@ -6,7 +6,6 @@
 }:
 
 let
-  theme = osConfig.mySystem.theme;
   apps = osConfig.mySystem.defaultApps;
 in
 {
@@ -24,9 +23,6 @@ in
     GTK_USE_PORTAL = "1";
 
     ELECTRON_OZONE_PLATFORM_HINT = "auto";
-
-    GTK_THEME = theme.gtk.theme.name;
-    ICON_THEME = theme.gtk.iconTheme.name;
 
     UV_PYTHON_PREFERENCE = "managed";
 

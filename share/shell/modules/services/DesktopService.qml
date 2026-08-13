@@ -10,22 +10,17 @@ Singleton {
 
     property string desktopDir: ""
     property bool initialLoadComplete: false
-    property string positionsFile: Quickshell.dataPath("desktop-positions.json")
     property int maxRowsHint: 15
     property int maxColumnsHint: 10
     property bool gridReady: false
-    property bool positionsLoaded: false
 
     onMaxRowsHintChanged: checkGridReady()
     onMaxColumnsHintChanged: checkGridReady()
-    onPositionsLoadedChanged: checkGridReady()
 
     function checkGridReady() {
-        if (maxRowsHint > 0 && maxColumnsHint > 0 && positionsLoaded && !gridReady) {
+        if (maxRowsHint > 0 && maxColumnsHint > 0 && !gridReady) {
             gridReady = true;
-            console.log("Grid ready - rows:", maxRowsHint, "cols:", maxColumnsHint);
             if (tempItems.length > 0 || tempDesktopFiles.length > 0) {
-                console.log("Finalizing items with", tempItems.length + tempDesktopFiles.length, "items");
                 finalizeItems();
             }
         }
@@ -33,66 +28,6 @@ Singleton {
 
     property ListModel items: ListModel {
         id: itemsModel
-    }
-
-    property var iconPositions: ({})
-
-    function savePositions() {
-        var json = JSON.stringify(iconPositions, null, 2);
-        savePositionsProcess.command = ["sh", "-c", "echo '" + json.replace(/'/g, "'\\''") + "' > " + positionsFile];
-        savePositionsProcess.running = true;
-    }
-
-    function loadPositions() {
-        loadPositionsProcess.running = true;
-    }
-
-    function updateIconPosition(path, gridX, gridY) {
-        iconPositions[path] = {
-            x: gridX,
-            y: gridY
-        };
-        savePositions();
-    }
-
-    function getIconPosition(path) {
-        return iconPositions[path] || null;
-    }
-
-    function calculateAutoPosition(index) {
-        var usedPositions = {};
-
-        for (var key in iconPositions) {
-            var pos = iconPositions[key];
-            usedPositions[pos.x + "," + pos.y] = true;
-        }
-
-        var gridX = 0;
-        var gridY = 0;
-        var checked = 0;
-
-        while (checked <= index) {
-            var posKey = gridX + "," + gridY;
-            if (!usedPositions[posKey]) {
-                if (checked === index) {
-                    return {
-                        x: gridX,
-                        y: gridY
-                    };
-                }
-                checked++;
-            }
-            gridY++;
-            if (gridY >= maxRowsHint) {
-                gridY = 0;
-                gridX++;
-            }
-        }
-
-        return {
-            x: gridX,
-            y: gridY
-        };
     }
 
     function getDesktopDir() {
@@ -113,11 +48,6 @@ Singleton {
                 scanProcess.running = true;
             }
         }
-    }
-
-    function parseDesktopFile(filePath) {
-        parseDesktopProcess.command = ["cat", filePath];
-        parseDesktopProcess.running = true;
     }
 
     function executeDesktopFile(filePath) {
@@ -171,24 +101,6 @@ Singleton {
         ', root);
     }
 
-    function saveAllPositions() {
-        iconPositions = {};
-
-        for (var i = 0; i < items.count; i++) {
-            var item = items.get(i);
-            if (!item.isPlaceholder && item.path) {
-                var col = Math.floor(i / maxRowsHint);
-                var row = i % maxRowsHint;
-                iconPositions[item.path] = {
-                    x: col,
-                    y: row
-                };
-            }
-        }
-
-        savePositions();
-    }
-
     function moveItem(fromIndex, toIndex) {
         if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= items.count) {
             return;
@@ -233,8 +145,6 @@ Singleton {
             items.setProperty(fromIndex, "gridX", targetCol);
             items.setProperty(fromIndex, "gridY", targetRow);
         }
-
-        saveAllPositions();
     }
 
     function getFileType(fileName) {
@@ -286,58 +196,6 @@ Singleton {
     }
 
     Process {
-        id: savePositionsProcess
-        running: false
-        command: []
-
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.warn("Error saving positions:", text);
-                }
-            }
-        }
-    }
-
-    Process {
-        id: loadPositionsProcess
-        running: false
-        command: ["cat", positionsFile]
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.trim().length > 0) {
-                    try {
-                        var parsed = JSON.parse(text);
-
-                        for (var key in root.iconPositions) {
-                            delete root.iconPositions[key];
-                        }
-
-                        for (var k in parsed) {
-                            root.iconPositions[k] = {
-                                x: parsed[k].x,
-                                y: parsed[k].y
-                            };
-                        }
-
-                        console.log("Loaded", Object.keys(root.iconPositions).length, "icon positions");
-                    } catch (e) {
-                        console.warn("Error parsing positions file:", e);
-                    }
-                }
-                root.positionsLoaded = true;
-            }
-        }
-
-        stderr: StdioCollector {
-            onStreamFinished: {
-                root.positionsLoaded = true;
-            }
-        }
-    }
-
-    Process {
         id: getDesktopDirProcess
         running: false
         command: ["sh", "-c", "echo ${XDG_DESKTOP_DIR:-$HOME/Desktop}"]
@@ -345,9 +203,6 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 root.desktopDir = text.trim();
-                console.log("Desktop directory:", root.desktopDir);
-                console.log("Positions file:", root.positionsFile);
-                loadPositions();
                 scanDesktop();
                 directoryWatcher.path = root.desktopDir;
                 directoryWatcher.reload();
@@ -429,7 +284,7 @@ Singleton {
                         currentDesktopFileIndex = 0;
                         parseNextDesktopFile();
                     } else {
-                        if (gridReady && positionsLoaded) {
+                        if (gridReady) {
                             finalizeItems();
                         }
                     }
@@ -451,17 +306,18 @@ Singleton {
     property var tempDesktopFiles: []
     property var tempItems: []
     property int currentDesktopFileIndex: -1
+    property var currentItem: null
     property bool parsingInProgress: false
     property bool needsRescan: false
 
     function parseNextDesktopFile() {
         if (currentDesktopFileIndex < tempDesktopFiles.length) {
-            var item = tempDesktopFiles[currentDesktopFileIndex];
-            parseDesktopFileProcess.command = ["cat", item.path];
+            currentItem = tempDesktopFiles[currentDesktopFileIndex];
+            parseDesktopFileProcess.command = ["cat", currentItem.path];
             parseDesktopFileProcess.running = true;
         } else {
             parsingInProgress = false;
-            if (gridReady && positionsLoaded) {
+            if (gridReady) {
                 finalizeItems();
             }
             if (needsRescan) {
@@ -498,44 +354,19 @@ Singleton {
             });
         }
 
-        var usedIndices = {};
-
-        for (var i = 0; i < allItems.length; i++) {
+        for (var i = 0; i < allItems.length && i < gridSize; i++) {
             var item = allItems[i];
-            var savedPos = getIconPosition(item.path);
-            var gridIndex = -1;
+            var col = Math.floor(i / maxRowsHint);
+            var row = i % maxRowsHint;
 
-            if (savedPos && savedPos.x < maxColumnsHint && savedPos.y < maxRowsHint) {
-                gridIndex = savedPos.x * maxRowsHint + savedPos.y;
-
-                if (usedIndices[gridIndex]) {
-                    gridIndex = -1;
-                }
-            }
-
-            if (gridIndex === -1) {
-                for (var j = 0; j < gridSize; j++) {
-                    if (!usedIndices[j]) {
-                        gridIndex = j;
-                        break;
-                    }
-                }
-            }
-
-            if (gridIndex !== -1 && gridIndex < items.count) {
-                usedIndices[gridIndex] = true;
-                var col = Math.floor(gridIndex / maxRowsHint);
-                var row = gridIndex % maxRowsHint;
-
-                items.setProperty(gridIndex, "name", item.name);
-                items.setProperty(gridIndex, "path", item.path);
-                items.setProperty(gridIndex, "type", item.type);
-                items.setProperty(gridIndex, "icon", item.icon);
-                items.setProperty(gridIndex, "isDesktopFile", item.isDesktopFile);
-                items.setProperty(gridIndex, "isPlaceholder", false);
-                items.setProperty(gridIndex, "gridX", col);
-                items.setProperty(gridIndex, "gridY", row);
-            }
+            items.setProperty(i, "name", item.name);
+            items.setProperty(i, "path", item.path);
+            items.setProperty(i, "type", item.type);
+            items.setProperty(i, "icon", item.icon);
+            items.setProperty(i, "isDesktopFile", item.isDesktopFile);
+            items.setProperty(i, "isPlaceholder", false);
+            items.setProperty(i, "gridX", col);
+            items.setProperty(i, "gridY", row);
         }
 
         root.initialLoadComplete = true;
@@ -554,7 +385,7 @@ Singleton {
                 } else {
                     parsingInProgress = false;
                     currentDesktopFileIndex = -1;
-                    if (gridReady && positionsLoaded) {
+                    if (gridReady) {
                         finalizeItems();
                     }
                     if (needsRescan) {
@@ -567,11 +398,10 @@ Singleton {
 
         stdout: StdioCollector {
             onStreamFinished: {
-                if (currentDesktopFileIndex >= tempDesktopFiles.length) {
+                var item = root.currentItem;
+                if (!item)
                     return;
-                }
 
-                var item = tempDesktopFiles[currentDesktopFileIndex];
                 var lines = text.split("\n");
                 var name = "";
                 var icon = "application-x-executable";
@@ -597,16 +427,6 @@ Singleton {
                 if (text.length > 0) {
                     console.warn("Error parsing .desktop file:", text);
                 }
-                if (currentDesktopFileIndex >= tempDesktopFiles.length) {
-                    parsingInProgress = false;
-                    if (needsRescan) {
-                        needsRescan = false;
-                        scanDesktop();
-                    }
-                    return;
-                }
-                currentDesktopFileIndex++;
-                parseNextDesktopFile();
             }
         }
     }

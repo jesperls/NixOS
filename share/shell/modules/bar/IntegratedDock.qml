@@ -19,7 +19,6 @@ StyledRect {
 
     readonly property bool isVertical: orientation === "vertical"
     readonly property bool isIntegrated: (Config.dock?.theme ?? "default") === "integrated"
-    readonly property string dockPosition: Config.dock?.position ?? "center"
 
     readonly property int iconSize: 18
     readonly property int itemSpacing: 2
@@ -31,10 +30,10 @@ StyledRect {
     property real startRadius: radius
     property real endRadius: radius
 
-    topLeftRadius: isVertical ? startRadius : startRadius
+    topLeftRadius: startRadius
     topRightRadius: isVertical ? startRadius : endRadius
     bottomLeftRadius: isVertical ? endRadius : startRadius
-    bottomRightRadius: isVertical ? endRadius : endRadius
+    bottomRightRadius: endRadius
     
     enableShadow: Config.showBackground
 

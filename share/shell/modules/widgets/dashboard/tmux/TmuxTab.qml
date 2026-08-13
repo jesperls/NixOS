@@ -48,7 +48,6 @@ Item {
     property int expandedItemIndex: -1
     property int selectedOptionIndex: 0
     property bool keyboardNavigation: false
-    property bool isFiltering: false
 
     property var sessionWindows: []
     property var sessionPanes: []
@@ -131,11 +130,9 @@ Item {
 
     function cancelDeleteModeFromExternal() {
         if (deleteMode) {
-            console.log("DEBUG: Canceling delete mode from external source (tab change)");
             cancelDeleteMode();
         }
         if (renameMode) {
-            console.log("DEBUG: Canceling rename mode from external source (tab change)");
             cancelRenameMode();
         }
     }
@@ -148,7 +145,7 @@ Item {
         var sessionNameToCreate = "";
 
         if (searchText.length === 0) {
-            newFilteredSessions = tmuxSessions.slice();  // Copia del array
+            newFilteredSessions = tmuxSessions.slice();
         } else {
             newFilteredSessions = tmuxSessions.filter(function (session) {
                 return session.name.toLowerCase().includes(searchText.toLowerCase());
@@ -295,10 +292,6 @@ Item {
 
         panesProcess.command = ["tmux", "list-panes", "-t", sessionName, "-F", "#{pane_index}:#{pane_width}:#{pane_height}:#{pane_top}:#{pane_left}:#{pane_active}:#{pane_current_command}"];
         panesProcess.running = true;
-    }
-
-    function stripAnsiCodes(text) {
-        return text.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '').replace(/\x1b\][0-9;]*;[^\x07]*\x07/g, '').replace(/\x1b[=>]/g, '');
     }
 
     function createTmuxSession(sessionName) {
@@ -607,7 +600,6 @@ Item {
                                 }
                             }
                         } else {
-                            console.log("DEBUG: No action taken - selectedIndex:", root.selectedIndex, "count:", resultsList.count);
                         }
                     }
                 }
@@ -760,7 +752,7 @@ Item {
                         for (var i = 0; i < currentIndex && i < sessionsModel.count; i++) {
                             var itemHeight = 48;
                             if (i === root.expandedItemIndex && !root.deleteMode && !root.renameMode) {
-                                var listHeight = 36 * 3;  // Always 3 options
+                                var listHeight = 36 * 3;
                                 itemHeight = 48 + 4 + listHeight + 8;
                             }
                             itemY += itemHeight;
@@ -794,8 +786,8 @@ Item {
                     height: {
                         let baseHeight = 48;
                         if (index === root.expandedItemIndex && !isInDeleteMode && !isInRenameMode) {
-                            var listHeight = 36 * 3;  // Always 3 options: Open, Rename, Quit
-                            return baseHeight + 4 + listHeight + 8;  // base + spacing + list + bottom margin
+                            var listHeight = 36 * 3;
+                            return baseHeight + 4 + listHeight + 8;
                         }
                         return baseHeight;
                     }
@@ -977,7 +969,7 @@ Item {
 
                         ClippingRectangle {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 36 * 3  // Always 3 options
+                            Layout.preferredHeight: 36 * 3
                             color: Colors.background
                             radius: Styling.radius(0)
 
@@ -1201,14 +1193,14 @@ Item {
                             property real idx2X: root.renameButtonIndex
 
                             x: {
-                                let minX = Math.min(idx1X, idx2X) * 36 + activeButtonMargin;  // 32 + 4 spacing
+                                let minX = Math.min(idx1X, idx2X) * 36 + activeButtonMargin;
                                 return minX;
                             }
 
                             y: activeButtonMargin
 
                             width: {
-                                let stretchX = Math.abs(idx1X - idx2X) * 36 + 32 - activeButtonMargin * 2;  // 32 + 4 spacing
+                                let stretchX = Math.abs(idx1X - idx2X) * 36 + 32 - activeButtonMargin * 2;
                                 return stretchX;
                             }
 
@@ -1496,14 +1488,14 @@ Item {
                             property real idx2X: root.deleteButtonIndex
 
                             x: {
-                                let minX = Math.min(idx1X, idx2X) * 36 + activeButtonMargin;  // 32 + 4 spacing
+                                let minX = Math.min(idx1X, idx2X) * 36 + activeButtonMargin;
                                 return minX;
                             }
 
                             y: activeButtonMargin
 
                             width: {
-                                let stretchX = Math.abs(idx1X - idx2X) * 36 + 32 - activeButtonMargin * 2;  // 32 + 4 spacing
+                                let stretchX = Math.abs(idx1X - idx2X) * 36 + 32 - activeButtonMargin * 2;
                                 return stretchX;
                             }
 
@@ -1743,7 +1735,6 @@ Item {
                             mouse.accepted = true;
                         } else if (root.expandedItemIndex >= 0) {
                             if (!isClickInsideActiveItem(mouse.y)) {
-                                console.log("DEBUG: Clicked outside expanded item - closing options");
                                 root.expandedItemIndex = -1;
                                 root.selectedOptionIndex = 0;
                                 root.keyboardNavigation = false;

@@ -30,9 +30,9 @@ let
     if kernelOpts == defaultOpts then
       pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto
     else
-      (
-        pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { }
-      ).kernelModuleLLVMOverride (pkgs.linuxKernel.packagesFor customKernel);
+      (pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { }).kernelModuleLLVMOverride (
+        pkgs.linuxKernel.packagesFor customKernel
+      );
 in
 {
   nixpkgs.overlays = [
@@ -56,14 +56,11 @@ in
     tmp.useTmpfs = true;
     tmp.tmpfsSize = "75%";
 
-    initrd.systemd.enable = lib.mkDefault true;
-
     kernelPackages = lib.mkDefault kernelPackages;
 
     kernelParams = [
       "quiet"
       "nowatchdog"
-      "loglevel=3"
       "rd.systemd.show_status=false"
       "rd.udev.log_level=3"
       "udev.log_priority=3"
@@ -72,8 +69,6 @@ in
     ++ lib.optional (
       cfg.transparentHugepages != null
     ) "transparent_hugepage=${cfg.transparentHugepages}";
-
-    plymouth.enable = false;
 
     consoleLogLevel = 0;
     initrd.verbose = false;

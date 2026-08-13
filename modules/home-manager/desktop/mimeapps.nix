@@ -93,11 +93,11 @@ in
     defaultApplications =
       assign browserTypes apps.browser.desktopFile
       // assign editorTypes apps.editor.desktopFile
-      // assign textEditorTypes apps.textEditor.desktopFile
-      // assign imageTypes apps.imageViewer.desktopFile
-      // assign pdfTypes apps.pdfViewer.desktopFile
-      // assign archiveTypes apps.archiveManager.desktopFile
-      // assign avTypes apps.videoPlayer.desktopFile
+      // assign textEditorTypes apps.textEditor
+      // assign imageTypes apps.imageViewer
+      // assign pdfTypes apps.pdfViewer
+      // assign archiveTypes apps.archiveManager
+      // assign avTypes apps.videoPlayer
       // {
         "inode/directory" = apps.fileManager.desktopFile;
         "x-scheme-handler/discord" = "discord.desktop";

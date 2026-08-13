@@ -8,7 +8,6 @@ import Quickshell.Widgets
 import qs.modules.theme
 import qs.modules.components
 import qs.modules.services
-import qs.config
 
 PanelWindow {
     id: root
@@ -168,7 +167,7 @@ PanelWindow {
 
                     Text {
                         anchors.centerIn: parent
-                        text: Icons.handGrab  // Assuming this exists per user request
+                        text: Icons.handGrab
                         font.family: Icons.font
                         color: Colors.overBackground
                     }

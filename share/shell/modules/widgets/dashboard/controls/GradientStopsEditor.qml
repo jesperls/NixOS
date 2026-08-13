@@ -22,29 +22,6 @@ Item {
     property int draggingIndex: -1
     property real dragPosition: 0
 
-    function getStopPosition(index) {
-        if (!stops || stops.length === 0)
-            return 0;
-
-        if (draggingIndex === index)
-            return dragPosition;
-
-        if (index >= 0 && index < stops.length)
-            return stops[index][1];
-
-        return stops[stops.length - 1][1];
-    }
-
-    function getStopColor(index) {
-        if (!stops || stops.length === 0)
-            return "transparent";
-
-        if (index >= 0 && index < stops.length)
-            return stops[index][0];
-
-        return stops[stops.length - 1][0];
-    }
-
     readonly property var defaultBaseColors: ({
         bg: "background",
         internalbg: "background",
@@ -167,7 +144,7 @@ Item {
                     Canvas {
                         id: gradientPreviewCanvas
                         anchors.fill: parent
-                        anchors.margins: 2  // Keep inside border
+                        anchors.margins: 2
 
                         onPaint: {
                             var ctx = getContext("2d");

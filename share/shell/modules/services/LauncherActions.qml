@@ -91,6 +91,7 @@ Singleton {
                         ScreenRecorder.toggleRecording();
                     } else {
                         ScreenRecorder.initialize();
+                        GlobalStates.screenRecordReplayMode = false;
                         GlobalStates.screenRecordToolVisible = true;
                     }
                 }

@@ -23,7 +23,7 @@ PanelWindow {
     color: "transparent"
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     visible: state !== "idle"
     exclusionMode: ExclusionMode.Ignore
@@ -129,6 +129,7 @@ PanelWindow {
 
     function close() {
         screenrecordPopup.state = "idle";
+        GlobalStates.screenRecordToolVisible = false;
     }
 
     function executeCapture() {
@@ -141,8 +142,10 @@ PanelWindow {
                 var x = Math.round(selectionRect.x);
                 var y = Math.round(selectionRect.y);
 
-                x = x + screenrecordPopup.focusedMonitor.x;
-                y = y + screenrecordPopup.focusedMonitor.y;
+                if (screenrecordPopup.focusedMonitor) {
+                    x = x + screenrecordPopup.focusedMonitor.x;
+                    y = y + screenrecordPopup.focusedMonitor.y;
+                }
 
                 startCapture("region", w + "x" + h + "+" + x + "+" + y);
             }

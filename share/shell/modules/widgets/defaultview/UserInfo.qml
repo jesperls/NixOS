@@ -11,19 +11,6 @@ Item {
     implicitWidth: avatarClip.width
     implicitHeight: 40
 
-    Process {
-        id: hostnameProcess
-        command: ["hostname"]
-        running: true
-
-        stdout: StdioCollector {
-            id: hostnameCollector
-            waitForEnd: true
-
-            onStreamFinished: {}
-        }
-    }
-
     MouseArea {
         id: userHostArea
         anchors.fill: parent
@@ -75,26 +62,6 @@ Item {
                         font.pixelSize: 16
                         color: Colors.overBackground
                         visible: !avatarImage.visible
-                    }
-                }
-            }
-
-            Text {
-                id: userHostText
-                anchors.verticalCenter: parent.verticalCenter
-                text: `${Quickshell.env("USER")}@${hostnameCollector.text.trim()}`
-                color: userHostArea.pressed ? Colors.overBackground : (userHostArea.containsMouse ? Styling.srItem("overprimary") : Colors.overBackground)
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(0)
-                font.weight: Font.Bold
-                elide: Text.ElideRight
-                width: Math.min(implicitWidth, 180 - avatarClip.width - 8)
-                visible: false
-
-                Behavior on color {
-                    enabled: Config.animDuration > 0
-                    ColorAnimation {
-                        duration: Config.animDuration / 2
                     }
                 }
             }

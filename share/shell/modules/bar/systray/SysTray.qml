@@ -5,15 +5,17 @@ import qs.modules.theme
 import qs.modules.components
 
     StyledRect {
-    variant: "bg"
+    variant: root.flatStyle ? "transparent" : "bg"
     id: root
 
     visible: hasItems
 
-    topLeftRadius: root.vertical ? root.startRadius : root.startRadius
+    property bool flatStyle: false
+
+    topLeftRadius: root.startRadius
     topRightRadius: root.vertical ? root.startRadius : root.endRadius
     bottomLeftRadius: root.vertical ? root.endRadius : root.startRadius
-    bottomRightRadius: root.vertical ? root.endRadius : root.endRadius
+    bottomRightRadius: root.endRadius
 
     required property var bar
     

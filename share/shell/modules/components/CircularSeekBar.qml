@@ -49,7 +49,7 @@ Item {
     readonly property real cycleLength: baseDashLength + targetSpacing
     
     NumberAnimation on phase {
-        running: (root.dashedActive || root.wavy) && root.visible
+        running: (root.dashedActive || root.wavy) && root.visible && root.window !== null && root.window.visible
         from: 0
         to: -root.cycleLength  // Move forward along path
         duration: 1000  // Adjust speed
@@ -60,15 +60,15 @@ Item {
     
     Timer {
         id: waveTimer
-        interval: 32  // ~30 FPS
-        running: root.wavy && root.visible && (root.value > 0 || root.isDragging)
+        interval: 32
+        running: root.wavy && root.visible && root.window !== null && root.window.visible && (root.value > 0 || root.isDragging)
         repeat: true
         onTriggered: {
             root.wavePhase = (root.wavePhase + 0.1) % (Math.PI * 2)
         }
     }
 
-    readonly property real radius: (Math.min(width, height) / 2) - ringPadding
+    readonly property real radius: Math.max(0.001, (Math.min(width, height) / 2) - ringPadding)
     readonly property real effectiveValue: isDragging ? dragValue : value
     
     property real handleSpacing: 10 
@@ -78,7 +78,6 @@ Item {
     
     readonly property real currentAngleRad: (startAngleDeg + (spanAngleDeg * effectiveValue)) * Math.PI / 180
 
-    readonly property real waveOffsetAtHandle: 0 
     readonly property real effectiveRadiusAtHandle: root.radius
 
     function generateWavyArcPoints(startDeg, endDeg, phase) {
@@ -219,7 +218,7 @@ Item {
                 path: root.generateWavyArcPoints(
                     root.startAngleDeg, 
                     root.startAngleDeg + Math.max(0, (root.spanAngleDeg * root.effectiveValue) - root.gapAngleDeg),
-                    root.wavePhase  // Force dependency
+                    root.wavePhase
                 )
             }
         }

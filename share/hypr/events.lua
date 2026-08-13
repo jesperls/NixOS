@@ -13,7 +13,13 @@ end
 local demoting = false
 
 hl.on("window.fullscreen", function(window)
-  if demoting or fullscreen.suppress or not window or not classes[window.class] or window.fullscreen ~= 2 then
+  if
+    demoting
+    or fullscreen.suppress
+    or not window
+    or not classes[window.class]
+    or (window.fullscreen ~= 2 and window.fullscreen_client ~= 2)
+  then
     return
   end
 

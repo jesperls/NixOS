@@ -8,7 +8,6 @@ QtObject {
     readonly property string overview: ""
 
     readonly property string layout: ""
-    readonly property string dwindle: ""
     readonly property string master: ""
     readonly property string scrolling: ""
 
@@ -24,18 +23,11 @@ QtObject {
     readonly property string caretUp: ""
     readonly property string caretDown: ""
 
-    readonly property string caretDoubleLeft: ""
-    readonly property string caretDoubleRight: ""
     readonly property string caretDoubleUp: ""
     readonly property string caretDoubleDown: ""
 
-    readonly property string caretLineLeft: ""
-    readonly property string caretLineRight: ""
-    readonly property string caretLineUp: ""
-    readonly property string caretLineDown: ""
 
     readonly property string widgets: ""
-    readonly property string kanban: ""
     readonly property string wallpapers: ""
     readonly property string apps: ""
     readonly property string terminal: ""
@@ -47,7 +39,6 @@ QtObject {
     readonly property string pin: ""
     readonly property string unpin: ""
     readonly property string popOpen: ""
-    readonly property string hand: ""
     readonly property string handGrab: ""
     readonly property string heartbeat: ""
     readonly property string cpu: ""
@@ -62,20 +53,16 @@ QtObject {
     readonly property string glassMinus: ""
     readonly property string glassPlus: ""
     readonly property string circuitry: ""
-    readonly property string robot: ""
-    readonly property string minusCircle: ""
 
     readonly property string wifiOff: ""
     readonly property string wifiNone: ""
     readonly property string wifiLow: ""
     readonly property string wifiMedium: ""
     readonly property string wifiHigh: ""
-    readonly property string wifiX: ""
 
     readonly property string bluetooth: ""
     readonly property string bluetoothConnected: ""
     readonly property string bluetoothOff: ""
-    readonly property string bluetoothX: ""
 
     readonly property string nightLight: ""
     readonly property string caffeine: ""
@@ -112,7 +99,6 @@ QtObject {
     readonly property string telegram: "<font face='Symbols Nerd Font Mono'></font>"
 
     readonly property string clock: ""
-    readonly property string alarm: ""
     readonly property string timer: ""
 
     readonly property string speakerSlash: ""
@@ -134,7 +120,6 @@ QtObject {
 
     readonly property string keyboard: ""
     readonly property string backspace: ""
-    readonly property string enter: ""
     readonly property string shift: ""
     readonly property string arrowUp: ""
     readonly property string arrowDown: ""
@@ -153,23 +138,18 @@ QtObject {
     readonly property string image: ""
     readonly property string broom: ""
     readonly property string xeyes: ""
-    readonly property string seal: ""
     readonly property string info: ""
-    readonly property string help: ""
     readonly property string sun: ""
-    readonly property string sunDim: ""
     readonly property string moon: ""
     readonly property string user: ""
     readonly property string spinnerGap: ""
     readonly property string circleNotch: ""
     readonly property string file: ""
     readonly property string note: ""
-    readonly property string notepad: ""
     readonly property string link: ""
     readonly property string globe: ""
     readonly property string folder: ""
     readonly property string cactus: ""
-    readonly property string countdown: ""
     readonly property string sync: ""
     readonly property string cube: ""
     readonly property string picker: ""
@@ -190,9 +170,7 @@ QtObject {
     readonly property string arrowCounterClockwise: ""
     readonly property string arrowFatLinesDown: ""
     readonly property string arrowsOutCardinal: ""
-    readonly property string dotsThree: ""
     readonly property string dotsNine: ""
-    readonly property string heart: "\ue2a8"
     readonly property string arrowSquareOut: "\ue5de"
     readonly property string circleHalf: ""
 
@@ -220,18 +198,14 @@ QtObject {
     readonly property string sparkle: ""
 
     readonly property string ethernet: ""
-    readonly property string router: ""
-    readonly property string signalNone: ""
     readonly property string vpn: ""
 
     readonly property string shieldCheck: ""
     readonly property string shield: ""
 
     readonly property string list: ""
-    readonly property string paperPlane: ""
     readonly property string compositor: ""
     readonly property string aperture: ""
-    readonly property string magicWand: ""
     readonly property string google: ""
 
     readonly property string palette: paintBrush

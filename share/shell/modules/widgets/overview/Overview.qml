@@ -24,7 +24,7 @@ Item {
     readonly property real workspacePadding: 8
     readonly property color activeBorderColor: Styling.srItem("overprimary")
 
-    property var currentScreen: null  // This will be set from parent
+    property var currentScreen: null
     readonly property var monitor: currentScreen ? Compositor.monitorFor(currentScreen) : Compositor.focusedMonitor
     readonly property int workspaceGroup: Math.floor((monitor?.activeWorkspace?.id - 1 || 0) / workspacesShown)
 
@@ -217,8 +217,6 @@ Item {
                             id: workspace
                             property int colIndex: index
                             property int workspaceValue: overviewRoot.workspaceGroup * workspacesShown + rowIndex * overviewRoot.columns + colIndex + 1
-                            property color defaultWorkspaceColor: Colors.background
-                            property color hoveredWorkspaceColor: Colors.surfaceContainer
                             property color hoveredBorderColor: Colors.outline
                             property bool hoveredWhileDragging: false
 
@@ -235,6 +233,7 @@ Item {
                                 anchors.fill: parent
                                 radius: Styling.radius(2)
                                 tintEnabled: GlobalStates.wallpaperManager ? GlobalStates.wallpaperManager.tintEnabled : false
+                                sourceSize: Qt.size(960, 540)
 
                                 property string lockscreenFramePath: {
                                     if (!GlobalStates.wallpaperManager)
@@ -317,6 +316,7 @@ Item {
                     windowData: modelData.windowData
                     toplevel: modelData.toplevel
                     scale: overviewRoot.scale
+                    overviewRoot: overviewRoot
                     availableWorkspaceWidth: overviewRoot.workspaceImplicitWidth
                     availableWorkspaceHeight: overviewRoot.workspaceImplicitHeight
                     monitorData: overviewRoot.monitorData
