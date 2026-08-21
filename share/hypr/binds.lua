@@ -48,6 +48,7 @@ bind_exec(mainMod, "Tab", "pangu run overview", "Shell: workspace overview")
 bind_exec(mainMod, "Escape", "pangu run powermenu", "Shell: power menu")
 bind_exec(mainMod, "G", "pangu run gamemode", "Shell: toggle game mode")
 bind_exec(mainMod, "X", "pangu run tools", "Shell: tools menu")
+bind_exec(mainMod, "I", "pangu run settings", "Shell: settings")
 bind_exec(mainMod, "F1", "pangu run cheatsheet", "Shell: keybind cheatsheet")
 
 bind_exec(mainMod, "L", "loginctl lock-session", "Session: lock")

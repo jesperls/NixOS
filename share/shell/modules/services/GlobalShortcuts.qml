@@ -34,6 +34,7 @@ QtObject {
             case "powermenu": toggleSimpleModule("powermenu"); break;
             case "tools": toggleSimpleModule("tools"); break;
             case "config": toggleSettings(); break;
+            case "settings": toggleSettings(); break;
             case "screenshot": Screenshot.initialize(); GlobalStates.screenshotToolVisible = true; break;
             case "screenrecord": ScreenRecorder.initialize(); GlobalStates.screenRecordReplayMode = false; GlobalStates.screenRecordToolVisible = true; break;
             case "lens": 

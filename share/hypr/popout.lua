@@ -59,6 +59,8 @@ end
 
 local function unpin(window)
   local home = origin(window)
+  -- pinning refuses fullscreen windows, so drop any fullscreen first
+  hl.dispatch(hl.dsp.window.fullscreen_state({ internal = 0, client = 0, window = window }))
   hl.dispatch(hl.dsp.window.pin({ action = "disable", window = window }))
   if home then
     hl.dispatch(hl.dsp.window.tag({ tag = "-popout_from_" .. home, window = window }))
@@ -78,7 +80,7 @@ function M.toggle(window)
   if not window then
     return
   end
-  if window.pinned then
+  if window.pinned or window.pin_fullscreened then
     unpin(window)
   else
     pin(window)

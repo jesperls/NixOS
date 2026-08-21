@@ -37,6 +37,7 @@ hl.config({
   },
   binds = {
     scroll_event_delay = 0, -- must stay 0: throttled scroll events leak through to the window
+    allow_pin_fullscreen = true,
   },
   misc = {
     disable_hyprland_logo = true,
