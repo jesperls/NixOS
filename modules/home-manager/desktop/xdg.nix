@@ -1,4 +1,8 @@
-{ config, osConfig, ... }:
+{
+  config,
+  osConfig,
+  ...
+}:
 
 let
   homeDir = config.home.homeDirectory;

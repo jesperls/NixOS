@@ -63,6 +63,7 @@
 
       hosts = lib.mapAttrs mkHost {
         pangu = { };
+        gonggong = { };
       };
     in
     {

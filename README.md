@@ -1,10 +1,10 @@
 # nixos-config
 
-Flake-based NixOS + Home Manager configuration. Single host for now (`pangu`),
-but everything host-specific is parameterized through the `mySystem` options
-layer, so a new host is a `hosts/<name>/` directory plus one entry in the
-`hosts` attrset in `flake.nix` (which can override `system` and inject extra
-modules per host).
+Flake-based NixOS + Home Manager configuration. Two hosts: `pangu` (desktop)
+and `gonggong` (headless server), but everything host-specific is
+parameterized through the `mySystem` options layer, so a new host is a
+`hosts/<name>/` directory plus one entry in the `hosts` attrset in `flake.nix`
+(which can override `system` and inject extra modules per host).
 
 ## Layout
 
@@ -33,12 +33,20 @@ modules/nixos/
                            (module-specific options like hardware.nvidia.enable
                            or services.sunshine.enable are declared next to
                            their implementation module instead)
-  bundle.nix               Every shared module; host-shaped ones are off
-                           until their mySystem enable flag is set.
+  bundle.nix               Base bundle shared by every host: core, performance
+                            and feature modules, which are off until their
+                            mySystem enable flag is set.
+  desktop/bundle.nix        The graphical stack (compositor, portals, audio,
+                            Bluetooth, fonts) — imported only by hosts that
+                            want a desktop.
   home-manager.nix         Generic HM wiring (rotating activation backups).
   core/ services/ ...      Implementation modules reading mySystem.*.
 modules/home-manager/
-  bundle.nix               Common HM imports shared by all desktop hosts.
+  bundle.nix               Base HM bundle: CLI tooling + stateVersion.
+  desktop/bundle.nix        Desktop session (theme, xdg, mimeapps, Hyprland,
+                            shell, autostarts, mpv) — imported per host.
+                            Standalone apps (firefox, nixcord, obs, ...) are
+                            not in any bundle; hosts import them directly.
   lib/autostart.nix        mkAutostart — systemd user unit bound to the
                            Hyprland session.
   desktop/shell.nix        The shell's user service + config bootstrap.
@@ -58,11 +66,18 @@ share/                     Source trees deployed verbatim — no nix in here.
 
 ## Adding a host
 
-A new `hosts/<name>/` needs `configuration.nix`, `hardware-configuration.nix`
-and `monitors.nix`. Nothing in the shared layer has to be configured —
-hardware-shaped modules (`mySystem.hardware.*`, `programs.gaming`,
-`services.sunshine`, ...) default to off and are switched on per host, and
-`performance.cpuVendor` is read from `hardware-configuration.nix`.
+A new `hosts/<name>/` needs `configuration.nix` and
+`hardware-configuration.nix`. The entrypoint composes the host from bundles:
+`modules/nixos/bundle.nix` is always the base, and a desktop host adds
+`modules/nixos/desktop/bundle.nix`; on the HM side the same split applies,
+with standalone apps imported à la carte in `home.nix`.
+
+Nothing in the shared layer has to be configured — hardware-shaped modules
+(`mySystem.hardware.*`, `programs.gaming`, `services.sunshine`, ...) default
+to off and are switched on per host, and `performance.cpuVendor` is read from
+`hardware-configuration.nix`. Headless hosts import no desktop bundle, so no
+`monitors.nix` is needed either (the monitor assertion only fires when
+Hyprland is actually enabled).
 
 Overriding the baseline per host:
 

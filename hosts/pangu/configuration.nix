@@ -8,6 +8,7 @@
     ./audio.nix
 
     ../../modules/nixos/bundle.nix
+    ../../modules/nixos/desktop/bundle.nix
   ];
 
   mySystem = {

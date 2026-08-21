@@ -6,7 +6,7 @@ in
 {
   config.assertions = [
     {
-      assertion = builtins.any (m: !m.disabled) cfg.monitors;
+      assertion = config.programs.hyprland.enable -> builtins.any (m: !m.disabled) cfg.monitors;
       message = "mySystem.monitors needs at least one enabled monitor; workspace and special-workspace layout math depends on it.";
     }
     {
