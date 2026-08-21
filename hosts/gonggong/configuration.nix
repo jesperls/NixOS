@@ -17,7 +17,10 @@
     system = {
       hostName = "gonggong";
       regionalLocale = "sv_SE.UTF-8";
+      passwordlessSudo = true;
     };
+
+    network.allowedTCPPorts = [ 8080 5657 25565 ];
 
     performance.cpuVendor = "intel";
 

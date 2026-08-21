@@ -13,5 +13,7 @@
     tmux
     unzip
     zip
+    opencode
   ];
 }
+

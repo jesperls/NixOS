@@ -4,6 +4,10 @@
   networking = {
     hostName = config.mySystem.system.hostName;
     networkmanager.enable = true;
+    firewall = {
+      allowedTCPPorts = config.mySystem.network.allowedTCPPorts;
+      allowedUDPPorts = config.mySystem.network.allowedUDPPorts;
+    };
   };
 
   services.openssh = {

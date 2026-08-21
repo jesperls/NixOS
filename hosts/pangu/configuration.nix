@@ -28,6 +28,7 @@
     network.hosts = {
       nuwa = "192.168.1.49";
       oracle = "132.145.48.11";
+      gonggong = "192.168.1.96";
     };
 
     desktop.tearing.enable = true;

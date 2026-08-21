@@ -86,6 +86,18 @@
       description = "Named machine addresses shared between system and HM config.";
     };
 
+    network.allowedTCPPorts = lib.mkOption {
+      type = lib.types.listOf lib.types.port;
+      default = [ ];
+      description = "TCP ports to open in the firewall.";
+    };
+
+    network.allowedUDPPorts = lib.mkOption {
+      type = lib.types.listOf lib.types.port;
+      default = [ ];
+      description = "UDP ports to open in the firewall.";
+    };
+
     home = {
       stateVersion = lib.mkOption {
         type = lib.types.str;
