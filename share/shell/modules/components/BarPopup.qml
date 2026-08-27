@@ -26,6 +26,8 @@ PopupWindow {
 
     property bool isOpen: false
 
+    property string groupId: "bar"
+
     signal closedExternally
 
     property real popupOpacity: 0
@@ -144,6 +146,8 @@ PopupWindow {
         if (visible)
             return;
 
+        Visibilities.registerBarPopup(root);
+
         isOpen = true;
 
         popupOpacity = 0;
@@ -161,6 +165,8 @@ PopupWindow {
     function close() {
         if (!visible)
             return;
+
+        Visibilities.unregisterBarPopup(root);
 
         isOpen = false;
         focusActive = false;
@@ -185,5 +191,9 @@ PopupWindow {
         onTriggered: {
             root.visible = false;
         }
+    }
+
+    Component.onDestruction: {
+        Visibilities.unregisterBarPopup(root);
     }
 }

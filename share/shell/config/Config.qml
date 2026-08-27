@@ -27,7 +27,6 @@ Singleton {
         compositor: compositorFile,
         performance: performanceFile,
         weather: weatherFile,
-        desktop: desktopFile,
         lockscreen: lockscreenFile,
         prefix: prefixFile,
         system: systemFile,
@@ -38,7 +37,7 @@ Singleton {
         launcher: launcherFile
     })
 
-    readonly property bool initialLoadComplete: themeFile.ready && barFile.ready && workspacesFile.ready && overviewFile.ready && notchFile.ready && compositorFile.ready && performanceFile.ready && weatherFile.ready && desktopFile.ready && lockscreenFile.ready && prefixFile.ready && systemFile.ready && dockFile.ready && pinnedAppsFile.ready && osdFile.ready && dashboardFile.ready && launcherFile.ready
+    readonly property bool initialLoadComplete: themeFile.ready && barFile.ready && workspacesFile.ready && overviewFile.ready && notchFile.ready && compositorFile.ready && performanceFile.ready && weatherFile.ready && lockscreenFile.ready && prefixFile.ready && systemFile.ready && dockFile.ready && pinnedAppsFile.ready && osdFile.ready && dashboardFile.ready && launcherFile.ready
 
     readonly property bool barReady: barFile.ready
     readonly property bool dockReady: dockFile.ready
@@ -589,18 +588,6 @@ Singleton {
     }
 
     ConfigFile {
-        id: desktopFile
-        name: "desktop"
-
-        adapter: JsonAdapter {
-            property bool enabled: false
-            property int iconSize: 40
-            property int spacingVertical: 16
-            property string textColor: "overBackground"
-        }
-    }
-
-    ConfigFile {
         id: lockscreenFile
         name: "lockscreen"
 
@@ -773,7 +760,6 @@ Singleton {
     readonly property QtObject compositor: compositorFile.adapter
     readonly property QtObject performance: performanceFile.adapter
     readonly property QtObject weather: weatherFile.adapter
-    readonly property QtObject desktop: desktopFile.adapter
     readonly property QtObject lockscreen: lockscreenFile.adapter
     readonly property QtObject prefix: prefixFile.adapter
     readonly property QtObject system: systemFile.adapter

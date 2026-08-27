@@ -196,12 +196,6 @@ QtObject {
         
         { label: "Lockscreen", keywords: "lock screen password login", section: "shell", subSection: "lockscreen", subLabel: "Shell > Lockscreen", icon: Icons.lock, isIcon: true },
         
-        { label: "Desktop", keywords: "icons wallpaper home", section: "shell", subSection: "desktop", subLabel: "Shell > Desktop", icon: Icons.layout, isIcon: true },
-        { label: "Desktop Enabled", keywords: "show hide icons toggle", section: "shell", subSection: "desktop", subLabel: "Shell > Desktop", icon: Icons.layout, isIcon: true },
-        { label: "Desktop Icon Size", keywords: "width height pixels", section: "shell", subSection: "desktop", subLabel: "Shell > Desktop", icon: Icons.layout, isIcon: true },
-        { label: "Desktop Vertical Spacing", keywords: "gap margin", section: "shell", subSection: "desktop", subLabel: "Shell > Desktop", icon: Icons.layout, isIcon: true },
-        { label: "Desktop Text Color", keywords: "label font", section: "shell", subSection: "desktop", subLabel: "Shell > Desktop", icon: Icons.palette, isIcon: true },
-        
         { label: "Shell System", keywords: "config settings pangu", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.circuitry, isIcon: true }
     ]
 

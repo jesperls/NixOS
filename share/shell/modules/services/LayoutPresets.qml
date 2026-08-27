@@ -30,7 +30,6 @@ Singleton {
             notch: { theme: "default", position: "top", keepHidden: false },
             overview: { enabled: true, layout: "standard", rows: 2, columns: 5 },
             lockscreen: { position: "bottom" },
-            desktop: { enabled: false },
             compositor: { gapsIn: 2, gapsOut: 4, borderSize: 2, syncRoundness: true }
         }
     ]
@@ -91,7 +90,6 @@ Singleton {
     readonly property var _dashboardKeys: ["width", "height", "showTabRail", "tabPosition", "showWidgets", "showWallpapers", "showMetrics", "backgroundOpacity"]
     readonly property var _launcherKeys: ["width", "height", "showAppComments", "sortByUsage"]
     readonly property var _lockscreenKeys: ["position", "lockOnBoot", "showClock", "showDate", "showMediaPlayer", "showAvatar", "showUsername", "blurWallpaper", "dimOpacity"]
-    readonly property var _desktopKeys: ["enabled", "iconSize", "spacingVertical", "textColor"]
     readonly property var _osdKeys: ["position", "showPercentage", "showSlider", "iconStyle", "width"]
     readonly property var _compositorKeys: ["activeBorderColor", "borderAngle", "inactiveBorderColor", "inactiveBorderAngle", "borderSize", "rounding", "syncRoundness", "syncBorderWidth", "syncBorderColor", "syncShadowOpacity", "syncShadowColor", "gapsIn", "gapsOut", "shadowEnabled", "shadowRange", "shadowRenderPower", "shadowSharp", "shadowColor", "shadowColorInactive", "shadowOpacity", "shadowOffset", "shadowScale", "blurEnabled", "blurSize", "blurPasses", "blurIgnoreOpacity", "blurExplicitIgnoreAlpha", "blurIgnoreAlphaValue", "blurNewOptimizations", "blurXray", "blurNoise", "blurContrast", "blurBrightness", "blurVibrancy", "blurVibrancyDarkness", "blurSpecial", "blurPopups", "blurPopupsIgnorealpha", "blurInputMethods", "blurInputMethodsIgnorealpha"]
 
@@ -158,7 +156,6 @@ Singleton {
             dashboard: captureSection(Config.dashboard, _dashboardKeys),
             launcher: captureSection(Config.launcher, _launcherKeys),
             lockscreen: captureSection(Config.lockscreen, _lockscreenKeys),
-            desktop: captureSection(Config.desktop, _desktopKeys),
             osd: captureSection(Config.osd, _osdKeys),
             compositor: captureSection(Config.compositor, _compositorKeys)
         };
@@ -219,7 +216,6 @@ Singleton {
             assign(preset.dashboard, Config.dashboard);
             assign(preset.launcher, Config.launcher);
             assign(preset.lockscreen, Config.lockscreen);
-            assign(preset.desktop, Config.desktop);
             assign(preset.osd, Config.osd);
             assign(preset.compositor, Config.compositor);
 
@@ -237,7 +233,7 @@ Singleton {
             Config.pauseAutoSave = false;
         }
 
-        for (const name of ["theme", "bar", "dock", "notch", "workspaces", "overview", "dashboard", "launcher", "lockscreen", "desktop", "osd", "compositor"])
+        for (const name of ["theme", "bar", "dock", "notch", "workspaces", "overview", "dashboard", "launcher", "lockscreen", "osd", "compositor"])
             Config.save(name);
 
         GlobalStates.resetChangeTracking();

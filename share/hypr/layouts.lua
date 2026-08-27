@@ -231,9 +231,9 @@ local emitted = {}
 
 local function update_gap(mon)
   local master = full_master_box(mon)
+  local ws = mon.active_workspace
   local on = master ~= nil
   if on then
-    local ws = mon.active_workspace
     on = ws ~= nil and not ws.special and ws.tiled_layout == "lua:centered"
     if on then
       on = false
@@ -249,7 +249,7 @@ local function update_gap(mon)
   local payload
   if on then
     local box = monitor_box(mon)
-    local square = gamemode.is_active(mon.active_workspace.id) and 1 or 0
+    local square = gamemode.is_active(ws.id) and 1 or 0
     payload = string.format(
       "centergap,%s,%d,%d,%d",
       mon.name,

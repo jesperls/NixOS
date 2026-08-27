@@ -1,6 +1,7 @@
 local SIZE = { x = 640, y = 360 }
 local MARGIN = 20
 local TILED_TAG = "popout_was_tiled"
+local HOME_PREFIX = "popout_from_"
 
 local M = {
   scratchpad_size = { x = 900, y = 700 },
@@ -28,7 +29,7 @@ end
 
 local function origin(window)
   for _, tag in pairs(tag_list(window)) do
-    local home = tostring(tag):match("^popout_from_(.+)$")
+    local home = tostring(tag):match("^" .. HOME_PREFIX .. "(.+)$")
     if home then
       return home
     end
@@ -38,16 +39,22 @@ end
 local function pin(window)
   local workspace = window.workspace
   local monitor = workspace and workspace.monitor
-  local home = workspace and workspace.id < 0 and workspace.name:match("^special:(.+)$") or nil
-  if home then
-    hl.dispatch(hl.dsp.window.tag({ tag = "+popout_from_" .. home, window = window }))
+
+  if workspace and workspace.id < 0 then
+    local home = workspace.name:match("^special:(.+)$")
+    if home then
+      hl.dispatch(hl.dsp.window.tag({ tag = "+" .. HOME_PREFIX .. home, window = window }))
+    end
   end
+
   if not window.floating then
     hl.dispatch(hl.dsp.window.tag({ tag = "+" .. TILED_TAG, window = window }))
     hl.dispatch(hl.dsp.window.float({ action = "enable", window = window }))
   end
+
   hl.dispatch(hl.dsp.window.pin({ action = "enable", window = window }))
   hl.dispatch(hl.dsp.window.resize({ x = SIZE.x, y = SIZE.y, window = window }))
+
   if monitor then
     hl.dispatch(hl.dsp.window.move({
       x = monitor.x + math.floor(monitor.width / monitor.scale) - SIZE.x - MARGIN,
@@ -58,17 +65,21 @@ local function pin(window)
 end
 
 local function unpin(window)
-  local home = origin(window)
   -- pinning refuses fullscreen windows, so drop any fullscreen first
   hl.dispatch(hl.dsp.window.fullscreen_state({ internal = 0, client = 0, window = window }))
   hl.dispatch(hl.dsp.window.pin({ action = "disable", window = window }))
+
+  local home = origin(window)
   if home then
-    hl.dispatch(hl.dsp.window.tag({ tag = "-popout_from_" .. home, window = window }))
+    hl.dispatch(hl.dsp.window.tag({ tag = "-" .. HOME_PREFIX .. home, window = window }))
     hl.dispatch(hl.dsp.window.move({ workspace = "special:" .. home, follow = false, window = window }))
   end
+
   if has_tag(window, TILED_TAG) then
     hl.dispatch(hl.dsp.window.tag({ tag = "-" .. TILED_TAG, window = window }))
-    hl.dispatch(hl.dsp.window.float({ action = "disable", window = window }))
+    if not window.workspace or window.workspace.id > 0 then
+      hl.dispatch(hl.dsp.window.float({ action = "disable", window = window }))
+    end
   elseif home == "scratchpad" then
     hl.dispatch(hl.dsp.window.resize({ x = M.scratchpad_size.x, y = M.scratchpad_size.y, window = window }))
     hl.dispatch(hl.dsp.window.center({ window = window }))

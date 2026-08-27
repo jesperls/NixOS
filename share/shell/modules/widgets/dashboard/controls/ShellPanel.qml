@@ -744,10 +744,6 @@ Item {
                             sectionId: "lockscreen"
                         }
                         SectionButton {
-                            text: "Desktop"
-                            sectionId: "desktop"
-                        }
-                        SectionButton {
                             text: "OSD"
                             sectionId: "osd"
                         }
@@ -2711,98 +2707,6 @@ Item {
                                 if (newValue !== Config.lockscreen.dimOpacity) {
                                     GlobalStates.markShellChanged();
                                     Config.lockscreen.dimOpacity = newValue;
-                                }
-                            }
-                        }
-                    }
-
-                    Separator {
-                        Layout.fillWidth: true
-                        visible: false
-                    }
-
-                    ColumnLayout {
-                        visible: root.currentSection === "desktop"
-                        property string settingsSection: "desktop"
-                        Layout.fillWidth: true
-                        spacing: 8
-
-                        Text {
-                            text: "Desktop"
-                            font.family: Config.theme.font
-                            font.pixelSize: Styling.fontSize(-1)
-                            font.weight: Font.Medium
-                            color: Colors.overSurfaceVariant
-                            Layout.bottomMargin: -4
-                        }
-
-                        ToggleRow {
-                            label: "Enabled"
-                            checked: Config.desktop.enabled ?? false
-                            onToggled: value => {
-                                if (value !== Config.desktop.enabled) {
-                                    GlobalStates.markShellChanged();
-                                    Config.desktop.enabled = value;
-                                }
-                            }
-                        }
-
-                        NumberInputRow {
-                            label: "Icon Size"
-                            value: Config.desktop.iconSize ?? 40
-                            minValue: 24
-                            maxValue: 96
-                            suffix: "px"
-                            onValueEdited: newValue => {
-                                if (newValue !== Config.desktop.iconSize) {
-                                    GlobalStates.markShellChanged();
-                                    Config.desktop.iconSize = newValue;
-                                }
-                            }
-                        }
-
-                        NumberInputRow {
-                            label: "Vertical Spacing"
-                            value: Config.desktop.spacingVertical ?? 16
-                            minValue: 0
-                            maxValue: 48
-                            suffix: "px"
-                            onValueEdited: newValue => {
-                                if (newValue !== Config.desktop.spacingVertical) {
-                                    GlobalStates.markShellChanged();
-                                    Config.desktop.spacingVertical = newValue;
-                                }
-                            }
-                        }
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: 8
-
-                            Text {
-                                text: "Text Color"
-                                font.family: Config.theme.font
-                                font.pixelSize: Styling.fontSize(0)
-                                color: Colors.overBackground
-                                Layout.preferredWidth: 100
-                            }
-
-                            ColorButton {
-                                id: desktopTextColorButton
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 48
-                                colorNames: root.colorNames
-                                currentColor: Config.desktop.textColor ?? "overBackground"
-                                dialogTitle: "Desktop Text Color"
-                                compact: false
-
-                                onOpenColorPicker: (colorNames, currentColor, dialogTitle) => {
-                                    root.openColorPicker(colorNames, currentColor, dialogTitle, function (color) {
-                                        if (color !== Config.desktop.textColor) {
-                                            GlobalStates.markShellChanged();
-                                            Config.desktop.textColor = color;
-                                        }
-                                    });
                                 }
                             }
                         }

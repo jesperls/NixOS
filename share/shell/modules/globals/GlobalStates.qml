@@ -266,7 +266,6 @@ Singleton {
         "launcher": ["width", "height", "showAppComments", "sortByUsage"],
         "dock": ["enabled", "theme", "position", "height", "iconSize", "spacing", "margin", "hoverRegionHeight", "hideDelay", "pinnedOnStartup", "hoverToReveal", "availableOnFullscreen", "showRunningIndicators", "showPinButton", "showOverviewButton", "screenList", "keepHidden"],
         "lockscreen": ["position", "lockOnBoot", "showClock", "showMediaPlayer", "showAvatar", "showUsername", "blurWallpaper", "dimOpacity"],
-        "desktop": ["enabled", "iconSize", "spacingVertical", "textColor"],
         "system": ["disks", "idle", "ocr", "pomodoro", "replay", "nightLight", "slideshow", "autoTheme"]
     }
 
@@ -345,7 +344,7 @@ Singleton {
 
     function applyShellChanges() {
         if (shellHasChanges) {
-            for (const name of ["bar", "notch", "workspaces", "overview", "dashboard", "launcher", "dock", "lockscreen", "desktop", "system"])
+            for (const name of ["bar", "notch", "workspaces", "overview", "dashboard", "launcher", "dock", "lockscreen", "system"])
                 Config.save(name);
 
             shellHasChanges = false;

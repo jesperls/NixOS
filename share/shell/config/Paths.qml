@@ -22,7 +22,6 @@ Singleton {
     readonly property string wallpapersDir: Quickshell.env("PANGU_WALLPAPERS") || (home + "/Pictures/Wallpapers")
     readonly property string picturesDir: Quickshell.env("XDG_PICTURES_DIR") || (home + "/Pictures")
     readonly property string videosDir: Quickshell.env("XDG_VIDEOS_DIR") || (home + "/Videos")
-    readonly property string desktopDir: Quickshell.env("XDG_DESKTOP_DIR") || (home + "/Desktop")
 
     readonly property string avatar: home + "/.face.icon"
 

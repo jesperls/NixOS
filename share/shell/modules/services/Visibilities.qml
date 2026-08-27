@@ -18,6 +18,8 @@ Singleton {
     property bool playerMenuOpen: false
     readonly property var moduleNames: ["launcher", "dashboard", "overview", "powermenu", "tools"]
 
+    property var barPopupGroups: ({})
+
     function isNotchOpen(screenProps) {
         return screenProps ? (screenProps.launcher || screenProps.dashboard || screenProps.powermenu || screenProps.tools) : false;
     }
@@ -93,6 +95,31 @@ Singleton {
 
     function unregisterDockPanel(screenName) {
         dockPanels = _updateMap(dockPanels, screenName, null);
+    }
+
+    function registerBarPopup(popup) {
+        if (!popup || !popup.groupId) return;
+        const groups = Object.assign({}, barPopupGroups);
+        const list = groups[popup.groupId] || [];
+        for (let i = 0; i < list.length; i++) {
+            if (list[i] !== popup && list[i] !== null && list[i].visible) {
+                list[i].close();
+            }
+        }
+        groups[popup.groupId] = [popup];
+        barPopupGroups = groups;
+    }
+
+    function unregisterBarPopup(popup) {
+        if (!popup || !popup.groupId) return;
+        const groups = Object.assign({}, barPopupGroups);
+        const list = (groups[popup.groupId] || []).filter(p => p !== popup && p !== null);
+        if (list.length === 0) {
+            delete groups[popup.groupId];
+        } else {
+            groups[popup.groupId] = list;
+        }
+        barPopupGroups = groups;
     }
 
     function setActiveModule(moduleName) {

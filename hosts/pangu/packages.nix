@@ -68,5 +68,7 @@
     pear-desktop
     phoronix-test-suite
     zed-editor
+    nvme-cli
+    wget
   ];
 }

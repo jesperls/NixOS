@@ -34,7 +34,7 @@
     desktop.tearing.enable = true;
     desktop.layouts.centered.fullHeight = true;
     desktop.input.accelProfile = "flat";
-    performance.scheduler = "scx_lavd";
+    performance.scheduler = null;
     performance.transparentHugepages = "always";
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";

@@ -36,7 +36,7 @@ hl.config({
     preserve_split = true,
   },
   binds = {
-    scroll_event_delay = 0, -- must stay 0: throttled scroll events leak through to the window
+    scroll_event_delay = 0,
     allow_pin_fullscreen = true,
   },
   misc = {

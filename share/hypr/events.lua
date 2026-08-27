@@ -50,8 +50,6 @@ hl.on("window.fullscreen", function(window)
   demoting = false
 
   if pinned then
-    -- fullscreen_state leaves sync_fullscreen off, which would make the next
-    -- request native-fake and let allow_pin_fullscreen unpin the window
     pcall(hl.dispatch, hl.dsp.window.set_prop({
       prop = "sync_fullscreen",
       value = "1",

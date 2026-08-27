@@ -472,18 +472,6 @@ Rectangle {
                                 }, function () {
                                     TaskbarApps.togglePin(selectedApp.appId);
                                     appLauncher.expandedItemIndex = -1;
-                                }, function () {
-                                    let desktopDir = Paths.desktopDir;
-                                    let timestamp = Date.now();
-                                    let fileName = selectedApp.appId + "-" + timestamp + ".desktop";
-                                    let filePath = desktopDir + "/" + fileName;
-
-                                    let desktopContent = "[Desktop Entry]\n" + "Version=1.0\n" + "Type=Application\n" + "Name=" + selectedApp.appName + "\n" + "Exec=" + selectedApp.appExecString + "\n" + "Icon=" + selectedApp.appIcon + "\n" + (selectedApp.appComment ? "Comment=" + selectedApp.appComment + "\n" : "") + (selectedApp.appCategories.length > 0 ? "Categories=" + selectedApp.appCategories.join(";") + ";\n" : "") + (selectedApp.appRunInTerminal ? "Terminal=true\n" : "Terminal=false\n");
-
-                                    let writeCmd = "printf '%s' '" + desktopContent.replace(/'/g, "'\\''") + "' > \"" + filePath + "\" && chmod 755 \"" + filePath + "\" && gio set \"" + filePath + "\" metadata::trusted true";
-                                    copyProcess.command = ["sh", "-c", writeCmd];
-                                    copyProcess.running = true;
-                                    appLauncher.expandedItemIndex = -1;
                                 }];
 
                             if (appLauncher.selectedOptionIndex >= 0 && appLauncher.selectedOptionIndex < options.length) {
@@ -907,25 +895,6 @@ Rectangle {
                                             TaskbarApps.togglePin(appId);
                                             appLauncher.expandedItemIndex = -1;
                                         }
-                                    },
-                                    {
-                                        text: "Create Shortcut",
-                                        icon: Icons.shortcut,
-                                        highlightColor: Colors.secondary,
-                                        textColor: Styling.srItem("secondary"),
-                                        action: function () {
-                                            let desktopDir = Paths.desktopDir;
-                                            let timestamp = Date.now();
-                                            let fileName = appId + "-" + timestamp + ".desktop";
-                                            let filePath = desktopDir + "/" + fileName;
-
-                                            let desktopContent = "[Desktop Entry]\n" + "Version=1.0\n" + "Type=Application\n" + "Name=" + appName + "\n" + "Exec=" + appExecString + "\n" + "Icon=" + appIcon + "\n" + (appComment ? "Comment=" + appComment + "\n" : "") + (appCategories.length > 0 ? "Categories=" + appCategories.join(";") + ";\n" : "") + (appRunInTerminal ? "Terminal=true\n" : "Terminal=false\n");
-
-                                            let writeCmd = "printf '%s' '" + desktopContent.replace(/'/g, "'\\''") + "' > \"" + filePath + "\" && chmod 755 \"" + filePath + "\" && gio set \"" + filePath + "\" metadata::trusted true";
-                                            copyProcess.command = ["sh", "-c", writeCmd];
-                                            copyProcess.running = true;
-                                            appLauncher.expandedItemIndex = -1;
-                                        }
                                     }
                                 ]
                                 currentIndex: appLauncher.selectedOptionIndex
@@ -1111,13 +1080,6 @@ Rectangle {
 
                 highlightFollowsCurrentItem: false
             }
-        }
-
-        Process {
-            id: copyProcess
-            running: false
-
-            onExited: function (code) {}
         }
     }
 

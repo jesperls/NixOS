@@ -9,7 +9,6 @@ import Quickshell.Wayland
 import qs.modules.bar
 import qs.modules.bar.workspaces
 import qs.modules.notifications
-import qs.modules.widgets.dashboard.wallpapers
 
 import qs.modules.notch
 import qs.modules.widgets.overview
@@ -18,7 +17,6 @@ import qs.modules.services
 import qs.modules.corners
 import qs.modules.frame
 import qs.modules.components
-import qs.modules.desktop
 import qs.modules.lockscreen
 import qs.modules.dock
 import qs.modules.globals
@@ -43,21 +41,10 @@ ShellRoot {
             id: wallpaperLoader
             active: true
             required property ShellScreen modelData
-            sourceComponent: Wallpaper {
-                screen: wallpaperLoader.modelData
-            }
-        }
-    }
-
-    Variants {
-        model: Quickshell.screens
-
-        Loader {
-            id: desktopLoader
-            active: Config.desktop.enabled && SuspendManager.wakeReady
-            required property ShellScreen modelData
-            sourceComponent: Desktop {
-                screen: desktopLoader.modelData
+            source: "modules/widgets/dashboard/wallpapers/Wallpaper.qml"
+            onLoaded: {
+                if (item)
+                    item.screen = wallpaperLoader.modelData;
             }
         }
     }
