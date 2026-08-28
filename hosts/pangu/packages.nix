@@ -54,7 +54,6 @@
     unrar
     evince
     imv
-    faugus-launcher
     umu-launcher
     protonup-qt
     evtest
