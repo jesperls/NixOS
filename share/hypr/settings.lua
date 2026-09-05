@@ -11,7 +11,6 @@ hl.config({
     },
   },
   layout = {
-    single_window_aspect_ratio = state.layouts.single_window_ratio,
     single_window_aspect_ratio_tolerance = 0,
   },
   animations = {

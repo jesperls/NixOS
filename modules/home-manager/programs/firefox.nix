@@ -38,7 +38,10 @@
         "media.hardware-video-decoding.force-enabled" = true;
 
         "widget.use-xdg-desktop-portal.file-picker" = 1;
-        "widget.use-xdg-desktop-portal.mime-handler" = 1;
+        "widget.use-xdg-desktop-portal.mime-handler" = 0;
+
+        "browser.download.always_ask_before_handling_new_types" = true;
+        "browser.download.start_downloads_in_tmp_dir" = true;
 
         "privacy.trackingprotection.enabled" = true;
         "privacy.trackingprotection.socialtracking.enabled" = true;

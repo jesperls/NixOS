@@ -69,5 +69,6 @@
     zed-editor
     nvme-cli
     wget
+    ungoogled-chromium
   ];
 }

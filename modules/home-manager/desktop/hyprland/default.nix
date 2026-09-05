@@ -20,20 +20,16 @@ let
   autoFakeFullscreen = osConfig.mySystem.desktop.autoFakeFullscreen;
   primaryMonitor =
     if hyprlandConfig.activeMonitors == [ ] then null else lib.head hyprlandConfig.activeMonitors;
-  singleWindowRatio =
-    if primaryMonitor == null then
-      [
-        16
-        9
-      ]
-    else
-      [
-        (layouts.centered.masterWidth * hyprlandConfig.monitorWidth primaryMonitor)
-        (lib.toInt (lib.elemAt (lib.splitString "x" primaryMonitor.resolution) 1))
-      ];
+  numMonitors = builtins.length hyprlandConfig.activeMonitors;
   input = osConfig.mySystem.desktop.input;
   generatedState = {
     shell = osConfig.mySystem.desktop.shell.enable;
+    monitors = {
+      primary = if primaryMonitor == null then null else primaryMonitor.name;
+      primary_workspaces =
+        if numMonitors == 0 then [ ] else
+        lib.filter (workspace: lib.mod (workspace - 1) numMonitors == 0) (lib.range 1 10);
+    };
     keyboard_layout = osConfig.mySystem.system.keyboardLayout;
     input = {
       accel_profile = input.accelProfile;
@@ -63,7 +59,6 @@ let
         full_height = layouts.centered.fullHeight;
         aspect = layouts.centered.fullHeightAspect;
       };
-      single_window_ratio = singleWindowRatio;
     };
     auto_fake_fullscreen = {
       enable = autoFakeFullscreen.enable;

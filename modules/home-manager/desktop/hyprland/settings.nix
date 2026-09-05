@@ -62,7 +62,7 @@ let
 
 in
 {
-  inherit activeMonitors monitorWidth;
+  inherit activeMonitors;
 
   settings = {
     env = lib.mapAttrsToList (

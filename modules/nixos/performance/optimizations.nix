@@ -39,10 +39,10 @@ in
     "kernel.split_lock_mitigate" = 0; # 0 only warns, games that trip split locks would otherwise get SIGBUS'd
   };
 
-  services.journald.extraConfig = lib.mkDefault ''
-    SystemMaxUse=512M
-    SystemMaxFileSize=64M
-  '';
+  services.journald.settings.Journal = lib.mapAttrs (_: lib.mkDefault) {
+    SystemMaxUse = "512M";
+    SystemMaxFileSize = "64M";
+  };
 
   systemd.coredump.settings.Coredump = lib.mapAttrs (_: lib.mkDefault) {
     ProcessSizeMax = "2G";

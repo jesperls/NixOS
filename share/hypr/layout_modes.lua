@@ -1,6 +1,7 @@
 local state = require("pangu.generated")
 local layouts_module = require("pangu.layouts")
 local session = require("pangu.session")
+local primary = require("pangu.primary")
 
 local cycle = state.layouts.cycle
 
@@ -27,7 +28,9 @@ local function apply(id, target)
 end
 
 for id, target in pairs(modes) do
-  apply(id, target)
+  if target ~= "lua:centered" or primary.workspace_id(id) then
+    apply(id, target)
+  end
 end
 
 local function next_layout(current)
@@ -44,6 +47,10 @@ local M = {}
 function M.set(target)
   local workspace = hl.get_active_workspace()
   if not workspace or workspace.special or workspace.tiled_layout == target then
+    return
+  end
+
+  if target == "lua:centered" and not primary.workspace(workspace) then
     return
   end
 

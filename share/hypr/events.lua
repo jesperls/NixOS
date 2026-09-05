@@ -1,5 +1,6 @@
 local state = require("pangu.generated")
 local fullscreen = require("pangu.fullscreen")
+local primary = require("pangu.primary")
 
 local classes = {}
 for _, class in ipairs(state.auto_fake_fullscreen.classes) do
@@ -15,6 +16,10 @@ hl.on("window.fullscreen", function(window)
     or not window
     or (window.fullscreen ~= 2 and window.fullscreen_client ~= 2)
   then
+    return
+  end
+
+  if not primary.monitor(window.monitor) then
     return
   end
 
