@@ -5,11 +5,12 @@ import Quickshell
 import Quickshell.Io
 import qs.modules.services
 import qs.config
+import qs.modules.widgets.dashboard.wallpapers
 
 Singleton {
     id: root
 
-    property var wallpaperManager: null
+    readonly property var wallpaperManager: WallpaperService
     property string avatarCacheBuster: ""
 
     property bool hasAvatar: false
@@ -231,7 +232,7 @@ Singleton {
     function markThemeChanged() {
         if (!themeHasChanges) {
             themeSnapshot = createThemeSnapshot();
-            Config.pauseAutoSave = true;
+            Config.beginEdit("theme", ["theme"]);
         }
         themeHasChanges = true;
     }
@@ -241,7 +242,7 @@ Singleton {
             Config.save("theme");
             themeHasChanges = false;
             themeSnapshot = null;
-            Config.pauseAutoSave = false;
+            Config.endEdit("theme");
         }
     }
 
@@ -250,7 +251,7 @@ Singleton {
             restoreThemeSnapshot(themeSnapshot);
             themeHasChanges = false;
             themeSnapshot = null;
-            Config.pauseAutoSave = false;
+            Config.endEdit("theme");
         }
     }
 
@@ -265,7 +266,8 @@ Singleton {
         "dashboard": ["width", "height", "showTabRail", "tabPosition", "showWidgets", "showWallpapers", "showMetrics", "backgroundOpacity"],
         "launcher": ["width", "height", "showAppComments", "sortByUsage"],
         "dock": ["enabled", "theme", "position", "height", "iconSize", "spacing", "margin", "hoverRegionHeight", "hideDelay", "pinnedOnStartup", "hoverToReveal", "availableOnFullscreen", "showRunningIndicators", "showPinButton", "showOverviewButton", "screenList", "keepHidden"],
-        "lockscreen": ["position", "lockOnBoot", "showClock", "showMediaPlayer", "showAvatar", "showUsername", "blurWallpaper", "dimOpacity"],
+        "lockscreen": ["position", "lockOnBoot", "showClock", "showDate", "showMediaPlayer", "showAvatar", "showUsername", "blurWallpaper", "dimOpacity"],
+        "osd": ["position", "width", "iconStyle", "showPercentage", "showSlider"],
         "system": ["disks", "idle", "ocr", "pomodoro", "replay", "nightLight", "slideshow", "autoTheme"]
     }
 
@@ -337,19 +339,19 @@ Singleton {
     function markShellChanged() {
         if (!shellHasChanges) {
             shellSnapshot = createShellSnapshot();
-            Config.pauseAutoSave = true;
+            Config.beginEdit("shell", Object.keys(_shellSections));
         }
         shellHasChanges = true;
     }
 
     function applyShellChanges() {
         if (shellHasChanges) {
-            for (const name of ["bar", "notch", "workspaces", "overview", "dashboard", "launcher", "dock", "lockscreen", "system"])
+            for (const name of Object.keys(_shellSections))
                 Config.save(name);
 
             shellHasChanges = false;
             shellSnapshot = null;
-            Config.pauseAutoSave = false;
+            Config.endEdit("shell");
         }
     }
 
@@ -358,7 +360,7 @@ Singleton {
             restoreShellSnapshot(shellSnapshot);
             shellHasChanges = false;
             shellSnapshot = null;
-            Config.pauseAutoSave = false;
+            Config.endEdit("shell");
         }
     }
 
@@ -415,7 +417,7 @@ Singleton {
     function markCompositorChanged() {
         if (!compositorHasChanges) {
             compositorSnapshot = createCompositorSnapshot();
-            Config.pauseAutoSave = true;
+            Config.beginEdit("compositor", ["compositor"]);
         }
         compositorHasChanges = true;
     }
@@ -425,7 +427,7 @@ Singleton {
             Config.save("compositor");
             compositorHasChanges = false;
             compositorSnapshot = null;
-            Config.pauseAutoSave = false;
+            Config.endEdit("compositor");
         }
     }
 
@@ -434,7 +436,7 @@ Singleton {
             restoreCompositorSnapshot(compositorSnapshot);
             compositorHasChanges = false;
             compositorSnapshot = null;
-            Config.pauseAutoSave = false;
+            Config.endEdit("compositor");
         }
     }
 
@@ -445,8 +447,7 @@ Singleton {
         shellSnapshot = null;
         compositorHasChanges = false;
         compositorSnapshot = null;
-        Config.pauseAutoSave = false;
+        for (const group of ["theme", "shell", "compositor"]) Config.endEdit(group);
     }
 
-    property int settingsCurrentTab: 0
 }

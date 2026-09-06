@@ -187,6 +187,7 @@ Item {
         }
 
         StyledRect {
+            id: inputBackground
             variant: "common"
             Layout.preferredWidth: 60
             Layout.preferredHeight: 32
@@ -196,7 +197,7 @@ Item {
             Rectangle {
                 id: rejectOverlay
                 anchors.fill: parent
-                radius: parent.radius
+                radius: inputBackground.radius
                 color: Colors.error
                 opacity: 0
             }
@@ -304,6 +305,7 @@ Item {
         }
 
         StyledRect {
+            id: inputBackground
             variant: "common"
             Layout.preferredWidth: 60
             Layout.preferredHeight: 32
@@ -313,7 +315,7 @@ Item {
             Rectangle {
                 id: rejectOverlay
                 anchors.fill: parent
-                radius: parent.radius
+                radius: inputBackground.radius
                 color: Colors.error
                 opacity: 0
             }

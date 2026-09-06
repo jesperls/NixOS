@@ -18,9 +18,18 @@ Singleton {
     property string activeInputPreset: ""
 
     property int _replyIndex: 2
+    property bool queryPending: false
 
     function _query() {
+        if (!socket.connected) return;
+        if (_replyIndex < 2) {
+            queryPending = true;
+            socket.flush();
+            return;
+        }
+        queryPending = false;
         _replyIndex = 0;
+        queryTimeout.restart();
         socket.write("get_global_bypass\nget_last_loaded_preset:input\nget_last_loaded_preset:output\n");
         socket.flush();
     }
@@ -33,14 +42,12 @@ Singleton {
 
     function loadOutputPreset(name: string) {
         if (!socket.connected) return;
-        root.activeOutputPreset = name;  // Optimistic
         socket.write("load_preset:output:" + name + "\n");
         _query();
     }
 
     function loadInputPreset(name: string) {
         if (!socket.connected) return;
-        root.activeInputPreset = name;  // Optimistic
         socket.write("load_preset:input:" + name + "\n");
         _query();
     }
@@ -56,11 +63,17 @@ Singleton {
     }
 
     function openApp() {
-        Quickshell.execDetached(["easyeffects"]);
+        ApplicationLauncher.launchCommand(["easyeffects"]);
     }
 
     function initialize() {
         refresh();
+    }
+
+    Timer {
+        id: queryTimeout
+        interval: 2000
+        onTriggered: socket.connected = false
     }
 
     Socket {
@@ -69,6 +82,9 @@ Singleton {
         connected: false
         onConnectionStateChanged: {
             root.available = connected;
+            root._replyIndex = 2;
+            root.queryPending = false;
+            queryTimeout.stop();
             if (connected) {
                 root._query();
             }
@@ -86,6 +102,8 @@ Singleton {
                 } else if (root._replyIndex === 1) {
                     root.activeOutputPreset = data;
                     root._replyIndex = 2;
+                    queryTimeout.stop();
+                    if (root.queryPending) root._query();
                 }
             }
         }

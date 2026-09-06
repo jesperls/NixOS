@@ -23,7 +23,8 @@ Singleton {
     }
 
     function restore() {
-        root.workspaces = StateService.get("gameModeWorkspaces", []);
+        const saved = StateService.get("gameModeWorkspaces", []);
+        root.workspaces = Array.isArray(saved) ? saved.filter((id, index) => Number.isInteger(id) && id > 0 && saved.indexOf(id) === index) : [];
         root.publish();
     }
 

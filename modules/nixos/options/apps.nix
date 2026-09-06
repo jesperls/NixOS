@@ -37,10 +37,10 @@ in
     fileManager = mkApp "file manager" "thunar" "thunar.desktop";
     editor = mkApp "code editor" "zeditor" "dev.zed.Zed.desktop";
 
-    textEditor = mkHandler "plain text files" "gedit.desktop";
+    textEditor = mkHandler "plain text files" "org.gnome.gedit.desktop";
     imageViewer = mkHandler "image files" "imv.desktop";
     videoPlayer = mkHandler "video and audio files" "mpv.desktop";
-    pdfViewer = mkHandler "PDF documents" "evince.desktop";
-    archiveManager = mkHandler "archives" "file-roller.desktop";
+    pdfViewer = mkHandler "PDF documents" "org.gnome.Evince.desktop";
+    archiveManager = mkHandler "archives" "org.gnome.FileRoller.desktop";
   };
 }

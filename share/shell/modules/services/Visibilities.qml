@@ -29,13 +29,27 @@ Singleton {
     }
 
     function getForScreen(screenName) {
-        if (!screens[screenName]) {
-            screens[screenName] = screenPropertiesComponent.createObject(root, {
-                screenName: screenName
-            });
-        }
-        return screens[screenName];
+        return screens[screenName] || null;
     }
+
+    function syncScreens() {
+        const names = Quickshell.screens.map(screen => screen.name);
+        const next = {};
+        const removed = [];
+        for (const name of names)
+            next[name] = screens[name] || screenPropertiesComponent.createObject(root, {screenName: name});
+        for (const name in screens)
+            if (!names.includes(name)) removed.push(screens[name]);
+        screens = next;
+        if (!names.includes(lastFocusedScreen)) {
+            clearAll();
+            currentActiveModule = "";
+            lastFocusedScreen = "";
+        }
+        for (const properties of removed) properties.destroy();
+    }
+
+    Component.onCompleted: syncScreens()
 
     function getForActive() {
         if (!Compositor.focusedMonitor) {
@@ -141,18 +155,8 @@ Singleton {
         lastFocusedScreen = focusedScreenName;
     }
 
-    function moveActiveModuleToFocusedScreen() {
-        const focusedMonitor = Compositor.focusedMonitor;
-        if (!focusedMonitor || !currentActiveModule)
-            return;
-
-        const newFocusedScreen = focusedMonitor.name;
-        if (newFocusedScreen === lastFocusedScreen)
-            return;
-
-        clearAll();
-        applyActiveModuleToScreen(newFocusedScreen);
-        lastFocusedScreen = newFocusedScreen;
+    function isActiveOnFocusedScreen(moduleName) {
+        return currentActiveModule === moduleName && lastFocusedScreen === Compositor.focusedMonitor?.name;
     }
 
     Component {
@@ -181,28 +185,13 @@ Singleton {
             return;
 
         const screenProps = getForScreen(screenName);
-        if (moduleNames.indexOf(currentActiveModule) !== -1) {
+        if (screenProps && moduleNames.indexOf(currentActiveModule) !== -1) {
             screenProps[currentActiveModule] = true;
         }
     }
 
     Connections {
-        target: Compositor
-        function onFocusedMonitorChanged() {
-            moveActiveModuleToFocusedScreen();
-        }
-    }
-
-    Connections {
         target: Quickshell
-        function onScreensChanged() {
-            const names = Quickshell.screens.map(s => s.name);
-            const next = {};
-            for (const name in root.screens) {
-                if (names.indexOf(name) !== -1)
-                    next[name] = root.screens[name];
-            }
-            root.screens = next;
-        }
+        function onScreensChanged() { root.syncScreens(); }
     }
 }

@@ -88,36 +88,16 @@ QtObject {
         conf += `color7 ${color7}\n`;
         conf += `color15 ${color15}\n`;
 
-        writer.text = conf;
-
-        const kittyConfPath = Paths.cachePath("kitty.conf");
-
-        const cmd = `
-            mkdir -p "$(dirname "${kittyConfPath}")" && \\
-            echo "${conf}" > "${kittyConfPath}" && \\
-            pkill -SIGUSR1 kitty
-        `;
-
-        writerProcess.command = ["sh", "-c", cmd];
-        writerProcess.running = true;
+        kittyFile.write(conf);
     }
 
-    property QtObject writer: QtObject {
-        id: writer
-        property string text
+    property ThemeFile kittyFile: ThemeFile {
+        id: kittyFile
+        path: Paths.cachePath("kitty.conf")
+        onWritten: reloadProcess.running = true
     }
 
-    property Process writerProcess: Process {
-        id: writerProcess
-        running: false
-        stdout: StdioCollector {
-            onStreamFinished: console.log("KittyGenerator: Colors generated.")
-        }
-        stderr: StdioCollector {
-            onStreamFinished: err => {
-                if (err)
-                    console.error("KittyGenerator Error:", err);
-            }
-        }
+    property Process reloadProcess: Process {
+        command: ["pkill", "-USR1", "-x", "kitty"]
     }
 }

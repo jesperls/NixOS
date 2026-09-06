@@ -105,7 +105,8 @@ local layouts = require("pangu.layouts")
 
 bind(mainMod, "mouse:272", hl.dsp.window.drag(), "Mouse: drag window")
 bind(mainMod, "mouse:273", function()
-  if not in_centered() then
+  local window = hl.get_active_window()
+  if not in_centered() or (window and window.floating) then
     hl.dispatch(hl.dsp.window.resize())
   end
 end, "Mouse: resize window")
@@ -114,7 +115,8 @@ bind(mainMod, "mouse:273", layouts.end_drag, "Centered: end weight drag", { rele
 
 bind("", "mouse:275", hl.dsp.window.drag(), "Mouse: drag window (side button)")
 bind("", "mouse:276", function()
-  if not in_centered() then
+  local window = hl.get_active_window()
+  if not in_centered() or (window and window.floating) then
     hl.dispatch(hl.dsp.window.resize())
   end
 end, "Mouse: resize window (side button)")

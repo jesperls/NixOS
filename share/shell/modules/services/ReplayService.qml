@@ -35,7 +35,7 @@ Singleton {
     }
 
     function startWithOptions(mode, region, out, inp, seconds) {
-        if (root.active)
+        if (root.active || root._pendingStart || prepareProcess.running || daemonProcess.running)
             return;
         root.captureMode = mode === "region" && region ? "region" : "screen";
         root.captureRegion = region || "";
@@ -46,7 +46,7 @@ Singleton {
     }
 
     function start() {
-        if (root.active)
+        if (root.active || root._pendingStart || prepareProcess.running || daemonProcess.running)
             return;
         if (!ScreenRecorder.canRecordDirectly) {
             Notifications.notifyInternal({
@@ -143,7 +143,7 @@ Singleton {
 
     Process {
         id: scanProcess
-        command: ["bash", "-c", "pgrep -fa gpu-screen-recorder || true"]
+        command: ["bash", "-c", "pgrep -u \"$(id -u)\" -fa '^([^ ]*/)?\\.?gpu-screen-recorder(-wrapped)?( |$)' || true"]
         running: false
         stdout: StdioCollector {}
         onExited: exitCode => {
@@ -173,6 +173,10 @@ Singleton {
         command: ["mkdir", "-p", root.videosDir]
         running: false
         onExited: exitCode => {
+            if (exitCode !== 0) {
+                Notifications.notifyInternal({summary: "Replay", body: "Could not create replay directory"});
+                return;
+            }
             var cmd = ["gpu-screen-recorder", "-f", "60"];
             if (root.captureMode === "region" && root.captureRegion !== "") {
                 cmd.push("-w", "region", "-region", root.captureRegion);
@@ -217,6 +221,7 @@ Singleton {
         onExited: exitCode => {
             root.daemonPid = 0;
             root.active = false;
+            root.saving = false;
             if (!root._stopping && exitCode !== 0 && exitCode !== 130 && exitCode !== 2) {
                 Notifications.notifyInternal({
                     summary: "Replay",
@@ -240,7 +245,7 @@ Singleton {
                 savingResetTimer.restart();
                 Notifications.notifyInternal({
                     summary: "Replay",
-                    body: "Saved last " + root.activeSeconds + "s to " + root.videosDir
+                    body: "Requested saving the last " + root.activeSeconds + "s to " + root.videosDir
                 });
             } else {
                 root.saving = false;

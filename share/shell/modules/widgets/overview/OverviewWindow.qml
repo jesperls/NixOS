@@ -15,7 +15,7 @@ Item {
     property var windowData
     property var toplevel
     property var monitorData: null
-    property Item overviewRoot: null
+    required property Item overviewItem
     property real scale
     property real availableWorkspaceWidth
     property real availableWorkspaceHeight
@@ -258,7 +258,7 @@ Item {
         }
 
         onReleased: mouse => {
-            const overviewRoot = root.overviewRoot;
+            const overviewRoot = root.overviewItem;
             let targetWorkspace = overviewRoot.draggingTargetWorkspace;
 
             root.pressed = false;

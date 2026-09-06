@@ -35,7 +35,7 @@
     desktop.layouts.centered.fullHeight = true;
     desktop.input.accelProfile = "flat";
     performance.scheduler = null;
-    performance.transparentHugepages = "always";
+    performance.transparentHugepages = "madvise";
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";
     # Tuned kernel — re-enable once you have a merged profile (docs/autofdo.md):

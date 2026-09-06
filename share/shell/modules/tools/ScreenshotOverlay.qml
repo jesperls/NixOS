@@ -251,6 +251,7 @@ PanelWindow {
         signal triggered
 
         StyledRect {
+            id: buttonBackground
             anchors.fill: parent
             radius: Styling.radius(0)
             variant: {
@@ -266,7 +267,7 @@ PanelWindow {
                 text: btn.icon
                 font.family: Icons.font
                 font.pixelSize: 16
-                color: Styling.srItem(parent.variant) || Colors.overBackground
+                color: buttonBackground.item
             }
         }
 

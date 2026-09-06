@@ -37,7 +37,7 @@ WlSessionLockSurface {
             return GlobalStates.wallpaperManager.getLockscreenFramePath(GlobalStates.wallpaperManager.currentWallpaper);
         }
 
-        source: lockscreenFramePath ? "file://" + lockscreenFramePath : ""
+        source: lockscreenFramePath ? "file://" + lockscreenFramePath + "?v=" + (GlobalStates.wallpaperManager?.lockscreenVersion ?? 0) : ""
 
         opacity: startAnim ? 1 : 0
         visible: true
@@ -739,6 +739,10 @@ WlSessionLockSurface {
                 console.warn("PAM auth failed with result:", result);
                 if (Config.animDuration > 0) {
                     wrongPasswordAnim.start();
+                } else {
+                    passwordInput.text = "";
+                    authenticating = false;
+                    passwordInputBox.showError = false;
                 }
             }
         }

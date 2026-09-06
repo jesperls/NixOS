@@ -197,7 +197,10 @@ Manual kernel AutoFDO (profile collection → merge → rebuild) is documented i
 
 Locking is `loginctl lock-session` (`SUPER L` / the power menu); idle
 timeouts and lock-on-boot/sleep live in the shell's settings UI under
-System → Idle. `mySystem.system.autoLogin` and `.passwordlessSudo` trade
+System → Idle. Hypridle handles idle detection, application inhibitors and
+logind events; Pangu generates its runtime configuration and owns the daemon
+process. Sleep waits for the compositor to confirm the session lock. Caffeine
+uses a standard systemd idle inhibitor. `mySystem.system.autoLogin` and `.passwordlessSudo` trade
 security for convenience; both default to off and are opted into by `pangu`.
 
 CI: GitHub Actions evaluates the flake (no builds); garnix builds

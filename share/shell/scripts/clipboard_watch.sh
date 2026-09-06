@@ -1,21 +1,10 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-CHECK_SCRIPT="$1"
-DB_PATH="$2"
-INSERT_SCRIPT="$3"
-DATA_DIR="$4"
-
-check_clipboard() {
-	cat >/dev/null
-
-	if "$CHECK_SCRIPT" "$DB_PATH" "$INSERT_SCRIPT" "$DATA_DIR"; then
-		echo "REFRESH_LIST"
-	else
-		echo "Check failed with code $?" >&2
-	fi
-}
-
-export -f check_clipboard
-export CHECK_SCRIPT DB_PATH INSERT_SCRIPT DATA_DIR
-
-exec wl-paste --watch bash -c 'check_clipboard'
+export PANGU_CLIPBOARD_BACKEND="$1" PANGU_CLIPBOARD_DB="$2" PANGU_CLIPBOARD_DATA="$3"
+exec wl-paste --watch bash -c '
+    cat >/dev/null
+    if [ "${CLIPBOARD_STATE:-data}" = data ] && python3 "$PANGU_CLIPBOARD_BACKEND" "$PANGU_CLIPBOARD_DB" capture "$PANGU_CLIPBOARD_DATA"; then
+        echo REFRESH_LIST
+    fi
+'

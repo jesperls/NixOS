@@ -256,6 +256,7 @@ Item {
         }
 
         StyledRect {
+            id: inputBackground
             variant: "common"
             Layout.preferredWidth: 60
             Layout.preferredHeight: 32
@@ -265,7 +266,7 @@ Item {
             Rectangle {
                 id: rejectOverlay
                 anchors.fill: parent
-                radius: parent.radius
+                radius: inputBackground.radius
                 color: Colors.error
                 opacity: 0
             }
@@ -413,6 +414,7 @@ Item {
         }
 
         StyledRect {
+            id: textActionButton
             variant: textInputRowRoot.actionText === "" ? "common" : "primary"
             Layout.preferredWidth: actionLabel.implicitWidth + 20
             Layout.preferredHeight: 32
@@ -426,7 +428,7 @@ Item {
                 font.family: Config.theme.font
                 font.pixelSize: Styling.fontSize(0)
                 font.bold: true
-                color: parent.item
+                color: textActionButton.item
             }
 
             MouseArea {
@@ -917,6 +919,7 @@ Item {
                                     spacing: 8
 
                                     StyledRect {
+                                        id: savePresetButton
                                         variant: isHovered ? "primaryfocus" : "primary"
                                         Layout.fillWidth: true
                                         Layout.preferredHeight: 36
@@ -930,15 +933,15 @@ Item {
                                             font.family: Config.theme.font
                                             font.pixelSize: Styling.fontSize(0)
                                             font.bold: true
-                                            color: parent.item
+                                            color: savePresetButton.item
                                         }
 
                                         MouseArea {
                                             anchors.fill: parent
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
-                                            onEntered: parent.isHovered = true
-                                            onExited: parent.isHovered = false
+                                            onEntered: savePresetButton.isHovered = true
+                                            onExited: savePresetButton.isHovered = false
                                             onClicked: {
                                                 const id = LayoutPresets.saveCurrent(presetsSection.presetName, presetsSection.presetDescription);
                                                 if (id) {
@@ -953,6 +956,7 @@ Item {
                                     }
 
                                     StyledRect {
+                                        id: cancelPresetButton
                                         variant: isHovered ? "focus" : "common"
                                         Layout.fillWidth: true
                                         Layout.preferredHeight: 36
@@ -965,15 +969,15 @@ Item {
                                             text: "Cancel"
                                             font.family: Config.theme.font
                                             font.pixelSize: Styling.fontSize(0)
-                                            color: parent.item
+                                            color: cancelPresetButton.item
                                         }
 
                                         MouseArea {
                                             anchors.fill: parent
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
-                                            onEntered: parent.isHovered = true
-                                            onExited: parent.isHovered = false
+                                            onEntered: cancelPresetButton.isHovered = true
+                                            onExited: cancelPresetButton.isHovered = false
                                             onClicked: presetsSection.saveVisible = false
                                         }
                                     }

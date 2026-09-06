@@ -282,7 +282,6 @@ Rectangle {
                 Qt.callLater(run);
             } else {
                 app.execute();
-                UsageTracker.recordUsage(appId);
                 Visibilities.setActiveModule("");
             }
         }
@@ -294,12 +293,13 @@ Rectangle {
         Component.onCompleted: {
             initialLoadTimer.start();
             
-            UsageTracker.usageDataReady.connect(function() {
-                AppSearch.invalidateCache();
-                if (appLauncher.visible) {
-                     appLauncher.updateFilteredApps();
-                }
-            });
+        }
+
+        Connections {
+            target: AppSearch
+            function onResultsChanged() {
+                if (appLauncher.visible) appLauncher.updateFilteredApps();
+            }
         }
 
         Timer {
@@ -1189,11 +1189,6 @@ Rectangle {
         }
     }
 
-    Process {
-        id: globalOpenProcess
-        running: false
-    }
-
     function openItemInternal(itemId, items, currentContent, getFilePathFromUri, isUrl) {
         for (var i = 0; i < items.length; i++) {
             if (items[i].id === itemId) {
@@ -1203,15 +1198,12 @@ Rectangle {
                 if (item.isFile) {
                     var filePath = getFilePathFromUri(content);
                     if (filePath) {
-                        globalOpenProcess.command = ["xdg-open", filePath];
-                        globalOpenProcess.running = true;
+                        ApplicationLauncher.launchCommand(["xdg-open", filePath]);
                     }
                 } else if (item.isImage && item.binaryPath) {
-                    globalOpenProcess.command = ["xdg-open", item.binaryPath];
-                    globalOpenProcess.running = true;
+                    ApplicationLauncher.launchCommand(["xdg-open", item.binaryPath]);
                 } else if (isUrl(content)) {
-                    globalOpenProcess.command = ["xdg-open", content.trim()];
-                    globalOpenProcess.running = true;
+                    ApplicationLauncher.launchCommand(["xdg-open", content.trim()]);
                 }
                 break;
             }

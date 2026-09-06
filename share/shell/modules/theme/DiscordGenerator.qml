@@ -69,42 +69,11 @@ QtObject {
 
 `
 
-        const home = Paths.home
-        const vesktopPath = home + "/.config/vesktop/themes/pangu.css"
-        
-        const escape = (str) => {
-            if (!str) return ""
-            return str.toString()
-                .replace(/\\/g, "\\\\")
-                .replace(/"/g, '\\"')
-                .replace(/\$/g, '\\$')
-                .replace(/`/g, '\\`');
-        }
-
-        const cmd = `mkdir -p "$(dirname "${vesktopPath}")" && echo "${escape(css)}" > "${vesktopPath}"`
-        
-        writerProcess.command = ["sh", "-c", cmd]
-        writerProcess.running = true
+        discordFile.write(css);
     }
 
-    property QtObject writer: QtObject {
-        id: writer
-        property string text
-    }
-
-    property Process writerProcess: Process {
-        id: writerProcess
-        running: false
-        stdout: StdioCollector {
-            onStreamFinished: console.log("DiscordGenerator: Theme generated.")
-        }
-        stderr: StdioCollector {
-            onStreamFinished: (err) => {
-                if (err) {
-                    const text = err.toString().trim();
-                    if (text) console.error("DiscordGenerator Error:", text)
-                }
-            }
-        }
+    property ThemeFile discordFile: ThemeFile {
+        id: discordFile
+        path: Paths.configHome + "/vesktop/themes/pangu.css"
     }
 }

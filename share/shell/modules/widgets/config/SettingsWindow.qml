@@ -9,10 +9,12 @@ import qs.modules.theme
 FloatingWindow {
     id: settingsWindow
 
-    implicitWidth: 900
-    implicitHeight: 650
+    implicitWidth: 1000
+    implicitHeight: 760
     title: "Pangu Settings"
-    visible: GlobalStates.settingsWindowVisible
+    property var clientsBeforeMapping: []
+    property bool initialized: false
+    visible: initialized && GlobalStates.settingsWindowVisible
 
     color: "transparent"
 
@@ -29,6 +31,7 @@ FloatingWindow {
     }
 
     function preparePlacement() {
+        clientsBeforeMapping = Compositor.clients.values.map(client => client.nativeToplevel);
         const targetScreen = screenByName(GlobalStates.settingsTargetScreenName || Compositor.focusedMonitor?.name || "");
         if (targetScreen) {
             settingsWindow.screen = targetScreen;
@@ -45,11 +48,12 @@ FloatingWindow {
         const clients = Compositor.clients.values || [];
         for (let i = 0; i < clients.length; i++) {
             const client = clients[i];
-            if (client.title === settingsWindow.title) {
+            if (client.title === settingsWindow.title && !clientsBeforeMapping.includes(client.nativeToplevel)) {
                 if (client.workspace?.id !== targetWorkspace) {
                     Compositor.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${client.address}`);
                 }
                 Compositor.dispatch(`focuswindow address:${client.address}`);
+                settingsTab.focusSearchInput();
                 return true;
             }
         }
@@ -76,28 +80,16 @@ FloatingWindow {
         radius: 0
 
         SettingsTab {
+            id: settingsTab
             anchors.fill: parent
             anchors.margins: 16
         }
     }
 
-    onVisibleChanged: {
-        if (visible) {
-            preparePlacement();
-        }
-
-        if (!visible && GlobalStates.settingsWindowVisible) {
-            GlobalStates.settingsWindowVisible = false;
-        }
+    Component.onCompleted: {
+        preparePlacement();
+        initialized = true;
     }
 
-    Connections {
-        target: GlobalStates
-        function onSettingsWindowVisibleChanged() {
-            if (GlobalStates.settingsWindowVisible) {
-                settingsWindow.preparePlacement();
-            }
-            settingsWindow.visible = GlobalStates.settingsWindowVisible;
-        }
-    }
+    onClosed: GlobalStates.settingsWindowVisible = false
 }

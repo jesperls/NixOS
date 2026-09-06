@@ -16,7 +16,9 @@ PanelWindow {
     id: unifiedPanel
 
     required property ShellScreen targetScreen
+    property string registeredScreenName: ""
     screen: targetScreen
+    visible: targetScreen !== null
 
     anchors {
         top: true
@@ -37,15 +39,15 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     exclusionMode: ExclusionMode.Ignore
 
-    readonly property bool needsFullScreenInput: notchContent.screenNotchOpen || FocusGrabManager.hasActiveGrab
+    readonly property bool needsFullScreenInput: notchContent.screenNotchOpen || FocusGrabManager.hasGrabFor(targetScreen)
 
     readonly property bool barEnabled: {
-        if (!Config.barReady) return false;
+        if (!targetScreen || !Config.barReady) return false;
         return Config.enabledForScreen(Config.bar.screenList, targetScreen.name);
     }
 
     readonly property bool dockEnabled: {
-        if (!Config.dockReady || !Config.dockPanelEnabled) return false;
+        if (!targetScreen || !Config.dockReady || !Config.dockPanelEnabled) return false;
         return Config.enabledForScreen(Config.dock.screenList, targetScreen.name);
     }
 
@@ -97,6 +99,8 @@ PanelWindow {
     readonly property bool containBar: Config.bar.containBar && (Config.bar.frameEnabled ?? false)
 
     Component.onCompleted: {
+        if (!targetScreen) return;
+        registeredScreenName = targetScreen.name;
         Visibilities.registerBarPanel(screen.name, unifiedPanel);
         Visibilities.registerNotchPanel(screen.name, unifiedPanel);
         Visibilities.registerDockPanel(screen.name, dockContent);
@@ -104,10 +108,12 @@ PanelWindow {
     }
 
     Component.onDestruction: {
-        Visibilities.unregisterBarPanel(screen.name);
-        Visibilities.unregisterNotchPanel(screen.name);
-        Visibilities.unregisterDockPanel(screen.name);
-        Visibilities.unregisterNotch(screen.name);
+        const name = registeredScreenName;
+        if (!name) return;
+        if (Visibilities.barPanels[name] === unifiedPanel) Visibilities.unregisterBarPanel(name);
+        if (Visibilities.notchPanels[name] === unifiedPanel) Visibilities.unregisterNotchPanel(name);
+        if (Visibilities.dockPanels[name] === dockContent) Visibilities.unregisterDockPanel(name);
+        if (Visibilities.notches[name] === notchContent.notchContainerRef) Visibilities.unregisterNotch(name);
     }
 
     Item {
@@ -150,7 +156,7 @@ PanelWindow {
         z: -1
 
         onClicked: {
-            FocusGrabManager.clearTopGrab();
+            FocusGrabManager.clearTopGrab(unifiedPanel.targetScreen);
         }
     }
 

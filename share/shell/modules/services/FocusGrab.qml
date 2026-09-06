@@ -9,15 +9,18 @@ Item {
 
     readonly property string _grabId: `grab_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 
-    onActiveChanged: {
+    function updateGrab() {
         if (active) {
             FocusGrabManager.requestGrab(_grabId, () => {
                 root.cleared();
-            });
+            }, root.windows);
         } else {
             FocusGrabManager.releaseGrab(_grabId);
         }
     }
+
+    onActiveChanged: updateGrab()
+    onWindowsChanged: updateGrab()
 
     Component.onDestruction: {
         if (active) {

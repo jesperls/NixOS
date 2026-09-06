@@ -12,7 +12,6 @@ let
     "x-scheme-handler/unknown"
     "x-scheme-handler/chrome"
     "x-scheme-handler/ftp"
-    "x-scheme-handler/file"
   ];
 
   editorTypes = [
@@ -64,6 +63,13 @@ let
     "application/x-bzip2"
     "application/gzip"
     "application/x-7z-compressed"
+    "application/vnd.rar"
+    "application/x-compressed-tar"
+    "application/x-bzip-compressed-tar"
+    "application/x-xz"
+    "application/x-xz-compressed-tar"
+    "application/zstd"
+    "application/x-zstd-compressed-tar"
   ];
 
   avTypes = [

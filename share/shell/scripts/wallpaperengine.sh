@@ -3,8 +3,8 @@
 set -u
 
 DEFAULT_WORKSHOP_DIR="$HOME/.local/share/Steam/steamapps/workshop/content/431960"
-GUI_CONFIG_DIR="$HOME/.config/Linux Wallpaper Engine"
-PREVIEW_CACHE_DIR="$HOME/.cache/pangu/we_previews"
+GUI_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/Linux Wallpaper Engine"
+PREVIEW_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/pangu/we_previews"
 
 cmd_scan() {
     local dir="${1:-}"
@@ -41,23 +41,17 @@ cmd_scan() {
 }
 
 gui_setting() {
-    jq -r "$1 // empty" "$GUI_CONFIG_DIR/settings.json" 2>/dev/null
+    jq -r "$1 | if . == null then empty else . end" "$GUI_CONFIG_DIR/settings.json" 2>/dev/null
 }
 
 gui_override() {
-    jq -r --arg bg "$wall_dir" ".overrides[\$bg]$1 // empty" \
+    jq -r --arg bg "$wall_dir" ".overrides[\$bg]$1 | if . == null then empty else . end" \
         "$GUI_CONFIG_DIR/wallpaper-overrides.json" 2>/dev/null
 }
 
 cmd_apply() {
     wall_dir="$1"
     local screen="$2"
-
-    if pgrep -af linux-wallpaperengine 2>/dev/null \
-        | grep -F -- "--screen-root $screen" \
-        | grep -qF -- "--bg $wall_dir"; then
-        exit 0
-    fi
 
     if ! command -v linux-wallpaperengine >/dev/null 2>&1; then
         notify-send -e "Wallpaper Engine" "linux-wallpaperengine not found on PATH" -i dialog-error
@@ -106,73 +100,11 @@ cmd_apply() {
         '.overrides[$bg].customProperties // {} | to_entries[] | "\(.key)=\(.value)"' \
         "$GUI_CONFIG_DIR/wallpaper-overrides.json" 2>/dev/null)
 
-    stop_renderer "$screen"
-
-    local renderer
-    renderer=$(command -v linux-wallpaperengine)
-    if command -v systemd-run >/dev/null 2>&1; then
-        systemctl --user reset-failed "wallpaperengine-$screen.service" 2>/dev/null
-        systemd-run --user --collect --quiet --unit "wallpaperengine-$screen" \
-            "$renderer" "${args[@]}"
-    else
-        setsid -f "$renderer" "${args[@]}" >/dev/null 2>&1
-    fi
-
-    sync_gui_state "$screen" "$wall_dir" "$scaling" "$fps" "$volume" "$silent"
-}
-
-sync_gui_state() {
-    local screen="$1" bg="$2" scaling="$3" fps="$4" volume="$5" silent="$6"
-    local state="$GUI_CONFIG_DIR/active-wallpapers.json"
-    [ -f "$state" ] || return 0
-    local tmp
-    tmp=$(mktemp) || return 0
-    if jq --arg screen "$screen" --arg bg "$bg" \
-        --arg scaling "${scaling:-default}" \
-        --argjson fps "${fps:-60}" --argjson volume "${volume:-100}" \
-        --argjson silent "${silent:-false}" \
-        '.activeWallpapers[$screen] = {
-            backgroundId: $bg, screen: $screen, scaling: $scaling,
-            fps: $fps, volume: $volume, silent: $silent,
-            noAutomute: false, noAudioProcessing: false, disableMouse: false,
-            disableParallax: false, disableParticles: false, noFullscreenPause: false
-        } | .appliedHistory[$bg] = (now * 1000 | floor)' \
-        "$state" >"$tmp" 2>/dev/null; then
-        mv "$tmp" "$state"
-    else
-        rm -f "$tmp"
-    fi
-}
-
-stop_renderer() {
-    local screen="$1"
-    systemctl --user stop "wallpaperengine-$screen.service" 2>/dev/null
-    pkill -9 -f "linux-wallpaperengine.*--screen-root.*$screen" 2>/dev/null
-}
-
-cmd_stop() {
-    local screen="${1:-}"
-    if [ -n "$screen" ]; then
-        stop_renderer "$screen"
-    else
-        systemctl --user stop 'wallpaperengine-*.service' 2>/dev/null
-        pkill -9 -f "linux-wallpaperengine.*--screen-root" 2>/dev/null
-    fi
-
-    local state="$GUI_CONFIG_DIR/active-wallpapers.json"
-    [ -f "$state" ] || return 0
-    local tmp
-    tmp=$(mktemp) || return 0
-    if [ -n "$screen" ]; then
-        jq --arg screen "$screen" 'del(.activeWallpapers[$screen])' "$state" >"$tmp" 2>/dev/null
-    else
-        jq '.activeWallpapers = {}' "$state" >"$tmp" 2>/dev/null
-    fi && mv "$tmp" "$state" || rm -f "$tmp"
+    exec linux-wallpaperengine "${args[@]}"
 }
 
 case "${1:-}" in
     scan) shift; cmd_scan "$@" ;;
     apply) shift; cmd_apply "$@" ;;
-    stop) shift; cmd_stop "$@" ;;
-    *) echo "usage: $0 {scan [dir]|apply <dir> <screen>|stop [screen]}" >&2; exit 1 ;;
+    *) echo "usage: $0 {scan [dir]|apply <dir> <screen>}" >&2; exit 1 ;;
 esac

@@ -14,6 +14,8 @@ QtObject {
     property bool askingPassword: false
 
     onActiveChanged: NetworkService.updateFriendlyList()
+    onStrengthChanged: NetworkService.updateFriendlyList()
+    onSsidChanged: NetworkService.updateFriendlyList()
 
     readonly property Connections failWatch: Connections {
         target: root.network

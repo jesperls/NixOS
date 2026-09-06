@@ -16,8 +16,18 @@ Item {
     readonly property int contentWidth: Math.min(width, maxContentWidth)
     readonly property real sideMargin: (width - contentWidth) / 2
 
+    property bool scanReady: false
     Component.onCompleted: {
-        initialScanTimer.start();
+        scanReady = true;
+        updateScanning();
+    }
+    Component.onDestruction: NetworkService.setScanClient(root, false)
+    onVisibleChanged: if (scanReady) updateScanning()
+
+    function updateScanning() {
+        NetworkService.setScanClient(root, visible);
+        if (visible) initialScanTimer.restart();
+        else initialScanTimer.stop();
     }
 
     Timer {
@@ -45,10 +55,10 @@ Item {
                 id: titlebar
                 width: root.contentWidth
                 anchors.horizontalCenter: parent.horizontalCenter
-                title: "Wi-Fi"
-                statusText: NetworkService.wifiConnecting ? "Connecting..." : (NetworkService.wifiStatus === "limited" ? "Limited" : "")
+                title: NetworkService.wifiDevice ? "Wi-Fi" : "Network"
+                statusText: NetworkService.ethernet ? "Ethernet connected" : (NetworkService.wifiConnecting ? "Connecting..." : (NetworkService.wifiStatus === "limited" ? "Limited" : ""))
                 statusColor: NetworkService.wifiStatus === "limited" ? Colors.warning : Styling.srItem("overprimary")
-                showToggle: true
+                showToggle: NetworkService.wifiDevice !== null
                 toggleChecked: NetworkService.wifiStatus !== "disabled"
 
                 actions: [
@@ -64,13 +74,13 @@ Item {
                         icon: Icons.popOpen,
                         tooltip: "Network settings",
                         onClicked: function () {
-                            Quickshell.execDetached(["nm-connection-editor"]);
+                            ApplicationLauncher.launchCommand(["nm-connection-editor"]);
                         }
                     },
                     {
                         icon: Icons.sync,
                         tooltip: "Rescan networks",
-                        enabled: NetworkService.wifiEnabled,
+                        enabled: NetworkService.wifiEnabled && NetworkService.wifiDevice !== null,
                         loading: NetworkService.wifiScanning,
                         onClicked: function () {
                             NetworkService.rescanWifi();
@@ -103,7 +113,7 @@ Item {
         Text {
             anchors.centerIn: parent
             visible: networkList.count === 0 && !NetworkService.wifiScanning
-            text: NetworkService.wifiEnabled ? "No networks found" : "Wi-Fi is disabled"
+            text: !NetworkService.wifiDevice ? "No Wi-Fi adapter detected" : (NetworkService.wifiEnabled ? "No Wi-Fi networks found" : "Wi-Fi is disabled")
             font.family: Config.theme.font
             font.pixelSize: Config.theme.fontSize
             color: Colors.overSurfaceVariant

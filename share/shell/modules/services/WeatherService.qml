@@ -36,6 +36,7 @@ Singleton {
     property int retryCount: 0
     readonly property int maxRetries: 3
     property bool wasCancelled: false
+    property bool pendingRefresh: false
 
     property var suspendConnections: Connections {
         target: SuspendManager
@@ -44,6 +45,8 @@ Singleton {
                 root.wasCancelled = true;
                 weatherProcess.running = false;
             }
+            root.pendingRefresh = false;
+            root.isLoading = false;
             if (retryTimer) retryTimer.stop();
         }
         function onWakingUp() {
@@ -363,105 +366,110 @@ Singleton {
         }
     }
 
-    property Process weatherProcess: Process {
-        running: false
-        command: []
+    function handleResponse(text) {
+        var raw = text.trim();
+        if (raw.length > 0) {
+            try {
+                var data = JSON.parse(raw);
 
-        stdout: StdioCollector {
-            waitForEnd: true
-            onStreamFinished: {
-                if (root.wasCancelled) {
+                if (data.error) {
+                    console.warn("WeatherService:", data.error);
+                    root.dataAvailable = false;
+                    root.handleError();
                     return;
                 }
 
-                var raw = text.trim();
-                if (raw.length > 0) {
-                    try {
-                        var data = JSON.parse(raw);
+                if (data.current_weather && data.daily) {
+                    var weather = data.current_weather;
+                    var daily = data.daily;
 
-                        if (data.error) {
-                            console.warn("WeatherService:", data.error);
-                            root.dataAvailable = false;
-                            root.handleError();
-                            return;
-                        }
+                    root.weatherCode = parseInt(weather.weathercode);
+                    root.currentTemp = convertTemp(parseFloat(weather.temperature));
+                    root.windSpeed = parseFloat(weather.windspeed);
 
-                        if (data.current_weather && data.daily) {
-                            var weather = data.current_weather;
-                            var daily = data.daily;
-
-                            root.weatherCode = parseInt(weather.weathercode);
-                            root.currentTemp = convertTemp(parseFloat(weather.temperature));
-                            root.windSpeed = parseFloat(weather.windspeed);
-
-                            if (daily.temperature_2m_max && daily.temperature_2m_max.length > 0) {
-                                root.maxTemp = convertTemp(parseFloat(daily.temperature_2m_max[0]));
-                            }
-                            if (daily.temperature_2m_min && daily.temperature_2m_min.length > 0) {
-                                root.minTemp = convertTemp(parseFloat(daily.temperature_2m_min[0]));
-                            }
-
-                            if (daily.sunrise && daily.sunrise.length > 0) {
-                                root.sunrise = daily.sunrise[0].split("T")[1];
-                            }
-                            if (daily.sunset && daily.sunset.length > 0) {
-                                root.sunset = daily.sunset[0].split("T")[1];
-                            }
-
-                            var forecastData = [];
-                            var dayCount = Math.min(7, daily.time ? daily.time.length : 0);
-                            for (var i = 0; i < dayCount; i++) {
-                                var dateParts = daily.time[i].split("-");
-                                var year = parseInt(dateParts[0]);
-                                var month = parseInt(dateParts[1]) - 1;  // 0-indexed months
-                                var day = parseInt(dateParts[2]);
-                                
-                                var dayDate = new Date(year, month, day);
-                                var rawDayName = i === 0 ? "Today" : dayDate.toLocaleDateString(Qt.locale(), "ddd");
-                                var dayName = rawDayName.charAt(0).toUpperCase() + rawDayName.slice(1);
-                                forecastData.push({
-                                    date: daily.time[i],
-                                    dayName: dayName,
-                                    weatherCode: daily.weathercode ? daily.weathercode[i] : 0,
-                                    emoji: getWeatherCodeEmoji(daily.weathercode ? daily.weathercode[i] : 0),
-                                    maxTemp: convertTemp(daily.temperature_2m_max ? daily.temperature_2m_max[i] : 0),
-                                    minTemp: convertTemp(daily.temperature_2m_min ? daily.temperature_2m_min[i] : 0)
-                                });
-                            }
-                            root.forecast = forecastData;
-
-                            root.weatherSymbol = getWeatherCodeEmoji(root.weatherCode);
-                            root.weatherDescription = getWeatherDescription(root.weatherCode);
-                            root.calculateSunPosition();
-                            root.dataAvailable = true;
-                            root.isLoading = false;
-                            root.hasFailed = false;
-                            root.retryCount = 0;
-                        } else {
-                            console.warn("WeatherService: Invalid response structure");
-                            root.dataAvailable = false;
-                            root.handleError();
-                        }
-                    } catch (e) {
-                        console.warn("WeatherService: JSON parse error:", e);
-                        root.dataAvailable = false;
-                        root.handleError();
+                    if (daily.temperature_2m_max && daily.temperature_2m_max.length > 0) {
+                        root.maxTemp = convertTemp(parseFloat(daily.temperature_2m_max[0]));
                     }
+                    if (daily.temperature_2m_min && daily.temperature_2m_min.length > 0) {
+                        root.minTemp = convertTemp(parseFloat(daily.temperature_2m_min[0]));
+                    }
+
+                    if (daily.sunrise && daily.sunrise.length > 0) {
+                        root.sunrise = daily.sunrise[0].split("T")[1];
+                    }
+                    if (daily.sunset && daily.sunset.length > 0) {
+                        root.sunset = daily.sunset[0].split("T")[1];
+                    }
+
+                    var forecastData = [];
+                    var dayCount = Math.min(7, daily.time ? daily.time.length : 0);
+                    for (var i = 0; i < dayCount; i++) {
+                        var dateParts = daily.time[i].split("-");
+                        var year = parseInt(dateParts[0]);
+                        var month = parseInt(dateParts[1]) - 1;  // 0-indexed months
+                        var day = parseInt(dateParts[2]);
+
+                        var dayDate = new Date(year, month, day);
+                        var rawDayName = i === 0 ? "Today" : dayDate.toLocaleDateString(Qt.locale(), "ddd");
+                        var dayName = rawDayName.charAt(0).toUpperCase() + rawDayName.slice(1);
+                        forecastData.push({
+                            date: daily.time[i],
+                            dayName: dayName,
+                            weatherCode: daily.weathercode ? daily.weathercode[i] : 0,
+                            emoji: getWeatherCodeEmoji(daily.weathercode ? daily.weathercode[i] : 0),
+                            maxTemp: convertTemp(daily.temperature_2m_max ? daily.temperature_2m_max[i] : 0),
+                            minTemp: convertTemp(daily.temperature_2m_min ? daily.temperature_2m_min[i] : 0)
+                        });
+                    }
+                    root.forecast = forecastData;
+
+                    root.weatherSymbol = getWeatherCodeEmoji(root.weatherCode);
+                    root.weatherDescription = getWeatherDescription(root.weatherCode);
+                    root.calculateSunPosition();
+                    root.dataAvailable = true;
+                    root.isLoading = false;
+                    root.hasFailed = false;
+                    root.retryCount = 0;
                 } else {
-                    console.warn("WeatherService: Empty response");
+                    console.warn("WeatherService: Invalid response structure");
+                    root.dataAvailable = false;
                     root.handleError();
                 }
-            }
-        }
-
-        onExited: function (code) {
-            if (code !== 0 && code !== 15 && code !== 124 && code !== 143) {
-                console.warn("WeatherService: Script exited with code", code);
+            } catch (e) {
+                console.warn("WeatherService: JSON parse error:", e);
                 root.dataAvailable = false;
                 root.handleError();
             }
-            root.wasCancelled = false;
+        } else {
+            console.warn("WeatherService: Empty response");
+            root.handleError();
         }
+    }
+
+    function finishRequest(code, text) {
+        if (root.wasCancelled || SuspendManager.isSuspending) {
+            root.wasCancelled = false;
+            root.isLoading = false;
+            return;
+        }
+        if (root.pendingRefresh) {
+            root.pendingRefresh = false;
+            Qt.callLater(root.updateWeather);
+            return;
+        }
+        if (code === 0) {
+            root.handleResponse(text);
+        } else {
+            root.dataAvailable = false;
+            root.handleError();
+        }
+    }
+
+    property Process weatherProcess: Process {
+        running: false
+        command: []
+        stdout: StdioCollector { id: weatherOutput; waitForEnd: true }
+        onExited: code => root.finishRequest(code, weatherOutput.text)
     }
 
     property var weatherConfig: Config.weather
@@ -481,10 +489,13 @@ Singleton {
     }
 
     function updateWeather() {
+        if (SuspendManager.isSuspending) return;
         if (weatherProcess.running) {
-            root.wasCancelled = true;
-            weatherProcess.running = false;
+            root.pendingRefresh = true;
+            return;
         }
+        retryTimer.stop();
+        root.wasCancelled = false;
 
         if (!Config.weather) {
             console.warn("WeatherService: Config.weather is null");
@@ -496,9 +507,9 @@ Singleton {
 
         var locationStr = Config.weather.location || "";
         var location = locationStr.trim();
-        
+
         console.log("WeatherService: Fetching weather for '" + location + "'");
-        
+
         weatherProcess.command = ["timeout", "-k", "5s", "60s", scriptPath, location];
         weatherProcess.running = true;
     }

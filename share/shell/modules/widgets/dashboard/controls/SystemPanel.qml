@@ -966,6 +966,14 @@ Item {
                             }
                         }
 
+                        ToggleRow {
+                            Layout.fillWidth: true
+                            label: "Use Sunrise and Sunset"
+                            description: "Use weather times when available; otherwise use the times below"
+                            checked: Config.system.autoTheme.useSunriseSunset
+                            onToggled: checked => Config.system.autoTheme.useSunriseSunset = checked
+                        }
+
                         TextInputRow {
                             label: "Day Starts"
                             value: Config.system.autoTheme.dayStart
@@ -1114,6 +1122,7 @@ Item {
         }
 
         StyledRect {
+            id: inputBackground
             variant: "common"
             Layout.preferredWidth: 60
             Layout.preferredHeight: 32
@@ -1123,7 +1132,7 @@ Item {
             Rectangle {
                 id: rejectOverlay
                 anchors.fill: parent
-                radius: parent.radius
+                radius: inputBackground.radius
                 color: Colors.error
                 opacity: 0
             }

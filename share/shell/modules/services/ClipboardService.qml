@@ -17,12 +17,13 @@ QtObject {
     readonly property string dbPath: Quickshell.dataPath("clipboard.db")
     readonly property string binaryDataDir: Quickshell.dataPath("clipboard-data")
     readonly property string schemaPath: Qt.resolvedUrl("clipboard_init.sql").toString().replace("file://", "")
-    readonly property string insertScriptPath: Paths.script("clipboard_insert.sh")
-    readonly property string checkScriptPath: Paths.script("clipboard_check.sh")
+    readonly property string backendPath: Paths.script("clipboard.py")
     readonly property string watchScriptPath: Paths.script("clipboard_watch.sh")
     readonly property string linkPreviewScriptPath: Paths.script("link_preview.py")
 
     property bool _initialized: false
+    property bool watcherEnabled: true
+    property bool listPending: false
 
     property var suspendConnections: Connections {
         target: SuspendManager
@@ -38,7 +39,7 @@ QtObject {
         onTriggered: {
             if (root._initialized) {
                 root.list();
-                clipboardWatcher.running = true;
+                root.watcherEnabled = true;
             }
         }
     }
@@ -48,10 +49,10 @@ QtObject {
     property int watcherRestarts: 0
 
     property Process clipboardWatcher: Process {
-        running: root._initialized && !SuspendManager.isSuspending
-        command: [watchScriptPath, checkScriptPath, dbPath, insertScriptPath, binaryDataDir]
+        running: root._initialized && !SuspendManager.isSuspending && root.watcherEnabled
+        command: [watchScriptPath, backendPath, dbPath, binaryDataDir]
 
-        onStarted: root.watcherRestarts = 0
+        onStarted: watcherStableTimer.restart()
         
         stdout: SplitParser {
             splitMarker: "\n"
@@ -72,6 +73,7 @@ QtObject {
         
         onExited: function(code) {
             if (root._initialized && !SuspendManager.isSuspending) {
+                root.watcherEnabled = false;
                 root.watcherRestarts++;
                 console.warn("ClipboardService: watcher exited with code:", code, "- restarting...");
                 watcherRestartTimer.interval = Math.min(30000, 1000 * root.watcherRestarts);
@@ -80,12 +82,17 @@ QtObject {
         }
     }
 
+    property Timer watcherStableTimer: Timer {
+        interval: 30000
+        onTriggered: root.watcherRestarts = 0
+    }
+
     property Timer watcherRestartTimer: Timer {
         interval: 1000
         repeat: false
         onTriggered: {
             if (root._initialized && !SuspendManager.isSuspending) {
-                clipboardWatcher.running = true;
+                root.watcherEnabled = true;
             }
         }
     }
@@ -102,16 +109,11 @@ QtObject {
         onExited: function(code) {
             if (code === 0) {
                 root._initialized = true;
-                ensureBinaryDataDir();
                 Qt.callLater(root.list);
             } else {
                 console.warn("ClipboardService: Failed to initialize database (Exit code: " + code + ")");
             }
         }
-    }
-
-    property Process ensureDirProcess: Process {
-        running: false
     }
 
     property Process checkAndInsertProcess: Process {
@@ -205,6 +207,10 @@ QtObject {
         }
         
         onExited: function(code) {
+            if (root.listPending) {
+                root.listPending = false;
+                Qt.callLater(root.list);
+            }
             if (code !== 0) {
                 root.items = [];
                 root.listCompleted();
@@ -213,68 +219,19 @@ QtObject {
         }
     }
 
-    property Process insertProcess: Process {
-        property string itemHash: ""
-        property string itemContent: ""
-        property string tmpFile: ""
-        running: false
-        
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.warn("ClipboardService: insertProcess stderr:", text);
-                }
-            }
-        }
-        
-        onExited: function(code) {
-            if (code === 0) {
-                Qt.callLater(root.list);
-            } else {
-                console.warn("ClipboardService: insertProcess failed with code:", code);
-                root._operationInProgress = false;
-            }
-            
-            itemHash = "";
-            itemContent = "";
-            tmpFile = "";
-        }
-    }
-
     property Process getContentProcess: Process {
+        property var pending: []
         property string itemId: ""
-        running: false
-        
-        stdout: StdioCollector {
-            waitForEnd: true
-            
-            onStreamFinished: {
-                root.fullContentRetrieved(getContentProcess.itemId, text);
-            }
-        }
-        
-        onExited: function(code) {
-            if (code !== 0) {
-                root.fullContentRetrieved(getContentProcess.itemId, "");
-            }
+        stdout: StdioCollector {}
+        onExited: code => {
+            root.fullContentRetrieved(itemId, code === 0 ? stdout.text : "");
+            Qt.callLater(root.startNext, getContentProcess);
         }
     }
 
     property Process deleteProcess: Process {
         property string itemId: ""
         running: false
-        
-        stdout: StdioCollector {
-            waitForEnd: true
-            
-            onStreamFinished: {
-                var deletedHash = text.trim();
-                if (deletedHash.length > 0) {
-                    clearClipboardIfMatches.deletedHash = deletedHash;
-                    clearClipboardIfMatches.running = true;
-                }
-            }
-        }
         
         stderr: StdioCollector {
             onStreamFinished: {
@@ -293,42 +250,12 @@ QtObject {
         }
     }
     
-    property Process clearClipboardIfMatches: Process {
-        property string deletedHash: ""
-        running: false
-        
-        command: ["sh", "-c",
-            "# Get current clipboard hash for different types\n" +
-            "CURRENT_HASH=''; " +
-            "if CONTENT=$(wl-paste --type text/uri-list 2>/dev/null); then " +
-            "  CURRENT_HASH=$(echo -n \"$CONTENT\" | tr -d '\\r' | md5sum | cut -d' ' -f1); " +
-            "elif CONTENT=$(wl-paste --type text/plain 2>/dev/null); then " +
-            "  CURRENT_HASH=$(echo -n \"$CONTENT\" | md5sum | cut -d' ' -f1); " +
-            "elif IMAGE_MIME=$(wl-paste --list-types 2>/dev/null | grep '^image/' | head -1); then " +
-            "  [ -n \"$IMAGE_MIME\" ] && CURRENT_HASH=$(wl-paste --type \"$IMAGE_MIME\" 2>/dev/null | md5sum | cut -d' ' -f1); " +
-            "fi; " +
-            "# Clear clipboard if hashes match\n" +
-            "if [ \"$CURRENT_HASH\" = '" + deletedHash + "' ]; then " +
-            "  wl-copy --clear 2>/dev/null || true; " +
-            "fi"
-        ]
-        
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0 && !text.includes("No selection")) {
-                    console.warn("ClipboardService: clearClipboardIfMatches stderr:", text);
-                }
-            }
-        }
-    }
-
     property Process clearProcess: Process {
         running: false
         
         onExited: function(code) {
             if (code === 0) {
                 Qt.callLater(root.list);
-                cleanBinaryDataDirProcess.running = true;
             }
         }
     }
@@ -375,73 +302,50 @@ QtObject {
         }
     }
     
-    property Process cleanBinaryDataDirProcess: Process {
-        running: false
-        command: ["sh", "-c", 
-            "cd '" + binaryDataDir + "' && " +
-            "for f in *; do " +
-            "  [ -f \"$f\" ] || continue; " +
-            "  sqlite3 '" + dbPath + "' \"SELECT COUNT(*) FROM clipboard_items WHERE binary_path = '" + binaryDataDir + "/$f';\" | grep -q '^0$' && rm -f \"$f\"; " +
-            "done"
-        ]
-    }
-
     property Process loadImageProcess: Process {
+        property var pending: []
         property string itemId: ""
         property string mimeType: ""
-        running: false
-        
-        stdout: StdioCollector {
-            waitForEnd: true
-            
-            onStreamFinished: {
-                if (text.length > 0) {
-                    var cleanBase64 = text.replace(/\s/g, '');
-                    var dataUrl = "data:" + loadImageProcess.mimeType + ";base64," + cleanBase64;
-                    root.imageDataById[loadImageProcess.itemId] = dataUrl;
-                    root.revision++;
-                }
+        stdout: StdioCollector {}
+        onExited: code => {
+            if (code === 0 && stdout.text.length > 0) {
+                root.imageDataById[itemId] = "data:" + mimeType + ";base64," + stdout.text.replace(/\s/g, "");
+                root.revision++;
             }
+            Qt.callLater(root.startNext, loadImageProcess);
         }
     }
-    
+
     property Process linkPreviewProcess: Process {
+        property var pending: []
         property string requestUrl: ""
         property string requestItemId: ""
-        running: false
-        
-        stdout: StdioCollector {
-            waitForEnd: true
-            
-            onStreamFinished: {
-                try {
-                    var metadata = JSON.parse(text);
-                    var responseUrl = metadata.request_url || metadata.url || linkPreviewProcess.requestUrl;
-                    
-                    if (!metadata.error && responseUrl) {
-                        root.linkPreviewCache[responseUrl] = metadata;
-                    }
-                    root.linkPreviewFetched(responseUrl, metadata, linkPreviewProcess.requestItemId);
-                } catch (e) {
-                    console.warn("ClipboardService: Failed to parse link preview:", e);
-                    root.linkPreviewFetched(linkPreviewProcess.requestUrl, {'error': 'Failed to parse response'}, linkPreviewProcess.requestItemId);
-                }
+        stdout: StdioCollector {}
+        onExited: code => {
+            let metadata;
+            try {
+                if (code !== 0) throw new Error("Preview process failed");
+                metadata = JSON.parse(stdout.text);
+                if (!metadata.error) root.linkPreviewCache[requestUrl] = metadata;
+            } catch (error) {
+                metadata = {error: String(error)};
             }
+            root.linkPreviewFetched(requestUrl, metadata, requestItemId);
+            Qt.callLater(root.startNext, linkPreviewProcess);
         }
-        
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.warn("ClipboardService: linkPreviewProcess stderr:", text);
-                }
-            }
-        }
-        
-        onExited: function(code) {
-            if (code !== 0) {
-                root.linkPreviewFetched(linkPreviewProcess.requestUrl, {'error': 'Failed to fetch preview'}, linkPreviewProcess.requestItemId);
-            }
-        }
+    }
+
+    function enqueue(process, request) {
+        process.pending = process.pending.concat([request]);
+        root.startNext(process);
+    }
+
+    function startNext(process) {
+        if (process.running || process.pending.length === 0) return;
+        const request = process.pending[0];
+        process.pending = process.pending.slice(1);
+        for (const key of Object.keys(request)) process[key] = request[key];
+        process.running = true;
     }
 
     signal fullContentRetrieved(string itemId, string content)
@@ -455,37 +359,36 @@ QtObject {
         }
     }
 
-    function initialize() {
-        initDbProcess.command = ["sh", "-c", "sqlite3 " + dbPath + " < " + schemaPath];
-        initDbProcess.running = true;
+    function backend(operation, args = []) {
+        return ["python3", backendPath, dbPath, operation, "--"].concat(args);
     }
 
-    function ensureBinaryDataDir() {
-        ensureDirProcess.command = ["mkdir", "-p", binaryDataDir];
-        ensureDirProcess.running = true;
+    function initialize() {
+        initDbProcess.command = backend("init", [schemaPath]);
+        initDbProcess.running = true;
     }
 
     function checkClipboard() {
         if (!_initialized || _operationInProgress) return;
         _operationInProgress = true;
-        checkAndInsertProcess.command = [checkScriptPath, dbPath, insertScriptPath, binaryDataDir];
+        checkAndInsertProcess.command = backend("capture", [binaryDataDir]);
         checkAndInsertProcess.running = true;
     }
 
     function list() {
         if (!_initialized) return;
+        if (listProcess.running) {
+            root.listPending = true;
+            return;
+        }
         _operationInProgress = true;
-        listProcess.command = ["sh", "-c", 
-            "sqlite3 '" + dbPath + "' <<'EOSQL'\n.timeout 5000\n.mode json\nSELECT id, mime_type, preview, is_image, binary_path, content_hash, size, created_at, pinned, alias, display_index FROM clipboard_items ORDER BY pinned DESC, display_index ASC, updated_at DESC, id DESC LIMIT 100;\nEOSQL"
-        ];
+        listProcess.command = backend("list");
         listProcess.running = true;
     }
 
     function getFullContent(id) {
         if (!_initialized) return;
-        getContentProcess.itemId = id;
-        getContentProcess.command = ["sh", "-c", "sqlite3 '" + dbPath + "' '.timeout 5000' 'SELECT full_content FROM clipboard_items WHERE id = " + id + ";'"];
-        getContentProcess.running = true;
+        enqueue(getContentProcess, {itemId: id, command: backend("content", [id])});
     }
 
     function deleteItem(id) {
@@ -493,20 +396,13 @@ QtObject {
         _operationInProgress = true;
         deleteProcess.itemId = id;
         
-        deleteProcess.command = ["sh", "-c", 
-            "HASH=$(sqlite3 '" + dbPath + "' '.timeout 5000' 'SELECT content_hash FROM clipboard_items WHERE id = " + id + ";'); " +
-            "sqlite3 '" + dbPath + "' '.timeout 5000' 'DELETE FROM clipboard_items WHERE id = " + id + ";'; " +
-            "echo \"$HASH\""
-        ];
+        deleteProcess.command = backend("delete", [id, binaryDataDir]);
         deleteProcess.running = true;
     }
 
     function clear() {
         if (!_initialized) return;
-        clearProcess.command = ["sh", "-c", 
-            "sqlite3 '" + dbPath + "' '.timeout 5000' 'DELETE FROM clipboard_items WHERE pinned = 0;'; " +
-            "wl-copy --clear 2>/dev/null || true"
-        ];
+        clearProcess.command = backend("clear", [binaryDataDir]);
         clearProcess.running = true;
     }
 
@@ -514,33 +410,7 @@ QtObject {
         if (!_initialized) return;
         _operationInProgress = true;
         togglePinProcess.itemId = id;
-        togglePinProcess.command = ["sh", "-c", 
-            "sqlite3 '" + dbPath + "' <<'EOSQL'\n" +
-            ".timeout 5000\n" +
-            "BEGIN TRANSACTION;\n" +
-            "-- Toggle pin status\n" +
-            "UPDATE clipboard_items SET pinned = CASE WHEN pinned = 1 THEN 0 ELSE 1 END WHERE id = " + id + ";\n" +
-            "-- Get new pinned status\n" +
-            "-- If item is now pinned (pinned=1), set its index to 0 and shift others\n" +
-            "-- If item is now unpinned (pinned=0), set its index to 0 and shift others\n" +
-            "UPDATE clipboard_items SET display_index = CASE \n" +
-            "  WHEN id = " + id + " THEN 0\n" +
-            "  ELSE display_index + 1\n" +
-            "END WHERE pinned = (SELECT pinned FROM clipboard_items WHERE id = " + id + ");\n" +
-            "-- Compact indices to remove gaps for both pinned and unpinned\n" +
-            "WITH reindexed_pinned AS (\n" +
-            "  SELECT id, ROW_NUMBER() OVER (ORDER BY display_index ASC, updated_at DESC, id DESC) - 1 AS new_idx\n" +
-            "  FROM clipboard_items WHERE pinned = 1\n" +
-            ")\n" +
-            "UPDATE clipboard_items SET display_index = (SELECT new_idx FROM reindexed_pinned WHERE reindexed_pinned.id = clipboard_items.id) WHERE pinned = 1;\n" +
-            "WITH reindexed_unpinned AS (\n" +
-            "  SELECT id, ROW_NUMBER() OVER (ORDER BY display_index ASC, updated_at DESC, id DESC) - 1 AS new_idx\n" +
-            "  FROM clipboard_items WHERE pinned = 0\n" +
-            ")\n" +
-            "UPDATE clipboard_items SET display_index = (SELECT new_idx FROM reindexed_unpinned WHERE reindexed_unpinned.id = clipboard_items.id) WHERE pinned = 0;\n" +
-            "COMMIT;\n" +
-            "EOSQL"
-        ];
+        togglePinProcess.command = backend("pin", [id]);
         togglePinProcess.running = true;
     }
 
@@ -548,12 +418,7 @@ QtObject {
         if (!_initialized) return;
         _operationInProgress = true;
         setAliasProcess.itemId = id;
-        if (alias.trim() === "") {
-            setAliasProcess.command = ["sqlite3", dbPath, ".timeout 5000", "UPDATE clipboard_items SET alias = NULL WHERE id = " + id + ";"];
-        } else {
-            var escapedAlias = alias.replace(/'/g, "''");
-            setAliasProcess.command = ["sqlite3", dbPath, ".timeout 5000", "UPDATE clipboard_items SET alias = '" + escapedAlias + "' WHERE id = " + id + ";"];
-        }
+        setAliasProcess.command = backend("alias", [id, alias.trim()]);
         setAliasProcess.running = true;
     }
 
@@ -566,10 +431,7 @@ QtObject {
             if (items[i].id === id) {
                 var binaryPath = items[i].binaryPath;
                 if (binaryPath && binaryPath.length > 0) {
-                    loadImageProcess.itemId = id;
-                    loadImageProcess.mimeType = mime;
-                    loadImageProcess.command = ["base64", "-w", "0", binaryPath];
-                    loadImageProcess.running = true;
+                    enqueue(loadImageProcess, {itemId: id, mimeType: mime, command: ["base64", "-w", "0", binaryPath]});
                 }
                 break;
             }
@@ -590,10 +452,7 @@ QtObject {
             return;
         }
         
-        linkPreviewProcess.requestUrl = url;
-        linkPreviewProcess.requestItemId = itemId;
-        linkPreviewProcess.command = ["python3", linkPreviewScriptPath, url, "5"];
-        linkPreviewProcess.running = true;
+        enqueue(linkPreviewProcess, {requestUrl: url, requestItemId: itemId, command: ["python3", linkPreviewScriptPath, url, "5"]});
     }
     
     function moveItemUp(itemId) {
@@ -653,38 +512,9 @@ QtObject {
     function swapItems(itemId1, itemId2) {
         if (!_initialized) return;
         
-        var cmd = "sqlite3 '" + dbPath + "' <<'EOSQL'\n" +
-            ".timeout 5000\n" +
-            "BEGIN TRANSACTION;\n" +
-            "-- Reindex to ensure unique indices\n" +
-            "WITH reindexed_pinned AS (\n" +
-            "  SELECT id, ROW_NUMBER() OVER (ORDER BY display_index ASC, updated_at DESC, id DESC) - 1 AS new_idx\n" +
-            "  FROM clipboard_items WHERE pinned = 1\n" +
-            ")\n" +
-            "UPDATE clipboard_items SET display_index = (SELECT new_idx FROM reindexed_pinned WHERE reindexed_pinned.id = clipboard_items.id) WHERE pinned = 1;\n" +
-            "WITH reindexed_unpinned AS (\n" +
-            "  SELECT id, ROW_NUMBER() OVER (ORDER BY display_index ASC, updated_at DESC, id DESC) - 1 AS new_idx\n" +
-            "  FROM clipboard_items WHERE pinned = 0\n" +
-            ")\n" +
-            "UPDATE clipboard_items SET display_index = (SELECT new_idx FROM reindexed_unpinned WHERE reindexed_unpinned.id = clipboard_items.id) WHERE pinned = 0;\n" +
-            "-- Create temp variables for the swap\n" +
-            "CREATE TEMP TABLE IF NOT EXISTS swap_temp (idx1 INTEGER, idx2 INTEGER);\n" +
-            "DELETE FROM swap_temp;\n" +
-            "INSERT INTO swap_temp (idx1, idx2) \n" +
-            "  SELECT \n" +
-            "    (SELECT display_index FROM clipboard_items WHERE id = " + itemId1 + "),\n" +
-            "    (SELECT display_index FROM clipboard_items WHERE id = " + itemId2 + ");\n" +
-            "-- Perform the swap\n" +
-            "UPDATE clipboard_items SET display_index = (SELECT idx2 FROM swap_temp) WHERE id = " + itemId1 + ";\n" +
-            "UPDATE clipboard_items SET display_index = (SELECT idx1 FROM swap_temp) WHERE id = " + itemId2 + ";\n" +
-            "-- Clean up\n" +
-            "DELETE FROM swap_temp;\n" +
-            "COMMIT;\n" +
-            "EOSQL";
-            
         var proc = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-        proc.command = ["sh", "-c", cmd];
-        
+        proc.command = backend("swap", [itemId1, itemId2]);
+
         proc.onExited.connect(function(code) {
              if (code === 0) {
                  Qt.callLater(root.list);
@@ -727,14 +557,15 @@ QtObject {
     property Process emojiCopyProcess: Process {
         running: false
 
-        onExited: destroy()
+        onExited: code => {
+            if (code === 0) emojiTypeTimer.restart();
+        }
     }
 
     function copyAndTypeEmoji(emojiText) {
-        emojiCopyProcess.command = ["bash", "-c", "echo -n '" + emojiText.replace(/'/g, "'\\''") + "' | wl-copy"];
+        emojiCopyProcess.command = ["wl-copy", "--", emojiText];
         emojiCopyProcess.running = true;
-        
-        emojiTypeTimer.start();
+
     }
 
     Component.onCompleted: {

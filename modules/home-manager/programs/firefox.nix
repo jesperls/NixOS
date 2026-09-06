@@ -33,9 +33,9 @@
       isDefault = true;
 
       settings = {
-        "gfx.webrender.all" = true;
+        "gfx.webrender.all" = false;
+        "media.hardware-video-decoding.force-enabled" = false;
         "media.ffmpeg.vaapi.enabled" = true;
-        "media.hardware-video-decoding.force-enabled" = true;
 
         "widget.use-xdg-desktop-portal.file-picker" = 1;
         "widget.use-xdg-desktop-portal.mime-handler" = 0;
@@ -55,7 +55,7 @@
 
         "general.smoothScroll" = true;
 
-        "browser.sessionstore.resume_from_crash" = false;
+        "browser.sessionstore.resume_from_crash" = true;
       };
     };
   };

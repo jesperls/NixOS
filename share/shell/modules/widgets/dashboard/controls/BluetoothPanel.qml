@@ -30,10 +30,6 @@ Item {
         onTriggered: BluetoothService.updateDevices()
     }
 
-    Component.onDestruction: {
-        BluetoothService.stopDiscovery();
-    }
-
     ListView {
         id: deviceList
         anchors.fill: parent
@@ -53,15 +49,15 @@ Item {
                 width: root.contentWidth
                 anchors.horizontalCenter: parent.horizontalCenter
                 title: "Bluetooth"
-                showToggle: true
+                showToggle: BluetoothService.adapter !== null
                 toggleChecked: BluetoothService.enabled
 
                 actions: [
                     {
                         icon: Icons.popOpen,
-                        tooltip: "Open Blueman",
+                        tooltip: "Open Bluetooth manager",
                         onClicked: function () {
-                            Quickshell.execDetached(["overskride"]);
+                            ApplicationLauncher.launchCommand(["overskride"]);
                         }
                     },
                     {

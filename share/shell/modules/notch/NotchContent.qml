@@ -20,8 +20,9 @@ Item {
     id: root
 
     required property ShellScreen screen
+    readonly property string screenName: screen?.name ?? ""
 
-    readonly property var screenVisibilities: Visibilities.getForScreen(screen.name)
+    readonly property var screenVisibilities: Visibilities.getForScreen(screenName)
 
     readonly property var compositorMonitor: Compositor.monitorFor(screen)
     readonly property var toplevels: (!compositorMonitor || !compositorMonitor.activeWorkspace || !Compositor.clients.values) ? [] : Compositor.clients.values.filter(c => c.workspace.id === compositorMonitor.activeWorkspace.id)
@@ -31,7 +32,7 @@ Item {
     readonly property string barPosition: (Config.bar && Config.bar.position !== undefined) ? Config.bar.position : "top"
     readonly property string notchPosition: Config.notchPosition !== undefined ? Config.notchPosition : "top"
 
-    readonly property var barPanelRef: Visibilities.barPanels[screen.name]
+    readonly property var barPanelRef: Visibilities.barPanels[screenName]
 
     readonly property bool barPinned: {
         if (barPanelRef && typeof barPanelRef.pinned !== 'undefined') {
@@ -76,12 +77,14 @@ Item {
     readonly property bool isMouseOverNotch: notchMouseAreaHover.hovered || notchRegionHover.hovered
 
     readonly property bool reveal: {
-        if ((Config.notch && Config.notch.keepHidden !== undefined) ? Config.notch.keepHidden : false) {
-            return (screenNotchOpen || hasActiveNotifications || hoverActive || barHoverActive);
-        }
+        if (screenNotchOpen) return true;
 
         if (activeWindowFullscreen && !(Config.bar && Config.bar.availableOnFullscreen !== undefined ? Config.bar.availableOnFullscreen : false)) {
             return false;
+        }
+
+        if ((Config.notch && Config.notch.keepHidden !== undefined) ? Config.notch.keepHidden : false) {
+            return (hasActiveNotifications || hoverActive || barHoverActive);
         }
 
         if (!shouldAutoHide) return true;
@@ -115,7 +118,7 @@ Item {
 
     readonly property Item notchHitbox: root.reveal ? notchRegionContainer : notchHoverRegion
 
-    readonly property var centerGap: (Config.bar && Config.bar.splitOnCenteredLayout !== undefined ? Config.bar.splitOnCenteredLayout : true) ? CenteredLayoutService.gapFor(screen.name) : null
+    readonly property var centerGap: (Config.bar && Config.bar.splitOnCenteredLayout !== undefined ? Config.bar.splitOnCenteredLayout : true) ? CenteredLayoutService.gapFor(screenName) : null
     readonly property bool splitActive: centerGap !== null && width > 0
     property real notchCenterFrac: {
         if (!splitActive)
@@ -137,7 +140,7 @@ Item {
     readonly property real notchCenterX: notchCenterFrac * width
 
     Component {
-        id: defaultViewComponent
+        id: defaultContentComponent
         DefaultView {}
     }
 
@@ -150,7 +153,7 @@ Item {
     Loader {
         id: persistentDashboardViewLoader
         active: false
-        sourceComponent: Component { DashboardView { visible: false; screenName: root.screen.name } }
+        sourceComponent: Component { DashboardView { visible: false; screenName: root.screenName } }
     }
 
     Loader {
@@ -249,7 +252,7 @@ Item {
                 anchors.topMargin: (root.notchPosition === "top" ? (Config.notchTheme === "default" ? 0 : (Config.notchTheme === "island" ? 4 : 0)) : 0) + (root.notchPosition === "top" ? frameOffset : 0)
                 anchors.bottomMargin: (root.notchPosition === "bottom" ? (Config.notchTheme === "default" ? 0 : (Config.notchTheme === "island" ? 4 : 0)) : 0) + (root.notchPosition === "bottom" ? frameOffset : 0)
 
-                defaultViewComponent: defaultViewComponent
+                defaultViewComponent: defaultContentComponent
                 visibilities: root.screenVisibilities
 
                 Keys.onPressed: event => {
@@ -312,7 +315,7 @@ Item {
                 if (!root.hasActiveNotifications || !root.screenNotchOpen)
                     return false;
 
-                if (screenVisibilities.dashboard) {
+                if (screenVisibilities?.dashboard) {
                     return !(GlobalStates.dashboardCurrentTab === 0 && GlobalStates.widgetsTabCurrentIndex === 0);
                 }
 
@@ -368,13 +371,13 @@ Item {
         target: screenVisibilities
 
         function onLauncherChanged() {
-            if (screenVisibilities.launcher) {
+            if (screenVisibilities?.launcher) {
                 persistentLauncherViewLoader.active = true;
                 Qt.callLater(() => {
-                    if (screenVisibilities.launcher && persistentLauncherViewLoader.item) {
+                    if (screenVisibilities?.launcher && persistentLauncherViewLoader.item) {
                         notchContainer.stackView.push(persistentLauncherViewLoader.item);
                         Qt.callLater(() => {
-                            if (screenVisibilities.launcher && notchContainer.stackView.currentItem) {
+                            if (screenVisibilities?.launcher && notchContainer.stackView.currentItem) {
                                 notchContainer.stackView.currentItem.forceActiveFocus();
                             }
                         });
@@ -388,13 +391,13 @@ Item {
         }
 
         function onDashboardChanged() {
-            if (screenVisibilities.dashboard) {
+            if (screenVisibilities?.dashboard) {
                 persistentDashboardViewLoader.active = true;
                 Qt.callLater(() => {
-                    if (screenVisibilities.dashboard && persistentDashboardViewLoader.item) {
+                    if (screenVisibilities?.dashboard && persistentDashboardViewLoader.item) {
                         notchContainer.stackView.push(persistentDashboardViewLoader.item);
                         Qt.callLater(() => {
-                            if (screenVisibilities.dashboard && notchContainer.stackView.currentItem) {
+                            if (screenVisibilities?.dashboard && notchContainer.stackView.currentItem) {
                                 notchContainer.stackView.currentItem.forceActiveFocus();
                             }
                         });
@@ -408,13 +411,13 @@ Item {
         }
 
         function onPowermenuChanged() {
-            if (screenVisibilities.powermenu) {
+            if (screenVisibilities?.powermenu) {
                 persistentPowerMenuViewLoader.active = true;
                 Qt.callLater(() => {
-                    if (screenVisibilities.powermenu && persistentPowerMenuViewLoader.item) {
+                    if (screenVisibilities?.powermenu && persistentPowerMenuViewLoader.item) {
                         notchContainer.stackView.push(persistentPowerMenuViewLoader.item);
                         Qt.callLater(() => {
-                            if (screenVisibilities.powermenu && notchContainer.stackView.currentItem) {
+                            if (screenVisibilities?.powermenu && notchContainer.stackView.currentItem) {
                                 notchContainer.stackView.currentItem.forceActiveFocus();
                             }
                         });
@@ -428,13 +431,13 @@ Item {
         }
 
         function onToolsChanged() {
-            if (screenVisibilities.tools) {
+            if (screenVisibilities?.tools) {
                 persistentToolsMenuViewLoader.active = true;
                 Qt.callLater(() => {
-                    if (screenVisibilities.tools && persistentToolsMenuViewLoader.item) {
+                    if (screenVisibilities?.tools && persistentToolsMenuViewLoader.item) {
                         notchContainer.stackView.push(persistentToolsMenuViewLoader.item);
                         Qt.callLater(() => {
-                            if (screenVisibilities.tools && notchContainer.stackView.currentItem) {
+                            if (screenVisibilities?.tools && notchContainer.stackView.currentItem) {
                                 notchContainer.stackView.currentItem.forceActiveFocus();
                             }
                         });

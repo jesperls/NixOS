@@ -11,6 +11,11 @@ Singleton {
     id: root
 
     component Notif: QtObject {
+        id: entry
+        property Timer closeTimer: Timer {
+            interval: 350
+            onTriggered: root.finishTimeout(entry.id)
+        }
         required property int id
         property Notification notification
         property list<var> actions: notification?.actions.map(action => ({
@@ -98,38 +103,14 @@ Singleton {
     component NotifTimer: Timer {
         required property int id
         property bool isPaused: false
-
-        property var suspendConnections: Connections {
-            target: SuspendManager
-            function onWakingUp() {
-                if (!isPaused) {
-                    wakeStartTimer.restart();
-                }
-            }
+        property bool expired: false
+        running: !isPaused && !expired && !SuspendManager.isSuspending && interval > 0
+        onTriggered: {
+            expired = true;
+            root.timeoutNotification(id);
         }
-
-        property var wakeStartTimer: Timer {
-            id: wakeStartTimer
-            interval: 1000
-            repeat: false
-            onTriggered: if (!isPaused)
-                parent.start()
-        }
-
-        running: !isPaused && !SuspendManager.isSuspending && interval > 0
-        onTriggered: root.timeoutNotification(id)
-
-        function pause() {
-            isPaused = true;
-            stop();
-        }
-
-        function resume() {
-            isPaused = false;
-            if (!SuspendManager.isSuspending && interval > 0) {
-                start();
-            }
-        }
+        function pause() { isPaused = true; }
+        function resume() { isPaused = false; }
     }
 
     property bool silent: false
@@ -159,13 +140,14 @@ Singleton {
     FileView {
         id: notifFileView
         path: Paths.cachePath("notifications.json")
+        atomicWrites: true
         onLoaded: loadNotifications()
     }
 
     function appendNotification(notif) {
         root.list = [...root.list, notif];
         if (root.list.length > 200) {
-            root.list = root.list.slice(root.list.length - 200);
+            root.discardNotifications(root.list.slice(0, root.list.length - 200).map(entry => entry.id));
         }
     }
 
@@ -176,7 +158,7 @@ Singleton {
     function jsonToNotif(json) {
         return notifComponent.createObject(root, {
             "id": json.id,
-            "actions": json.actions,
+            "actions": [],
             "appIcon": json.cachedAppIcon || json.appIcon,
             "appName": json.appName,
             "body": json.body,
@@ -188,7 +170,7 @@ Singleton {
             "replaceKey": json.replaceKey || "",
             "cachedAppIcon": json.cachedAppIcon || "",
             "cachedImage": json.cachedImage || "",
-            "isCached": json.isCached === true,
+            "isCached": true,
             "popup": false
         });
     }
@@ -199,10 +181,10 @@ Singleton {
     }
 
     function limitNotificationsPerSummary(notifications) {
-        var groups = {};
+        var groups = Object.create(null);
 
         notifications.forEach(notif => {
-            const key = notif.appName + '|' + (notif.summary || '');
+            const key = JSON.stringify([notif.appName, notif.summary || ""]);
             if (!groups[key]) {
                 groups[key] = [];
             }
@@ -216,13 +198,14 @@ Singleton {
             limitedNotifications.push(...group.slice(0, 5));
         }
 
-        return limitedNotifications;
+        return limitedNotifications.sort((a, b) => a.time - b.time);
     }
 
     function loadNotifications() {
         try {
             const data = JSON.parse(notifFileView.text());
-            root.list = data.map(jsonToNotif);
+            if (!Array.isArray(data)) throw new Error("Expected a notification list");
+            root.list = data.slice(-200).map(jsonToNotif);
             let maxId = 0;
             root.list.forEach(notif => {
                 if (notif.id > maxId)
@@ -261,7 +244,7 @@ Singleton {
     }
 
     function groupsForList(list) {
-        const groups = {};
+        const groups = Object.create(null);
         list.forEach((notif, index) => {
             if (!notif || !notif.appName || (!notif.summary && !notif.body)) {
                 return;
@@ -329,7 +312,7 @@ Singleton {
                 newNotifObject.popup = true;
                 newNotifObject.timer = notifTimerComponent.createObject(root, {
                     "id": newNotifObject.id,
-                    "interval": notification.expireTimeout === -1 ? 0 : (notification.expireTimeout || 5000)
+                    "interval": root.popupTimeout(notification.expireTimeout, notification.urgency)
                 });
             }
 
@@ -359,7 +342,7 @@ Singleton {
             "image": options.image || "",
             "summary": options.summary || "",
             "time": options.time || Date.now(),
-            "urgency": options.urgency || NotificationUrgency.Normal,
+            "urgency": options.urgency ?? NotificationUrgency.Normal,
             "historyPriority": options.historyPriority || 0,
             "replaceKey": options.replaceKey || "",
             "localActionHandlers": options.actionHandlers || {},
@@ -370,7 +353,7 @@ Singleton {
         if (newNotifObject.popup) {
             newNotifObject.timer = notifTimerComponent.createObject(root, {
                 "id": newNotifObject.id,
-                "interval": options.expireTimeout === -1 ? 0 : (options.expireTimeout || 5000)
+                "interval": root.popupTimeout(options.expireTimeout, options.urgency)
             });
         }
 
@@ -439,54 +422,48 @@ Singleton {
 
     signal timeoutWithAnimation(id: var)
 
-    Timer {
-        id: timeoutAnimationTimer
-        interval: 350
-        running: false
-        repeat: false
-        property int notificationId: -1
-        onTriggered: {
-            const index = root.list.findIndex(notif => notif.id === notificationId);
-            if (index !== -1 && root.list[index] != null) {
-                const notif = root.list[index];
-                notif.popup = false;
-                if (notif.timer) {
-                    notif.timer.stop();
-                    notif.timer.destroy();
-                    notif.timer = null;
-                }
-            }
-            root.timeout(notificationId);
+    function popupTimeout(timeout, urgency) {
+        if (urgency === NotificationUrgency.Critical || timeout === 0) return 0;
+        return timeout > 0 ? timeout : 5000;
+    }
+
+    function finishTimeout(id) {
+        const notif = root.list.find(entry => entry.id === id);
+        if (!notif) return;
+        notif.popup = false;
+        if (notif.timer) {
+            notif.timer.destroy();
+            notif.timer = null;
         }
+        root.timeout(id);
     }
 
     function timeoutNotification(id) {
+        const notif = root.list.find(entry => entry.id === id);
+        if (!notif || notif.closeTimer.running) return;
         root.timeoutWithAnimation(id);
-        timeoutAnimationTimer.notificationId = id;
-        timeoutAnimationTimer.restart();
+        notif.closeTimer.start();
     }
 
     function attemptInvokeAction(id, notifIdentifier, autoDiscard = true) {
-        const notifIndex = root.list.findIndex(notif => notif.id === id);
-        if (notifIndex !== -1) {
-            const localHandlers = root.list[notifIndex].localActionHandlers || {};
-            const localHandler = localHandlers[notifIdentifier];
-            if (typeof localHandler === "function") {
-                localHandler(id);
-            }
-        }
-
-        const notifServerIndex = notifServer.trackedNotifications.values.findIndex(notif => notif.id + root.idOffset === id);
-        if (notifServerIndex !== -1) {
-            const notifServerNotif = notifServer.trackedNotifications.values[notifServerIndex];
-            const action = notifServerNotif.actions.find(action => action.identifier === notifIdentifier);
+        const entry = root.list.find(notif => notif.id === id);
+        if (!entry || entry.isCached) return false;
+        const localHandler = (entry.localActionHandlers || {})[notifIdentifier];
+        let invoked = false;
+        if (typeof localHandler === "function") {
+            localHandler(id);
+            invoked = true;
+        } else {
+            const notification = notifServer.trackedNotifications.values.find(notif => notif.id + root.idOffset === id);
+            const action = notification?.actions.find(action => action.identifier === notifIdentifier);
             if (action) {
                 action.invoke();
+                invoked = true;
             }
         }
-        if (autoDiscard) {
+        if (invoked && autoDiscard)
             root.discardNotification(id);
-        }
+        return invoked;
     }
 
     function pauseGroupTimers(appName) {
@@ -549,9 +526,9 @@ Singleton {
     }
 
     function scheduleDestroy(notif) {
-        if (!notif) return;
+        if (!notif || root.pendingDestroys.indexOf(notif) !== -1) return;
         root.pendingDestroys = [...root.pendingDestroys, notif];
-        destroyTimer.restart();
+        if (!destroyTimer.running) destroyTimer.start();
     }
 
     property int activeXhrCount: 0

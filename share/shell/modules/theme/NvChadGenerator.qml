@@ -119,39 +119,18 @@ QtObject {
         lua += "\t},\n"
         lua += "}\n\n"
 
-        lua += "return M"
+        lua += "return M";
 
-        writer.text = lua
-        
-        const home = Paths.home
-        const targetPath = home + `/.cache/wal/base46-${mode}.lua`
-        
-        const cmd = `
-            mkdir -p "$(dirname "${targetPath}")"
-            cat <<'EOF_NVCHAD' > "${targetPath}"
-${lua}
-EOF_NVCHAD
-        `
-
-        writerProcess.command = ["sh", "-c", cmd]
-        writerProcess.running = true
+        (mode === "light" ? lightFile : darkFile).write(lua);
     }
 
-    property QtObject writer: QtObject {
-        id: writer
-        property string text
+    property ThemeFile lightFile: ThemeFile {
+        id: lightFile
+        path: Paths.cacheHome + "/wal/base46-light.lua"
     }
 
-    property Process writerProcess: Process {
-        id: writerProcess
-        running: false
-        stdout: StdioCollector {
-            onStreamFinished: console.log("NvChadGenerator: Colors generated.")
-        }
-        stderr: StdioCollector {
-            onStreamFinished: (err) => {
-                if (err) console.error("NvChadGenerator Error:", err)
-            }
-        }
+    property ThemeFile darkFile: ThemeFile {
+        id: darkFile
+        path: Paths.cacheHome + "/wal/base46-dark.lua"
     }
 }

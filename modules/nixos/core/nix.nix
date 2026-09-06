@@ -7,6 +7,8 @@
 }:
 
 {
+  imports = [ inputs.nix-index-database.nixosModules.default ];
+
   nix = {
     registry.nixpkgs.flake = inputs.nixpkgs;
     nixPath = [ "nixpkgs=flake:nixpkgs" ];
@@ -59,12 +61,23 @@
     flake = config.mySystem.paths.repoRoot;
   };
 
+  systemd.services.nh-clean = lib.mkIf config.programs.nh.clean.enable {
+    serviceConfig = {
+      Nice = 19;
+      CPUSchedulingPolicy = "idle";
+      IOSchedulingClass = "idle";
+    };
+  };
+  systemd.timers.nh-clean = lib.mkIf config.programs.nh.clean.enable {
+    timerConfig.RandomizedDelaySec = "30min";
+  };
+
   programs.nix-index = {
     enable = true;
     enableZshIntegration = true;
   };
   programs.command-not-found.enable = false;
-  environment.systemPackages = [ pkgs.comma ];
+  programs.nix-index-database.comma.enable = true;
 
   programs.nix-ld = {
     enable = true;

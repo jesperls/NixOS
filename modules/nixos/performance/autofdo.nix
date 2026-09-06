@@ -38,12 +38,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # AutoFDO: unprivileged perf and readable kernel symbols while collecting
-    boot.kernel.sysctl = {
-      "kernel.perf_event_paranoid" = 0;
-      "kernel.kptr_restrict" = 0;
-    };
-
     systemd.timers.autofdo-collector = {
       wantedBy = [ "timers.target" ];
       timerConfig = {
@@ -63,6 +57,8 @@ in
       serviceConfig = {
         Type = "oneshot";
         StateDirectory = "autofdo";
+        RuntimeDirectory = "autofdo";
+        UMask = "0077";
       };
       script = ''
         set -e
@@ -77,8 +73,15 @@ in
           fi
         ''}
 
+        if [ "$(uname -r)" != ${lib.escapeShellArg config.boot.kernelPackages.kernel.modDirVersion} ]; then
+          echo "autofdo: running kernel differs from the configured kernel; reboot before collecting" >&2
+          exit 0
+        fi
+
         timestamp=$(date +%s)
-        raw=/tmp/autofdo-$timestamp.data
+        raw="$RUNTIME_DIRECTORY/perf.data"
+        profile="$STATE_DIRECTORY/profile-$timestamp.afdo"
+        trap 'rm -f "$raw" "$raw.old" "$profile.tmp"' EXIT
         vmlinux=${config.boot.kernelPackages.kernel.dev}/vmlinux
 
         if [ ! -f "$vmlinux" ]; then
@@ -89,15 +92,16 @@ in
         # AMD Zen5 (amd_lbr_v2): taken-branch sampling + branch stack. The kernel
         # docs' --pfm-events name isn't in nixpkgs' libpfm4, branches:k is equivalent.
         perf record -e branches:k \
-          -a -N -b -c ${cfg.samplePeriod} -o "$raw" -- sleep ${cfg.duration}
+          -a -N -b -c ${lib.escapeShellArg cfg.samplePeriod} -o "$raw" -- sleep ${lib.escapeShellArg cfg.duration}
 
         create_llvm_prof \
           --binary="$vmlinux" \
           --profile="$raw" \
           --format=extbinary \
-          --out=/var/lib/autofdo/profile-$timestamp.afdo
+          --out="$profile.tmp"
 
-        rm -f "$raw"
+        chmod 644 "$profile.tmp"
+        mv "$profile.tmp" "$profile"
       '';
     };
   };

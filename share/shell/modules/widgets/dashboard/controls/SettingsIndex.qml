@@ -5,7 +5,6 @@ import qs.modules.theme
 QtObject {
 
     
-    property var dynamicItems: []
 
     readonly property var staticItems: [
         { label: "Network", keywords: "internet wifi connection ethernet ip", section: "network", subSection: "", subLabel: "", icon: Icons.wifiHigh, isIcon: true },
@@ -196,26 +195,136 @@ QtObject {
         
         { label: "Lockscreen", keywords: "lock screen password login", section: "shell", subSection: "lockscreen", subLabel: "Shell > Lockscreen", icon: Icons.lock, isIcon: true },
         
-        { label: "Shell System", keywords: "config settings pangu", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.circuitry, isIcon: true }
+        { label: "Shell System", keywords: "config settings pangu", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.circuitry, isIcon: true },
+        { label: "Light Mode", keywords: "Light Mode general", section: "theme", subSection: "general", subLabel: "Theme > General", icon: Icons.faders, isIcon: true },
+        { label: "OLED Mode", keywords: "OLED Mode general", section: "theme", subSection: "general", subLabel: "Theme > General", icon: Icons.faders, isIcon: true },
+        { label: "Colors Follow Wallpaper", keywords: "Colors Follow Wallpaper colors", section: "theme", subSection: "colors", subLabel: "Theme > Colors", icon: Icons.faders, isIcon: true },
+        { label: "Clipboard", keywords: "Clipboard prefixes", section: "system", subSection: "prefixes", subLabel: "System > Prefixes", icon: Icons.faders, isIcon: true },
+        { label: "Emoji", keywords: "Emoji prefixes", section: "system", subSection: "prefixes", subLabel: "System > Prefixes", icon: Icons.faders, isIcon: true },
+        { label: "Tmux", keywords: "Tmux prefixes", section: "system", subSection: "prefixes", subLabel: "System > Prefixes", icon: Icons.faders, isIcon: true },
+        { label: "Wallpapers", keywords: "Wallpapers prefixes", section: "system", subSection: "prefixes", subLabel: "System > Prefixes", icon: Icons.faders, isIcon: true },
+        { label: "Notes", keywords: "Notes prefixes", section: "system", subSection: "prefixes", subLabel: "System > Prefixes", icon: Icons.faders, isIcon: true },
+        { label: "Celsius", keywords: "Celsius weather", section: "system", subSection: "weather", subLabel: "System > Weather", icon: Icons.faders, isIcon: true },
+        { label: "Fahrenheit", keywords: "Fahrenheit weather", section: "system", subSection: "weather", subLabel: "System > Weather", icon: Icons.faders, isIcon: true },
+        { label: "Persist Dashboard Tabs", keywords: "Persist Dashboard Tabs performance", section: "system", subSection: "performance", subLabel: "System > Performance", icon: Icons.faders, isIcon: true },
+        { label: "Max Persistent Tabs", keywords: "Max Persistent Tabs performance", section: "system", subSection: "performance", subLabel: "System > Performance", icon: Icons.faders, isIcon: true },
+        { label: "Disable Cover Art Rotation", keywords: "Disable Cover Art Rotation performance", section: "system", subSection: "performance", subLabel: "System > Performance", icon: Icons.faders, isIcon: true },
+        { label: "Lock When Idle", keywords: "Lock When Idle idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.faders, isIcon: true },
+        { label: "Screen Off When Idle", keywords: "Screen Off When Idle idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.faders, isIcon: true },
+        { label: "Screen Off After", keywords: "Screen Off After idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.faders, isIcon: true },
+        { label: "Suspend When Idle", keywords: "Suspend When Idle idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.faders, isIcon: true },
+        { label: "Lock Cmd", keywords: "Lock Cmd idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.faders, isIcon: true },
+        { label: "Timeout (s)", keywords: "Timeout (s) idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.faders, isIcon: true },
+        { label: "On Timeout", keywords: "On Timeout idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.faders, isIcon: true },
+        { label: "On Resume", keywords: "On Resume idle", section: "system", subSection: "idle", subLabel: "System > Idle", icon: Icons.faders, isIcon: true },
+        { label: "Shuffle", keywords: "Shuffle wallpaper", section: "system", subSection: "wallpaper", subLabel: "System > Wallpaper", icon: Icons.faders, isIcon: true },
+        { label: "Interval", keywords: "Interval wallpaper", section: "system", subSection: "wallpaper", subLabel: "System > Wallpaper", icon: Icons.faders, isIcon: true },
+        { label: "Use Sunrise and Sunset", keywords: "Use Sunrise and Sunset daynight", section: "system", subSection: "daynight", subLabel: "System > Daynight", icon: Icons.faders, isIcon: true },
+        { label: "Day Starts", keywords: "Day Starts daynight", section: "system", subSection: "daynight", subLabel: "System > Daynight", icon: Icons.faders, isIcon: true },
+        { label: "Night Starts", keywords: "Night Starts daynight", section: "system", subSection: "daynight", subLabel: "System > Daynight", icon: Icons.faders, isIcon: true },
+        { label: "Work Session", keywords: "Work Session pomodoro", section: "system", subSection: "pomodoro", subLabel: "System > Pomodoro", icon: Icons.faders, isIcon: true },
+        { label: "Rest Session", keywords: "Rest Session pomodoro", section: "system", subSection: "pomodoro", subLabel: "System > Pomodoro", icon: Icons.faders, isIcon: true },
+        { label: "Auto Start Next", keywords: "Auto Start Next pomodoro", section: "system", subSection: "pomodoro", subLabel: "System > Pomodoro", icon: Icons.faders, isIcon: true },
+        { label: "Sync Spotify", keywords: "Sync Spotify pomodoro", section: "system", subSection: "pomodoro", subLabel: "System > Pomodoro", icon: Icons.faders, isIcon: true },
+        { label: "Sync Border Size", keywords: "Sync Border Size general", section: "compositor", subSection: "general", subLabel: "Compositor > General", icon: Icons.faders, isIcon: true },
+        { label: "Sync Rounding", keywords: "Sync Rounding general", section: "compositor", subSection: "general", subLabel: "Compositor > General", icon: Icons.faders, isIcon: true },
+        { label: "Rounding", keywords: "Rounding general", section: "compositor", subSection: "general", subLabel: "Compositor > General", icon: Icons.faders, isIcon: true },
+        { label: "Gaps In", keywords: "Gaps In general", section: "compositor", subSection: "general", subLabel: "Compositor > General", icon: Icons.faders, isIcon: true },
+        { label: "Gaps Out", keywords: "Gaps Out general", section: "compositor", subSection: "general", subLabel: "Compositor > General", icon: Icons.faders, isIcon: true },
+        { label: "Border Angle", keywords: "Border Angle general", section: "compositor", subSection: "general", subLabel: "Compositor > General", icon: Icons.faders, isIcon: true },
+        { label: "Inactive Angle", keywords: "Inactive Angle general", section: "compositor", subSection: "general", subLabel: "Compositor > General", icon: Icons.faders, isIcon: true },
+        { label: "Sync Border Color", keywords: "Sync Border Color colors", section: "compositor", subSection: "colors", subLabel: "Compositor > Colors", icon: Icons.faders, isIcon: true },
+        { label: "Active Border", keywords: "Active Border colors", section: "compositor", subSection: "colors", subLabel: "Compositor > Colors", icon: Icons.faders, isIcon: true },
+        { label: "Inactive Border", keywords: "Inactive Border colors", section: "compositor", subSection: "colors", subLabel: "Compositor > Colors", icon: Icons.faders, isIcon: true },
+        { label: "Enabled", keywords: "Enabled shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Sync Color", keywords: "Sync Color shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Sync Opacity", keywords: "Sync Opacity shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Range", keywords: "Range shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Offset X", keywords: "Offset X shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Offset Y", keywords: "Offset Y shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Render Power", keywords: "Render Power shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Scale", keywords: "Scale shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Opacity", keywords: "Opacity shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Sharp", keywords: "Sharp shadows", section: "compositor", subSection: "shadows", subLabel: "Compositor > Shadows", icon: Icons.faders, isIcon: true },
+        { label: "Size", keywords: "Size blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Passes", keywords: "Passes blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Xray", keywords: "Xray blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "New Optimizations", keywords: "New Optimizations blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Blur Special Workspaces", keywords: "Blur Special Workspaces blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Blur Popups", keywords: "Blur Popups blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Ignore Opacity", keywords: "Ignore Opacity blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Explicit Ignorealpha", keywords: "Explicit Ignorealpha blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Ignorealpha Value", keywords: "Ignorealpha Value blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Noise", keywords: "Noise blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Contrast", keywords: "Contrast blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Brightness", keywords: "Brightness blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "Vibrancy", keywords: "Vibrancy blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
+        { label: "", keywords: " bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Bar Height (0 = auto)", keywords: "Bar Height (0 = auto) bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Use 12h Format", keywords: "Use 12h Format bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Show Seconds", keywords: "Show Seconds bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Show Date", keywords: "Show Date bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Enable Firefox Player", keywords: "Enable Firefox Player bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Split on Centered Layout", keywords: "Split on Centered Layout bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Split Gap Padding", keywords: "Split Gap Padding bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Hide Delay", keywords: "Hide Delay bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Screens", keywords: "Screens bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Enabled", keywords: "Enabled frame", section: "shell", subSection: "frame", subLabel: "Shell > Frame", icon: Icons.faders, isIcon: true },
+        { label: "Thickness", keywords: "Thickness frame", section: "shell", subSection: "frame", subLabel: "Shell > Frame", icon: Icons.faders, isIcon: true },
+        { label: "Contain Bar", keywords: "Contain Bar frame", section: "shell", subSection: "frame", subLabel: "Shell > Frame", icon: Icons.faders, isIcon: true },
+        { label: "Keep Bar Shadow", keywords: "Keep Bar Shadow frame", section: "shell", subSection: "frame", subLabel: "Shell > Frame", icon: Icons.faders, isIcon: true },
+        { label: "Keep Bar Border", keywords: "Keep Bar Border frame", section: "shell", subSection: "frame", subLabel: "Shell > Frame", icon: Icons.faders, isIcon: true },
+        { label: "Split Side", keywords: "Split Side notch", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.faders, isIcon: true },
+        { label: "Hover Expansion Delay", keywords: "Hover Expansion Delay notch", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.faders, isIcon: true },
+        { label: "Keep Hidden", keywords: "Keep Hidden notch", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.faders, isIcon: true },
+        { label: "Disable Hover Expansion", keywords: "Disable Hover Expansion notch", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.faders, isIcon: true },
+        { label: "Show User", keywords: "Show User notch", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.faders, isIcon: true },
+        { label: "Show Media Player", keywords: "Show Media Player notch", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.faders, isIcon: true },
+        { label: "Show Notification Indicator", keywords: "Show Notification Indicator notch", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.faders, isIcon: true },
+        { label: "Custom Text", keywords: "Custom Text notch", section: "shell", subSection: "notch", subLabel: "Shell > Notch", icon: Icons.faders, isIcon: true },
+        { label: "Shown", keywords: "Shown workspaces", section: "shell", subSection: "workspaces", subLabel: "Shell > Workspaces", icon: Icons.faders, isIcon: true },
+        { label: "Dynamic", keywords: "Dynamic workspaces", section: "shell", subSection: "workspaces", subLabel: "Shell > Workspaces", icon: Icons.faders, isIcon: true },
+        { label: "Layout", keywords: "Layout overview", section: "shell", subSection: "overview", subLabel: "Shell > Overview", icon: Icons.faders, isIcon: true },
+        { label: "Rows", keywords: "Rows overview", section: "shell", subSection: "overview", subLabel: "Shell > Overview", icon: Icons.faders, isIcon: true },
+        { label: "Columns", keywords: "Columns overview", section: "shell", subSection: "overview", subLabel: "Shell > Overview", icon: Icons.faders, isIcon: true },
+        { label: "Workspace Spacing", keywords: "Workspace Spacing overview", section: "shell", subSection: "overview", subLabel: "Shell > Overview", icon: Icons.faders, isIcon: true },
+        { label: "Dashboard Width (0 = auto)", keywords: "Dashboard Width (0 = auto) dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.faders, isIcon: true },
+        { label: "Dashboard Height (0 = auto)", keywords: "Dashboard Height (0 = auto) dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.faders, isIcon: true },
+        { label: "Show Tab Rail", keywords: "Show Tab Rail dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.faders, isIcon: true },
+        { label: "Tab Rail Position", keywords: "Tab Rail Position dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.faders, isIcon: true },
+        { label: "Show Widgets Tab", keywords: "Show Widgets Tab dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.faders, isIcon: true },
+        { label: "Show Wallpapers Tab", keywords: "Show Wallpapers Tab dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.faders, isIcon: true },
+        { label: "Show Metrics Tab", keywords: "Show Metrics Tab dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.faders, isIcon: true },
+        { label: "Background Opacity", keywords: "Background Opacity dashboard", section: "shell", subSection: "dashboard", subLabel: "Shell > Dashboard", icon: Icons.faders, isIcon: true },
+        { label: "Launcher Width (0 = auto)", keywords: "Launcher Width (0 = auto) launcher", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.faders, isIcon: true },
+        { label: "Launcher Height (0 = auto)", keywords: "Launcher Height (0 = auto) launcher", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.faders, isIcon: true },
+        { label: "Show App Comments", keywords: "Show App Comments launcher", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.faders, isIcon: true },
+        { label: "Sort by Usage", keywords: "Sort by Usage launcher", section: "shell", subSection: "launcher", subLabel: "Shell > Launcher", icon: Icons.faders, isIcon: true },
+        { label: "Position", keywords: "Position dock", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.faders, isIcon: true },
+        { label: "Theme", keywords: "Theme dock", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.faders, isIcon: true },
+        { label: "Height", keywords: "Height dock", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.faders, isIcon: true },
+        { label: "Icon Size", keywords: "Icon Size dock", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.faders, isIcon: true },
+        { label: "Spacing", keywords: "Spacing dock", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.faders, isIcon: true },
+        { label: "Margin", keywords: "Margin dock", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.faders, isIcon: true },
+        { label: "Hover Region", keywords: "Hover Region dock", section: "shell", subSection: "dock", subLabel: "Shell > Dock", icon: Icons.faders, isIcon: true },
+        { label: "Lock on Boot", keywords: "Lock on Boot lockscreen", section: "shell", subSection: "lockscreen", subLabel: "Shell > Lockscreen", icon: Icons.faders, isIcon: true },
+        { label: "Show Clock", keywords: "Show Clock lockscreen", section: "shell", subSection: "lockscreen", subLabel: "Shell > Lockscreen", icon: Icons.faders, isIcon: true },
+        { label: "Show Avatar", keywords: "Show Avatar lockscreen", section: "shell", subSection: "lockscreen", subLabel: "Shell > Lockscreen", icon: Icons.faders, isIcon: true },
+        { label: "Show Username", keywords: "Show Username lockscreen", section: "shell", subSection: "lockscreen", subLabel: "Shell > Lockscreen", icon: Icons.faders, isIcon: true },
+        { label: "Blur Wallpaper", keywords: "Blur Wallpaper lockscreen", section: "shell", subSection: "lockscreen", subLabel: "Shell > Lockscreen", icon: Icons.faders, isIcon: true },
+        { label: "Dim Strength", keywords: "Dim Strength lockscreen", section: "shell", subSection: "lockscreen", subLabel: "Shell > Lockscreen", icon: Icons.faders, isIcon: true },
+        { label: "Width", keywords: "Width osd", section: "shell", subSection: "osd", subLabel: "Shell > Osd", icon: Icons.faders, isIcon: true },
+        { label: "Icon Style", keywords: "Icon Style osd", section: "shell", subSection: "osd", subLabel: "Shell > Osd", icon: Icons.faders, isIcon: true },
+        { label: "Show Percentage", keywords: "Show Percentage osd", section: "shell", subSection: "osd", subLabel: "Shell > Osd", icon: Icons.faders, isIcon: true },
+        { label: "Show Slider", keywords: "Show Slider osd", section: "shell", subSection: "osd", subLabel: "Shell > Osd", icon: Icons.faders, isIcon: true },
+        { label: "English", keywords: "English system", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.faders, isIcon: true },
+        { label: "Spanish", keywords: "Spanish system", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.faders, isIcon: true },
+        { label: "Latin", keywords: "Latin system", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.faders, isIcon: true },
+        { label: "Japanese", keywords: "Japanese system", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.faders, isIcon: true },
+        { label: "Chinese (Simplified)", keywords: "Chinese (Simplified) system", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.faders, isIcon: true },
+        { label: "Chinese (Traditional)", keywords: "Chinese (Traditional) system", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.faders, isIcon: true },
+        { label: "Korean", keywords: "Korean system", section: "shell", subSection: "system", subLabel: "Shell > System", icon: Icons.faders, isIcon: true }
     ]
 
-    property var items: staticItems.concat(dynamicItems)
-
-    function addDynamicItems(newItems) {
-        let currentLabels = new Set(items.map(i => i.section + ":" + i.label));
-        let uniqueNew = [];
-        
-        for (let i = 0; i < newItems.length; i++) {
-            let item = newItems[i];
-            let key = item.section + ":" + item.label;
-            if (!currentLabels.has(key)) {
-                uniqueNew.push(item);
-                currentLabels.add(key);
-            }
-        }
-        
-        if (uniqueNew.length > 0) {
-            dynamicItems = dynamicItems.concat(uniqueNew);
-        }
-    }
+    readonly property var items: staticItems
 }

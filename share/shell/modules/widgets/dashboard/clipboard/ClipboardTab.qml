@@ -509,24 +509,7 @@ Item {
     }
 
     function copyToClipboard(itemId) {
-        for (var i = 0; i < root.allItems.length; i++) {
-            if (root.allItems[i].id === itemId) {
-                var item = root.allItems[i];
-                if (item.isImage && item.binaryPath) {
-                    copyProcess.command = ["sh", "-c", "cat '" + item.binaryPath + "' | wl-copy --type '" + item.mime + "'"];
-                } else if (item.isFile) {
-                    copyProcess.command = ["sh", "-c", "sqlite3 '" + ClipboardService.dbPath + "' \"SELECT full_content FROM clipboard_items WHERE id = " + itemId + ";\" | tr -d '\\r' | wl-copy --type text/uri-list"];
-                } else {
-                    if (root.contentMatchesSelection && root.currentItemId === itemId && root.currentFullContent) {
-                        copyProcess.command = ["sh", "-c", "printf '%s' " + ClipboardUtils.escapeShellArg(root.currentFullContent) + " | wl-copy"];
-                    } else {
-                        copyProcess.command = ["sh", "-c", "sqlite3 '" + ClipboardService.dbPath + "' \"SELECT full_content FROM clipboard_items WHERE id = " + itemId + ";\" | wl-copy"];
-                    }
-                }
-                copyProcess.running = true;
-                break;
-            }
-        }
+        ClipboardService.enqueue(copyProcess, {command: ClipboardService.backend("copy", [itemId])});
     }
 
     signal requestOpenItem(string itemId, var items, string currentContent, var filePathGetter, var urlChecker)
@@ -597,12 +580,12 @@ Item {
 
     Process {
         id: copyProcess
+        property var pending: []
         running: false
 
         onExited: function (code) {
-            if (code === 0) {
-                ClipboardService.checkClipboard();
-            }
+            if (code === 0) ClipboardService.checkClipboard();
+            Qt.callLater(ClipboardService.startNext, copyProcess);
         }
     }
 

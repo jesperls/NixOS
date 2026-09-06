@@ -38,15 +38,11 @@ QtObject {
     }
 
     function toggle() {
-        GlobalStates.lockscreenVisible = !GlobalStates.lockscreenVisible;
+        root.lock();
     }
 
     function lock() {
         GlobalStates.lockscreenVisible = true;
-    }
-
-    function unlock() {
-        GlobalStates.lockscreenVisible = false;
     }
 
     property IpcHandler ipc: IpcHandler {
@@ -60,8 +56,5 @@ QtObject {
             root.lock();
         }
 
-        function unlock() {
-            root.unlock();
-        }
     }
 }

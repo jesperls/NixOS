@@ -1,4 +1,4 @@
-{ osConfig, ... }:
+{ osConfig, lib, ... }:
 
 {
   programs.zsh = {
@@ -29,11 +29,11 @@
       "..." = "cd ../..";
       "...." = "cd ../../..";
 
-      snis = "nh os switch $FLAKE";
-      snub = "nh os boot $FLAKE";
-      snus = "nh os switch $FLAKE --update";
+      snis = ''nh os switch "$FLAKE"'';
+      snub = ''nh os boot "$FLAKE"'';
+      snus = ''nh os switch "$FLAKE" --update'';
       snuf = "nh clean all --keep ${toString osConfig.mySystem.system.keepGenerations}";
-      nfu = "cd $FLAKE && nix flake update";
+      nfu = ''cd -- "$FLAKE" && nix flake update'';
 
       cat = "bat --paging=never";
       trash = "trash-put";
@@ -52,7 +52,7 @@
       gd = "git diff";
     };
 
-    loginExtra = ''
+    loginExtra = lib.optionalString osConfig.programs.hyprland.enable ''
       if [ "$(tty)" = /dev/tty1 ] && [ -z "$WAYLAND_DISPLAY" ]; then
         exec start-hyprland
       fi

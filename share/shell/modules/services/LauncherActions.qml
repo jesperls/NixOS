@@ -123,21 +123,21 @@ Singleton {
                 icon: Icons.picker,
                 comment: "Pick a color from the screen",
                 keywords: ["pick", "hex", "eyedropper"],
-                run: () => Quickshell.execDetached(["python3", Paths.script("colorpicker.py")])
+                run: () => ApplicationLauncher.launchCommand(["python3", Paths.script("colorpicker.py")])
             },
             {
                 name: "OCR",
                 icon: Icons.textT,
                 comment: "Copy text from a screen region",
                 keywords: ["text", "tesseract", "read"],
-                run: () => Quickshell.execDetached(["bash", Paths.script("ocr.sh"), root.ocrLangString()])
+                run: () => ApplicationLauncher.launchCommand(["bash", Paths.script("ocr.sh"), root.ocrLangString()])
             },
             {
                 name: "Scan QR Code",
                 icon: Icons.qrCode,
                 comment: "Decode a QR code from the screen",
                 keywords: ["qr", "barcode", "scan"],
-                run: () => Quickshell.execDetached(["bash", Paths.script("qr_scan.sh")])
+                run: () => ApplicationLauncher.launchCommand(["bash", Paths.script("qr_scan.sh")])
             },
             {
                 name: "Google Lens",
@@ -185,27 +185,13 @@ Singleton {
                 keywords: ["dismiss", "clean"],
                 run: () => Notifications.discardAllNotifications()
             },
-            {
-                name: "Profile: Performance",
-                icon: Icons.performance,
-                comment: PowerProfile.currentProfile === "performance" ? "Active power profile" : "Switch power profile",
-                keywords: ["power", "profile", "fast"],
-                run: () => PowerProfile.setProfile("performance")
-            },
-            {
-                name: "Profile: Balanced",
-                icon: Icons.balanced,
-                comment: PowerProfile.currentProfile === "balanced" ? "Active power profile" : "Switch power profile",
-                keywords: ["power", "profile"],
-                run: () => PowerProfile.setProfile("balanced")
-            },
-            {
-                name: "Profile: Power Saver",
-                icon: Icons.powerSave,
-                comment: PowerProfile.currentProfile === "power-saver" ? "Active power profile" : "Switch power profile",
-                keywords: ["power", "profile", "battery", "save"],
-                run: () => PowerProfile.setProfile("power-saver")
-            },
+            ...PowerProfile.availableProfiles.map(profile => ({
+                name: "Profile: " + PowerProfile.getProfileDisplayName(profile),
+                icon: PowerProfile.getProfileIcon(profile),
+                comment: PowerProfile.currentProfile === profile ? "Active power profile" : "Switch power profile",
+                keywords: ["power", "profile", profile, ...(profile === "performance" ? ["fast"] : profile === "power-saver" ? ["battery", "save"] : [])],
+                run: () => PowerProfile.setProfile(profile)
+            })),
             {
                 name: WallpaperSlideshowService.enabled ? "Slideshow: Off" : "Slideshow: On",
                 icon: Icons.wallpapers,

@@ -32,7 +32,8 @@ QtObject {
         }
     }
 
-    property string videosDir: ""
+    property string videosDir: Paths.videosDir + "/Recordings"
+    property bool starting: false
 
     property Process xdgVideosProcess: Process {
         id: xdgVideosProcess
@@ -64,10 +65,10 @@ QtObject {
 
     property Process checkProcess: Process {
         id: checkProcess
-        command: ["bash", "-c", "pgrep -fa gpu-screen-recorder | grep -v \"^$$ \" | grep -v ' -r ' | grep -q ."]
+        command: ["bash", "-c", "pgrep -u \"$(id -u)\" -fa '^([^ ]*/)?\\.?gpu-screen-recorder(-wrapped)?( |$)' | grep -v \"^$$ \" | grep -v ' -r ' | grep -q ."]
         onExited: exitCode => {
             var wasRecording = root.isRecording;
-            root.isRecording = (exitCode === 0);
+            root.isRecording = startProcess.running || (exitCode === 0);
 
             if (root.isRecording && !wasRecording) {
                 console.log("[ScreenRecorder] Detected running instance.");
@@ -83,7 +84,7 @@ QtObject {
 
     property Process timeProcess: Process {
         id: timeProcess
-        command: ["bash", "-c", "pid=$(pgrep -fa gpu-screen-recorder | grep -v \"^$$ \" | grep -v ' -r ' | awk 'NR==1 {print $1}'); if [ -n \"$pid\" ]; then ps -o etime= -p \"$pid\"; fi"]
+        command: ["bash", "-c", "pid=$(pgrep -u \"$(id -u)\" -fa '^([^ ]*/)?\\.?gpu-screen-recorder(-wrapped)?( |$)' | grep -v \"^$$ \" | grep -v ' -r ' | awk 'NR==1 {print $1}'); if [ -n \"$pid\" ]; then ps -o etime= -p \"$pid\"; fi"]
         stdout: StdioCollector {
             onStreamFinished: {
                 root.duration = text.trim();
@@ -100,39 +101,26 @@ QtObject {
     }
 
     function startRecording(recordAudioOutput, recordAudioInput, mode, regionStr) {
-        if (isRecording)
+        if (isRecording || starting)
             return;
+        if (["portal", "screen", "region"].indexOf(mode) === -1)
+            return;
+        root.starting = true;
 
         var outputFile = root.videosDir + "/" + new Date().toISOString().replace(/[:.]/g, "-") + ".mp4";
-        var cmd = "gpu-screen-recorder -f 60";
-
-        if (mode === "portal") {
-            cmd += " -w portal";
-        } else if (mode === "screen") {
-            cmd += " -w screen";
-        } else if (mode === "region") {
-            cmd += " -w region";
-            if (regionStr) {
-                cmd += " -region " + regionStr;
-            }
-        }
+        var cmd = ["gpu-screen-recorder", "-f", "60", "-w", mode];
+        if (mode === "region" && regionStr)
+            cmd.push("-region", regionStr);
 
         var audioSources = [];
         if (recordAudioOutput)
             audioSources.push("default_output");
         if (recordAudioInput)
             audioSources.push("default_input");
-
-        if (audioSources.length === 1) {
-            cmd += " -a " + audioSources[0];
-        } else if (audioSources.length > 1) {
-            cmd += " -a \"" + audioSources.join("|") + "\"";
-        }
-
-        cmd += " -o \"" + outputFile + "\"";
-
-        console.log("[ScreenRecorder] Starting with command: " + cmd);
-        startProcess.command = ["bash", "-c", cmd];
+        if (audioSources.length > 0)
+            cmd.push("-a", audioSources.join("|"));
+        cmd.push("-o", outputFile);
+        startProcess.command = cmd;
 
         prepareProcess.running = true;
     }
@@ -142,12 +130,12 @@ QtObject {
         command: ["mkdir", "-p", root.videosDir]
         onExited: exitCode => {
             if (exitCode !== 0) {
+                root.starting = false;
                 console.warn("[ScreenRecorder] failed to create output dir:", root.videosDir);
                 return;
             }
             notifyStartProcess.running = true;
             startProcess.running = true;
-            root.isRecording = true;
         }
     }
 
@@ -158,7 +146,10 @@ QtObject {
 
     property Process startProcess: Process {
         id: startProcess
-        command: ["bash", "-c", "echo 'Error: Command not set'"]
+        onStarted: {
+            root.starting = false;
+            root.isRecording = true;
+        }
 
         stdout: StdioCollector {
             onStreamFinished: console.log("[ScreenRecorder] OUT: " + text)
@@ -171,9 +162,11 @@ QtObject {
         }
 
         onExited: exitCode => {
+            root.starting = false;
+            root.isRecording = false;
+            root.duration = "";
             console.log("[ScreenRecorder] Exited with code: " + exitCode);
             if (exitCode !== 0 && exitCode !== 130 && exitCode !== 2) {  // 2 = SIGINT
-                root.isRecording = false;
                 notifyErrorProcess.running = true;
             } else {
                 notifySavedProcess.running = true;
@@ -193,6 +186,6 @@ QtObject {
 
     property Process stopProcess: Process {
         id: stopProcess
-        command: ["bash", "-c", "pgrep -fa gpu-screen-recorder | grep -v \"^$$ \" | grep -v ' -r ' | awk '{print $1}' | xargs -r kill -INT"]
+        command: ["bash", "-c", "pgrep -u \"$(id -u)\" -fa '^([^ ]*/)?\\.?gpu-screen-recorder(-wrapped)?( |$)' | grep -v \"^$$ \" | grep -v ' -r ' | awk '{print $1}' | xargs -r kill -INT"]
     }
 }

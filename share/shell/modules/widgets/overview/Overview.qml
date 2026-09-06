@@ -316,7 +316,7 @@ Item {
                     windowData: modelData.windowData
                     toplevel: modelData.toplevel
                     scale: overviewRoot.scale
-                    overviewRoot: overviewRoot
+                    overviewItem: overviewRoot
                     availableWorkspaceWidth: overviewRoot.workspaceImplicitWidth
                     availableWorkspaceHeight: overviewRoot.workspaceImplicitHeight
                     monitorData: overviewRoot.monitorData

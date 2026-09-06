@@ -266,43 +266,6 @@ local function update_gap(mon)
   end
 end
 
-local function work_size(mon)
-  local w, h = mon.width, mon.height
-  if mon.transform % 2 == 1 then
-    w, h = h, w
-  end
-  local reserved = mon.reserved
-  if type(reserved) == "table" then
-    w = w - (reserved.left or 0) - (reserved.right or 0)
-    h = h - (reserved.top or 0) - (reserved.bottom or 0)
-  end
-  return w, h
-end
-
-local last_ratio
-
-local function update_aspect_ratio()
-  local monitors = hl.get_monitors()
-  local target = monitors[1]
-  for i = 2, #monitors do
-    if monitors[i].width < target.width then
-      target = monitors[i]
-    end
-  end
-  if not target then
-    return
-  end
-  local w, h = work_size(target)
-  if w <= 0 or h <= 0 then
-    return
-  end
-  if last_ratio and last_ratio[1] == w and last_ratio[2] == h then
-    return
-  end
-  last_ratio = { w, h }
-  hl.config({ layout = { single_window_aspect_ratio = { w, h } } })
-end
-
 local function prune_session()
   local live_ws = {}
   local live_windows = {}
@@ -326,7 +289,6 @@ local function prune_session()
 end
 
 local function scan()
-  update_aspect_ratio()
   if full_height then
     for _, mon in ipairs(hl.get_monitors()) do
       update_gap(mon)
@@ -647,8 +609,11 @@ hl.layout.register("centered", {
     end
 
     if msg == "equalize" then
-      for id in pairs(weights) do
-        weights[id] = nil
+      if s.master then weights[s.master] = nil end
+      for _, list in ipairs({ s.left, s.right }) do
+        for _, id in ipairs(list) do
+          weights[id] = nil
+        end
       end
       return true
     end

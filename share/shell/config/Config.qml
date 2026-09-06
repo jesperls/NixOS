@@ -16,7 +16,37 @@ Singleton {
 
     readonly property string configDir: Paths.configPath("config")
 
+    property var nixOverridePaths: []
+
+    FileView {
+        path: Quickshell.env("PANGU_NIX_OVERRIDES") || "/dev/null"
+        onLoaded: {
+            try {
+                const paths = JSON.parse(text() || "[]");
+                root.nixOverridePaths = Array.isArray(paths) ? paths.filter(p => typeof p === "string") : [];
+            } catch (error) {
+                root.nixOverridePaths = [];
+            }
+        }
+        onLoadFailed: root.nixOverridePaths = []
+    }
+
     property bool pauseAutoSave: false
+    property var editGroups: ({})
+
+    function beginEdit(group, names) {
+        root.editGroups = Object.assign({}, root.editGroups, {[group]: names.slice()});
+    }
+
+    function endEdit(group) {
+        const groups = Object.assign({}, root.editGroups);
+        delete groups[group];
+        root.editGroups = groups;
+    }
+
+    function isPaused(name) {
+        return root.pauseAutoSave || Object.values(root.editGroups).some(names => names.includes(name));
+    }
 
     readonly property var files: ({
         theme: themeFile,
@@ -53,9 +83,10 @@ Singleton {
     Process {
         command: ["mkdir", "-p", root.configDir]
         running: true
-        onExited: {
+        onExited: exitCode => {
+            if (exitCode !== 0) return;
             for (const name in root.files)
-                root.files[name].reload();
+                root.files[name].reloadConfig();
         }
     }
 
@@ -669,6 +700,7 @@ Singleton {
                 property int minutes: 30
             }
             property JsonObject autoTheme: JsonObject {
+                property bool useSunriseSunset: true
                 property string dayStart: "08:00"
                 property string nightStart: "20:00"
             }

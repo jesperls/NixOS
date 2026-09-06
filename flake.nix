@@ -4,6 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -77,8 +82,20 @@
 
       formatter.${system} = pkgs.nixfmt-tree;
 
-      checks.${system} = lib.mapAttrs' (
-        hostName: host: lib.nameValuePair "${hostName}-system" host.config.system.build.toplevel
-      ) hosts;
+      checks.${system} =
+        lib.mapAttrs' (
+          hostName: host: lib.nameValuePair "${hostName}-system" host.config.system.build.toplevel
+        ) hosts
+        // {
+          shell-settings = import ./tests/shell-settings.nix { inherit lib pkgs; };
+          service-options = import ./tests/service-options.nix {
+            inherit lib pkgs;
+            host = hosts.pangu;
+          };
+          hyprland-lua = pkgs.runCommand "hyprland-lua-check" { nativeBuildInputs = [ pkgs.lua ]; } ''
+            lua ${./tests/hyprland.lua} ${./share/hypr}
+            touch "$out"
+          '';
+        };
     };
 }

@@ -77,7 +77,7 @@ Item {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) {
-                    Quickshell.execDetached(["pavucontrol"]);
+                    ApplicationLauncher.launchCommand(["pavucontrol"]);
                     return;
                 } else if (mouse.button === Qt.LeftButton) {
                     controlsPopup.toggle();

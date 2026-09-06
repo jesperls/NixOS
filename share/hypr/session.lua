@@ -6,7 +6,7 @@ local path = dir .. "/hypr-layout-state.lua"
 
 local M = { data = {} }
 
-local chunk = loadfile(path)
+local chunk = loadfile(path, "t", {})
 if chunk then
   local ok, result = pcall(chunk)
   if ok and type(result) == "table" then
@@ -72,10 +72,13 @@ function M.save()
   if not file then
     return
   end
-  file:write(text)
-  file:close()
-  os.rename(tmp, path)
-  written = text
+  local ok = file:write(text)
+  local closed = file:close()
+  if ok and closed and os.rename(tmp, path) then
+    written = text
+  else
+    os.remove(tmp)
+  end
 end
 
 return M

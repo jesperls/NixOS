@@ -20,7 +20,7 @@ Singleton {
         property var values: []
     }
 
-    readonly property var focusedMonitor: monitors.values.find(m => m.focused) ?? null
+    readonly property var focusedMonitor: root.monitorFor(Hyprland.focusedMonitor)
     readonly property var focusedWorkspace: workspaces.values.find(w => w.active) ?? null
     readonly property var focusedClient: clients.values.find(c => c.is_focused) ?? null
 
@@ -54,7 +54,8 @@ Singleton {
 
         const target = str => {
             const match = str.match(/address:([^\s,]+)/);
-            return `address:${match ? match[1] : str.trim()}`;
+            const address = match ? match[1] : str.trim();
+            return `address:${/^[0-9a-f]+$/i.test(address) ? "0x" + address : address}`;
         };
 
         switch (action) {
@@ -138,6 +139,7 @@ Singleton {
         root.clients.values = Hyprland.toplevels.values.map(toplevel => {
             const raw = toplevel.lastIpcObject ?? {};
             return {
+                nativeToplevel: toplevel,
                 address: raw.address ?? toplevel.address,
                 class: raw.class ?? "",
                 title: raw.title ?? toplevel.title,

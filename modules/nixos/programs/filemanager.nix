@@ -21,7 +21,7 @@ in
       ];
     };
 
-    programs.xfconf.enable = true;
+    environment.systemPackages = [ pkgs.file-roller ];
 
     services.gvfs.enable = true;
     services.tumbler.enable = true;

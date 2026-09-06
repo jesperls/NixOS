@@ -14,15 +14,16 @@
   cava,
   coreutils,
   curl,
-  dbus,
   ddcutil,
   ffmpeg,
   gawk,
   glib,
+  gtk3,
   gnugrep,
   gnused,
   gpu-screen-recorder,
   grim,
+  hypridle,
   imagemagick,
   inetutils,
   jq,
@@ -33,6 +34,7 @@
   matugen,
   mpvpaper,
   networkmanagerapplet,
+  nodejs,
   power-profiles-daemon,
   procps,
   python3,
@@ -47,6 +49,8 @@
   wl-clipboard,
   wlsunset,
   wtype,
+  xvfb-run,
+  xdg-terminal-exec,
   xdg-user-dirs,
   xdg-utils,
   zbar,
@@ -77,6 +81,11 @@ let
     nativeBuildInputs = [
       bash
       python3
+      nodejs
+      quickshell
+      gtk3
+      xvfb-run
+      jq
       qt6.qtdeclarative # qmllint
     ];
 
@@ -87,6 +96,14 @@ let
     doCheck = true;
     checkPhase = ''
       runHook preCheck
+
+      node tests/test_services.js
+      PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+      python3 -m compileall -q scripts
+      find scripts -type d -name __pycache__ -exec rm -rf {} +
+      while IFS= read -r -d $'\0' script; do
+        bash -n "$script"
+      done < <(find . -name '*.sh' -print0)
 
       command -v qmllint >/dev/null || { echo "qmllint not on PATH" >&2; exit 1; }
 
@@ -144,15 +161,16 @@ writeShellApplication {
     cava
     coreutils
     curl
-    dbus # dbus-monitor, used by the loginlock/sleep watchers
     ddcutil
     ffmpeg
     gawk
     glib # gsettings
+    gtk3 # gtk-launch
     gnugrep
     gnused
     (gpu-screen-recorder.override { wrapperDir = "/run/wrappers/bin"; }) # execs the setcap gsr-kms-server for promptless capture
     grim
+    hypridle
     imagemagick
     inetutils # hostname
     jq
@@ -173,10 +191,11 @@ writeShellApplication {
     systemd # systemctl, loginctl
     (tesseract.override { enableLanguages = ocrLanguages; })
     tmux # the dashboard's tmux tab drives real sessions
-    util-linux # setsid, used to detach the wallpaper-engine renderer
+    util-linux # setsid for launching applications
     wl-clipboard
     wlsunset
     wtype
+    xdg-terminal-exec
     xdg-user-dirs
     xdg-utils
     zbar

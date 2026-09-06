@@ -23,6 +23,7 @@ Singleton {
 
     function onPrepareForSleep() {
         console.log("SuspendManager: Preparing for sleep...");
+        wakeReadyTimer.stop();
         root.isSuspending = true;
         root.wakeReady = false;
         root.preparingForSleep();

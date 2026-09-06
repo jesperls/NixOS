@@ -22,6 +22,7 @@ Singleton {
     }
 
     function setProfile(profileName) {
+        if (!root.availableProfiles.includes(profileName)) return;
         switch (profileName) {
         case "power-saver":
             UPower.PowerProfiles.profile = UPower.PowerProfile.PowerSaver;

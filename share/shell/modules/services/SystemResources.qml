@@ -39,15 +39,21 @@ Singleton {
     property int totalDataPoints: 0
 
     property int updateInterval: 2000
+    property bool restarting: false
+    readonly property bool monitorWanted: GlobalStates.dashboardOpen && GlobalStates.dashboardCurrentTab === 2
+        && Config.dashboard.showMetrics !== false && root.validDisks.length > 0
+        && !SuspendManager.isSuspending && SuspendManager.wakeReady
 
     property Process monitorProcess: Process {
         id: monitorProcess
-        running: GlobalStates.dashboardOpen && GlobalStates.dashboardCurrentTab === 2 && Config.dashboard.showMetrics !== false && root.validDisks.length > 0
+        running: root.monitorWanted && !root.restarting
         
         command: {
             let cmd = ["python3", Paths.script("system_monitor.py"), root.updateInterval.toString()];
             return cmd.concat(root.validDisks);
         }
+
+        onExited: if (root.monitorWanted) root.restartMonitor()
         
         stdout: SplitParser {
             onRead: data => {
@@ -105,8 +111,14 @@ Singleton {
     onUpdateIntervalChanged: if (monitorProcess.running) restartMonitor()
 
     function restartMonitor() {
-        monitorProcess.running = false;
-        Qt.callLater(() => { monitorProcess.running = true; });
+        root.restarting = true;
+        restartTimer.restart();
+    }
+
+    Timer {
+        id: restartTimer
+        interval: 1000
+        onTriggered: root.restarting = false
     }
 
     function validateDisks() {

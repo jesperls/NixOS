@@ -39,7 +39,10 @@ Singleton {
         atomicWrites: true
         onLoaded: {
             try {
-                root.state = JSON.parse(text()) || {};
+                const loaded = JSON.parse(text());
+                if (!loaded || typeof loaded !== "object" || Array.isArray(loaded))
+                    throw new Error("Expected a state object");
+                root.state = loaded;
             } catch (e) {
                 console.warn("StateService: discarding unreadable state file:", e);
                 root.state = {};

@@ -11,10 +11,10 @@ Singleton {
 
     readonly property UPowerDevice primaryDevice: UPower.displayDevice
 
-    readonly property bool available: primaryDevice !== null && primaryDevice.type === UPowerDevice.Battery
+    readonly property bool available: primaryDevice !== null && primaryDevice.ready && primaryDevice.type === UPowerDevice.Battery
     readonly property real percentage: available ? (primaryDevice.percentage * 100) : 0
     readonly property bool isCharging: available && primaryDevice.state === UPowerDevice.Charging
-    readonly property bool isPluggedIn: available && (primaryDevice.state === UPowerDevice.Charging || primaryDevice.state === UPowerDevice.FullyCharged)
+    readonly property bool isPluggedIn: available && !UPower.onBattery
     property int lastBatteryAlertThreshold: 0
 
     readonly property string timeToEmpty: available && primaryDevice.timeToEmpty > 0 ? formatTime(primaryDevice.timeToEmpty) : ""
@@ -92,6 +92,10 @@ Singleton {
         target: root
 
         function onPercentageChanged() {
+            root.evaluateBatteryAlert();
+        }
+
+        function onAvailableChanged() {
             root.evaluateBatteryAlert();
         }
 

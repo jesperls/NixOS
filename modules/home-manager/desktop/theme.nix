@@ -91,7 +91,7 @@ in
     gtk-theme = theme.gtk.theme.name;
     cursor-theme = theme.gtk.cursorTheme.name;
     cursor-size = theme.gtk.cursorTheme.size;
-    color-scheme = "prefer-dark";
+    color-scheme = lib.mkIf (!shellPalette) "prefer-dark";
     font-name = "${theme.fonts.sans} ${toString theme.fonts.size}";
     monospace-font-name = "${theme.fonts.monospace} ${toString theme.fonts.size}";
   };

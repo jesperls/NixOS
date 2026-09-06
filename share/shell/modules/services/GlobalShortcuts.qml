@@ -101,7 +101,7 @@ QtObject {
     }
 
     function toggleSimpleModule(moduleName) {
-        if (Visibilities.currentActiveModule === moduleName) {
+        if (Visibilities.isActiveOnFocusedScreen(moduleName)) {
             Visibilities.setActiveModule("");
         } else {
             Visibilities.setActiveModule(moduleName);
@@ -109,7 +109,7 @@ QtObject {
     }
 
     function toggleLauncher() {
-        const isActive = Visibilities.currentActiveModule === "launcher";
+        const isActive = Visibilities.isActiveOnFocusedScreen("launcher");
         if (isActive && GlobalStates.widgetsTabCurrentIndex === 0 && GlobalStates.launcherSearchText === "") {
             Visibilities.setActiveModule("");
         } else {
@@ -123,7 +123,7 @@ QtObject {
     }
 
     function toggleLauncherWithPrefix(tabIndex, prefix) {
-        const isActive = Visibilities.currentActiveModule === "launcher";
+        const isActive = Visibilities.isActiveOnFocusedScreen("launcher");
         const currentTab = GlobalStates.widgetsTabCurrentIndex;
         const currentText = GlobalStates.launcherSearchText;
 
@@ -142,7 +142,7 @@ QtObject {
     }
 
     function toggleDashboardTab(tabIndex) {
-        const isActive = Visibilities.currentActiveModule === "dashboard";
+        const isActive = Visibilities.isActiveOnFocusedScreen("dashboard");
         
         if (tabIndex === 0) {
             if (isActive && GlobalStates.dashboardCurrentTab === 0 && GlobalStates.launcherSearchText === "") {

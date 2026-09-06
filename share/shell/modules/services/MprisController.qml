@@ -23,7 +23,7 @@ Singleton {
         return filtered;
     }
 
-    property var activePlayer: trackedPlayer ? trackedPlayer : (filteredPlayers.length > 0 ? filteredPlayers[0] : null)
+    readonly property var activePlayer: filteredPlayers.includes(trackedPlayer) ? trackedPlayer : (filteredPlayers.find(player => player.isPlaying) ?? filteredPlayers[0] ?? null)
     
     property bool isInitializing: true
     property string cachedDbusName: ""
@@ -59,6 +59,8 @@ Singleton {
     }
 
     onFilteredPlayersChanged: {
+        if (!root.filteredPlayers.includes(root.trackedPlayer))
+            root.trackedPlayer = root.filteredPlayers.find(player => player.isPlaying) ?? root.filteredPlayers[0] ?? null;
         if (root.isInitializing && root.cachedDbusName && root.filteredPlayers.length > 0) {
             for (let i = 0; i < root.filteredPlayers.length; i++) {
                 const player = root.filteredPlayers[i];
@@ -164,35 +166,15 @@ Singleton {
     }
 
     Instantiator {
-        model: Mpris.players
+        model: root.filteredPlayers
 
         Connections {
             required property var modelData
             target: modelData
 
             Component.onCompleted: {
-                const dbusName = (modelData.dbusName || "").toLowerCase();
-                const shouldIgnore = !Config.bar.enableFirefoxPlayer && dbusName.includes("firefox");
-
-                if (!shouldIgnore && (root.trackedPlayer == null || modelData.isPlaying)) {
+                if (!root.trackedPlayer || (modelData.isPlaying && !root.trackedPlayer.isPlaying))
                     root.trackedPlayer = modelData;
-                }
-            }
-
-            Component.onDestruction: {
-                if (root.trackedPlayer === modelData) {
-                    for (let i = 0; i < root.filteredPlayers.length; i++) {
-                        const player = root.filteredPlayers[i];
-                        if (player.isPlaying) {
-                            root.trackedPlayer = player;
-                            break;
-                        }
-                    }
-
-                    if (root.trackedPlayer === modelData) {
-                        root.trackedPlayer = root.filteredPlayers.length > 0 ? root.filteredPlayers[0] : null;
-                    }
-                }
             }
 
             function onPlaybackStateChanged() {

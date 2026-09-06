@@ -50,10 +50,17 @@ Item {
                             }
                         },
                         {
+                            icon: Icons.faders,
+                            tooltip: "Open audio routing",
+                            onClicked: function () {
+                                ApplicationLauncher.launchCommand(["qpwgraph"]);
+                            }
+                        },
+                        {
                             icon: Icons.popOpen,
                             tooltip: "Open PipeWire Volume Control",
                             onClicked: function () {
-                                Quickshell.execDetached(["pavucontrol"]);
+                                ApplicationLauncher.launchCommand(["pavucontrol"]);
                             }
                         }
                     ]

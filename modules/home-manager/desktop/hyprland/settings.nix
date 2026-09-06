@@ -27,9 +27,9 @@ let
           transform
           bitdepth
           cm
-          sdrBrightness
-          sdrSaturation
           ;
+        sdrbrightness = monitor.sdrBrightness;
+        sdrsaturation = monitor.sdrSaturation;
       }
       // lib.optionalAttrs (monitor.vrr != 0) { inherit (monitor) vrr; }
     );

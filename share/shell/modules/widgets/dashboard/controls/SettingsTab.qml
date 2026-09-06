@@ -9,7 +9,6 @@ import qs.modules.components
 import qs.modules.services
 import qs.config
 import qs.modules.globals
-import "SettingsCrawler.js" as SettingsCrawler
 
 Rectangle {
     id: root
@@ -18,42 +17,16 @@ Rectangle {
     implicitHeight: 300
 
     property string currentSection: "network"
-    property int selectedIndex: GlobalStates.settingsCurrentTab
+    property int selectedIndex: 0
     property string searchQuery: ""
 
     onFilteredSectionsChanged: {
-        if (searchQuery.length > 0) {
+        if (searchQuery.trim().length > 0 || selectedIndex >= filteredSections.length)
             selectedIndex = 0;
-        } else if (selectedIndex >= filteredSections.length) {
-            selectedIndex = 0;
-        }
+        Qt.callLater(root.activateSelection);
     }
 
-    Timer {
-        id: focusRestoreTimer
-        interval: 50
-        onTriggered: searchInput.focusInput()
-    }
-
-    onSelectedIndexChanged: {
-        GlobalStates.settingsCurrentTab = selectedIndex;
-        if (filteredSections && selectedIndex >= 0 && selectedIndex < filteredSections.length) {
-            const item = filteredSections[selectedIndex];
-            root.currentSection = item.section;
-            root.dispatchSubSection(item.section, item.subSection);
-            root.scrollSidebarToSelection();
-            focusRestoreTimer.restart();
-        }
-    }
-
-    Connections {
-        target: GlobalStates
-        function onSettingsCurrentTabChanged() {
-            if (root.selectedIndex !== GlobalStates.settingsCurrentTab) {
-                root.selectedIndex = GlobalStates.settingsCurrentTab;
-            }
-        }
-    }
+    onSelectedIndexChanged: Qt.callLater(root.activateSelection)
 
     function focusSearchInput() {
         searchInput.focusInput();
@@ -63,69 +36,21 @@ Rectangle {
         id: searchIndex
     }
 
-    Item {
-        id: settingsIndexer
-        visible: false
-
-        property int currentPanelIndex: 0
-        property var aggregatedItems: []
-        property bool isIndexing: false
-
-        Loader {
-            id: indexerLoader
-            active: settingsIndexer.isIndexing
-            asynchronous: true
-            source: settingsIndexer.isIndexing && settingsIndexer.currentPanelIndex < contentArea.panelComponents.length ? contentArea.panelComponents[settingsIndexer.currentPanelIndex].component : ""
-
-            onStatusChanged: {
-                if (status === Loader.Ready && item) {
-                    const sectionId = contentArea.panelComponents[settingsIndexer.currentPanelIndex].section;
-                    const newItems = SettingsCrawler.crawl(item, sectionId);
-                    settingsIndexer.aggregatedItems = settingsIndexer.aggregatedItems.concat(newItems);
-
-                    settingsIndexer.currentPanelIndex++;
-                } else if (status === Loader.Error) {
-                    console.warn("Failed to load panel for indexing:", source);
-                    settingsIndexer.currentPanelIndex++;
-                }
-            }
-        }
-
-        onCurrentPanelIndexChanged: {
-            if (currentPanelIndex >= contentArea.panelComponents.length) {
-                if (isIndexing) {
-                    isIndexing = false;
-                    searchIndex.addDynamicItems(aggregatedItems);
-                }
-            }
-        }
-
-        Component.onCompleted: {
-            indexingTimer.start();
-        }
-
-        Timer {
-            id: indexingTimer
-            interval: 500
-            onTriggered: {
-                settingsIndexer.isIndexing = true;
-            }
-        }
-    }
-
     property string pendingSubSection: ""
 
-    function dispatchSubSection(sectionId, subSectionId) {
-        if (!subSectionId || subSectionId === "")
-            return;
+    function activateSelection() {
+        const entry = filteredSections[selectedIndex];
+        if (!entry) return;
+        pendingSubSection = entry.subSection || "";
+        currentSection = entry.section;
+        if (panelLoader.status === Loader.Ready && panelLoader.loadedSection === currentSection)
+            applySubSection();
+        scrollSidebarToSelection();
+    }
 
-        if (["theme", "system", "compositor", "shell"].includes(sectionId)) {
-            if (panelLoader.item && panelLoader.status === Loader.Ready) {
-                panelLoader.item.currentSection = subSectionId;
-            } else {
-                pendingSubSection = subSectionId;
-            }
-        }
+    function applySubSection() {
+        if (panelLoader.item && panelLoader.item.currentSection !== undefined)
+            panelLoader.item.currentSection = pendingSubSection;
     }
 
     function scrollSidebarToSelection() {
@@ -141,22 +66,6 @@ Rectangle {
         } else if (itemY + tabHeight > sidebarFlickable.contentY + sidebarFlickable.height) {
             sidebarFlickable.contentY = itemY + tabHeight - sidebarFlickable.height;
         }
-    }
-
-    function fuzzyMatch(query, target) {
-        if (query.length === 0)
-            return true;
-        if (target.length === 0)
-            return false;
-        const lowerQuery = query.toLowerCase();
-        const lowerTarget = target.toLowerCase();
-        let queryIndex = 0;
-        for (let i = 0; i < lowerTarget.length && queryIndex < lowerQuery.length; i++) {
-            if (lowerTarget[i] === lowerQuery[queryIndex]) {
-                queryIndex++;
-            }
-        }
-        return queryIndex === lowerQuery.length;
     }
 
     function fuzzyScore(query, target) {
@@ -237,13 +146,19 @@ Rectangle {
     ]
 
     readonly property var filteredSections: {
-        if (searchQuery.length === 0)
+        const query = searchQuery.trim().toLowerCase();
+        if (!query)
             return sectionModel;
 
-        const query = searchQuery.toLowerCase();
-        return searchIndex.items.filter(item => {
-            return fuzzyMatch(query, item.label) || (item.keywords && item.keywords.includes(query));
-        }).map(item => {
+        const words = query.split(/\s+/);
+        return searchIndex.items.map(item => {
+            const context = [item.label, item.keywords || "", item.subLabel || ""].join(" ").toLowerCase();
+            let score = fuzzyScore(query, item.label);
+            for (const word of words) {
+                const labelScore = fuzzyScore(word, item.label);
+                if (labelScore < 0 && !context.includes(word)) return null;
+                score += Math.max(0, labelScore);
+            }
             const sectionMeta = sectionModel.find(s => s.section === item.section) || {};
             return {
                 label: item.label,
@@ -252,9 +167,9 @@ Rectangle {
                 subLabel: item.subLabel || "",
                 icon: sectionMeta.icon || item.icon,
                 isIcon: sectionMeta.isIcon !== undefined ? sectionMeta.isIcon : (item.isIcon !== undefined ? item.isIcon : true),
-                score: fuzzyScore(query, item.label)
+                score: score
             };
-        }).sort((a, b) => b.score - a.score);
+        }).filter(item => item !== null).sort((a, b) => b.score - a.score);
     }
 
     RowLayout {
@@ -281,13 +196,7 @@ Rectangle {
                     root.forceActiveFocus();
                 }
 
-                onAccepted: {
-                    if (root.filteredSections.length > 0) {
-                        const item = root.filteredSections[root.selectedIndex];
-                        root.currentSection = item.section;
-                        root.dispatchSubSection(item.section, item.subSection);
-                    }
-                }
+                onAccepted: root.activateSelection()
 
                 onDownPressed: {
                     if (root.selectedIndex < root.filteredSections.length - 1) {
@@ -460,7 +369,7 @@ Rectangle {
 
                                 onClicked: {
                                     root.selectedIndex = index;
-                                    root.dispatchSubSection(sidebarButton.modelData.section, sidebarButton.modelData.subSection);
+                                    root.activateSelection();
                                 }
                             }
                         }
@@ -508,27 +417,77 @@ Rectangle {
                 },
                 {
                     component: "ThemePanel.qml",
-                    section: "theme"
+                    section: "theme",
+                    configPrefixes: ["theme"]
                 },
                 {
                     component: "SystemPanel.qml",
-                    section: "system"
+                    section: "system",
+                    configPrefixes: ["system", "prefix", "performance", "weather"]
                 },
                 {
                     component: "CompositorPanel.qml",
-                    section: "compositor"
+                    section: "compositor",
+                    configPrefixes: ["compositor"]
                 },
                 {
                     component: "ShellPanel.qml",
-                    section: "shell"
+                    section: "shell",
+                    configPrefixes: ["bar", "dashboard", "dock", "launcher", "lockscreen", "notch", "osd", "overview", "workspaces", "system.ocr"]
                 }
             ]
 
+            readonly property var currentPanel: panelComponents.find(p => p.section === root.currentSection)
+            readonly property var visibleOverrides: {
+                const prefixes = currentPanel?.configPrefixes ?? [];
+                return Config.nixOverridePaths.filter(path => prefixes.some(prefix =>
+                    path === prefix || path.startsWith(prefix + ".")));
+            }
+
+            ScrollView {
+                id: overrideNotice
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: visible ? Math.min(120, overrideText.implicitHeight + 16) : 0
+                visible: root.filteredSections.length > 0 && contentArea.visibleOverrides.length > 0
+                clip: true
+
+                Text {
+                    id: overrideText
+                    width: overrideNotice.availableWidth
+                    padding: 8
+                    textFormat: Text.PlainText
+                    wrapMode: Text.Wrap
+                    font.family: Config.theme.font
+                    color: Colors.overBackground
+                    text: "Nix restores these settings when the shell restarts. Changes here are temporary:\n"
+                        + contentArea.visibleOverrides.join(", ")
+                }
+            }
+
+            Text {
+                anchors.centerIn: parent
+                width: Math.min(parent.width - 32, 400)
+                visible: root.filteredSections.length === 0
+                text: "No matching settings. Try a shorter search or another word."
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+                font.family: Config.theme.font
+                font.pixelSize: Config.theme.fontSize
+                color: Colors.overSurfaceVariant
+            }
+
             Loader {
                 id: panelLoader
-                anchors.fill: parent
+                property string loadedSection: ""
+                anchors.top: overrideNotice.bottom
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
                 asynchronous: true
-                source: contentArea.panelComponents.find(p => p.section === root.currentSection)?.component ?? ""
+                visible: root.filteredSections.length > 0
+                source: contentArea.currentPanel?.component ?? ""
 
                 opacity: status === Loader.Ready ? 1 : 0
                 Behavior on opacity {
@@ -542,10 +501,8 @@ Rectangle {
                 onLoaded: {
                     if (item) {
                         item.maxContentWidth = contentArea.maxContentWidth;
-                        if (root.pendingSubSection !== "" && item.currentSection !== undefined) {
-                            item.currentSection = root.pendingSubSection;
-                            root.pendingSubSection = "";
-                        }
+                        loadedSection = root.currentSection;
+                        root.applySubSection();
                     }
                 }
             }

@@ -20,7 +20,10 @@
           "hyprland"
           "gtk"
         ];
-        "org.freedesktop.impl.portal.OpenURI" = [
+        "org.freedesktop.impl.portal.AppChooser" = [
+          "gtk"
+        ];
+        "org.freedesktop.impl.portal.FileChooser" = [
           "gtk"
         ];
       };

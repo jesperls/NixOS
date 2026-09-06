@@ -6,8 +6,28 @@ import qs.config
 QtObject {
     id: root
 
+    readonly property string colorScheme: Config.theme.lightMode ? "prefer-light" : "prefer-dark"
+    property string appliedColorScheme: ""
+
+    function syncColorScheme() {
+        if (schemeProcess.running || root.appliedColorScheme === root.colorScheme) return;
+        schemeProcess.scheme = root.colorScheme;
+        schemeProcess.running = true;
+    }
+
+    property Process schemeProcess: Process {
+        property string scheme
+        command: ["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", scheme]
+        onExited: code => {
+            if (code === 0) root.appliedColorScheme = scheme;
+            else console.warn("Could not update desktop color scheme:", code);
+            if (scheme !== root.colorScheme) Qt.callLater(root.syncColorScheme);
+        }
+    }
+
     function generate(Colors) {
         if (!Colors) return
+        root.syncColorScheme();
 
         const fmt = (c) => c.toString()
         const toRgba = (c, a) => `rgba(${Math.round(c.r * 255)}, ${Math.round(c.g * 255)}, ${Math.round(c.b * 255)}, ${a})`
@@ -41,40 +61,33 @@ QtObject {
         css += `@define-color sidebar_border_color @window_bg_color;\n`
         css += `@define-color sidebar_backdrop_color @window_bg_color;\n`
 
-        const home = Paths.home
-        const gtk3Dir = home + "/.config/gtk-3.0"
-        const gtk4Dir = home + "/.config/gtk-4.0"
-
-        writer.text = css
-        
-        const cmd = `
-            mkdir -p "${gtk3Dir}" "${gtk4Dir}" && \\
-            echo "${css}" | tee "${gtk3Dir}/gtk.css" "${gtk4Dir}/gtk.css" > /dev/null && \\
-            CUR=$(gsettings get org.gnome.desktop.interface gtk-theme | tr -d "'"); \\
-            [ -n "$CUR" ] || CUR=adw-gtk3; \\
-            gsettings set org.gnome.desktop.interface gtk-theme "" && \\
-            gsettings set org.gnome.desktop.interface gtk-theme "$CUR"
-        `
-        
-        writerProcess.command = ["sh", "-c", cmd]
-        writerProcess.running = true
+        gtk3File.write(css);
+        gtk4File.write(css);
     }
 
-    property QtObject writer: QtObject {
-        id: writer
-        property string text
+    property ThemeFile gtk3File: ThemeFile {
+        id: gtk3File
+        path: Paths.configHome + "/gtk-3.0/gtk.css"
+        onWritten: Qt.callLater(root.reloadApplications)
     }
 
-    property Process writerProcess: Process {
-        id: writerProcess
-        running: false
-        stdout: StdioCollector {
-            onStreamFinished: console.log("GtkGenerator: Colors generated.")
-        }
-        stderr: StdioCollector {
-            onStreamFinished: (err) => {
-                if (err) console.error("GtkGenerator Error:", err)
-            }
-        }
+    property ThemeFile gtk4File: ThemeFile {
+        id: gtk4File
+        path: Paths.configHome + "/gtk-4.0/gtk.css"
+        onWritten: Qt.callLater(root.reloadApplications)
+    }
+
+    property bool reloadPending: false
+
+    function reloadApplications() {
+        if ([gtk3File, gtk4File].some(file => file.saving || file.savedText === null || (file.pendingText !== null && file.pendingText !== file.savedText)))
+            return;
+        reloadPending = reloadProcess.running;
+        if (!reloadPending) reloadProcess.running = true;
+    }
+
+    property Process reloadProcess: Process {
+        onExited: if (root.reloadPending) Qt.callLater(root.reloadApplications)
+        command: ["bash", "-c", "theme=$(gsettings get org.gnome.desktop.interface gtk-theme); gsettings set org.gnome.desktop.interface gtk-theme \"''\" && gsettings set org.gnome.desktop.interface gtk-theme \"$theme\""]
     }
 }

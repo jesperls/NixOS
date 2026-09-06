@@ -31,18 +31,25 @@ CREATE VIRTUAL TABLE IF NOT EXISTS clipboard_fts USING fts5(
     content_rowid=id
 );
 
--- Triggers to keep FTS table in sync
+DROP TRIGGER IF EXISTS clipboard_items_ai;
+DROP TRIGGER IF EXISTS clipboard_items_ad;
+DROP TRIGGER IF EXISTS clipboard_items_au;
+
+UPDATE clipboard_items SET preview = CAST(preview AS TEXT), full_content = CAST(full_content AS TEXT)
+WHERE typeof(preview) = 'blob' OR typeof(full_content) = 'blob';
 CREATE TRIGGER IF NOT EXISTS clipboard_items_ai AFTER INSERT ON clipboard_items BEGIN
     INSERT INTO clipboard_fts(rowid, preview, full_content)
     VALUES (new.id, new.preview, new.full_content);
 END;
 
 CREATE TRIGGER IF NOT EXISTS clipboard_items_ad AFTER DELETE ON clipboard_items BEGIN
-    DELETE FROM clipboard_fts WHERE rowid = old.id;
+    INSERT INTO clipboard_fts(clipboard_fts, rowid, preview, full_content)
+    VALUES ('delete', old.id, old.preview, old.full_content);
 END;
 
-CREATE TRIGGER IF NOT EXISTS clipboard_items_au AFTER UPDATE ON clipboard_items BEGIN
-    DELETE FROM clipboard_fts WHERE rowid = old.id;
+CREATE TRIGGER IF NOT EXISTS clipboard_items_au AFTER UPDATE OF preview, full_content ON clipboard_items BEGIN
+    INSERT INTO clipboard_fts(clipboard_fts, rowid, preview, full_content)
+    VALUES ('delete', old.id, old.preview, old.full_content);
     INSERT INTO clipboard_fts(rowid, preview, full_content)
     VALUES (new.id, new.preview, new.full_content);
 END;

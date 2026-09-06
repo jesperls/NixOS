@@ -9,7 +9,10 @@ Singleton {
     id: root
 
     readonly property var wifiDevice: (Networking.devices.values ?? []).find(d => d.type === DeviceType.Wifi) ?? null
-    readonly property var wiredDevice: (Networking.devices.values ?? []).find(d => d.type === DeviceType.Wired) ?? null
+    readonly property var wiredDevice: {
+        const devices = (Networking.devices.values ?? []).filter(d => d.type === DeviceType.Wired);
+        return devices.find(d => d.connected) ?? devices[0] ?? null;
+    }
 
     readonly property bool wifiEnabled: Networking.wifiEnabled
     readonly property bool ethernet: wiredDevice?.connected ?? false
@@ -32,6 +35,19 @@ Singleton {
     readonly property int networkStrength: active?.strength ?? 0
 
     property bool wifiScanning: false
+    property var scanClients: []
+
+    function setScanClient(client, enabled) {
+        const clients = root.scanClients.filter(entry => entry !== client);
+        root.scanClients = enabled ? clients.concat([client]) : clients;
+    }
+
+    Binding {
+        target: root.wifiDevice
+        property: "scannerEnabled"
+        value: root.scanClients.length > 0 && root.wifiEnabled && !SuspendManager.isSuspending
+        when: root.wifiDevice !== null
+    }
     property list<var> friendlyWifiNetworks: []
     property var active: null
 
@@ -113,7 +129,6 @@ Singleton {
     function rescanWifi(): void {
         if (!wifiDevice || !wifiEnabled)
             return;
-        wifiDevice.scannerEnabled = true;
         wifiScanning = true;
         scanPulse.restart();
         updateFriendlyList();
@@ -142,6 +157,6 @@ Singleton {
     }
 
     function openPublicWifiPortal() {
-        Quickshell.execDetached(["xdg-open", "https://nmcheck.gnome.org/"]);
+        ApplicationLauncher.launchCommand(["xdg-open", "https://nmcheck.gnome.org/"]);
     }
 }

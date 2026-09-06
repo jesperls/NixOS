@@ -82,18 +82,21 @@ local function poll()
     return
   end
 
+  local chunk = load(text, "@" .. path, "t", {})
+  if not chunk then
+    return
+  end
+  local ok, result = pcall(chunk)
+  if not ok or type(result) ~= "table" then
+    return
+  end
+
   local desired = {}
-  local chunk = loadfile(path)
-  if chunk then
-    local ok, result = pcall(chunk)
-    if ok and type(result) == "table" then
-      for _, id in ipairs(result) do
-        desired[id] = true
-      end
-    else
-      -- File is mid-write or malformed; keep the current rules and retry.
+  for key, id in pairs(result) do
+    if type(key) ~= "number" or type(id) ~= "number" or id <= 0 or id % 1 ~= 0 then
       return
     end
+    desired[id] = true
   end
 
   last_text = text

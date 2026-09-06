@@ -182,36 +182,17 @@ QtObject {
         ini += "inactiveBlend=161,169,177\n"
         ini += `inactiveForeground=${inactive}\n`
 
-        const home = Paths.home
-        const qt5Dir = home + "/.config/qt5ct/colors"
-        const qt6Dir = home + "/.config/qt6ct/colors"
-
-        writer.text = ini
-        
-        const cmd = `
-            mkdir -p "${qt5Dir}" "${qt6Dir}" && \\
-            echo "${ini}" | tee "${qt5Dir}/pangu.colors" "${qt6Dir}/pangu.colors" > /dev/null
-        `
-        
-        writerProcess.command = ["sh", "-c", cmd]
-        writerProcess.running = true
-    }
-    
-    property QtObject writer: QtObject {
-        id: writer
-        property string text
+        qt5File.write(ini);
+        qt6File.write(ini);
     }
 
-    property Process writerProcess: Process {
-        id: writerProcess
-        running: false
-        stdout: StdioCollector {
-            onStreamFinished: console.log("QtCtGenerator: Colors generated.")
-        }
-        stderr: StdioCollector {
-            onStreamFinished: (err) => {
-                if (err) console.error("QtCtGenerator Error:", err)
-            }
-        }
+    property ThemeFile qt5File: ThemeFile {
+        id: qt5File
+        path: Paths.configHome + "/qt5ct/colors/pangu.colors"
+    }
+
+    property ThemeFile qt6File: ThemeFile {
+        id: qt6File
+        path: Paths.configHome + "/qt6ct/colors/pangu.colors"
     }
 }

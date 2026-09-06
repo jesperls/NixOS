@@ -26,10 +26,6 @@ QtObject {
 
             console.log("PywalGenerator: Using wallpaper:", image)
 
-            const escape = (str) => {
-                if (!str) return ""
-                return str.toString().replace(/[\\`$"]/g, (m) => "\\" + m)
-            }
             
             const darken = (c, percent) => {
                 try {
@@ -106,37 +102,53 @@ QtObject {
             shContent += `color14="${fmt(Colors.primaryFixed)}"\n`
             shContent += `color15="${fmt(Colors.overSurface)}"\n`
 
-            const home = Paths.home
-            const walDir = home + "/.cache/wal"
-
-            const cmd = `
-                mkdir -p "${walDir}"
-                echo "${escape(colorsContent)}" > "${walDir}/colors"
-                echo "${escape(jsonContent)}" > "${walDir}/colors.json"
-                echo "${escape(shContent)}" > "${walDir}/colors.sh"
-                echo "${escape(image)}" > "${walDir}/wal"
-                command -v pywalfox >/dev/null 2>&1 && pywalfox update &
-                command -v walogram >/dev/null 2>&1 && walogram -B > /dev/null 2>&1 &
-            `
-            
-            writerProcess.command = ["sh", "-c", cmd]
-            writerProcess.running = true
-            
+            colorsFile.write(colorsContent);
+            jsonFile.write(jsonContent);
+            shellFile.write(shContent);
+            imageFile.write(image);
         } catch (e) {
             console.error("PywalGenerator: Critical error in generate:", e)
         }
     }
 
-    property Process writerProcess: Process {
-        id: writerProcess
-        running: false
-        stdout: StdioCollector {
-            onStreamFinished: console.log("PywalGenerator: Colors generated.")
-        }
-        stderr: StdioCollector {
-            onStreamFinished: (err) => {
-                if (err) console.error("PywalGenerator Error:", err)
-            }
-        }
+    property ThemeFile colorsFile: ThemeFile {
+        id: colorsFile
+        path: Paths.cacheHome + "/wal/colors"
+        onWritten: Qt.callLater(root.reloadApplications)
+    }
+
+    property ThemeFile jsonFile: ThemeFile {
+        id: jsonFile
+        path: Paths.cacheHome + "/wal/colors.json"
+        onWritten: Qt.callLater(root.reloadApplications)
+    }
+
+    property ThemeFile shellFile: ThemeFile {
+        id: shellFile
+        path: Paths.cacheHome + "/wal/colors.sh"
+        onWritten: Qt.callLater(root.reloadApplications)
+    }
+
+    property ThemeFile imageFile: ThemeFile {
+        id: imageFile
+        path: Paths.cacheHome + "/wal/wal"
+        onWritten: Qt.callLater(root.reloadApplications)
+    }
+
+    property bool reloadPending: false
+
+    function reloadApplications() {
+        const files = [colorsFile, jsonFile, shellFile, imageFile];
+        if (files.some(file => file.saving || file.savedText === null || (file.pendingText !== null && file.pendingText !== file.savedText)))
+            return;
+        reloadPending = reloadProcess.running;
+        if (!reloadPending) reloadProcess.running = true;
+    }
+
+    property Process reloadProcess: Process {
+        onExited: if (root.reloadPending) Qt.callLater(root.reloadApplications)
+        command: ["bash", "-c", "if command -v pywalfox >/dev/null; then pywalfox update; fi; if command -v walogram >/dev/null; then walogram -B; fi"]
+        stdout: StdioCollector {}
+        stderr: StdioCollector { onStreamFinished: if (text.trim()) console.warn(text.trim()) }
     }
 }

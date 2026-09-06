@@ -5,6 +5,11 @@ local primary = require("pangu.primary")
 
 local cycle = state.layouts.cycle
 
+local allowed = {}
+for _, target in ipairs(cycle) do
+  allowed[target] = true
+end
+
 local modes = session.table("layout_modes")
 
 local rules = {}
@@ -28,8 +33,11 @@ local function apply(id, target)
 end
 
 for id, target in pairs(modes) do
-  if target ~= "lua:centered" or primary.workspace_id(id) then
+  if type(id) == "number" and id > 0 and id % 1 == 0 and allowed[target]
+    and (target ~= "lua:centered" or primary.workspace_id(id)) then
     apply(id, target)
+  else
+    modes[id] = nil
   end
 end
 
@@ -46,7 +54,7 @@ local M = {}
 
 function M.set(target)
   local workspace = hl.get_active_workspace()
-  if not workspace or workspace.special or workspace.tiled_layout == target then
+  if not allowed[target] or not workspace or workspace.special or workspace.tiled_layout == target then
     return
   end
 
@@ -70,7 +78,14 @@ function M.toggle()
   if not workspace or workspace.special then
     return
   end
-  M.set(next_layout(workspace.tiled_layout))
+  local target = workspace.tiled_layout
+  for _ = 1, #cycle do
+    target = next_layout(target)
+    if target ~= "lua:centered" or primary.workspace(workspace) then
+      M.set(target)
+      return
+    end
+  end
 end
 
 return M

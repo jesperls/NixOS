@@ -8,8 +8,9 @@ import re
 
 
 class SystemMonitor:
-    def __init__(self, disks=[]):
-        self.prev_cpu_total = 0
+    def __init__(self, disks=None):
+        disks = disks if disks is not None else []
+        self.prev_cpu_total = None
         self.prev_cpu_idle = 0
         self.monitored_disks = disks
         self.cpu_model = self._detect_cpu_model()
@@ -100,23 +101,13 @@ class SystemMonitor:
         for mount in disks:
             types[mount] = "unknown"
             try:
-                with open("/proc/mounts", "r") as f:
-                    for line in f:
-                        parts = line.split()
-                        if parts[1] == mount:
-                            dev = parts[0]
-                            if dev.startswith("/dev/"):
-                                base = re.sub(
-                                    r"p?[0-9]*$", "", dev.replace("/dev/", "")
-                                )
-                                rota_path = f"/sys/block/{base}/queue/rotational"
-                                if os.path.exists(rota_path):
-                                    with open(rota_path, "r") as f2:
-                                        types[mount] = (
-                                            "hdd" if f2.read().strip() == "1" else "ssd"
-                                        )
-                            break
-            except:
+                device = os.stat(mount).st_dev
+                block = os.path.realpath(f"/sys/dev/block/{os.major(device)}:{os.minor(device)}")
+                if os.path.exists(os.path.join(block, "partition")):
+                    block = os.path.dirname(block)
+                with open(os.path.join(block, "queue", "rotational")) as file:
+                    types[mount] = "hdd" if file.read().strip() == "1" else "ssd"
+            except OSError:
                 pass
         return types
 
@@ -128,12 +119,15 @@ class SystemMonitor:
                     return 0.0
                 values = [int(x) for x in line.split()[1:]]
                 idle = values[3] + values[4]
-                total = sum(values)
+                total = sum(values[:8])  # guest time is already included in user/nice.
+                if self.prev_cpu_total is None:
+                    self.prev_cpu_total, self.prev_cpu_idle = total, idle
+                    return 0.0
                 diff_idle = idle - self.prev_cpu_idle
                 diff_total = total - self.prev_cpu_total
                 self.prev_cpu_total = total
                 self.prev_cpu_idle = idle
-                if diff_total == 0:
+                if diff_total <= 0:
                     return 0.0
                 return max(
                     0.0, min(100.0, ((diff_total - diff_idle) * 100.0) / diff_total)
@@ -226,7 +220,9 @@ class SystemMonitor:
                                     gpu["pci_id"],
                                     "--query-gpu=utilization.gpu,temperature.gpu",
                                     "--format=csv,noheader,nounits",
-                                ]
+                                ],
+                                timeout=2,
+                                stderr=subprocess.DEVNULL
                             )
                             .decode("utf-8")
                             .strip()

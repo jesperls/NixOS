@@ -129,7 +129,7 @@
       };
       centered = {
         masterWidth = lib.mkOption {
-          type = lib.types.numbers.between 0.0 1.0;
+          type = lib.types.addCheck lib.types.number (value: value > 0 && value < 1);
           default = 0.50;
           description = "Fraction of the workspace width the fixed centered master column occupies.";
         };
@@ -139,7 +139,9 @@
           description = "Make the centered master span the full monitor height at a fixed aspect ratio, extending over the bar's reserved area. The bar is expected to split around it (Pangu listens for the centergap event).";
         };
         fullHeightAspect = lib.mkOption {
-          type = lib.types.listOf lib.types.int;
+          type = lib.types.addCheck (lib.types.listOf lib.types.ints.positive) (
+            value: builtins.length value == 2
+          );
           default = [
             16
             9

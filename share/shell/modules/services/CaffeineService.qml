@@ -2,13 +2,17 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
-// Gating IdleService is the whole of it: Wayland's inhibitor protocol is
-// per-surface and cannot express a global toggle.
 Singleton {
     id: root
 
     property bool inhibit: false
+
+    Process {
+        command: ["systemd-inhibit", "--what=idle", "--who=Pangu", "--why=Caffeine enabled", "--mode=block", "sleep", "infinity"]
+        running: root.inhibit
+    }
 
     function toggleInhibit() {
         root.inhibit = !root.inhibit;

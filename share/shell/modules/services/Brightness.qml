@@ -12,9 +12,20 @@ Singleton {
     signal brightnessChanged(real value, var screen)
 
     property var ddcMonitors: []
-    readonly property list<BrightnessMonitor> monitors: Quickshell.screens.map(screen => monitorComp.createObject(root, {
-            screen
-        }))
+    property list<BrightnessMonitor> monitors: []
+
+    function syncMonitors() {
+        const previous = root.monitors.slice();
+        root.monitors = Quickshell.screens.map(screen => previous.find(monitor => monitor.screen === screen)
+            || monitorComp.createObject(root, {screen}));
+        previous.filter(monitor => root.monitors.indexOf(monitor) === -1).forEach(monitor => monitor.destroy());
+    }
+
+    Component.onCompleted: syncMonitors()
+    Connections {
+        target: Quickshell
+        function onScreensChanged() { root.syncMonitors(); }
+    }
 
     property bool syncBrightness: StateService.get("syncBrightness", false)
 
@@ -88,6 +99,8 @@ Singleton {
     Process {
         id: ddcProc
 
+        property var found: []
+        onStarted: found = []
         command: ["ddcutil", "detect", "--brief"]
         stdout: SplitParser {
             splitMarker: "\n\n"
@@ -123,17 +136,12 @@ Singleton {
                         model = `${manufacturer} ${model}`;
                 }
 
-                root.ddcMonitors.push({
-                    model,
-                    busNum
-                });
+                const connectorLine = lines.find(line => line.startsWith("DRM connector:")) || "";
+                const connector = connectorLine.match(/card\d+-(.+)$/)?.[1] || "";
+                ddcProc.found.push({model, busNum, connector});
             }
         }
-        onExited: root.ddcMonitorsChanged()
-    }
-
-    Process {
-        id: setProc
+        onExited: code => root.ddcMonitors = code === 0 ? found : []
     }
 
     component BrightnessMonitor: QtObject {
@@ -152,6 +160,9 @@ Singleton {
                 if (mon && mon.ddcEntry && mon.ddcEntry.busNum && !usedBuses.includes(mon.ddcEntry.busNum))
                     usedBuses.push(mon.ddcEntry.busNum);
             }
+
+            const connectorMatch = root.ddcMonitors.find(entry => entry.connector === screen.name && !usedBuses.includes(entry.busNum));
+            if (connectorMatch) return connectorMatch;
 
             const screenModel = screen && screen.model ? screen.model.toLowerCase() : "";
             if (screenModel) {
@@ -229,15 +240,30 @@ Singleton {
             }
         }
 
+        property bool writePending: false
+        readonly property Process setProc: Process {
+            onExited: {
+                if (monitor.writePending) {
+                    monitor.writePending = false;
+                    monitor.syncBrightness();
+                }
+            }
+        }
+
         function syncBrightness() {
-            if (isDdc && !busNum)
+            if (!ready || (isDdc && !busNum))
                 return;
+            if (setProc.running) {
+                writePending = true;
+                return;
+            }
             const rounded = Math.round(monitor.brightness * monitor.rawMaxBrightness);
             setProc.command = isDdc ? ["ddcutil", "-b", busNum, "setvcp", "10", rounded] : ["brightnessctl", "--class", "backlight", "s", rounded, "--quiet"];
-            setProc.startDetached();
+            setProc.running = true;
         }
 
         function setBrightness(value: real): void {
+            if (!ready || !Number.isFinite(value)) return;
             value = Math.max(0.01, Math.min(1, value));
             monitor.brightness = value;
             setTimer.restart();

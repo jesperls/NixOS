@@ -27,10 +27,10 @@ Singleton {
     onShouldRunChanged: {
         if (shouldRun) {
             retried = false;
-            if (available) {
-                cavaProc.running = true;
-            }
+            available = true;
+            cavaProc.running = true;
         } else {
+            retryTimer.stop();
             cavaProc.running = false;
             values = [];
         }
@@ -55,14 +55,20 @@ Singleton {
 
         onExited: (exitCode, exitStatus) => {
             root.values = [];
-            if (exitCode === 0 || !root.shouldRun)
+            if (!root.shouldRun)
                 return;
             if (root.retried) {
                 root.available = false;
             } else {
                 root.retried = true;
-                cavaProc.running = true;
+                retryTimer.restart();
             }
         }
+    }
+
+    Timer {
+        id: retryTimer
+        interval: 1000
+        onTriggered: if (root.shouldRun && root.available) cavaProc.running = true
     }
 }

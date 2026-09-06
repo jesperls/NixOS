@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import Quickshell.Widgets
 import qs.modules.theme
 import qs.modules.components
@@ -20,15 +19,14 @@ Item {
 
     property int leftPanelWidth: 0
 
-    property string notesDir: Paths.notesDir
-    property string indexPath: notesDir + "/index.json"
-    property string notesPath: notesDir + "/notes"
-    property string noteExtension: ".html"  // Store as HTML for rich text (Markdown uses .md)
+    readonly property string viewId: NotesUtils.generateUUID()
+    property bool updatingNotes: false
+    property bool initialized: false
 
     property string searchText: ""
     property bool showResults: searchText.length > 0
     property int selectedIndex: -1
-    property var allNotes: []
+    readonly property var allNotes: NotesService.notes
     property var filteredNotes: []
 
     ListModel {
@@ -56,7 +54,7 @@ Item {
     property string currentNoteTitle: ""
     property bool currentNoteIsMarkdown: false
     property bool loadingNote: false
-    property bool editorDirty: false
+    readonly property bool editorDirty: NotesService.document(currentNoteId)?.dirty ?? false
 
 
     property var preFormatBold: null
@@ -351,17 +349,6 @@ Item {
         }
     }
 
-    Timer {
-        id: saveDebounceTimer
-        interval: 500
-        repeat: false
-        onTriggered: {
-            if (currentNoteId && editorDirty) {
-                saveCurrentNote();
-            }
-        }
-    }
-
     Keys.onEscapePressed: {
         if (root.deleteMode) {
             root.cancelDeleteMode();
@@ -397,7 +384,9 @@ Item {
         }
     }
 
-    onSelectedIndexChanged: {
+    onSelectedIndexChanged: if (initialized && !updatingNotes) syncSelection()
+
+    function syncSelection() {
         if (selectedIndex === -1 && resultsList.count > 0) {
             resultsList.positionViewAtIndex(0, ListView.Beginning);
         }
@@ -425,7 +414,7 @@ Item {
     }
 
     onSearchTextChanged: {
-        updateFilteredNotes();
+        if (initialized) updateFilteredNotes();
     }
 
     function clearSearch() {
@@ -449,6 +438,8 @@ Item {
     }
 
     function updateFilteredNotes() {
+        const selectedId = pendingRenamedNote || currentNoteId;
+        updatingNotes = true;
         var newFilteredNotes = [];
 
         var createButtonText = "Create new note";
@@ -522,6 +513,15 @@ Item {
                 pendingRenamedNote = "";
             }
         }
+        if (selectedId && !pendingRenamedNote) {
+            const retained = filteredNotes.findIndex(note => note.id === selectedId);
+            if (retained >= 0) {
+                selectedIndex = retained;
+                resultsList.currentIndex = retained;
+            }
+        }
+        updatingNotes = false;
+        syncSelection();
     }
 
     function enterDeleteMode(noteId) {
@@ -544,19 +544,7 @@ Item {
     }
 
     function confirmDeleteNote() {
-        if (noteToDelete) {
-            var isMarkdown = false;
-            for (var i = 0; i < allNotes.length; i++) {
-                if (allNotes[i].id === noteToDelete) {
-                    isMarkdown = allNotes[i].isMarkdown || false;
-                    break;
-                }
-            }
-            var extension = isMarkdown ? ".md" : noteExtension;
-            deleteNoteProcess.deletedNoteId = noteToDelete;
-            deleteNoteProcess.command = ["rm", "-f", notesPath + "/" + noteToDelete + extension];
-            deleteNoteProcess.running = true;
-        }
+        if (noteToDelete) NotesService.remove(noteToDelete);
         cancelDeleteMode();
     }
 
@@ -601,73 +589,32 @@ Item {
     }
 
     function createNewNote(title, isMarkdown) {
-        var noteId = NotesUtils.generateUUID();
-        var noteTitle = title || "Untitled Note";
-        var extension = isMarkdown ? ".md" : noteExtension;
+        NotesService.create(title || "Untitled Note", isMarkdown || false, viewId);
+    }
 
-        var initialContent = isMarkdown ? "# " + noteTitle + "\n\n" : "<h1>" + noteTitle + "</h1><p></p>";
-
-        createNoteProcess.noteId = noteId;
-        createNoteProcess.noteTitle = noteTitle;
-        createNoteProcess.noteIsMarkdown = isMarkdown || false;
-        createNoteProcess.command = ["sh", "-c", "mkdir -p '" + notesPath + "' && printf '%s' '" + initialContent.replace(/'/g, "'\\''") + "' > '" + notesPath + "/" + noteId + extension + "'"];
-        createNoteProcess.running = true;
+    function syncEditor() {
+        const doc = NotesService.document(currentNoteId);
+        loadingNote = true;
+        const content = doc?.loaded ? doc.content : "";
+        if (currentNoteContent !== content) currentNoteContent = content;
+        loadingNote = !doc?.loaded;
     }
 
     function loadNoteContent(noteId) {
-        if (!noteId || noteId === "__create__")
-            return;
-
-        if (currentNoteId && editorDirty) {
-            saveCurrentNote();
-        }
-
-        var isMarkdown = false;
-        for (var i = 0; i < allNotes.length; i++) {
-            if (allNotes[i].id === noteId) {
-                isMarkdown = allNotes[i].isMarkdown || false;
-                break;
-            }
-        }
-
+        if (!noteId || noteId === "__create__") return;
+        const note = allNotes.find(note => note.id === noteId);
+        if (!note) return;
+        if (currentNoteId !== noteId) NotesService.flush();
         loadingNote = true;
         currentNoteId = noteId;
-        currentNoteIsMarkdown = isMarkdown;
-
-        var extension = isMarkdown ? ".md" : noteExtension;
-        readNoteProcess.command = ["cat", notesPath + "/" + noteId + extension];
-        readNoteProcess.running = true;
-    }
-
-    function saveCurrentNote() {
-        if (!currentNoteId || currentNoteId === "__create__")
-            return;
-
-        var extension = currentNoteIsMarkdown ? ".md" : noteExtension;
-
-        var content = currentNoteIsMarkdown ? mdEditor.text : noteEditor.text;
-        saveNoteProcess.command = ["sh", "-c", "printf '%s' '" + content.replace(/'/g, "'\\''") + "' > '" + notesPath + "/" + currentNoteId + extension + "'"];
-        saveNoteProcess.running = true;
-        editorDirty = false;
-
-        updateNoteModified(currentNoteId);
+        currentNoteIsMarkdown = note.isMarkdown || false;
+        currentNoteTitle = note.title;
+        NotesService.load(noteId);
+        syncEditor();
     }
 
     function updateNoteTitle(noteId, newTitle) {
-        readIndexForUpdateProcess.noteId = noteId;
-        readIndexForUpdateProcess.newTitle = newTitle;
-        readIndexForUpdateProcess.command = ["cat", indexPath];
-        readIndexForUpdateProcess.running = true;
-    }
-
-    function updateNoteModified(noteId) {
-        readIndexForModifiedProcess.noteId = noteId;
-        readIndexForModifiedProcess.command = ["cat", indexPath];
-        readIndexForModifiedProcess.running = true;
-    }
-
-    function refreshNotes() {
-        readIndexProcess.running = true;
+        NotesService.rename(noteId, newTitle);
     }
 
     function openNoteInEditor(noteId) {
@@ -690,267 +637,33 @@ Item {
     }
 
     function moveNoteUp() {
-        if (selectedIndex <= 1)
-            return;  // Can't move create button or first note
-
-        let note = filteredNotes[selectedIndex];
-        if (note.isCreateButton)
-            return;
-
-        let noteIdx = -1;
-        for (let i = 0; i < allNotes.length; i++) {
-            if (allNotes[i].id === note.id) {
-                noteIdx = i;
-                break;
-            }
-        }
-
-        if (noteIdx > 0) {
-            allNotes = NotesUtils.moveArrayItem(allNotes, noteIdx, noteIdx - 1);
-            saveNotesOrder();
-            updateFilteredNotes();
-            selectedIndex = selectedIndex - 1;
-            resultsList.currentIndex = selectedIndex;
-        }
+        const note = filteredNotes[selectedIndex];
+        if (note && !note.isCreateButton) NotesService.move(note.id, -1);
     }
 
     function moveNoteDown() {
-        if (selectedIndex < 1 || selectedIndex >= filteredNotes.length - 1)
-            return;
-
-        let note = filteredNotes[selectedIndex];
-        if (note.isCreateButton)
-            return;
-
-        let noteIdx = -1;
-        for (let i = 0; i < allNotes.length; i++) {
-            if (allNotes[i].id === note.id) {
-                noteIdx = i;
-                break;
-            }
-        }
-
-        if (noteIdx >= 0 && noteIdx < allNotes.length - 1) {
-            allNotes = NotesUtils.moveArrayItem(allNotes, noteIdx, noteIdx + 1);
-            saveNotesOrder();
-            updateFilteredNotes();
-            selectedIndex = selectedIndex + 1;
-            resultsList.currentIndex = selectedIndex;
-        }
+        const note = filteredNotes[selectedIndex];
+        if (note && !note.isCreateButton) NotesService.move(note.id, 1);
     }
 
-    function saveNotesOrder() {
-        var indexData = {
-            order: allNotes.map(n => n.id),
-            notes: {}
-        };
-        for (var i = 0; i < allNotes.length; i++) {
-            var note = allNotes[i];
-            indexData.notes[note.id] = {
-                title: note.title,
-                created: note.created,
-                modified: note.modified,
-                isMarkdown: note.isMarkdown || false
-            };
-        }
-        var jsonContent = NotesUtils.serializeIndex(indexData);
-        saveIndexProcess.command = ["sh", "-c", "printf '%s' '" + jsonContent.replace(/'/g, "'\\''") + "' > '" + indexPath + "'"];
-        saveIndexProcess.running = true;
+    onAllNotesChanged: if (initialized) updateFilteredNotes()
+    onVisibleChanged: {
+        if (visible) NotesService.refresh();
+        else NotesService.flush();
     }
-
     Component.onCompleted: {
-        initDirProcess.running = true;
+        initialized = true;
+        updateFilteredNotes();
     }
+    Component.onDestruction: NotesService.flush()
 
-    Process {
-        id: initDirProcess
-        command: ["sh", "-c", "mkdir -p '" + notesPath + "' && touch '" + indexPath + "'"]
-
-        onExited: code => {
-            refreshNotes();
+    Connections {
+        target: NotesService
+        function onNoteChanged(noteId, origin) {
+            if (noteId === root.currentNoteId && origin !== root.viewId) root.syncEditor();
         }
-    }
-
-    Process {
-        id: readIndexProcess
-        command: ["cat", indexPath]
-        stdout: SplitParser {
-            onRead: data => readIndexProcess.stdoutData += data + "\n"
-        }
-        property string stdoutData: ""
-
-        onExited: code => {
-            var indexData = NotesUtils.parseIndex(stdoutData.trim());
-            stdoutData = "";
-
-            var loadedNotes = [];
-            for (var i = 0; i < indexData.order.length; i++) {
-                var noteId = indexData.order[i];
-                var noteMeta = indexData.notes[noteId];
-                if (noteMeta) {
-                    loadedNotes.push({
-                        id: noteId,
-                        title: noteMeta.title || "Untitled",
-                        created: noteMeta.created || "",
-                        modified: noteMeta.modified || "",
-                        isMarkdown: noteMeta.isMarkdown || false,
-                        isCreateButton: false
-                    });
-                }
-            }
-
-            allNotes = loadedNotes;
-            updateFilteredNotes();
-        }
-    }
-
-    Process {
-        id: createNoteProcess
-        property string noteId: ""
-        property string noteTitle: ""
-        property bool noteIsMarkdown: false
-
-        onExited: code => {
-            if (code === 0) {
-                var newNote = {
-                    id: noteId,
-                    title: noteTitle,
-                    created: NotesUtils.getCurrentTimestamp(),
-                    modified: NotesUtils.getCurrentTimestamp(),
-                    isMarkdown: noteIsMarkdown,
-                    isCreateButton: false
-                };
-                allNotes.unshift(newNote);
-                saveNotesOrder();
-                updateFilteredNotes();
-
-                pendingRenamedNote = noteId;
-                updateFilteredNotes();
-
-                Qt.callLater(() => {
-                    openNoteInEditor(noteId);
-                });
-            }
-            noteId = "";
-            noteTitle = "";
-            noteIsMarkdown = false;
-        }
-    }
-
-    Process {
-        id: deleteNoteProcess
-        property string deletedNoteId: ""
-
-        onExited: code => {
-            if (code === 0 && deletedNoteId !== "") {
-                allNotes = allNotes.filter(n => n.id !== deletedNoteId);
-                saveNotesOrder();
-
-                if (currentNoteId === deletedNoteId) {
-                    currentNoteId = "";
-                    currentNoteContent = "";
-                    currentNoteTitle = "";
-                }
-
-                updateFilteredNotes();
-                deletedNoteId = "";
-            }
-        }
-    }
-
-    Process {
-        id: readNoteProcess
-        stdout: SplitParser {
-            onRead: data => readNoteProcess.stdoutData += data + "\n"
-        }
-        property string stdoutData: ""
-
-        onExited: code => {
-            if (code === 0) {
-                currentNoteContent = stdoutData.replace(/\n$/, '');
-
-                for (var i = 0; i < allNotes.length; i++) {
-                    if (allNotes[i].id === currentNoteId) {
-                        currentNoteTitle = allNotes[i].title;
-                        break;
-                    }
-                }
-            } else {
-                currentNoteContent = "";
-                currentNoteTitle = "";
-            }
-            stdoutData = "";
-            editorDirty = false;
-            loadingNote = false;
-        }
-    }
-
-    Process {
-        id: saveNoteProcess
-        onExited: code => {}
-    }
-
-    Process {
-        id: saveIndexProcess
-        onExited: code => {}
-    }
-
-    Process {
-        id: readIndexForUpdateProcess
-        property string noteId: ""
-        property string newTitle: ""
-        stdout: SplitParser {
-            onRead: data => readIndexForUpdateProcess.stdoutData += data + "\n"
-        }
-        property string stdoutData: ""
-
-        onExited: code => {
-            var indexData = NotesUtils.parseIndex(stdoutData.trim());
-            stdoutData = "";
-
-            if (indexData.notes[noteId]) {
-                indexData.notes[noteId].title = newTitle;
-                indexData.notes[noteId].modified = NotesUtils.getCurrentTimestamp();
-            }
-
-            for (var i = 0; i < allNotes.length; i++) {
-                if (allNotes[i].id === noteId) {
-                    allNotes[i].title = newTitle;
-                    allNotes[i].modified = NotesUtils.getCurrentTimestamp();
-                    break;
-                }
-            }
-
-            var jsonContent = NotesUtils.serializeIndex(indexData);
-            saveIndexProcess.command = ["sh", "-c", "printf '%s' '" + jsonContent.replace(/'/g, "'\\''") + "' > '" + indexPath + "'"];
-            saveIndexProcess.running = true;
-
-            updateFilteredNotes();
-            noteId = "";
-            newTitle = "";
-        }
-    }
-
-    Process {
-        id: readIndexForModifiedProcess
-        property string noteId: ""
-        stdout: SplitParser {
-            onRead: data => readIndexForModifiedProcess.stdoutData += data + "\n"
-        }
-        property string stdoutData: ""
-
-        onExited: code => {
-            var indexData = NotesUtils.parseIndex(stdoutData.trim());
-            stdoutData = "";
-
-            if (indexData.notes[noteId]) {
-                indexData.notes[noteId].modified = NotesUtils.getCurrentTimestamp();
-            }
-
-            var jsonContent = NotesUtils.serializeIndex(indexData);
-            saveIndexProcess.command = ["sh", "-c", "printf '%s' '" + jsonContent.replace(/'/g, "'\\''") + "' > '" + indexPath + "'"];
-            saveIndexProcess.running = true;
-            noteId = "";
+        function onCreated(noteId, origin) {
+            if (origin === root.viewId) root.openNoteInEditor(noteId);
         }
     }
 
@@ -958,8 +671,52 @@ Item {
     implicitHeight: 392
 
     RowLayout {
+        id: statusBar
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: visible ? implicitHeight : 0
+        visible: NotesService.error !== "" || NotesService.unsaved
+        Text {
+            Layout.fillWidth: true
+            text: NotesService.error || "Saving…"
+            color: NotesService.error ? Colors.error : Colors.overSurface
+            font.family: Config.theme.font
+            font.pixelSize: Config.theme.fontSize
+            wrapMode: Text.Wrap
+        }
+        Repeater {
+            model: root.currentNoteId ? ["Retry", "Discard draft and reload"] : ["Retry"]
+            delegate: Button {
+                id: recoveryButton
+                required property string modelData
+                required property int index
+                visible: NotesService.error !== ""
+                text: modelData
+                padding: 8
+                background: StyledRect {
+                    variant: recoveryButton.hovered || recoveryButton.activeFocus ? "focus" : "common"
+                    radius: Styling.radius(-4)
+                }
+                contentItem: Text {
+                    text: recoveryButton.text
+                    font.family: Config.theme.font
+                    font.pixelSize: Config.theme.fontSize
+                    color: Colors.overSurface
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: {
+                    if (index === 0) NotesService.retry();
+                    else NotesService.reload(root.currentNoteId);
+                }
+            }
+        }
+    }
+
+    RowLayout {
         id: mainLayout
         anchors.fill: parent
+        anchors.bottomMargin: statusBar.visible ? statusBar.height + 8 : 0
         spacing: 8
 
         Item {
@@ -2571,6 +2328,7 @@ Item {
 
                     TextArea.flickable: TextArea {
                         id: noteEditor
+                        readOnly: loadingNote
                         text: currentNoteContent
                         textFormat: TextEdit.RichText
                         font.family: Config.theme.font
@@ -2589,9 +2347,8 @@ Item {
                         }
 
                         onTextChanged: {
-                            if (currentNoteId && !loadingNote) {
-                                editorDirty = true;
-                                saveDebounceTimer.restart();
+                            if (currentNoteId && !loadingNote && !currentNoteIsMarkdown) {
+                                NotesService.edit(currentNoteId, text, root.viewId);
                             }
                         }
 
@@ -3117,6 +2874,7 @@ Item {
 
                         TextArea.flickable: TextArea {
                             id: mdEditor
+                            readOnly: loadingNote
                             text: currentNoteContent
                             textFormat: TextEdit.PlainText
                             font.family: Config.theme.monoFont
@@ -3136,8 +2894,7 @@ Item {
 
                             onTextChanged: {
                                 if (currentNoteId && !loadingNote && currentNoteIsMarkdown) {
-                                    editorDirty = true;
-                                    saveDebounceTimer.restart();
+                                    NotesService.edit(currentNoteId, text, root.viewId);
                                 }
                                 root.mdUpdateHeadingDisplay();
                                 mdSyncTimer.restart();

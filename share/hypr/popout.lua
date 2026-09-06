@@ -52,13 +52,19 @@ local function pin(window)
     hl.dispatch(hl.dsp.window.float({ action = "enable", window = window }))
   end
 
+  hl.dispatch(hl.dsp.window.fullscreen_state({ internal = 0, client = 0, window = window }))
   hl.dispatch(hl.dsp.window.pin({ action = "enable", window = window }))
   hl.dispatch(hl.dsp.window.resize({ x = SIZE.x, y = SIZE.y, window = window }))
 
   if monitor then
+    local width, height = monitor.width, monitor.height
+    if (monitor.transform or 0) % 2 == 1 then
+      width, height = height, width
+    end
+    local scale = monitor.scale or 1
     hl.dispatch(hl.dsp.window.move({
-      x = monitor.x + math.floor(monitor.width / monitor.scale) - SIZE.x - MARGIN,
-      y = monitor.y + math.floor(monitor.height / monitor.scale) - SIZE.y - MARGIN,
+      x = monitor.x + math.floor(width / scale) - SIZE.x - MARGIN,
+      y = monitor.y + math.floor(height / scale) - SIZE.y - MARGIN,
       window = window,
     }))
   end

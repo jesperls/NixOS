@@ -32,6 +32,13 @@ for _, title in ipairs({
 end
 
 hl.window_rule({
+  match = { class = "^(org\\.quickshell)$", title = "^(Pangu Settings)$" },
+  float = true,
+  center = true,
+  size = { 1000, 760 },
+})
+
+hl.window_rule({
   match = { title = "^(Picture-in-Picture)$" },
   float = true,
   pin = true,

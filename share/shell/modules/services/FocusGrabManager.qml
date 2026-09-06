@@ -5,42 +5,32 @@ import Quickshell
 Singleton {
     id: root
 
-    property int _activeCount: 0
-    readonly property bool hasActiveGrab: _activeCount > 0
-
     property var _grabs: ({})
     property var _grabOrder: []
+    readonly property bool hasActiveGrab: _grabOrder.length > 0
 
-    function requestGrab(grabId, clearCallback) {
-        if (_grabs[grabId] === undefined) {
-            _grabOrder = [..._grabOrder, grabId];
-            _activeCount++;
-        }
-        let updated = {};
-        Object.keys(_grabs).forEach(k => { updated[k] = _grabs[k]; });
-        updated[grabId] = clearCallback;
-        _grabs = updated;
+    function hasGrabFor(screen) {
+        return Object.values(_grabs).some(grab => grab.windows.some(window => window?.screen?.name === screen?.name));
+    }
+
+    function requestGrab(grabId, clearCallback, windows) {
+        if (_grabs[grabId] === undefined) _grabOrder = [..._grabOrder, grabId];
+        _grabs = Object.assign({}, _grabs, {[grabId]: {callback: clearCallback, windows: windows || []}});
     }
 
     function releaseGrab(grabId) {
-        if (_grabs[grabId] !== undefined) {
-            let updated = {};
-            Object.keys(_grabs).forEach(k => {
-                if (k !== grabId) updated[k] = _grabs[k];
-            });
-            _grabs = updated;
-            _grabOrder = _grabOrder.filter(id => id !== grabId);
-            _activeCount = Math.max(0, _activeCount - 1);
-        }
+        const grabs = Object.assign({}, _grabs);
+        delete grabs[grabId];
+        _grabs = grabs;
+        _grabOrder = _grabOrder.filter(id => id !== grabId);
     }
 
-    function clearTopGrab() {
-        if (_grabOrder.length === 0) return;
-        const topId = _grabOrder[_grabOrder.length - 1];
-        const callback = _grabs[topId];
+    function clearTopGrab(screen) {
+        const order = _grabOrder.filter(id => !screen || _grabs[id].windows.some(window => window?.screen?.name === screen.name));
+        if (order.length === 0) return;
+        const topId = order[order.length - 1];
+        const callback = _grabs[topId].callback;
         releaseGrab(topId);
-        if (callback) {
-            Qt.callLater(callback);
-        }
+        if (callback) Qt.callLater(callback);
     }
 }

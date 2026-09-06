@@ -17,6 +17,7 @@ Item {
     id: root
 
     required property ShellScreen screen
+    readonly property string screenName: screen?.name ?? ""
 
     readonly property bool keepHidden: Config.dock?.keepHidden ?? false
     property bool pinned: Config.dock?.pinnedOnStartup ?? false
@@ -70,7 +71,7 @@ Item {
     readonly property int windowSideMargin: dockMargin > 0 ? Math.max(0, dockMargin - compositorGapsOut) : 0
     readonly property int edgeSideMargin: isDefault ? 0 : dockMargin
 
-    readonly property var barPanelRef: Visibilities.barPanels[screen.name]
+    readonly property var barPanelRef: Visibilities.barPanels[screenName]
     readonly property bool barPinned: {
         if (barPanelRef && typeof barPanelRef.pinned !== 'undefined') {
             return barPanelRef.pinned;
@@ -507,7 +508,7 @@ Item {
                         }
 
                         onClicked: {
-                            let visibilities = Visibilities.getForScreen(root.screen.name);
+                            let visibilities = Visibilities.getForScreen(root.screenName);
                             if (visibilities) {
                                 visibilities.overview = !visibilities.overview;
                             }
@@ -640,7 +641,7 @@ Item {
                         }
 
                         onClicked: {
-                            let visibilities = Visibilities.getForScreen(root.screen.name);
+                            let visibilities = Visibilities.getForScreen(root.screenName);
                             if (visibilities) {
                                 visibilities.overview = !visibilities.overview;
                             }

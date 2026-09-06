@@ -97,6 +97,10 @@ run)
 lock)
 	ipc pangu run lockscreen
 	;;
+idle)
+	shift
+	ipc idle "$@"
+	;;
 reload)
 	systemctl --user restart pangu.service
 	;;

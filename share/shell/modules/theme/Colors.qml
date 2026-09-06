@@ -9,25 +9,15 @@ FileView {
     path: Paths.cachePath("colors.json")
     preload: true
     watchChanges: true
-    onFileChanged: {
-        reload();
-        generationTimer.restart();
-    }
+    onFileChanged: reload()
+    onLoaded: generationTimer.restart()
 
-    // FileView's default property is its adapter, so live objects are held
-    // as named properties instead of bare children.
-    property Connections oledWatcher: Connections {
+    readonly property string exportSettings: JSON.stringify([Config.oledMode, Config.theme.lightMode, Config.theme.font, Config.theme.srBg.opacity])
+    onExportSettingsChanged: generationTimer.restart()
+
+    property Connections configWatcher: Connections {
         target: Config
-        function onOledModeChanged() {
-            generationTimer.restart();
-        }
-    }
-
-    property Connections themeWatcher: Connections {
-        target: Config.loader
-        function onFileChanged() {
-            generationTimer.restart();
-        }
+        function onInitialLoadCompleteChanged() { generationTimer.restart(); }
     }
 
     property QtCtGenerator qtCtGenerator: QtCtGenerator {
@@ -59,6 +49,7 @@ FileView {
         interval: 100
         repeat: false
         onTriggered: {
+            if (!colors.loaded || !Config.initialLoadComplete) return;
             qtCtGenerator.generate(colors);
             gtkGenerator.generate(colors);
             pywalGenerator.generate(colors);

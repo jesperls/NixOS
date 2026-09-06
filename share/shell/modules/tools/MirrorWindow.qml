@@ -50,7 +50,7 @@ PanelWindow {
         y: yPos
         width: currentWidth
         height: currentHeight
-        color: camera.cameraStatus === Camera.ActiveStatus ? "transparent" : "black"
+        color: camera.active ? "transparent" : "black"
         radius: Styling.radius(8)
 
         CaptureSession {
@@ -59,16 +59,16 @@ PanelWindow {
                 id: camera
                 active: root.visible
             }
-            videoOutput: videoOutput
+            videoOutput: cameraView
         }
 
         VideoOutput {
-            id: videoOutput
+            id: cameraView
             anchors.fill: parent
             fillMode: VideoOutput.PreserveAspectCrop
 
             transform: Scale {
-                origin.x: videoOutput.width / 2
+                origin.x: cameraView.width / 2
                 xScale: root.isFlipped ? -1 : 1
             }
         }
@@ -105,7 +105,7 @@ PanelWindow {
                 spacing: 16
                 z: 3
 
-                opacity: (dragArea.containsMouse || controlHover.containsMouse) ? 1.0 : 0.0
+                opacity: (dragArea.containsMouse || controlHover.hovered) ? 1.0 : 0.0
                 Behavior on opacity {
                     NumberAnimation {
                         duration: 200

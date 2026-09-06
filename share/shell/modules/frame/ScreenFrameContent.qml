@@ -13,6 +13,7 @@ Item {
     id: root
 
     required property ShellScreen targetScreen
+    readonly property string screenName: targetScreen?.name ?? ""
     property bool hasFullscreenWindow: false
 
     readonly property bool frameEnabled: Config.bar?.frameEnabled ?? false
@@ -20,8 +21,8 @@ Item {
     readonly property string barPos: Config.bar?.position ?? "top"
     readonly property string notchPos: Config.notchPosition ?? "top"
     
-    readonly property var barPanel: Visibilities.barPanels[targetScreen.name]
-    readonly property var dockPanel: Visibilities.dockPanels[targetScreen.name]
+    readonly property var barPanel: Visibilities.barPanels[screenName]
+    readonly property var dockPanel: Visibilities.dockPanels[screenName]
     
     readonly property bool barReveal: barPanel ? barPanel.reveal : true
     readonly property bool dockReveal: dockPanel ? dockPanel.reveal : true
@@ -41,7 +42,7 @@ Item {
         return isHoriz ? barPanel.barTargetHeight : barPanel.barTargetWidth;
     }
 
-    readonly property var centerGap: (Config.bar?.splitOnCenteredLayout ?? true) ? CenteredLayoutService.gapFor(targetScreen.name) : null
+    readonly property var centerGap: (Config.bar?.splitOnCenteredLayout ?? true) ? CenteredLayoutService.gapFor(screenName) : null
     readonly property bool splitActive: centerGap !== null && width > 0 && (barPos === "top" || barPos === "bottom")
     readonly property int splitGapPadding: (centerGap && centerGap.square) ? 0 : (Config.bar?.splitGapPadding ?? 4)
     readonly property real splitStart: splitActive ? Math.max(0, centerGap.x - splitGapPadding) : 0

@@ -28,22 +28,11 @@ in
       settings = {
         friendly_name = cfg.friendlyName;
         media_dir = cfg.mediaDirs;
-        log_level = "error";
+        inotify = "yes";
       };
     };
 
-    # minidlna reads the library as its own user, so it needs a group the media
-    # dirs are readable by.
     users.users.minidlna.extraGroups = [ "users" ];
-
-    # DLNA clients reply to SSDP discovery on minidlna's ephemeral source port,
-    # not the advertised one.
-    networking.firewall.allowedUDPPortRanges = [
-      {
-        from = 32768;
-        to = 61000;
-      }
-    ];
 
     services.avahi = {
       enable = true;

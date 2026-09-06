@@ -442,8 +442,7 @@ Item {
 
                         onClicked: {
                             if (latestNotification) {
-                                Notifications.attemptInvokeAction(latestNotification.id, modelData.identifier, false);
-                                root.destroyRequested();
+                                Notifications.attemptInvokeAction(latestNotification.id, modelData.identifier);
                             }
                         }
                     }

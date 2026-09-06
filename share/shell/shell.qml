@@ -13,6 +13,7 @@ import qs.modules.notifications
 import qs.modules.notch
 import qs.modules.widgets.overview
 import qs.modules.widgets.cheatsheet
+import qs.modules.widgets.dashboard.wallpapers
 import qs.modules.services
 import qs.modules.corners
 import qs.modules.frame
@@ -39,12 +40,10 @@ ShellRoot {
 
         Loader {
             id: wallpaperLoader
-            active: true
+            active: modelData !== null
             required property ShellScreen modelData
-            source: "modules/widgets/dashboard/wallpapers/Wallpaper.qml"
-            onLoaded: {
-                if (item)
-                    item.screen = wallpaperLoader.modelData;
+            sourceComponent: Wallpaper {
+                screen: wallpaperLoader.modelData
             }
         }
     }
@@ -62,7 +61,7 @@ ShellRoot {
             }
 
             Loader {
-                active: Config.theme.enableCorners && Config.roundness > 0
+                active: screenShellContainer.modelData !== null && Config.theme.enableCorners && Config.roundness > 0
                 sourceComponent: ScreenCorners {
                     screen: screenShellContainer.modelData
                 }
@@ -73,7 +72,7 @@ ShellRoot {
 
                 barEnabled: {
                     const list = (Config.bar && Config.bar.screenList !== undefined ? Config.bar.screenList : []);
-                    return (!list || list.length === 0 || list.indexOf(screen.name) !== -1);
+                    return screen !== null && (!list || list.length === 0 || list.indexOf(screen.name) !== -1);
                 }
                 barPosition: unifiedPanel.barPosition
                 barPinned: unifiedPanel.pinned
@@ -81,7 +80,7 @@ ShellRoot {
                 barOuterMargin: unifiedPanel.barOuterMargin
 
                 dockEnabled: {
-                    if (!Config.dockPanelEnabled)
+                    if (!screenShellContainer.modelData || !Config.dockPanelEnabled)
                         return false;
                     return Config.enabledForScreen(Config.dock?.screenList, screenShellContainer.modelData.name);
                 }
@@ -108,7 +107,7 @@ ShellRoot {
 
         Loader {
             id: overviewLoader
-            active: ((Config.overview && Config.overview.enabled !== undefined ? Config.overview.enabled : true)) && SuspendManager.wakeReady && overviewEnabledFor(modelData.name)
+            active: modelData !== null && ((Config.overview && Config.overview.enabled !== undefined ? Config.overview.enabled : true)) && SuspendManager.wakeReady && overviewEnabledFor(modelData.name)
             required property ShellScreen modelData
             sourceComponent: OverviewPopup {
                 screen: overviewLoader.modelData

@@ -23,7 +23,11 @@ Zen 5 (`amd_lbr_v2`) supports taken-branch sampling. Every hour the
 2. `create_llvm_prof` converts the raw `perf.data` against the *running*
    kernel's unstripped `vmlinux` (`config.boot.kernelPackages.kernel.dev/vmlinux`)
    into an `extbinary` profile
-3. profiles land in `/var/lib/autofdo/profile-<ts>.afdo`, the raw data is deleted
+3. completed profiles land atomically in `/var/lib/autofdo/profile-<ts>.afdo`; raw data and incomplete profiles are removed on exit
+
+The collector skips sampling if the running kernel differs from the configured
+kernel, so a switch without a reboot cannot produce a profile against the wrong
+`vmlinux`. Collection runs as root without relaxing system-wide perf permissions.
 
 After a few days you merge them and rebuild the kernel with the merged
 profile via `CLANG_AUTOFDO_PROFILE`.
@@ -33,7 +37,7 @@ profile via `CLANG_AUTOFDO_PROFILE`.
 | File | What |
 | ---- | ---- |
 | `pkgs/autofdo/default.nix` | Google's prebuilt static `create_llvm_prof` v0.30.1 |
-| `modules/nixos/performance/autofdo.nix` | The collector timer + service + `perf` sysctls |
+| `modules/nixos/performance/autofdo.nix` | The collector timer and service |
 | `modules/nixos/options/performance.nix` | `performance.kernel.autofdo` (bool or profile path) |
 | `hosts/pangu/configuration.nix` | Collection enabled here |
 
@@ -91,7 +95,7 @@ back to the cached `linuxPackages-cachyos-latest-lto`.
 performance.autofdo.enable = false;
 ```
 
-This stops the timer and drops the two sysctls. The compiled profile stays
+This stops the timer. The compiled profile stays
 baked into the running kernel until you rebuild.
 
 ## Options

@@ -11,7 +11,7 @@ hl.config({
     },
   },
   layout = {
-    single_window_aspect_ratio_tolerance = 0,
+    single_window_aspect_ratio = { 0, 0 }, -- The centered layout already sets its own width.
   },
   animations = {
     enabled = theme.animations.enabled,

@@ -158,13 +158,23 @@ Singleton {
     
     property var allAppsCache: null
 
+    signal resultsChanged()
+
     function invalidateCache() {
         allAppsCache = null;
+        resultsChanged();
     }
 
     onListChanged: {
-        allAppsCache = null;
+        iconCache = {};
         buildIndex();
+        invalidateCache();
+    }
+
+    Connections {
+        target: UsageTracker
+        function onUsageDataReady() { root.invalidateCache(); }
+        function onUsageChanged() { root.invalidateCache(); }
     }
 
     Connections {
@@ -180,36 +190,9 @@ Singleton {
     
 
     function launchApp(app) {
-        const path = app.fileName || app.path || app.filePath;
-        
-        if (path && path.toString().endsWith('.desktop')) {
-            const escapedPath = path.toString().replace(/'/g, "'\\''");
-            runInActiveWorkspace("gio launch '" + escapedPath + "'");
+        if (!app || !app.id)
             return;
-        }
-
-        if (app.command && app.command.length > 0) {
-            const safeArgs = [];
-            for (let i = 0; i < app.command.length; i++) {
-                const arg = app.command[i];
-                if (/^%[fFuUijkc]$/.test(arg)) continue;
-                safeArgs.push("'" + arg.replace(/'/g, "'\\''") + "'");
-            }
-
-            if (safeArgs.length > 0) {
-                runInActiveWorkspace(safeArgs.join(" "));
-                return;
-            }
-        }
-
-        app.execute();
-    }
-
-    function runInActiveWorkspace(command) {
-        const p = Qt.createQmlObject('import Quickshell.Io; Process { }', root);
-        p.command = ["bash", "-c", "cd ~ && env -u HL_INITIAL_WORKSPACE_TOKEN setsid " + command + " < /dev/null > /dev/null 2>&1 &"];
-        p.onExited.connect(() => p.destroy());
-        p.running = true;
+        ApplicationLauncher.launchDesktop(app.id, app.name);
     }
 
     function getAllApps() {

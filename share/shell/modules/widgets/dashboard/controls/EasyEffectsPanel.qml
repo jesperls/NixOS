@@ -39,12 +39,12 @@ Item {
                     width: root.contentWidth
                     anchors.horizontalCenter: parent.horizontalCenter
                     title: "EasyEffects"
-                    statusText: EasyEffectsService.bypassed ? "Bypassed" : ""
+                    statusText: !EasyEffectsService.available ? "Unavailable" : (EasyEffectsService.bypassed ? "Bypassed" : "")
                     statusColor: Colors.error
                     showToggle: EasyEffectsService.available
                     toggleChecked: !EasyEffectsService.bypassed
 
-                    actions: EasyEffectsService.available ? [
+                    actions: [
                         {
                             icon: Icons.popOpen,
                             tooltip: "Open EasyEffects",
@@ -59,7 +59,7 @@ Item {
                                 EasyEffectsService.refresh();
                             }
                         }
-                    ] : []
+                    ]
 
                     onToggleChanged: checked => {
                         if (checked !== !EasyEffectsService.bypassed) {
@@ -81,7 +81,7 @@ Item {
 
                     Text {
                         visible: !EasyEffectsService.available
-                        text: "EasyEffects not running"
+                        text: "Open EasyEffects, then refresh to reconnect."
                         font.family: Config.theme.font
                         font.pixelSize: Config.theme.fontSize
                         color: Colors.overSurfaceVariant

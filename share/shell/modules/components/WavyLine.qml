@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Window
 import qs.modules.theme
 
 Canvas {
@@ -15,13 +16,20 @@ Canvas {
 
     readonly property bool shouldAnimate: running && animationsEnabled && 
                                           visible && width > 0 && opacity > 0 &&
-                                          root.window !== null && root.window.visible
+                                          (root.Window.window?.visible ?? false)
+
+    onColorChanged: requestPaint()
+    onLineWidthChanged: requestPaint()
+    onFrequencyChanged: requestPaint()
+    onAmplitudeMultiplierChanged: requestPaint()
+    onFullLengthChanged: requestPaint()
+    onShouldAnimateChanged: requestPaint()
 
     onPaint: {
         var ctx = getContext("2d");
         ctx.clearRect(0, 0, width, height);
 
-        if (width <= 0 || height <= 0) return;
+        if (width <= 0 || height <= 0 || fullLength <= 0) return;
 
         var amp = root.lineWidth * root.amplitudeMultiplier;
         var freq = root.frequency;

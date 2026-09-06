@@ -164,18 +164,6 @@ Item {
         colorPickerCurrentColor = color;
     }
 
-    FileView {
-        id: wallpaperConfig
-        path: Paths.cachePath("wallpapers.json")
-
-        JsonAdapter {
-            property string currentWall: ""
-            property string wallPath: ""
-            property string matugenScheme: "scheme-tonal-spot"
-            property string activeColorPreset: ""
-        }
-    }
-
     function srNameToId(srName: string): string {
         return srName.substring(2).toLowerCase();
     }
@@ -379,13 +367,10 @@ Item {
                                             visible: !parent.text && !parent.activeFocus
                                         }
 
-                                        text: wallpaperConfig.adapter.wallPath
+                                        text: GlobalStates.wallpaperManager.wallpaperDir
 
                                         onEditingFinished: {
-                                            if (wallpaperConfig.adapter.wallPath !== text) {
-                                                wallpaperConfig.adapter.wallPath = text;
-                                                wallpaperConfig.writeAdapter();
-                                            }
+                                            GlobalStates.wallpaperManager.setWallpaperDirectory(text);
                                         }
                                     }
                                 }

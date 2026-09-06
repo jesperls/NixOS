@@ -7,107 +7,100 @@ import qs.config
 Singleton {
     id: root
 
-    property string usageFilePath: Paths.cachePath("usage.json")
-
+    readonly property string usageFilePath: Paths.cachePath("usage.json")
     property var usageData: ({})
+    property var pendingUsage: []
     property bool dataLoaded: false
     property bool fileReady: false
 
-    signal usageDataReady
+    signal usageDataReady()
+    signal usageChanged()
 
     readonly property int maxBoostScore: 200
     readonly property int dayInMs: 86400000
 
     Process {
-        id: ensureUsageFile
+        id: ensureUsageDirectory
         running: true
-        command: ["bash", "-c", "mkdir -p \"$(dirname '" + root.usageFilePath + "')\" && if [ ! -f '" + root.usageFilePath + "' ]; then echo '{}' > '" + root.usageFilePath + "'; fi"]
-        onExited: {
-            root.fileReady = true;
-            Qt.callLater(() => usageFile.reload());
+        command: ["mkdir", "-p", "--", Paths.cacheDir]
+        onExited: code => {
+            root.fileReady = code === 0;
+            if (!root.fileReady) {
+                console.warn("Cannot prepare application usage directory");
+                root.finishLoad({});
+            }
         }
     }
 
     FileView {
         id: usageFile
         path: root.fileReady ? root.usageFilePath : ""
+        atomicWrites: true
         onLoaded: root.loadUsageData()
+        onLoadFailed: error => {
+            if (!root.fileReady) return;
+            if (error !== FileViewError.FileNotFound)
+                console.warn("Cannot read application usage:", error);
+            root.finishLoad({});
+        }
+        onSaveFailed: error => console.warn("Cannot save application usage:", error)
     }
 
-    Component.onCompleted: {
-        Qt.callLater(() => usageFile.reload());
+    function finishLoad(data) {
+        if (dataLoaded) return;
+        const entries = Object.create(null);
+        const now = Date.now();
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+            for (const [id, entry] of Object.entries(data)) {
+                if (!entry || !Number.isFinite(entry.count) || entry.count < 1 || !Number.isFinite(entry.lastUsed) || entry.lastUsed < 0)
+                    continue;
+                entries[id] = {count: Math.min(Number.MAX_SAFE_INTEGER, Math.floor(entry.count)), lastUsed: Math.min(now, entry.lastUsed)};
+            }
+        }
+        usageData = entries;
+        dataLoaded = true;
+        const pending = pendingUsage;
+        pendingUsage = [];
+        for (const id of pending) recordUsage(id);
+        usageDataReady();
     }
 
     function loadUsageData() {
         try {
-            const data = usageFile.text();
-            if (!data || data.trim() === "") {
-                console.log("UsageTracker: No existing usage data, starting fresh");
-                root.usageData = {};
-                root.dataLoaded = true;
-                root.usageDataReady();
-                return;
-            }
-
-            root.usageData = JSON.parse(data);
-            console.log("UsageTracker: Loaded", Object.keys(root.usageData).length, "entries from usage.json");
-            root.dataLoaded = true;
-            root.usageDataReady();
-        } catch (e) {
-            console.warn("UsageTracker: Failed to parse usage.json:", e);
-            root.usageData = {};
-            root.dataLoaded = true;
-            root.usageDataReady();
+            finishLoad(JSON.parse(usageFile.text()));
+        } catch (error) {
+            console.warn("Invalid application usage file:", error);
+            finishLoad({});
         }
-    }
-
-    function saveUsageData() {
-        if (!root.fileReady) {
-            console.warn("UsageTracker: File not ready, skipping save");
-            return;
-        }
-
-        const jsonData = JSON.stringify(usageData, null, 2);
-        usageFile.setText(jsonData);
     }
 
     function recordUsage(appId) {
-        if (!appId) {
-            console.warn("UsageTracker: recordUsage called with empty appId");
+        if (typeof appId !== "string" || !appId) return;
+        if (!dataLoaded) {
+            pendingUsage = pendingUsage.concat(appId);
             return;
         }
-
-        var now = Date.now();
-
-        if (usageData[appId]) {
-            usageData[appId].count++;
-            usageData[appId].lastUsed = now;
-        } else {
-            usageData[appId] = {
-                count: 1,
-                lastUsed: now
-            };
-        }
-
-        usageData = usageData;
-
-        saveUsageData();
+        const previous = Object.prototype.hasOwnProperty.call(usageData, appId) ? usageData[appId] : null;
+        const next = Object.assign(Object.create(null), usageData);
+        next[appId] = {
+            count: Math.min(Number.MAX_SAFE_INTEGER, (previous ? previous.count : 0) + 1),
+            lastUsed: Date.now()
+        };
+        usageData = next;
+        if (fileReady) saveTimer.restart();
+        usageChanged();
     }
 
     function getUsageScore(appId) {
-        if (!appId || !usageData[appId]) {
-            return 0;
-        }
-
-        var data = usageData[appId];
-        var now = Date.now();
-        var daysSinceLastUse = (now - data.lastUsed) / dayInMs;
-
-        var timeBoost = maxBoostScore * Math.exp(-daysSinceLastUse / 7);
-
-        var frequencyScore = Math.log(data.count + 1) * 20;
-
-        return timeBoost + frequencyScore;
+        if (!Object.prototype.hasOwnProperty.call(usageData, appId)) return 0;
+        const data = usageData[appId];
+        const daysSinceLastUse = Math.max(0, (Date.now() - data.lastUsed) / dayInMs);
+        return maxBoostScore * Math.exp(-daysSinceLastUse / 7) + Math.log(data.count + 1) * 20;
     }
 
+    Timer {
+        id: saveTimer
+        interval: 100
+        onTriggered: usageFile.setText(JSON.stringify(root.usageData, null, 2))
+    }
 }

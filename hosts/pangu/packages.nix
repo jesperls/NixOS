@@ -38,7 +38,6 @@
     networkmanagerapplet
     mission-center
     pavucontrol
-    qpwgraph
     overskride
     audacity
     reaper
@@ -48,7 +47,6 @@
     gimp
     prismlauncher
     qbittorrent
-    file-roller
     unzip
     zip
     unrar

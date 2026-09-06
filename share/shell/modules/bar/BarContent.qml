@@ -23,6 +23,7 @@ Item {
     id: root
 
     required property ShellScreen screen
+    readonly property string screenName: screen?.name ?? ""
 
     property string barPosition: (Config.bar && Config.bar.position !== undefined && ["top", "bottom", "left", "right"].includes(Config.bar.position) ? Config.bar.position : "top")
     property string orientation: barPosition === "left" || barPosition === "right" ? "vertical" : "horizontal"
@@ -59,7 +60,7 @@ Item {
 
     readonly property bool isMouseOverBar: barMouseArea.containsMouse
 
-    readonly property var notchPanelRef: Visibilities.notchPanels[screen.name]
+    readonly property var notchPanelRef: Visibilities.notchPanels[screenName]
     readonly property string notchPosition: (Config.notchPosition !== undefined ? Config.notchPosition : "top")
     readonly property bool notchHoverActive: {
         if (barPosition !== notchPosition)
@@ -76,7 +77,7 @@ Item {
         return false;
     }
 
-    readonly property var screenVisibilities: Visibilities.getForScreen(screen.name)
+    readonly property var screenVisibilities: Visibilities.getForScreen(screenName)
     readonly property bool notchOpen: Visibilities.isNotchOpen(screenVisibilities)
 
     readonly property real outerRadius: Styling.radius(0)
@@ -168,7 +169,7 @@ Item {
 
     readonly property bool shadowsEnabled: Config.showBackground && (!actualContainBar || (Config.bar && Config.bar.keepBarShadow !== undefined ? Config.bar.keepBarShadow : false))
 
-    readonly property var centerGap: (Config.bar && Config.bar.splitOnCenteredLayout !== undefined ? Config.bar.splitOnCenteredLayout : true) ? CenteredLayoutService.gapFor(screen.name) : null
+    readonly property var centerGap: (Config.bar && Config.bar.splitOnCenteredLayout !== undefined ? Config.bar.splitOnCenteredLayout : true) ? CenteredLayoutService.gapFor(screenName) : null
     readonly property bool splitActive: orientation === "horizontal" && centerGap !== null && width > 0
     readonly property int splitGapPadding: (centerGap && centerGap.square) ? 0 : (Config.bar && Config.bar.splitGapPadding !== undefined ? Config.bar.splitGapPadding : 4)
     readonly property real splitStart: splitActive ? Math.max(0, centerGap.x - splitGapPadding) : 0
@@ -350,7 +351,7 @@ Item {
                     sourceComponent: RowLayout {
                         spacing: root.barSpacing
 
-                        readonly property var notchContainer: Visibilities.getNotchForScreen(root.screen.name)
+                        readonly property var notchContainer: Visibilities.getNotchForScreen(root.screenName)
 
                         LauncherButton {
                             id: launcherButton
