@@ -423,8 +423,9 @@ Singleton {
     signal timeoutWithAnimation(id: var)
 
     function popupTimeout(timeout, urgency) {
-        if (urgency === NotificationUrgency.Critical || timeout === 0) return 0;
-        return timeout > 0 ? timeout : 5000;
+        if (timeout === 0) return 0; // Explicit "never expire".
+        if (timeout > 0) return timeout;
+        return urgency === NotificationUrgency.Critical ? 0 : 5000;
     }
 
     function finishTimeout(id) {

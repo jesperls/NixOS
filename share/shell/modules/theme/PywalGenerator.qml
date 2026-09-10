@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import qs.modules.globals
 import qs.config
+import qs.modules.components
 
 QtObject {
     id: root
@@ -114,41 +115,29 @@ QtObject {
     property ThemeFile colorsFile: ThemeFile {
         id: colorsFile
         path: Paths.cacheHome + "/wal/colors"
-        onWritten: Qt.callLater(root.reloadApplications)
+        onWritten: Qt.callLater(root.reloader.reload)
     }
 
     property ThemeFile jsonFile: ThemeFile {
         id: jsonFile
         path: Paths.cacheHome + "/wal/colors.json"
-        onWritten: Qt.callLater(root.reloadApplications)
+        onWritten: Qt.callLater(root.reloader.reload)
     }
 
     property ThemeFile shellFile: ThemeFile {
         id: shellFile
         path: Paths.cacheHome + "/wal/colors.sh"
-        onWritten: Qt.callLater(root.reloadApplications)
+        onWritten: Qt.callLater(root.reloader.reload)
     }
 
     property ThemeFile imageFile: ThemeFile {
         id: imageFile
         path: Paths.cacheHome + "/wal/wal"
-        onWritten: Qt.callLater(root.reloadApplications)
+        onWritten: Qt.callLater(root.reloader.reload)
     }
 
-    property bool reloadPending: false
-
-    function reloadApplications() {
-        const files = [colorsFile, jsonFile, shellFile, imageFile];
-        if (files.some(file => file.saving || file.savedText === null || (file.pendingText !== null && file.pendingText !== file.savedText)))
-            return;
-        reloadPending = reloadProcess.running;
-        if (!reloadPending) reloadProcess.running = true;
-    }
-
-    property Process reloadProcess: Process {
-        onExited: if (root.reloadPending) Qt.callLater(root.reloadApplications)
+    property ThemeReloader reloader: ThemeReloader {
+        files: [colorsFile, jsonFile, shellFile, imageFile]
         command: ["bash", "-c", "if command -v pywalfox >/dev/null; then pywalfox update; fi; if command -v walogram >/dev/null; then walogram -B; fi"]
-        stdout: StdioCollector {}
-        stderr: StdioCollector { onStreamFinished: if (text.trim()) console.warn(text.trim()) }
     }
 }

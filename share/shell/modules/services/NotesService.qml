@@ -173,8 +173,8 @@ Singleton {
             write(JSON.stringify(root.currentJob));
             stdinEnabled = false;
         }
-        stdout: StdioCollector { id: response }
-        stderr: StdioCollector {}
+        stdout: StdioCollector { id: response; waitForEnd: true }
+        stderr: StdioCollector { waitForEnd: true }
         onExited: code => {
             let result;
             try { result = JSON.parse(response.text); }

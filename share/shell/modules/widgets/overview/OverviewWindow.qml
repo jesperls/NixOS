@@ -297,11 +297,9 @@ Item {
                         Compositor.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${windowData?.address}`);
                         Compositor.dispatch(`movewindowpixel exact ${percentageX}% ${percentageY}%, address:${windowData?.address}`);
                         
-                        CompositorData.updateWindowList();
                     } else {
                         Compositor.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${windowData?.address}`);
                         
-                        CompositorData.updateWindowList();
                     }
                     
                     root.x = root.initX;
@@ -318,7 +316,6 @@ Item {
                     
                     Compositor.dispatch(`movewindowpixel exact ${percentageX}% ${percentageY}%, address:${windowData?.address}`);
                     
-                    CompositorData.updateWindowList();
                     
                     root.overrideX = draggedX;
                     root.overrideY = draggedY;

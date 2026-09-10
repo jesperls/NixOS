@@ -11,8 +11,44 @@ import socket
 import sys
 import urllib.error
 import urllib.request
+import ipaddress
 from html.parser import HTMLParser
 from urllib.parse import quote, urljoin, urlparse
+
+
+def _is_blocked_ip(ip):
+    try:
+        addr = ipaddress.ip_address(ip)
+    except ValueError:
+        return True
+    if addr.version == 6 and addr.ipv4_mapped is not None:
+        addr = addr.ipv4_mapped
+    return (
+        addr.is_private
+        or addr.is_loopback
+        or addr.is_link_local
+        or addr.is_reserved
+        or addr.is_multicast
+        or addr.is_unspecified
+    )
+
+
+def _resolves_public(hostname):
+    if not hostname:
+        return False
+    try:
+        infos = socket.getaddrinfo(hostname, None)
+    except OSError:
+        return False
+    return all(not _is_blocked_ip(info[4][0]) for info in infos)
+
+
+class _SafeRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        parsed = urlparse(newurl)
+        if parsed.scheme not in ("http", "https") or not _resolves_public(parsed.hostname):
+            return None
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def extract_youtube_id(url):
@@ -236,13 +272,8 @@ def fetch_preview(url, timeout=5):
         if parsed.scheme not in ("http", "https"):
             return {"error": "Unsupported scheme"}
 
-        try:
-            for addr in socket.getaddrinfo(parsed.hostname, None):
-                ip = addr[4][0]
-                if ip.startswith(("127.", "10.", "192.168.", "169.254.", "0.", "::1", "fe80", "fc", "fd")):
-                    return {"error": "Blocked address"}
-        except OSError:
-            return {"error": "Invalid host"}
+        if not _resolves_public(parsed.hostname):
+            return {"error": "Blocked address"}
 
         if is_youtube_url(url):
             result = fetch_youtube_metadata(url, timeout)
@@ -264,17 +295,12 @@ def fetch_preview(url, timeout=5):
 
         req = urllib.request.Request(url, headers=headers)
 
-        with urllib.request.urlopen(req, timeout=timeout) as response:
+        with urllib.request.build_opener(_SafeRedirect()).open(req, timeout=timeout) as response:
             final_url = response.geturl()
             final_parsed = urlparse(final_url)
 
-            try:
-                for addr in socket.getaddrinfo(final_parsed.hostname, None):
-                    ip = addr[4][0]
-                    if ip.startswith(("127.", "10.", "192.168.", "169.254.", "0.", "::1", "fe80", "fc", "fd")):
-                        return {"error": "Blocked address"}
-            except OSError:
-                return {"error": "Invalid host"}
+            if not _resolves_public(final_parsed.hostname):
+                return {"error": "Blocked address"}
 
             content_type = response.headers.get("Content-Type", "")
             if "text/html" not in content_type:

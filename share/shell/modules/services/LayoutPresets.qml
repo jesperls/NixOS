@@ -34,11 +34,10 @@ Singleton {
         }
     ]
 
-    FileView {
+    ConfigFile {
         id: presetsFile
-        path: Paths.configPath("layouts.json")
-        atomicWrites: true
-        watchChanges: true
+        name: "layouts"
+        pathOverride: Paths.configPath("layouts.json")
 
         adapter: JsonAdapter {
             property var presets: []
@@ -81,17 +80,18 @@ Singleton {
         }
     }
 
+    // Simple theme fields only; the sr* variants are captured separately.
     readonly property var _themeKeys: ["oledMode", "dynamicColors", "roundness", "font", "fontSize", "monoFont", "monoFontSize", "tintIcons", "enableCorners", "animDuration", "shadowOpacity", "shadowColor", "shadowXOffset", "shadowYOffset", "shadowBlur"]
-    readonly property var _barKeys: ["position", "height", "style", "margin", "spacing", "padding", "launcherIcon", "launcherIconTint", "launcherIconFullTint", "launcherIconSize", "pillStyle", "clockPosition", "launcherPosition", "flatButtons", "showWorkspaces", "enableFirefoxPlayer", "screenList", "frameEnabled", "frameThickness", "pinnedOnStartup", "hoverToReveal", "hoverRegionHeight", "hideDelay", "showPinButton", "availableOnFullscreen", "use12hFormat", "showSeconds", "showDate", "containBar", "keepBarShadow", "keepBarBorder", "splitOnCenteredLayout", "splitGapPadding"]
-    readonly property var _dockKeys: ["enabled", "theme", "position", "height", "iconSize", "spacing", "margin", "hoverRegionHeight", "hideDelay", "pinnedOnStartup", "hoverToReveal", "availableOnFullscreen", "showRunningIndicators", "showPinButton", "showOverviewButton", "ignoredAppRegexes", "screenList", "keepHidden"]
-    readonly property var _notchKeys: ["theme", "position", "hoverRegionHeight", "hideDelay", "hoverExpansionDelay", "showUser", "showMedia", "showNotificationIndicator", "keepHidden", "noMediaDisplay", "customText", "disableHoverExpansion", "splitSide"]
-    readonly property var _workspacesKeys: ["shown", "showAppIcons", "alwaysShowNumbers", "showNumbers", "dynamic"]
-    readonly property var _overviewKeys: ["enabled", "layout", "rows", "columns", "scale", "workspaceSpacing"]
-    readonly property var _dashboardKeys: ["width", "height", "showTabRail", "tabPosition", "showWidgets", "showWallpapers", "showMetrics", "backgroundOpacity"]
-    readonly property var _launcherKeys: ["width", "height", "showAppComments", "sortByUsage"]
-    readonly property var _lockscreenKeys: ["position", "lockOnBoot", "showClock", "showDate", "showMediaPlayer", "showAvatar", "showUsername", "blurWallpaper", "dimOpacity"]
-    readonly property var _osdKeys: ["position", "showPercentage", "showSlider", "iconStyle", "width"]
-    readonly property var _compositorKeys: ["activeBorderColor", "borderAngle", "inactiveBorderColor", "inactiveBorderAngle", "borderSize", "rounding", "syncRoundness", "syncBorderWidth", "syncBorderColor", "syncShadowOpacity", "syncShadowColor", "gapsIn", "gapsOut", "shadowEnabled", "shadowRange", "shadowRenderPower", "shadowSharp", "shadowColor", "shadowColorInactive", "shadowOpacity", "shadowOffset", "shadowScale", "blurEnabled", "blurSize", "blurPasses", "blurIgnoreOpacity", "blurExplicitIgnoreAlpha", "blurIgnoreAlphaValue", "blurNewOptimizations", "blurXray", "blurNoise", "blurContrast", "blurBrightness", "blurVibrancy", "blurVibrancyDarkness", "blurSpecial", "blurPopups", "blurPopupsIgnorealpha", "blurInputMethods", "blurInputMethodsIgnorealpha"]
+    readonly property var _barKeys: Config.adapterKeys("bar")
+    readonly property var _dockKeys: Config.adapterKeys("dock")
+    readonly property var _notchKeys: Config.adapterKeys("notch")
+    readonly property var _workspacesKeys: Config.adapterKeys("workspaces")
+    readonly property var _overviewKeys: Config.adapterKeys("overview")
+    readonly property var _dashboardKeys: Config.adapterKeys("dashboard")
+    readonly property var _launcherKeys: Config.adapterKeys("launcher")
+    readonly property var _lockscreenKeys: Config.adapterKeys("lockscreen")
+    readonly property var _osdKeys: Config.adapterKeys("osd")
+    readonly property var _compositorKeys: Config.adapterKeys("compositor")
 
     function deepCopy(value) {
         if (value === null || value === undefined)

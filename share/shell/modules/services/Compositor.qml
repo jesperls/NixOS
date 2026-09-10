@@ -24,6 +24,59 @@ Singleton {
     readonly property var focusedWorkspace: workspaces.values.find(w => w.active) ?? null
     readonly property var focusedClient: clients.values.find(c => c.is_focused) ?? null
 
+    readonly property var windowList: root.clients.values
+    readonly property var workspaceOccupationMap: {
+        const map = {};
+        for (const win of (root.clients.values ?? []))
+            map[win.workspace.id] = true;
+        return map;
+    }
+    readonly property var workspaceWindowsMap: {
+        const map = {};
+        for (const win of (root.clients.values ?? [])) {
+            const id = win.workspace.id;
+            if (!map[id])
+                map[id] = [];
+            map[id].push(win);
+        }
+        return map;
+    }
+
+    // Centered-layout master gap, published per screen by the compositor.
+    property var gaps: ({})
+
+    function gapFor(screenName) {
+        return root.gaps[screenName] ?? null;
+    }
+
+    function handleRawEvent(event) {
+        if (event.name !== "custom" || !event.data)
+            return;
+        const parts = event.data.split(",");
+        if (parts.length < 4 || parts[0] !== "centergap")
+            return;
+        const name = parts[1];
+        const x = parseInt(parts[2], 10);
+        const width = parseInt(parts[3], 10);
+        const square = parts[4] === "1";
+        const next = Object.assign({}, root.gaps);
+        if (!width || width <= 0) {
+            if (!(name in next))
+                return;
+            delete next[name];
+        } else {
+            const prev = next[name];
+            if (prev && prev.x === x && prev.width === width && prev.square === square)
+                return;
+            next[name] = {
+                x: x,
+                width: width,
+                square: square
+            };
+        }
+        root.gaps = next;
+    }
+
     function monitorFor(screen) {
         const name = screen && screen.name ? screen.name : screen;
         return root.monitors.values.find(m => m.name === name) ?? null;
@@ -210,6 +263,7 @@ Singleton {
         target: Hyprland
 
         function onRawEvent(event) {
+            root.handleRawEvent(event);
             refresh.restart();
         }
         function onFocusedMonitorChanged() {

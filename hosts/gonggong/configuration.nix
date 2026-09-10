@@ -1,10 +1,17 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   imports = [
     ./hardware-configuration.nix
 
     ../../modules/nixos/bundle.nix
+
+    ../../modules/nixos/services/docker.nix
   ];
 
   mySystem = {
@@ -20,14 +27,15 @@
       passwordlessSudo = true;
     };
 
-    network.allowedTCPPorts = [ 8080 5657 25565 ];
+    network.allowedTCPPorts = [
+      8080
+      5657
+      25565
+    ];
 
     performance.cpuVendor = "intel";
-
-    services.docker.enable = true;
   };
 
-  # boot.nix defaults to the CachyOS kernel; servers take the vanilla one
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.interfaces.enp2s0.wakeOnLan = {

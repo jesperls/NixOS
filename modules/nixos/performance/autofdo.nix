@@ -10,8 +10,6 @@ let
 in
 {
   options.mySystem.performance.autofdo = {
-    enable = lib.mkEnableOption "periodic system-wide AutoFDO profile collection";
-
     interval = lib.mkOption {
       type = lib.types.str;
       default = "1h";
@@ -37,7 +35,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = {
     systemd.timers.autofdo-collector = {
       wantedBy = [ "timers.target" ];
       timerConfig = {
@@ -81,7 +79,7 @@ in
         timestamp=$(date +%s)
         raw="$RUNTIME_DIRECTORY/perf.data"
         profile="$STATE_DIRECTORY/profile-$timestamp.afdo"
-        trap 'rm -f "$raw" "$raw.old" "$profile.tmp"' EXIT
+        trap 'rm -f "$raw" "$profile.tmp"' EXIT
         vmlinux=${config.boot.kernelPackages.kernel.dev}/vmlinux
 
         if [ ! -f "$vmlinux" ]; then

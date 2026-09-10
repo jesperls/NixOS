@@ -30,9 +30,27 @@ Item {
         }
     }
 
+    ListDetailController {
+        id: detail
+        renameHighlightsCancel: true
+        refresh: root.updateFilteredItems
+        focusSearch: root.focusSearchInput
+        setResultsCurrentIndex: value => {
+            resultsList.currentIndex = value;
+        }
+        prepareRename: id => {
+            for (var i = 0; i < root.allItems.length; i++) {
+                if (root.allItems[i].id === id)
+                    return root.allItems[i].alias || root.allItems[i].preview;
+            }
+            return "";
+        }
+    }
+
+    property alias selectedIndex: detail.selectedIndex
+
     property string searchText: ""
     property bool showResults: searchText.length > 0
-    property int selectedIndex: -1
     property var allItems: []
     property bool hasNavigatedFromSearch: false
 
@@ -43,16 +61,16 @@ Item {
     property bool clearButtonConfirmState: false
     property bool anyItemDragging: false
 
-    property bool deleteMode: false
-    property string itemToDelete: ""
-    property int originalSelectedIndex: -1
-    property int deleteButtonIndex: 0
+    property alias deleteMode: detail.deleteMode
+    property alias itemToDelete: detail.pendingDeleteId
+    property alias originalSelectedIndex: detail.originalSelectedIndex
+    property alias deleteButtonIndex: detail.deleteButtonIndex
 
-    property bool aliasMode: false
-    property string itemToAlias: ""
-    property string newAlias: ""
-    property int aliasSelectedIndex: -1
-    property int aliasButtonIndex: 0
+    property alias aliasMode: detail.renameMode
+    property alias itemToAlias: detail.pendingRenameId
+    property alias newAlias: detail.pendingRenameName
+    property alias aliasSelectedIndex: detail.renameSelectedIndex
+    property alias aliasButtonIndex: detail.renameButtonIndex
 
     property string pendingItemIdToSelect: ""
 
@@ -248,31 +266,16 @@ Item {
     }
 
     function cancelDeleteModeFromExternal() {
-        if (deleteMode) {
-            cancelDeleteMode();
-        }
-        if (aliasMode) {
-            cancelAliasMode();
-        }
+        detail.cancelModes();
     }
 
     function enterDeleteMode(itemId) {
-        originalSelectedIndex = selectedIndex;
-        deleteMode = true;
-        itemToDelete = itemId;
-        deleteButtonIndex = 0;
+        detail.enterDeleteMode(itemId);
         root.forceActiveFocus();
     }
 
     function cancelDeleteMode() {
-        deleteMode = false;
-        itemToDelete = "";
-        deleteButtonIndex = 0;
-        searchInput.focusInput();
-        updateFilteredItems();
-        selectedIndex = originalSelectedIndex;
-        resultsList.currentIndex = originalSelectedIndex;
-        originalSelectedIndex = -1;
+        detail.cancelDeleteMode();
     }
 
     function confirmDeleteItem() {
@@ -290,31 +293,12 @@ Item {
     }
 
     function enterAliasMode(itemId) {
-        aliasSelectedIndex = selectedIndex;
-        aliasMode = true;
-        itemToAlias = itemId;
-
-        for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-                newAlias = allItems[i].alias || allItems[i].preview;
-                break;
-            }
-        }
-
-        aliasButtonIndex = 1;
+        detail.enterRenameMode(itemId);
         root.forceActiveFocus();
     }
 
     function cancelAliasMode() {
-        aliasMode = false;
-        itemToAlias = "";
-        newAlias = "";
-        aliasButtonIndex = 0;
-        searchInput.focusInput();
-        updateFilteredItems();
-        selectedIndex = aliasSelectedIndex;
-        resultsList.currentIndex = aliasSelectedIndex;
-        aliasSelectedIndex = -1;
+        detail.cancelRenameMode();
     }
 
     function confirmAliasItem() {
@@ -1209,161 +1193,13 @@ Item {
                                 }
                             }
 
-                            Rectangle {
-                                id: actionContainer
-                                anchors.right: parent.right
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.rightMargin: 8
-                                width: 68
-                                height: 32
-                                color: "transparent"
-                                opacity: isInDeleteMode ? 1.0 : 0.0
-                                visible: opacity > 0
-
-                                transform: Translate {
-                                    x: isInDeleteMode ? 0 : 80
-
-                                    Behavior on x {
-                                        enabled: Config.animDuration > 0
-                                        NumberAnimation {
-                                            duration: Config.animDuration
-                                            easing.type: Easing.OutQuart
-                                        }
-                                    }
-                                }
-
-                                Behavior on opacity {
-                                    enabled: Config.animDuration > 0
-                                    NumberAnimation {
-                                        duration: Config.animDuration / 2
-                                        easing.type: Easing.OutQuart
-                                    }
-                                }
-
-                                StyledRect {
-                                    id: deleteHighlight
-                                    variant: "overerror"
-                                    radius: Styling.radius(-4)
-                                    visible: isInDeleteMode
-                                    z: 0
-
-                                    property real activeButtonMargin: 2
-                                    property real idx1X: root.deleteButtonIndex
-                                    property real idx2X: root.deleteButtonIndex
-
-                                    x: {
-                                        let minX = Math.min(idx1X, idx2X) * 36 + activeButtonMargin;
-                                        return minX;
-                                    }
-
-                                    y: activeButtonMargin
-
-                                    width: {
-                                        let stretchX = Math.abs(idx1X - idx2X) * 36 + 32 - activeButtonMargin * 2;
-                                        return stretchX;
-                                    }
-
-                                    height: 32 - activeButtonMargin * 2
-
-                                    Behavior on idx1X {
-                                        enabled: Config.animDuration > 0
-                                        NumberAnimation {
-                                            duration: Config.animDuration / 3
-                                            easing.type: Easing.OutSine
-                                        }
-                                    }
-                                    Behavior on idx2X {
-                                        enabled: Config.animDuration > 0
-                                        NumberAnimation {
-                                            duration: Config.animDuration
-                                            easing.type: Easing.OutSine
-                                        }
-                                    }
-                                }
-
-                                Row {
-                                    id: actionButtons
-                                    anchors.fill: parent
-                                    spacing: 4
-
-                                    Rectangle {
-                                        id: cancelButton
-                                        width: 32
-                                        height: 32
-                                        color: "transparent"
-                                        radius: 6
-                                        border.width: 0
-                                        border.color: Colors.outline
-                                        z: 1
-
-                                        property bool isHighlighted: root.deleteButtonIndex === 0
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            onClicked: root.cancelDeleteMode()
-                                            onEntered: {
-                                                root.deleteButtonIndex = 0;
-                                            }
-                                            onExited: parent.color = "transparent"
-                                        }
-
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: Icons.cancel
-                                            color: cancelButton.isHighlighted ? Colors.overErrorContainer : Colors.overError
-                                            font.pixelSize: 14
-                                            font.family: Icons.font
-                                            textFormat: Text.RichText
-
-                                            Behavior on color {
-                                                enabled: Config.animDuration > 0
-                                                ColorAnimation {
-                                                    duration: Config.animDuration / 2
-                                                    easing.type: Easing.OutQuart
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        id: confirmButton
-                                        width: 32
-                                        height: 32
-                                        color: "transparent"
-                                        radius: 6
-                                        z: 1
-
-                                        property bool isHighlighted: root.deleteButtonIndex === 1
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            onClicked: root.confirmDeleteItem()
-                                            onEntered: {
-                                                root.deleteButtonIndex = 1;
-                                            }
-                                            onExited: parent.color = "transparent"
-                                        }
-
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: Icons.accept
-                                            color: confirmButton.isHighlighted ? Colors.overErrorContainer : Colors.overError
-                                            font.pixelSize: 14
-                                            font.family: Icons.font
-                                            textFormat: Text.RichText
-
-                                            Behavior on color {
-                                                enabled: Config.animDuration > 0
-                                                ColorAnimation {
-                                                    duration: Config.animDuration / 2
-                                                    easing.type: Easing.OutQuart
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                            ActionBar {
+                                active: isInDeleteMode
+                                buttonIndex: root.deleteButtonIndex
+                                alignTop: false
+                                onButtonIndexRequested: index => root.deleteButtonIndex = index
+                                onCancelRequested: root.cancelDeleteMode()
+                                onConfirmRequested: root.confirmDeleteItem()
                             }
 
                             Rectangle {
@@ -1605,15 +1441,15 @@ Item {
                                     }
                                 }
 
-                                ListView {
+                                OptionsListView {
                                     id: optionsListView
                                     anchors.fill: parent
-                                    clip: true
                                     interactive: true
-                                    boundsBehavior: Flickable.StopAtBounds
-
-                                    property bool isScrolling: dragging || flicking
-
+                                    selectedIndex: root.selectedOptionIndex
+                                    onIndexHovered: index => {
+                                        root.selectedOptionIndex = index;
+                                        root.keyboardNavigation = false;
+                                    }
                                     model: {
                                         var options = [
                                             {
@@ -1671,137 +1507,6 @@ Item {
                                         });
 
                                         return options;
-                                    }
-                                    currentIndex: root.selectedOptionIndex
-                                    highlightFollowsCurrentItem: true
-                                    highlightRangeMode: ListView.ApplyRange
-                                    preferredHighlightBegin: 0
-                                    preferredHighlightEnd: height
-
-                                    highlight: StyledRect {
-                                        variant: {
-                                            if (optionsListView.currentIndex >= 0 && optionsListView.currentIndex < optionsListView.count) {
-                                                var item = optionsListView.model[optionsListView.currentIndex];
-                                                if (item && item.highlightColor) {
-                                                    if (item.highlightColor === Colors.error)
-                                                        return "error";
-                                                    if (item.highlightColor === Colors.secondary)
-                                                        return "secondary";
-                                                    return "primary";
-                                                }
-                                            }
-                                            return "primary";
-                                        }
-                                        radius: Styling.radius(0)
-                                        visible: optionsListView.currentIndex >= 0
-                                        z: -1
-
-                                        Behavior on opacity {
-                                            enabled: Config.animDuration > 0
-                                            NumberAnimation {
-                                                duration: Config.animDuration / 2
-                                                easing.type: Easing.OutQuart
-                                            }
-                                        }
-                                    }
-
-                                    highlightMoveDuration: Config.animDuration > 0 ? Config.animDuration / 2 : 0
-                                    highlightMoveVelocity: -1
-                                    highlightResizeDuration: Config.animDuration / 2
-                                    highlightResizeVelocity: -1
-
-                                    delegate: Item {
-                                        required property var modelData
-                                        required property int index
-
-                                        property alias itemData: delegateData.modelData
-
-                                        QtObject {
-                                            id: delegateData
-                                            property var modelData: parent ? parent.modelData : null
-                                        }
-
-                                        width: optionsListView.width
-                                        height: 36
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            color: "transparent"
-
-                                            RowLayout {
-                                                anchors.fill: parent
-                                                anchors.margins: 8
-                                                spacing: 8
-
-                                                Text {
-                                                    text: modelData && modelData.icon ? modelData.icon : ""
-                                                    font.family: Icons.font
-                                                    font.pixelSize: 14
-                                                    font.weight: Font.Bold
-                                                    textFormat: Text.RichText
-                                                    color: {
-                                                        if (optionsListView.currentIndex === index && modelData && modelData.textColor) {
-                                                            return modelData.textColor;
-                                                        }
-                                                        return Colors.overSurface;
-                                                    }
-
-                                                    Behavior on color {
-                                                        enabled: Config.animDuration > 0
-                                                        ColorAnimation {
-                                                            duration: Config.animDuration / 2
-                                                            easing.type: Easing.OutQuart
-                                                        }
-                                                    }
-                                                }
-
-                                                Text {
-                                                    Layout.fillWidth: true
-                                                    text: modelData && modelData.text ? modelData.text : ""
-                                                    font.family: Config.theme.font
-                                                    font.pixelSize: Config.theme.fontSize
-                                                    font.weight: optionsListView.currentIndex === index ? Font.Bold : Font.Normal
-                                                    color: {
-                                                        if (optionsListView.currentIndex === index && modelData && modelData.textColor) {
-                                                            return modelData.textColor;
-                                                        }
-                                                        return Colors.overSurface;
-                                                    }
-                                                    elide: Text.ElideRight
-                                                    maximumLineCount: 1
-
-                                                    Behavior on color {
-                                                        enabled: Config.animDuration > 0
-                                                        ColorAnimation {
-                                                            duration: Config.animDuration / 2
-                                                            easing.type: Easing.OutQuart
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                hoverEnabled: !optionsListView.isScrolling
-                                                cursorShape: Qt.PointingHandCursor
-
-                                                onEntered: {
-                                                    if (optionsListView.isScrolling)
-                                                        return;
-                                                    optionsListView.currentIndex = index;
-                                                    root.selectedOptionIndex = index;
-                                                    root.keyboardNavigation = false;
-                                                }
-
-                                                onClicked: {
-                                                    if (optionsListView.isScrolling)
-                                                        return;
-                                                    if (modelData && modelData.action) {
-                                                        modelData.action();
-                                                    }
-                                                }
-                                            }
-                                        }
                                     }
                                 }
 

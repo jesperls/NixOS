@@ -14,7 +14,7 @@ Singleton {
     property var subfolderFilters: []
     property var allSubdirs: []
     property int currentIndex: 0
-    readonly property string currentWallpaper: initialLoadCompleted && wallpaperPaths.length > 0 ? wallpaperPaths[currentIndex] : ""
+    readonly property string currentWallpaper: initialLoadCompleted && currentIndex >= 0 && currentIndex < wallpaperPaths.length ? wallpaperPaths[currentIndex] : ""
     property bool initialLoadCompleted: false
     onInitialLoadCompletedChanged: {
         if (initialLoadCompleted && currentWallpaper) {
@@ -400,33 +400,12 @@ Singleton {
         });
     }
 
-    FileView {
+    ConfigFile {
         id: wallpaperConfig
-        path: Paths.cachePath("wallpapers.json")
-        watchChanges: true
+        name: "wallpapers"
+        pathOverride: Paths.cachePath("wallpapers.json")
 
-        property bool ready: false
-        property bool reloading: true
-        onLoaded: {
-            ready = true;
-            reloading = false;
-            if (!wallpaperAdapter.wallPath) wallpaperAdapter.wallPath = wallpaper.fallbackDir;
-        }
-        onLoadFailed: error => {
-            reloading = false;
-            if (error === FileViewError.FileNotFound) {
-                ready = true;
-                wallpaperAdapter.wallPath = wallpaper.fallbackDir;
-                writeAdapter();
-            }
-        }
-        onFileChanged: {
-            reloading = true;
-            reload();
-        }
-        onAdapterUpdated: if (ready && !reloading) writeAdapter()
-
-        JsonAdapter {
+        adapter: JsonAdapter {
             id: wallpaperAdapter
             property string currentWall: ""
             property string wallPath: ""
@@ -477,6 +456,14 @@ Singleton {
                     }
                 }
             }
+        }
+    }
+
+    Connections {
+        target: wallpaperConfig
+        function onReadyChanged() {
+            if (wallpaperConfig.ready && !wallpaperAdapter.wallPath)
+                wallpaperAdapter.wallPath = wallpaper.fallbackDir;
         }
     }
 
@@ -608,7 +595,6 @@ Singleton {
 
                 topLevelFolders.sort();
                 subfolderFilters = topLevelFolders;
-                subfolderFiltersChanged();  // emitted manually: the list itself didn't change
                 console.log("Updated subfolderFilters:", subfolderFilters);
             }
         }

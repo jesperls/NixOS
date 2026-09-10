@@ -64,4 +64,32 @@ assert(dispatched == 2, 'Floating windows cannot be resized in centered workspac
 floating = false
 binds['Mouse: resize window']()
 assert(dispatched == 2, 'Tiled centered window used the floating resize dispatcher')
-print('Hyprland syntax, workspace isolation and floating resize tests passed')
+
+-- Restore must keep a centered mode for a workspace that is primary per the
+-- live monitor but absent from the generated static list, and must still drop
+-- structurally invalid entries.
+local modes = { [1] = 'lua:centered', [2] = 'dwindle', [3] = 'bogus' }
+local ruled = {}
+for _, name in ipairs({ 'pangu.generated', 'pangu.session', 'pangu.layouts', 'pangu.primary' }) do
+  package.loaded[name] = nil
+end
+package.preload['pangu.generated'] = function()
+  return { layouts = { cycle = {'dwindle', 'lua:centered'} }, monitors = {} }
+end
+package.preload['pangu.session'] = function() return { table = function() return modes end } end
+package.preload['pangu.layouts'] = function() return { center_active = function() end, schedule_scan = function() end } end
+package.preload['pangu.primary'] = function()
+  return { workspace_id = function(id) return id == 2 end, workspace = function() return false end }
+end
+hl = {
+  workspace_rule = function(rule)
+    ruled[#ruled + 1] = rule
+    return { set_enabled = function() end }
+  end,
+}
+dofile(source .. '/layout_modes.lua')
+assert(modes[1] == 'lua:centered', 'A live-primary centered mode was deleted on restore')
+assert(modes[2] == 'dwindle')
+assert(modes[3] == nil, 'An invalid layout mode target was not discarded')
+assert(#ruled == 1, 'Only the valid non-centered mode should be applied')
+print('Hyprland syntax, workspace isolation, floating resize and layout-mode restore tests passed')

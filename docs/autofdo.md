@@ -38,15 +38,15 @@ profile via `CLANG_AUTOFDO_PROFILE`.
 | ---- | ---- |
 | `pkgs/autofdo/default.nix` | Google's prebuilt static `create_llvm_prof` v0.30.1 |
 | `modules/nixos/performance/autofdo.nix` | The collector timer and service |
-| `modules/nixos/options/performance.nix` | `performance.kernel.autofdo` (bool or profile path) |
+| `modules/nixos/performance/kernel.nix` | `mySystem.performance.kernel.autofdo` (bool or profile path) |
 | `hosts/pangu/configuration.nix` | Collection enabled here |
 
 ## Workflow
 
 ### 1. Collect
 
-Collection is already enabled (`performance.autofdo.enable = true`). Rebuild
-and reboot, then just use the machine normally for a few days — builds,
+Collection is enabled by pangu importing `modules/nixos/performance/autofdo.nix`.
+Rebuild and reboot, then just use the machine normally for a few days — builds,
 gaming, VMs, whatever you want the kernel optimized for.
 
 ```bash
@@ -90,10 +90,8 @@ back to the cached `linuxPackages-cachyos-latest-lto`.
 
 ### 5. When done
 
-```nix
-# hosts/pangu/configuration.nix
-performance.autofdo.enable = false;
-```
+Remove the `modules/nixos/performance/autofdo.nix` import from
+`hosts/pangu/configuration.nix`.
 
 This stops the timer. The compiled profile stays
 baked into the running kernel until you rebuild.
@@ -106,7 +104,7 @@ baked into the running kernel until you rebuild.
 | `performance.kernel.autofdo` | `false` off · `true` profiling config only · `<repo path>` applies that profile |
 | `performance.kernel.performanceGovernor` | Default cpufreq governor = performance |
 | `performance.kernel.bbr3` | BBRv3 as default TCP congestion control |
-| `performance.autofdo.enable` | Turn the collector timer on/off |
+| importing `performance/autofdo.nix` | Turn the collector timer on (pangu imports it) |
 | `performance.autofdo.interval` | Sampling frequency (`1h` default) |
 | `performance.autofdo.duration` | Window length (`5m` default) |
 | `performance.autofdo.samplePeriod` | `perf` event period (`500009` default) |

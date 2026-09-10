@@ -2,13 +2,13 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
+import qs.modules.components
 
 Singleton {
     id: root
 
-    property var state: ({})
     property bool initialized: false
+    property alias state: store.data
 
     signal stateLoaded
 
@@ -20,35 +20,15 @@ Singleton {
         if (!root.initialized)
             return;
         root.state[key] = value;
-        file.setText(JSON.stringify(root.state, null, 2));
+        store.save();
     }
 
-    // Consumers restore from stateLoaded, so re-emitting it would overwrite
-    // whatever they have since changed.
-    function ready() {
-        if (root.initialized)
-            return;
-        root.initialized = true;
-        root.stateLoaded();
-    }
-
-    FileView {
-        id: file
-        path: Quickshell.statePath("states.json")
-        preload: true
-        atomicWrites: true
-        onLoaded: {
-            try {
-                const loaded = JSON.parse(text());
-                if (!loaded || typeof loaded !== "object" || Array.isArray(loaded))
-                    throw new Error("Expected a state object");
-                root.state = loaded;
-            } catch (e) {
-                console.warn("StateService: discarding unreadable state file:", e);
-                root.state = {};
-            }
-            root.ready();
+    JsonStore {
+        id: store
+        filePath: Quickshell.statePath("states.json")
+        onDataLoaded: {
+            root.initialized = true;
+            root.stateLoaded();
         }
-        onLoadFailed: root.ready()
     }
 }

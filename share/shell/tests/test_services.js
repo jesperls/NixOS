@@ -33,7 +33,8 @@ serviceFunctions('Notifications.qml', ['popupTimeout', 'finishTimeout', 'timeout
 assert.equal(notificationContext.popupTimeout(-1, 1), 5000);
 assert.equal(notificationContext.popupTimeout(0, 1), 0);
 assert.equal(notificationContext.popupTimeout(1200, 1), 1200);
-assert.equal(notificationContext.popupTimeout(1200, 2), 0);
+assert.equal(notificationContext.popupTimeout(1200, 2), 1200);
+assert.equal(notificationContext.popupTimeout(-1, 2), 0);
 notificationContext.timeoutNotification(1);
 notificationContext.timeoutNotification(2);
 assert.ok(notices.every(notice => notice.closeTimer.running));
@@ -197,11 +198,11 @@ assert.equal(settingsContext.isPaused('system'), false);
 console.log('Independent settings drafts and batch-save inhibition tests passed');
 
 const globalsSource = fs.readFileSync(path.join(__dirname, '../modules/globals/GlobalStates.qml'), 'utf8');
-const sectionsText = globalsSource.match(/readonly property var _shellSections: (\{[\s\S]*?\n    \})/)[1];
-const shellSections = JSON.parse(sectionsText);
+assert.match(globalsSource, /Config\.adapterKeys\(/, 'GlobalStates must derive tracked keys from the adapters');
+const sectionNames = JSON.parse(globalsSource.match(/const names = (\[[^\]]*\]);/)[1]);
 const shellPanelSource = fs.readFileSync(path.join(__dirname, '../modules/widgets/dashboard/controls/ShellPanel.qml'), 'utf8');
 for (const match of shellPanelSource.matchAll(/Config\.(\w+)\.(\w+)\s*=(?!=)/g)) {
-    assert.ok(shellSections[match[1]]?.includes(match[2]), `Untracked shell setting: ${match[1]}.${match[2]}`);
+    assert.ok(sectionNames.includes(match[1]), `Shell section is not drafted: ${match[1]}.${match[2]}`);
 }
 console.log('Shell Apply/Discard coverage matches editable controls');
 
@@ -441,17 +442,21 @@ console.log('Automatic theme validates times, handles midnight, and leaves setti
 
 let usageSignals = 0;
 const usageContext = {
-    root: {}, usageData: {}, pendingUsage: [], dataLoaded: false, fileReady: true,
+    root: {}, usageData: {}, pendingUsage: [], dataLoaded: false,
+    store: {ready: true, data: {}, save() {}},
     saveTimer: {restart() {}}, Date, maxBoostScore: 200, dayInMs: 86400000,
     usageDataReady() {}, usageChanged() { usageSignals++; }
 };
-serviceFunctions('UsageTracker.qml', ['finishLoad', 'recordUsage', 'getUsageScore'], usageContext);
+serviceFunctions('UsageTracker.qml', ['validate', 'finishLoad', 'recordUsage', 'getUsageScore'], usageContext);
 usageContext.recordUsage('early.desktop');
-usageContext.finishLoad({
+const loadedUsage = usageContext.validate({
     'early.desktop': {count: 4, lastUsed: Date.now()},
     invalid: {count: 'oops', lastUsed: null},
     future: {count: 1, lastUsed: Date.now() + 1e12}
 });
+usageContext.usageData = loadedUsage;
+usageContext.store.data = loadedUsage;
+usageContext.finishLoad();
 assert.equal(usageContext.usageData['early.desktop'].count, 5);
 assert.equal(usageContext.getUsageScore('invalid'), 0);
 assert.ok(usageContext.getUsageScore('future') <= 200 + Math.log(2) * 20);
@@ -459,8 +464,9 @@ usageContext.recordUsage('__proto__');
 assert.equal(usageContext.usageData.__proto__.count, 1);
 assert.ok(Number.isFinite(usageContext.getUsageScore('__proto__')));
 assert.equal(usageSignals, 2);
-usageContext.finishLoad({});
-assert.equal(usageContext.usageData['early.desktop'].count, 5);
+const settled = usageContext.usageData;
+usageContext.finishLoad();
+assert.equal(usageContext.usageData, settled);
 console.log('Usage history validates persisted data and preserves launches during initial loading');
 
 const launchRequests = [];
@@ -499,3 +505,114 @@ assert.equal(placementContext.placeOnTargetWorkspace(), false);
 placementContext.Compositor.clients.values = [{title: "Pangu Settings", nativeToplevel: {}, address: "new", workspace: {id: 1}}];
 assert.equal(placementContext.placeOnTargetWorkspace(), true);
 assert.deepEqual(placementCalls, ['movetoworkspacesilent 2, address:new', 'focuswindow address:new']);
+
+const themeWrites = [];
+const themeContext = {
+    root: {},
+    Qt: {callLater(callback) {}},
+    directoryReady: true,
+    saving: false,
+    pendingText: "",
+    savedText: null,
+    writingText: "",
+    prepareDirectory: {running: false},
+    setText(text) { themeWrites.push(text); },
+    written() { themeContext.writeCount = (themeContext.writeCount || 0) + 1; }
+};
+serviceFunctions('../theme/ThemeFile.qml', ['startWrite'], themeContext);
+themeContext.startWrite();
+assert.deepEqual(themeWrites, []);
+assert.equal(themeContext.savedText, "");
+assert.equal(themeContext.writeCount, 1);
+themeContext.pendingText = "content";
+themeContext.startWrite();
+assert.deepEqual(themeWrites, ["content"]);
+assert.equal(themeContext.saving, true);
+console.log('Theme exports treat an empty write as a completed no-op');
+
+const composerContext = {root: {gaps: {}}};
+serviceFunctions('Compositor.qml', ['handleRawEvent', 'gapFor'], composerContext);
+composerContext.handleRawEvent({name: 'custom', data: 'centergap,DP-1,100,500,1'});
+let gap = composerContext.gapFor('DP-1');
+assert.equal(gap.x, 100);
+assert.equal(gap.width, 500);
+assert.equal(gap.square, true);
+composerContext.handleRawEvent({name: 'custom', data: 'centergap,DP-1,100,500,1'});
+assert.equal(composerContext.gapFor('DP-1').width, 500);
+composerContext.handleRawEvent({name: 'custom', data: 'centergap,DP-1,0,0,0'});
+assert.equal(composerContext.gapFor('DP-1'), null);
+composerContext.handleRawEvent({name: 'custom', data: 'centergap,DP-2,0,0,0'});
+composerContext.handleRawEvent({name: 'workspace', data: 'ignored'});
+assert.equal(Object.keys(composerContext.root.gaps).length, 0);
+console.log('Centered-layout gap events are parsed and cleared per screen');
+
+const detailState = {
+    selectedIndex: 2, renameHighlightsCancel: false,
+    deleteMode: false, pendingDeleteId: '', originalSelectedIndex: -1, deleteButtonIndex: 0,
+    renameMode: false, pendingRenameId: '', pendingRenameName: '', renameSelectedIndex: -1, renameButtonIndex: 1, pendingRenamedId: '',
+    refreshes: 0, focuses: 0, resultsIndex: -1,
+    refresh() { this.refreshes++; }, focusSearch() { this.focuses++; },
+    setResultsCurrentIndex(value) { this.resultsIndex = value; },
+    prepareRename(id) { return 'name:' + id; }
+};
+const detailContext = {root: detailState, ctrl: detailState};
+serviceFunctions('../components/ListDetailController.qml', ['enterDeleteMode', 'cancelDeleteMode', 'enterRenameMode', 'cancelRenameMode', 'cancelModes'], detailContext);
+detailContext.enterDeleteMode('a');
+assert.equal(detailState.deleteMode, true);
+assert.equal(detailState.pendingDeleteId, 'a');
+assert.equal(detailState.originalSelectedIndex, 2);
+detailState.selectedIndex = 4;
+detailContext.cancelDeleteMode();
+assert.equal(detailState.deleteMode, false);
+assert.equal(detailState.selectedIndex, 2);
+assert.equal(detailState.resultsIndex, 2);
+assert.equal(detailState.refreshes, 1);
+assert.equal(detailState.focuses, 1);
+detailContext.enterRenameMode('b');
+assert.equal(detailState.renameMode, true);
+assert.equal(detailState.pendingRenameName, 'name:b');
+assert.equal(detailState.renameSelectedIndex, 2);
+detailState.pendingRenamedId = 'b';
+detailState.selectedIndex = 9;
+detailContext.cancelRenameMode();
+assert.equal(detailState.renameMode, false);
+assert.equal(detailState.pendingRenameName, '');
+assert.equal(detailState.selectedIndex, 9, 'A pending rename must not restore the selection');
+console.log('List-detail delete/rename state machine is shared');
+
+const controlsDir = path.join(__dirname, '../modules/widgets/dashboard/controls');
+const indexSource = fs.readFileSync(path.join(controlsDir, 'SettingsIndex.qml'), 'utf8');
+const indexEntries = [...indexSource.matchAll(/\{ label: "([^"]*)", keywords: "[^"]*", section: "(\w*)", subSection: "(\w*)", subLabel: "([^"]*)"/g)]
+    .map(match => ({label: match[1], section: match[2], subSection: match[3], subLabel: match[4]}));
+assert.ok(indexEntries.length > 200, 'Expected the settings search index to be populated');
+const settingsTab = fs.readFileSync(path.join(controlsDir, 'SettingsTab.qml'), 'utf8');
+const panelBlock = settingsTab.match(/panelComponents: \[([\s\S]*?)\n\s*\]/)[1];
+const panels = {};
+for (const match of panelBlock.matchAll(/component: "(\w+\.qml)",\s*\n\s*section: "(\w+)"/g))
+    panels[match[2]] = match[1];
+const subsections = {};
+for (const [section, file] of Object.entries(panels)) {
+    const source = fs.readFileSync(path.join(controlsDir, file), 'utf8');
+    subsections[section] = new Set([...source.matchAll(/currentSection === "(\w+)"/g)].map(match => match[1]));
+}
+for (const entry of indexEntries) {
+    assert.ok(entry.label.length > 0, `Settings index entry has no label (${entry.section}/${entry.subSection})`);
+    assert.ok(panels[entry.section], `Settings index targets an unknown section: ${entry.section}`);
+    if (entry.subSection) {
+        assert.ok(subsections[entry.section].has(entry.subSection),
+            `Settings index targets an unknown subsection: ${entry.section} > ${entry.subSection}`);
+        assert.ok(entry.subLabel.length > 0, `Settings index entry ${entry.section} > ${entry.subSection} has no subLabel`);
+    }
+}
+for (const [section, subs] of Object.entries(subsections)) {
+    for (const sub of subs) {
+        assert.ok(indexEntries.some(entry => entry.section === section && entry.subSection === sub),
+            `Panel subsection is not searchable: ${section} > ${sub}`);
+    }
+}
+console.log('Settings search index targets match the panels');
+
+const configSource = fs.readFileSync(path.join(__dirname, '../config/Config.qml'), 'utf8');
+assert.match(configSource, /name: "pinnedapps"\n\s*path: Paths\.dataPath\("pinnedapps\.json"\)/,
+    'pinnedapps must live in the shell data dir that nix overrides target');
+console.log('Pinned apps path matches the nix override target');

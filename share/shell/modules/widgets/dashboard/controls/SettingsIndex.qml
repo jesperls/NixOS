@@ -259,7 +259,7 @@ QtObject {
         { label: "Contrast", keywords: "Contrast blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
         { label: "Brightness", keywords: "Brightness blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
         { label: "Vibrancy", keywords: "Vibrancy blur", section: "compositor", subSection: "blur", subLabel: "Compositor > Blur", icon: Icons.faders, isIcon: true },
-        { label: "", keywords: " bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
+        { label: "Bar", keywords: "Bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
         { label: "Bar Height (0 = auto)", keywords: "Bar Height (0 = auto) bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
         { label: "Use 12h Format", keywords: "Use 12h Format bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },
         { label: "Show Seconds", keywords: "Show Seconds bar", section: "shell", subSection: "bar", subLabel: "Shell > Bar", icon: Icons.faders, isIcon: true },

@@ -30,10 +30,6 @@ in
       };
     };
 
-    cacheHome = "${homeDir}/.cache";
-    configHome = "${homeDir}/.config";
-    dataHome = "${homeDir}/.local/share";
-    stateHome = "${homeDir}/.local/state";
   };
 
   home.file = {
@@ -42,9 +38,4 @@ in
     "Projects/.keep".text = "";
     "Games/.keep".text = "";
   };
-
-  xdg.configFile."xfce4/helpers.rc".text = ''
-    TerminalEmulator=${osConfig.mySystem.defaultApps.terminal.command}
-    TerminalEmulatorDismissed=true
-  '';
 }

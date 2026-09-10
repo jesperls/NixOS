@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Wayland
 import qs.modules.services
 import qs.config
-import qs.modules.bar.workspaces
 
 PanelWindow {
     id: screenCorners
@@ -31,7 +30,7 @@ PanelWindow {
             return;
         }
 
-        const wins = CompositorData.windowList;
+        const wins = Compositor.windowList;
         for (let i = 0; i < wins.length; i++) {
             if (wins[i].monitor === monId && wins[i].fullscreen && wins[i].workspace.id === activeWorkspaceId) {
                 activeWindowFullscreen = true;
@@ -47,7 +46,7 @@ PanelWindow {
     }
 
     Connections {
-        target: CompositorData
+        target: Compositor
         function onWindowListChanged() { screenCorners.updateFullscreen(); }
     }
 

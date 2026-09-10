@@ -8,6 +8,6 @@ MultiEffect {
     shadowHorizontalOffset: 0
     shadowVerticalOffset: 2
     shadowBlur: 0.5
-    shadowColor: Config.resolveColor(Config.theme.shadowColor)
+    shadowColor: Colors.resolve(Config.theme.shadowColor)
     shadowOpacity: 1
 }

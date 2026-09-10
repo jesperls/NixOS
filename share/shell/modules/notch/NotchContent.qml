@@ -89,7 +89,7 @@ Item {
 
         if (!shouldAutoHide) return true;
         
-        if (screenNotchOpen || hasActiveNotifications || hoverActive || barHoverActive) {
+        if (hasActiveNotifications || hoverActive || barHoverActive) {
             return true;
         }
         
@@ -118,7 +118,7 @@ Item {
 
     readonly property Item notchHitbox: root.reveal ? notchRegionContainer : notchHoverRegion
 
-    readonly property var centerGap: (Config.bar && Config.bar.splitOnCenteredLayout !== undefined ? Config.bar.splitOnCenteredLayout : true) ? CenteredLayoutService.gapFor(screenName) : null
+    readonly property var centerGap: (Config.bar && Config.bar.splitOnCenteredLayout !== undefined ? Config.bar.splitOnCenteredLayout : true) ? Compositor.gapFor(screenName) : null
     readonly property bool splitActive: centerGap !== null && width > 0
     property real notchCenterFrac: {
         if (!splitActive)

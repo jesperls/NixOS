@@ -5,8 +5,6 @@ let
 in
 {
   options.mySystem.services.dlna = {
-    enable = lib.mkEnableOption "the minidlna media server and mDNS discovery";
-
     friendlyName = lib.mkOption {
       type = lib.types.str;
       default = "${config.mySystem.system.hostName} media";
@@ -21,7 +19,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = {
     services.minidlna = {
       enable = true;
       openFirewall = true;

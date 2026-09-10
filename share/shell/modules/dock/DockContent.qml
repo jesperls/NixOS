@@ -663,7 +663,7 @@ Item {
 
                 readonly property var borderData: Config.theme.srBg.border
                 readonly property int borderWidth: borderData[1]
-                readonly property color borderColor: Config.resolveColor(borderData[0])
+                readonly property color borderColor: Colors.resolve(borderData[0])
 
                 visible: root.isDefault && borderWidth > 0
 

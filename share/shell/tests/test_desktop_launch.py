@@ -75,6 +75,9 @@ class UsagePersistenceTest(unittest.TestCase):
             shell = Path(__file__).resolve().parents[1]
             shutil.copy(shell / "modules/services/UsageTracker.qml", root / "services/UsageTracker.qml")
             (root / "services/qmldir").write_text("singleton UsageTracker 1.0 UsageTracker.qml\n")
+            (root / "modules/components").mkdir(parents=True)
+            shutil.copy(shell / "modules/components/JsonStore.qml", root / "modules/components/JsonStore.qml")
+            (root / "modules/components/qmldir").write_text("JsonStore 1.0 JsonStore.qml\n")
             (root / "config/qmldir").write_text("singleton Paths 1.0 Paths.qml\n")
             (root / "config/Paths.qml").write_text('''pragma Singleton
 import QtQuick

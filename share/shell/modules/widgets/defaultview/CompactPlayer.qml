@@ -7,7 +7,6 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import Quickshell.Services.Mpris
 import qs.modules.theme
-import qs.modules.bar.workspaces
 import qs.modules.services
 import qs.modules.components
 import qs.modules.globals
@@ -39,7 +38,7 @@ Item {
     readonly property string focusedTitle: {
         const activeWsId = Compositor.focusedMonitor?.activeWorkspace?.id;
         if (!activeWsId) return "";
-        const windows = CompositorData.workspaceWindowsMap[activeWsId] || [];
+        const windows = Compositor.workspaceWindowsMap[activeWsId] || [];
         if (windows.length === 0) return "";
         const best = windows.reduce((best, win) => {
             const bestFocus = best?.focusHistoryID ?? Infinity;

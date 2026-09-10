@@ -86,13 +86,10 @@ in
     pkgs.libappindicator-gtk3
   ];
 
+  # The gtk module owns the theme/icon/cursor names and the sans font; only
+  # the keys it does not set live here.
   dconf.settings."org/gnome/desktop/interface" = {
-    icon-theme = theme.gtk.iconTheme.name;
-    gtk-theme = theme.gtk.theme.name;
-    cursor-theme = theme.gtk.cursorTheme.name;
-    cursor-size = theme.gtk.cursorTheme.size;
     color-scheme = lib.mkIf (!shellPalette) "prefer-dark";
-    font-name = "${theme.fonts.sans} ${toString theme.fonts.size}";
     monospace-font-name = "${theme.fonts.monospace} ${toString theme.fonts.size}";
   };
 }

@@ -81,9 +81,28 @@
     };
 
     network.hosts = lib.mkOption {
-      type = lib.types.attrsOf lib.types.str;
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            address = lib.mkOption {
+              type = lib.types.str;
+              description = "Hostname or IP address.";
+            };
+            sshUser = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "SSH login user; null uses the current user.";
+            };
+            sshTty = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Allocate a TTY in this host's shell alias.";
+            };
+          };
+        }
+      );
       default = { };
-      description = "Named machine addresses shared between system and HM config.";
+      description = "Named machines shared between system and HM config.";
     };
 
     network.allowedTCPPorts = lib.mkOption {

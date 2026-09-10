@@ -42,7 +42,7 @@ Item {
         return isHoriz ? barPanel.barTargetHeight : barPanel.barTargetWidth;
     }
 
-    readonly property var centerGap: (Config.bar?.splitOnCenteredLayout ?? true) ? CenteredLayoutService.gapFor(screenName) : null
+    readonly property var centerGap: (Config.bar?.splitOnCenteredLayout ?? true) ? Compositor.gapFor(screenName) : null
     readonly property bool splitActive: centerGap !== null && width > 0 && (barPos === "top" || barPos === "bottom")
     readonly property int splitGapPadding: (centerGap && centerGap.square) ? 0 : (Config.bar?.splitGapPadding ?? 4)
     readonly property real splitStart: splitActive ? Math.max(0, centerGap.x - splitGapPadding) : 0
@@ -51,7 +51,7 @@ Item {
     readonly property bool splitSquare: splitActive && (centerGap.square ?? false)
     readonly property real stripRadius: splitSquare ? 0 : Math.min(innerRadius, stripSize / 2)
     readonly property real stripFilletSize: splitSquare ? 0 : Math.max(1, Math.min(innerRadius, stripSize))
-    readonly property color stripColor: Config.resolveColor(Config.theme.srBg.gradient[0][0])
+    readonly property color stripColor: Colors.resolve(Config.theme.srBg.gradient[0][0])
 
     property real _barAnimProgress: barReveal ? 1.0 : 0.0
     Behavior on _barAnimProgress {

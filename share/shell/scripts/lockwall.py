@@ -2,6 +2,8 @@
 import argparse
 import hashlib
 from pathlib import Path
+import subprocess
+import sys
 
 from media_cache import current, frame_command, render_atomic
 
@@ -20,8 +22,13 @@ def main():
     parser.add_argument('wallpaper')
     parser.add_argument('cache')
     args = parser.parse_args()
-    generate(args.wallpaper, args.cache)
+    try:
+        generate(args.wallpaper, args.cache)
+    except (OSError, RuntimeError, subprocess.TimeoutExpired) as error:
+        print(f'lockscreen wallpaper: {error}', file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

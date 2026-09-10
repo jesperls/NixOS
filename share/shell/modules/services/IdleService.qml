@@ -17,6 +17,8 @@ Singleton {
     property int generation: 0
     property bool writing: false
     property bool configReady: false
+    property bool resyncPending: false
+    property int saveFailures: 0
     property string writtenSettings: ""
 
     readonly property var effectiveListeners: {
@@ -115,6 +117,7 @@ Singleton {
         atomicWrites: true
         onSaved: {
             root.writing = false;
+            root.saveFailures = 0;
             if (root.settings !== root.writtenSettings) {
                 root.configure();
                 return;
@@ -129,9 +132,31 @@ Singleton {
         onSaveFailed: {
             root.writing = false;
             console.error("Unable to write hypridle configuration");
+            if (++root.saveFailures >= 3) {
+                console.error("Giving up on hypridle configuration for this session");
+                return;
+            }
+            // FileView keeps the failed text in memory; reload from disk so the
+            // retry isn't short-circuited by setText.
+            root.resyncPending = true;
+            configFile.reload();
         }
+        onLoaded: root.finishResync()
+        onLoadFailed: root.finishResync()
     }
 
+    function finishResync() {
+        if (!root.resyncPending)
+            return;
+        root.resyncPending = false;
+        retryTimer.restart();
+    }
+
+    Timer {
+        id: retryTimer
+        interval: 3000
+        onTriggered: root.configure()
+    }
     Process {
         id: daemon
         command: ["hypridle", "-q", "-c", configFile.path]

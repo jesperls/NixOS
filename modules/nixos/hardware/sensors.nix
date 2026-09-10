@@ -10,8 +10,6 @@ let
 in
 {
   options.mySystem.hardware.sensors = {
-    enable = lib.mkEnableOption "motherboard sensor modules and monitoring tools";
-
     modules = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -23,7 +21,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = {
     boot.kernelModules = cfg.modules;
 
     # ddcutil in the shell reads monitor brightness over the i2c bus.

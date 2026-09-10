@@ -28,6 +28,10 @@
       url = "github:ThatOneCalculator/deltatune-linux";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    opencode = {
+      url = "github:anomalyco/opencode";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -47,28 +51,13 @@
 
       overlays = import ./pkgs { inherit shellVersion; };
 
-      mkHost =
-        hostName:
-        {
-          system ? "x86_64-linux",
-          modules ? [ ],
-        }:
-        lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./hosts/${hostName}/configuration.nix
-            home-manager.nixosModules.home-manager
-            {
-              nixpkgs.overlays = [ overlays ];
-            }
-          ]
-          ++ modules;
-        };
-
-      hosts = lib.mapAttrs mkHost {
-        pangu = { };
-        gonggong = { };
+      hosts = import ./nix/hosts.nix {
+        inherit
+          lib
+          inputs
+          home-manager
+          overlays
+          ;
       };
     in
     {
@@ -82,20 +71,13 @@
 
       formatter.${system} = pkgs.nixfmt-tree;
 
-      checks.${system} =
-        lib.mapAttrs' (
-          hostName: host: lib.nameValuePair "${hostName}-system" host.config.system.build.toplevel
-        ) hosts
-        // {
-          shell-settings = import ./tests/shell-settings.nix { inherit lib pkgs; };
-          service-options = import ./tests/service-options.nix {
-            inherit lib pkgs;
-            host = hosts.pangu;
-          };
-          hyprland-lua = pkgs.runCommand "hyprland-lua-check" { nativeBuildInputs = [ pkgs.lua ]; } ''
-            lua ${./tests/hyprland.lua} ${./share/hypr}
-            touch "$out"
-          '';
-        };
+      checks.${system} = import ./checks.nix {
+        inherit
+          lib
+          pkgs
+          hosts
+          overlays
+          ;
+      };
     };
 }

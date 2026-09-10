@@ -37,7 +37,7 @@ bind(mainMod .. " SHIFT", "W", function()
   if win then
     hl.dispatch(hl.dsp.focus({ window = win }))
   else
-    hl.exec_cmd("linux-wallpaper-engine")
+    hl.exec_cmd("linux-wallpaperengine")
   end
 end, "Apps: wallpaper engine (focus or launch)")
 bind_exec(mainMod, "Super_L", "pangu run launcher", "Shell: launcher", { release = true })

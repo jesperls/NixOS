@@ -157,7 +157,7 @@ Item {
                             var grad = ctx.createLinearGradient(0, 0, width, 0);
                             for (var i = 0; i < stops.length; i++) {
                                 var s = stops[i];
-                                grad.addColorStop(s[1], Config.resolveColor(s[0]));
+                                grad.addColorStop(s[1], Colors.resolve(s[0]));
                             }
 
                             ctx.fillStyle = grad;
@@ -215,7 +215,7 @@ Item {
                             height: 16
                             radius: 8
                             anchors.centerIn: parent
-                            color: Config.resolveColor(stopHandle.stopColor)
+                            color: Colors.resolve(stopHandle.stopColor)
                             border.color: stopHandle.isSelected ? Styling.srItem("overprimary") : Colors.outline
                             border.width: stopHandle.isSelected ? 2 : 1
 

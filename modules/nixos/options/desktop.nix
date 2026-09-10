@@ -5,13 +5,8 @@
     shell = {
       enable = lib.mkOption {
         type = lib.types.bool;
-        default = true;
-        description = ''
-          Run Pangu, the Quickshell desktop shell vendored in share/shell.
-          It owns the bar, notch, dock, launcher, lockscreen, notifications
-          and the Hyprland *appearance* settings; keybinds, autostarts and
-          layouts stay with the Lua config in share/hypr.
-        '';
+        default = false;
+        description = "Run Pangu, the Quickshell desktop shell (desktop hosts enable this by importing desktop/bundle.nix).";
       };
 
       wallpapers = lib.mkOption {

@@ -7,7 +7,6 @@ import Quickshell.Wayland
 import qs.modules.globals
 import qs.modules.theme
 import qs.modules.components
-import qs.modules.bar.workspaces
 import qs.modules.services
 import qs.config
 
@@ -28,8 +27,8 @@ Item {
     readonly property var monitor: currentScreen ? Compositor.monitorFor(currentScreen) : Compositor.focusedMonitor
     readonly property int workspaceGroup: Math.floor((monitor?.activeWorkspace?.id - 1 || 0) / workspacesShown)
 
-    readonly property var windowList: CompositorData.windowList
-    readonly property var monitors: CompositorData.monitors
+    readonly property var windowList: Compositor.windowList
+    readonly property var monitors: Compositor.monitors.values
     readonly property int monitorId: monitor?.id ?? -1
     readonly property var monitorData: monitors.find(m => m.id === monitorId) ?? null
 

@@ -11,7 +11,8 @@ def render_atomic(command, destination, timeout):
     os.close(fd)
     temporary = Path(name)
     try:
-        result = subprocess.run([*command, str(temporary)], capture_output=True, text=True, timeout=timeout)
+        result = subprocess.run([*command, str(temporary)], capture_output=True, text=True,
+                                errors='replace', timeout=timeout)
         if result.returncode != 0 or temporary.stat().st_size == 0:
             raise RuntimeError(result.stderr.strip() or 'Renderer produced no image')
         temporary.replace(destination)

@@ -22,6 +22,20 @@ QtObject {
         const selection = fmt(Colors.primary)
         const selectionFg = fmt(Colors.overPrimary)
 
+        const colorSection = (name, backgroundAlternate, backgroundNormal, decoration, foreground, foregroundInactive) => `[Colors:${name}]\n`
+            + `BackgroundAlternate=${backgroundAlternate}\n`
+            + `BackgroundNormal=${backgroundNormal}\n`
+            + `DecorationFocus=${decoration}\n`
+            + `DecorationHover=${decoration}\n`
+            + `ForegroundActive=${foreground}\n`
+            + `ForegroundInactive=${foregroundInactive}\n`
+            + `ForegroundLink=${link}\n`
+            + `ForegroundNegative=${error}\n`
+            + `ForegroundNeutral=${foreground}\n`
+            + `ForegroundNormal=${foreground}\n`
+            + `ForegroundPositive=${secondary}\n`
+            + `ForegroundVisited=${link}\n\n`
+
         let ini = ""
 
         ini += "[ColorEffects:Disabled]\n"
@@ -44,139 +58,28 @@ QtObject {
         ini += "IntensityAmount=0\n"
         ini += "IntensityEffect=0\n\n"
 
-        ini += "[Colors:Button]\n"
-        ini += `BackgroundAlternate=${surface}\n`
-        ini += `BackgroundNormal=${surface}\n`
-        ini += `DecorationFocus=${primary}\n`
-        ini += `DecorationHover=${primary}\n`
-        ini += `ForegroundActive=${fg}\n`
-        ini += `ForegroundInactive=${inactive}\n`
-        ini += `ForegroundLink=${link}\n`
-        ini += `ForegroundNegative=${error}\n`
-        ini += `ForegroundNeutral=${fg}\n`
-        ini += `ForegroundNormal=${fg}\n`
-        ini += `ForegroundPositive=${secondary}\n`
-        ini += `ForegroundVisited=${fmt(Colors.tertiary)}\n`
-        ini += "\n"
-
-        ini += "[Colors:Complementary]\n"
-        ini += `BackgroundAlternate=${bg}\n`
-        ini += `BackgroundNormal=${bg}\n`
-        ini += `DecorationFocus=${primary}\n`
-        ini += `DecorationHover=${primary}\n`
-        ini += `ForegroundActive=${fg}\n`
-        ini += `ForegroundInactive=${inactive}\n`
-        ini += `ForegroundLink=${link}\n`
-        ini += `ForegroundNegative=${error}\n`
-        ini += `ForegroundNeutral=${fg}\n`
-        ini += `ForegroundNormal=${fg}\n`
-        ini += `ForegroundPositive=${secondary}\n`
-        ini += `ForegroundVisited=${fmt(Colors.tertiary)}\n`
-        ini += "\n"
-
-        ini += "[Colors:Header]\n"
-        ini += `BackgroundAlternate=${bg}\n`
-        ini += `BackgroundNormal=${bg}\n`
-        ini += `DecorationFocus=${primary}\n`
-        ini += `DecorationHover=${primary}\n`
-        ini += `ForegroundActive=${fg}\n`
-        ini += `ForegroundInactive=${inactive}\n`
-        ini += `ForegroundLink=${link}\n`
-        ini += `ForegroundNegative=${error}\n`
-        ini += `ForegroundNeutral=${fg}\n`
-        ini += `ForegroundNormal=${fg}\n`
-        ini += `ForegroundPositive=${secondary}\n`
-        ini += `ForegroundVisited=${fmt(Colors.tertiary)}\n`
-        ini += "\n"
-
-        ini += "[Colors:Header][Inactive]\n"
-        ini += `BackgroundAlternate=${bg}\n`
-        ini += `BackgroundNormal=${bg}\n`
-        ini += `DecorationFocus=${primary}\n`
-        ini += `DecorationHover=${primary}\n`
-        ini += `ForegroundActive=${fg}\n`
-        ini += `ForegroundInactive=${inactive}\n`
-        ini += `ForegroundLink=${link}\n`
-        ini += `ForegroundNegative=${error}\n`
-        ini += `ForegroundNeutral=${fg}\n`
-        ini += `ForegroundNormal=${fg}\n`
-        ini += `ForegroundPositive=${secondary}\n`
-        ini += `ForegroundVisited=${fmt(Colors.tertiary)}\n`
-        ini += "\n"
-
-        ini += "[Colors:Selection]\n"
-        ini += `BackgroundAlternate=${selection}\n`
-        ini += `BackgroundNormal=${selection}\n`
-        ini += `DecorationFocus=${selection}\n`
-        ini += `DecorationHover=${selection}\n`
-        ini += `ForegroundActive=${selectionFg}\n`
-        ini += `ForegroundInactive=${selectionFg}\n`
-        ini += `ForegroundLink=${link}\n`
-        ini += `ForegroundNegative=${error}\n`
-        ini += `ForegroundNeutral=${selectionFg}\n`
-        ini += `ForegroundNormal=${selectionFg}\n`
-        ini += `ForegroundPositive=${secondary}\n`
-        ini += `ForegroundVisited=${fmt(Colors.tertiary)}\n`
-        ini += "\n"
-
-        ini += "[Colors:Tooltip]\n"
-        ini += `BackgroundAlternate=${surface}\n`
-        ini += `BackgroundNormal=${bg}\n`
-        ini += `DecorationFocus=${primary}\n`
-        ini += `DecorationHover=${primary}\n`
-        ini += `ForegroundActive=${fg}\n`
-        ini += `ForegroundInactive=${inactive}\n`
-        ini += `ForegroundLink=${link}\n`
-        ini += `ForegroundNegative=${error}\n`
-        ini += `ForegroundNeutral=${fg}\n`
-        ini += `ForegroundNormal=${fg}\n`
-        ini += `ForegroundPositive=${secondary}\n`
-        ini += `ForegroundVisited=${fmt(Colors.tertiary)}\n`
-        ini += "\n"
-
-        ini += "[Colors:View]\n"
-        ini += `BackgroundAlternate=${surface}\n`
-        ini += `BackgroundNormal=${bg}\n`
-        ini += `DecorationFocus=${primary}\n`
-        ini += `DecorationHover=${primary}\n`
-        ini += `ForegroundActive=${fg}\n`
-        ini += `ForegroundInactive=${inactive}\n`
-        ini += `ForegroundLink=${link}\n`
-        ini += `ForegroundNegative=${error}\n`
-        ini += `ForegroundNeutral=${fg}\n`
-        ini += `ForegroundNormal=${fg}\n`
-        ini += `ForegroundPositive=${secondary}\n`
-        ini += `ForegroundVisited=${fmt(Colors.tertiary)}\n`
-        ini += "\n"
-
-        ini += "[Colors:Window]\n"
-        ini += `BackgroundAlternate=${surface}\n`
-        ini += `BackgroundNormal=${bg}\n`
-        ini += `DecorationFocus=${primary}\n`
-        ini += `DecorationHover=${primary}\n`
-        ini += `ForegroundActive=${fg}\n`
-        ini += `ForegroundInactive=${inactive}\n`
-        ini += `ForegroundLink=${link}\n`
-        ini += `ForegroundNegative=${error}\n`
-        ini += `ForegroundNeutral=${fg}\n`
-        ini += `ForegroundNormal=${fg}\n`
-        ini += `ForegroundPositive=${secondary}\n`
-        ini += `ForegroundVisited=${fmt(Colors.tertiary)}\n`
-        ini += "\n"
+        ini += colorSection("Button", surface, surface, primary, fg, inactive)
+        ini += colorSection("Complementary", bg, bg, primary, fg, inactive)
+        ini += colorSection("Header", bg, bg, primary, fg, inactive)
+        ini += colorSection("Header][Inactive", bg, bg, primary, fg, inactive)
+        ini += colorSection("Selection", selection, selection, selection, selectionFg, selectionFg)
+        ini += colorSection("Tooltip", surface, bg, primary, fg, inactive)
+        ini += colorSection("View", surface, bg, primary, fg, inactive)
+        ini += colorSection("Window", surface, bg, primary, fg, inactive)
 
         ini += "[General]\n"
         ini += "ColorScheme=Pangu\n"
         ini += "Name=Pangu\n"
         ini += "shadeSortColumn=true\n"
         ini += "\n"
-        
+
         ini += "[KDE]\n"
         ini += "contrast=4\n"
         ini += "\n"
-        
+
         ini += "[WM]\n"
         ini += `activeBackground=${bg}\n`
-        ini += "activeBlend=252,252,252\n" 
+        ini += "activeBlend=252,252,252\n"
         ini += `activeForeground=${fg}\n`
         ini += `inactiveBackground=${fmt(Colors.surfaceDim)}\n`
         ini += "inactiveBlend=161,169,177\n"

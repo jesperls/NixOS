@@ -15,11 +15,13 @@ class ThemeExportsTest(unittest.TestCase):
     def test_native_exports_follow_live_settings(self):
         with tempfile.TemporaryDirectory(prefix="pangu-themes-") as directory:
             root = Path(directory)
-            for name in ("config", "modules/globals", "theme", "cache/pangu", "bin", "runtime"):
+            for name in ("config", "modules/globals", "modules/components", "theme", "cache/pangu", "bin", "runtime"):
                 (root / name).mkdir(parents=True)
             (root / "runtime").chmod(0o700)
             for source in (SHELL / "modules/theme").glob("*.qml"):
                 shutil.copy(source, root / "theme" / source.name)
+            shutil.copy(SHELL / "modules/components/ThemeReloader.qml", root / "modules/components/ThemeReloader.qml")
+            (root / "modules/components/qmldir").write_text("ThemeReloader 1.0 ThemeReloader.qml\n")
             (root / "theme/qmldir").write_text("".join(
                 ("singleton " if file.stem == "Colors" else "")
                 + f"{file.stem} 1.0 {file.name}\n"
@@ -114,3 +116,10 @@ ShellRoot {
                          if family == "gtk" else [root / f"output/qt{version}ct/colors/pangu.colors" for version in (5, 6)])
                 self.assertTrue(files[0].read_text())
                 self.assertEqual(files[0].read_text(), files[1].read_text())
+                if family == "qt":
+                    qt = files[0].read_text()
+                    self.assertEqual(qt.count("[Colors:"), 8)
+                    for section in ("Button", "Complementary", "Header", "Selection", "Tooltip", "View", "Window"):
+                        self.assertIn(f"[Colors:{section}]", qt)
+                    self.assertIn("[Colors:Header][Inactive]", qt)
+                    self.assertIn("[General]", qt)

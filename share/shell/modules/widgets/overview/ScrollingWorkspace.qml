@@ -520,11 +520,9 @@ Item {
                                             Compositor.dispatch(`movetoworkspacesilent ${targetWs}, address:${address}`);
                                             Compositor.dispatch(`movepixel ${globalX} ${globalY}, address:${address}`);
                                             
-                                            CompositorData.updateWindowList();
                                         } else {
                                             Compositor.dispatch(`movetoworkspacesilent ${targetWs}, address:${(windowDelegate.windowData && windowDelegate.windowData.address !== undefined ? windowDelegate.windowData.address : "")}`);
                                             
-                                            CompositorData.updateWindowList();
                                         }
                                         
                                         if (windowDelegate.originalParent) {
@@ -555,7 +553,6 @@ Item {
 
                                         Compositor.dispatch(`movepixel ${globalX} ${globalY}, address:${(windowDelegate.windowData && windowDelegate.windowData.address !== undefined ? windowDelegate.windowData.address : "")}`);
                                         
-                                        CompositorData.updateWindowList();
                                         
                                         if (windowDelegate.originalParent) {
                                             windowDelegate.parent = windowDelegate.originalParent;

@@ -12,13 +12,7 @@ in
   options.mySystem.hardware.nvidia.enable = lib.mkEnableOption "the NVIDIA driver stack";
 
   config = lib.mkIf cfg.enable {
-    hardware.graphics = {
-      enable = true;
-      enable32Bit = true;
-      extraPackages = with pkgs; [
-        nvidia-vaapi-driver
-      ];
-    };
+    hardware.graphics.extraPackages = [ pkgs.nvidia-vaapi-driver ];
 
     hardware.nvidia = {
       modesetting.enable = true;

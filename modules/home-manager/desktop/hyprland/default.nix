@@ -27,8 +27,10 @@ let
     monitors = {
       primary = if primaryMonitor == null then null else primaryMonitor.name;
       primary_workspaces =
-        if numMonitors == 0 then [ ] else
-        lib.filter (workspace: lib.mod (workspace - 1) numMonitors == 0) (lib.range 1 10);
+        if numMonitors == 0 then
+          [ ]
+        else
+          lib.filter (workspace: lib.mod (workspace - 1) numMonitors == 0) (lib.range 1 10);
     };
     keyboard_layout = osConfig.mySystem.system.keyboardLayout;
     input = {

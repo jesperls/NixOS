@@ -35,7 +35,7 @@ Item {
         if (val.startsWith("#")) {
             return val.replace("#", "").toUpperCase();
         }
-        const resolved = Config.resolveColor(val);
+        const resolved = Colors.resolve(val);
         return resolved ? resolved.toString().replace("#", "").toUpperCase().slice(0, 6) : "000000";
     }
 
@@ -98,7 +98,7 @@ Item {
                     Layout.preferredWidth: 28
                     Layout.preferredHeight: 28
                     radius: Styling.radius(-4)
-                    color: Config.resolveColor(root.currentColor)
+                    color: Colors.resolve(root.currentColor)
                     border.color: Colors.outline
                     border.width: 1
                 }
@@ -287,7 +287,7 @@ Item {
     ColorDialog {
         id: colorDialog
         title: root.dialogTitle
-        selectedColor: Config.resolveColor(root.currentColor)
+        selectedColor: Colors.resolve(root.currentColor)
 
         onAccepted: {
             root.colorSelected(selectedColor.toString().toUpperCase());

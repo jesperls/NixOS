@@ -11,7 +11,7 @@ Singleton {
     readonly property string outputPath: Paths.dataPath("hyprland.lua")
 
     function color(name) {
-        const resolved = Config.resolveColor(name);
+        const resolved = Colors.resolve(name);
         return typeof resolved === "string" ? Qt.color(resolved) : resolved;
     }
 

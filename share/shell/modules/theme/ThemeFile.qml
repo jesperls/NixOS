@@ -11,9 +11,12 @@ FileView {
     property var pendingText: null
     property var savedText: null
     property string writingText: ""
+    property bool resyncing: false
+    property int writeFailures: 0
     signal written()
 
     function write(text) {
+        writeFailures = 0;
         pendingText = text;
         startWrite();
     }
@@ -29,19 +32,50 @@ FileView {
             pendingText = null;
             return;
         }
-        saving = true;
-        writingText = pendingText;
+        const text = pendingText;
         pendingText = null;
-        setText(writingText);
+        if (text === "") {
+            // FileView.setText("") is a no-op against its empty initial state, so
+            // it would never emit saved(); report success without writing.
+            savedText = "";
+            written();
+            return;
+        }
+        saving = true;
+        writingText = text;
+        setText(text);
+    }
+
+    function finishResync() {
+        if (!resyncing)
+            return;
+        resyncing = false;
+        Qt.callLater(root.startWrite);
     }
 
     function finishWrite(success) {
-        if (success)
+        if (success) {
+            writeFailures = 0;
             savedText = writingText;
+            saving = false;
+            if (pendingText === null || pendingText === savedText)
+                written();
+            Qt.callLater(root.startWrite); // FileView must finish its saved signal before starting another write.
+            return;
+        }
+        // FileView keeps the failed text in memory, so re-writing the same
+        // content would be short-circuited; reload from disk to resync first.
+        if (writingText !== "")
+            pendingText = writingText;
+        writingText = "";
         saving = false;
-        if (success && (pendingText === null || pendingText === savedText))
-            written();
-        Qt.callLater(root.startWrite); // FileView must finish its saved signal before starting another write.
+        if (++writeFailures >= 3) {
+            console.warn("Giving up on theme export:", path);
+            return;
+        }
+        resyncing = true;
+        if (typeof reload === "function")
+            reload();
     }
 
     onSaved: finishWrite(true)
@@ -49,6 +83,8 @@ FileView {
         console.warn("Theme export failed:", path, error);
         finishWrite(false);
     }
+    onLoaded: finishResync()
+    onLoadFailed: finishResync()
 
     property Process prepareDirectory: Process {
         id: prepareDirectory

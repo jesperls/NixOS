@@ -105,7 +105,13 @@ def copy(db, item_id):
     row = db.execute('SELECT mime_type, is_image, binary_path, full_content FROM clipboard_items WHERE id = ?', (item_id,)).fetchone()
     if row is None:
         raise ValueError('Clipboard item no longer exists')
-    payload = Path(row['binary_path']).read_bytes() if row['is_image'] else (row['full_content'] or '').encode()
+    if row['is_image']:
+        path = row['binary_path']
+        if not path or not Path(path).is_file():
+            raise ValueError('Clipboard image data no longer exists')
+        payload = Path(path).read_bytes()
+    else:
+        payload = (row['full_content'] or '').encode()
     subprocess.run(['wl-copy', '--type', row['mime_type']], input=payload, check=True)
 
 

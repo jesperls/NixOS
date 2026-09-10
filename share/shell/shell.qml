@@ -40,7 +40,6 @@ ShellRoot {
 
         Loader {
             id: wallpaperLoader
-            active: modelData !== null
             required property ShellScreen modelData
             sourceComponent: Wallpaper {
                 screen: wallpaperLoader.modelData

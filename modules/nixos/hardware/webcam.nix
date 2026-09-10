@@ -10,7 +10,6 @@ let
 in
 {
   options.mySystem.hardware.webcam = {
-    enable = lib.mkEnableOption "the v4l2loopback virtual webcam";
     videoNr = lib.mkOption {
       type = lib.types.ints.unsigned;
       default = 2;
@@ -18,7 +17,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = {
     boot.extraModulePackages = with config.boot.kernelPackages; [
       v4l2loopback
     ];

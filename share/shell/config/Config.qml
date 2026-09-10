@@ -4,8 +4,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.modules.globals
-import qs.modules.theme
 import qs.modules.services as Services
 import qs.config
 
@@ -72,7 +70,11 @@ Singleton {
     readonly property bool barReady: barFile.ready
     readonly property bool dockReady: dockFile.ready
 
-    readonly property ConfigFile loader: themeFile
+    function adapterKeys(name) {
+        const section = root[name];
+        if (!section) return [];
+        return Object.keys(section).filter(key => key !== "objectName" && key !== "adapterUpdated" && !key.endsWith("Changed"));
+    }
 
     function save(name) {
         const file = root.files[name];
@@ -81,7 +83,7 @@ Singleton {
     }
 
     Process {
-        command: ["mkdir", "-p", root.configDir]
+        command: ["mkdir", "-p", root.configDir, Paths.dataDir, Paths.cacheDir]
         running: true
         onExited: exitCode => {
             if (exitCode !== 0) return;
@@ -736,7 +738,7 @@ Singleton {
     ConfigFile {
         id: pinnedAppsFile
         name: "pinnedapps"
-        path: Quickshell.dataPath("pinnedapps.json")
+        path: Paths.dataPath("pinnedapps.json")
 
         adapter: JsonAdapter {
             property list<string> apps: ["kitty"]
@@ -825,38 +827,4 @@ Singleton {
     readonly property real compositorShadowOpacity: compositor.syncShadowOpacity ? theme.shadowOpacity : compositor.shadowOpacity
     readonly property string compositorShadowColor: compositor.syncShadowColor ? theme.shadowColor : compositor.shadowColor
     readonly property string compositorShadowColorInactive: compositor.syncShadowColor ? theme.shadowColor : compositor.shadowColorInactive
-
-    onLightModeChanged: {
-        const manager = GlobalStates.wallpaperManager;
-        if (manager && manager.currentWallpaper)
-            manager.runMatugenForCurrentWallpaper(true);
-    }
-
-    onNotchPositionChanged: {
-        if (!initialLoadComplete)
-            return;
-
-        if (notchPosition === "bottom" && dock.position === "bottom") {
-            dock.position = bar.position === "left" ? "right" : "left";
-            GlobalStates.markShellChanged();
-        } else if (notchPosition === "top" && (dock.position === "left" || dock.position === "right")) {
-            dock.position = "bottom";
-            GlobalStates.markShellChanged();
-        }
-    }
-
-    function isHexColor(value) {
-        if (!value || typeof value !== "string")
-            return false;
-        const normalized = value.toLowerCase().trim();
-        return normalized.startsWith("#") || normalized.startsWith("rgb");
-    }
-
-    function resolveColor(value) {
-        if (!value)
-            return "transparent";
-        if (isHexColor(value))
-            return value;
-        return Colors[value] || "transparent";
-    }
 }

@@ -68,7 +68,8 @@ def main():
     with ThreadPoolExecutor(max_workers=min(4, os.cpu_count() or 1)) as executor:
         results = list(executor.map(render, files))
     print(f'Thumbnails ready: {sum(results)}/{len(results)}')
-    return 0 if all(results) else 1
+    # A single unreadable file must not suppress the thumbnails that did render.
+    return 0 if not files or any(results) else 1
 
 
 if __name__ == '__main__':

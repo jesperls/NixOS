@@ -16,6 +16,7 @@
   curl,
   ddcutil,
   ffmpeg,
+  findutils,
   gawk,
   glib,
   gtk3,
@@ -40,12 +41,10 @@
   python3,
   slurp,
   socat,
-  sqlite,
   swappy,
   systemd,
   tesseract,
   tmux,
-  util-linux,
   wl-clipboard,
   wlsunset,
   wtype,
@@ -128,6 +127,7 @@ let
       runHook preInstall
       mkdir -p "$out"
       cp -r . "$out"
+      rm -rf "$out/tests"
       chmod -R u+w "$out"
       chmod +x "$out"/scripts/*
       patchShebangs "$out/scripts"
@@ -163,6 +163,7 @@ writeShellApplication {
     curl
     ddcutil
     ffmpeg
+    findutils
     gawk
     glib # gsettings
     gtk3 # gtk-launch
@@ -186,12 +187,10 @@ writeShellApplication {
     python3
     slurp
     socat # mpv IPC sockets for animated wallpapers
-    sqlite
     swappy
     systemd # systemctl, loginctl
     (tesseract.override { enableLanguages = ocrLanguages; })
     tmux # the dashboard's tmux tab drives real sessions
-    util-linux # setsid for launching applications
     wl-clipboard
     wlsunset
     wtype
@@ -206,6 +205,11 @@ writeShellApplication {
     shellRoot=${src}
     version=${version}
     export PANGU_VERSION="$version"
+
+    # Tools the shell shells out to re-invoke `pangu` (hypridle lock_cmd,
+    # `pangu run ...`); keep the wrapper's own bin on PATH.
+    pangu_bin="$(dirname -- "$(readlink -f -- "$0")")"
+    export PATH="$pangu_bin''${PATH:+:$PATH}"
 
     export QML2_IMPORT_PATH="${qmlEnv}/lib/qt-6/qml''${QML2_IMPORT_PATH:+:$QML2_IMPORT_PATH}"
     export QML_IMPORT_PATH="$QML2_IMPORT_PATH"

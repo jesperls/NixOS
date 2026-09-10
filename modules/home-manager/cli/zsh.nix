@@ -50,6 +50,12 @@
       gp = "git push";
       gl = "git log --oneline --graph";
       gd = "git diff";
+    }
+    // lib.optionalAttrs ((osConfig.mySystem.hardware.webcam or { }) ? videoNr) {
+      webcam = "scrcpy --video-source=camera --camera-facing=back --camera-size=1920x1080 --v4l2-sink=/dev/video${toString osConfig.mySystem.hardware.webcam.videoNr} --no-audio --no-playback";
+    }
+    // {
+      phone = "scrcpy --render-driver=vulkan";
     };
 
     loginExtra = lib.optionalString osConfig.programs.hyprland.enable ''

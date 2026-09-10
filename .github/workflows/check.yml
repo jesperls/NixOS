@@ -18,6 +18,16 @@ jobs:
       - name: Check formatting
         run: nix fmt -- --ci
 
-      # Eval only — real builds are too heavy for GitHub runners (garnix does those)
+      # Eval only — the full system closure is too heavy for GitHub runners
+      # (garnix builds every checks.* on push).
       - name: Evaluate system
         run: nix flake check --no-build --all-systems
+
+      # Cheap checks that do run code: Hyprland Lua, the generated.lua contract,
+      # and the shell-settings merge.
+      - name: Build lightweight checks
+        run: >
+          nix build
+          .#checks.x86_64-linux.hyprland-lua
+          .#checks.x86_64-linux.hyprland-contract
+          .#checks.x86_64-linux.shell-settings

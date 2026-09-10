@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 
 {
   imports = [
@@ -10,4 +10,6 @@
     ../services/bluetooth.nix
     ../programs/fonts.nix
   ];
+
+  mySystem.desktop.shell.enable = lib.mkDefault true;
 }

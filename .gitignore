@@ -2,12 +2,6 @@
 __pycache__
 deltatune-linux
 wallpaper-picker
-*.md
-!README.md
-!autofdo.md
-
-!docs/review-status.md
-!docs/settings-ownership.md
 
 /result
 /result-*

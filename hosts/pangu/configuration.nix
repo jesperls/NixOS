@@ -9,6 +9,23 @@
 
     ../../modules/nixos/bundle.nix
     ../../modules/nixos/desktop/bundle.nix
+
+    ../../modules/nixos/hardware/nvidia.nix
+    ../../modules/nixos/hardware/sensors.nix
+    ../../modules/nixos/hardware/vial.nix
+    ../../modules/nixos/hardware/webcam.nix
+
+    ../../modules/nixos/performance/autofdo.nix
+    ../../modules/nixos/performance/kernel.nix
+
+    ../../modules/nixos/programs/coolercontrol.nix
+    ../../modules/nixos/programs/filemanager.nix
+    ../../modules/nixos/programs/gaming.nix
+    ../../modules/nixos/programs/lutris.nix
+
+    ../../modules/nixos/services/dlna.nix
+    ../../modules/nixos/services/flatpak.nix
+    ../../modules/nixos/services/sunshine.nix
   ];
 
   mySystem = {
@@ -26,15 +43,25 @@
     };
 
     network.hosts = {
-      nuwa = "192.168.1.49";
-      oracle = "132.145.48.11";
-      gonggong = "192.168.1.96";
+      nuwa = {
+        address = "192.168.1.49";
+        sshUser = "jesper";
+        sshTty = true;
+      };
+      oracle = {
+        address = "132.145.48.11";
+        sshUser = "ubuntu";
+      };
+      gonggong = {
+        address = "192.168.1.96";
+        sshUser = "jesperls";
+        sshTty = true;
+      };
     };
 
     desktop.tearing.enable = true;
     desktop.layouts.centered.fullHeight = true;
     desktop.input.accelProfile = "flat";
-    performance.scheduler = null;
     performance.transparentHugepages = "madvise";
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";
@@ -45,35 +72,15 @@
     #     performanceGovernor = true;
     #     bbr3 = true;
     #   };
-    performance.autofdo = {
-      enable = true;
-      minCpuLoad = 0.1;
-    };
+    performance.autofdo.minCpuLoad = 0.1;
 
     hardware.nvidia.enable = true;
-    hardware.vial.enable = true;
-    hardware.webcam.enable = true;
-    hardware.sensors = {
-      enable = true;
-      modules = [
-        "k10temp"
-        "nct6775"
-      ];
-    };
-
-    programs.coolercontrol = {
-      enable = true;
-    };
-
-    programs.gaming.enable = true;
-    programs.lutris.enable = true;
-    programs.fileManager.enable = true;
-
-    services.flatpak.enable = true;
-    services.sunshine.enable = true;
+    hardware.sensors.modules = [
+      "k10temp"
+      "nct6775"
+    ];
 
     services.dlna = {
-      enable = true;
       friendlyName = "DLNA MEDIA";
       mediaDirs = [ "V,/srv/media/videos" ];
     };

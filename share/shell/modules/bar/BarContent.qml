@@ -169,7 +169,7 @@ Item {
 
     readonly property bool shadowsEnabled: Config.showBackground && (!actualContainBar || (Config.bar && Config.bar.keepBarShadow !== undefined ? Config.bar.keepBarShadow : false))
 
-    readonly property var centerGap: (Config.bar && Config.bar.splitOnCenteredLayout !== undefined ? Config.bar.splitOnCenteredLayout : true) ? CenteredLayoutService.gapFor(screenName) : null
+    readonly property var centerGap: (Config.bar && Config.bar.splitOnCenteredLayout !== undefined ? Config.bar.splitOnCenteredLayout : true) ? Compositor.gapFor(screenName) : null
     readonly property bool splitActive: orientation === "horizontal" && centerGap !== null && width > 0
     readonly property int splitGapPadding: (centerGap && centerGap.square) ? 0 : (Config.bar && Config.bar.splitGapPadding !== undefined ? Config.bar.splitGapPadding : 4)
     readonly property real splitStart: splitActive ? Math.max(0, centerGap.x - splitGapPadding) : 0

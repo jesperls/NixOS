@@ -5,7 +5,6 @@
 
   services.hyprpolkitagent.enable = true;
   services.network-manager-applet.enable = true;
-  xsession.preferStatusNotifierItems = true;
 
   systemd.user.services = {
     hyprpolkitagent = {

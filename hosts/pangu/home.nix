@@ -10,9 +10,9 @@
     ../../modules/home-manager/programs/obs.nix
     ../../modules/home-manager/programs/spicetify.nix
     ../../modules/home-manager/programs/easyeffects.nix
+    ../../modules/home-manager/programs/flatpak.nix
     ../../modules/home-manager/services/deltatune.nix
 
     ./packages.nix
-    ./cli.nix
   ];
 }

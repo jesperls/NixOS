@@ -38,22 +38,22 @@ ClippingRectangle {
 
     readonly property real halftoneEnd: variantConfig.halftoneEnd
 
-    readonly property color halftoneDotColor: Config.resolveColor(variantConfig.halftoneDotColor)
+    readonly property color halftoneDotColor: Colors.resolve(variantConfig.halftoneDotColor)
 
-    readonly property color halftoneBackgroundColor: Config.resolveColor(variantConfig.halftoneBackgroundColor)
+    readonly property color halftoneBackgroundColor: Colors.resolve(variantConfig.halftoneBackgroundColor)
 
     readonly property var borderData: variantConfig.border
 
-    readonly property color solidColor: Config.resolveColor(variantConfig.color)
+    readonly property color solidColor: Colors.resolve(variantConfig.color)
     readonly property bool hasSolidColor: variantConfig.color !== undefined && variantConfig.color !== ""
 
-    readonly property color itemColor: Config.resolveColor(variantConfig.itemColor)
+    readonly property color itemColor: Colors.resolve(variantConfig.itemColor)
     property color item: itemColor
 
     readonly property real rectOpacity: backgroundOpacity >= 0 ? backgroundOpacity : variantConfig.opacity
 
     readonly property bool isSingleColorGradient: gradientStops && gradientStops.length === 1
-    readonly property color singleGradientColor: isSingleColorGradient ? Config.resolveColor(gradientStops[0][0]) : "transparent"
+    readonly property color singleGradientColor: isSingleColorGradient ? Colors.resolve(gradientStops[0][0]) : "transparent"
 
     readonly property bool needsGradientShader: (gradientType === "linear" || gradientType === "radial") && !isSingleColorGradient && gradientStops && gradientStops.length >= 2
 
@@ -61,7 +61,7 @@ ClippingRectangle {
 
     function resolveStopColor(index) {
         if (!gradientStops || index >= gradientStops.length) return Qt.vector4d(0,0,0,0);
-        const resolved = Config.resolveColor(gradientStops[index][0]);
+        const resolved = Colors.resolve(gradientStops[index][0]);
         const c = Qt.color(resolved);
         return Qt.vector4d(c.r, c.g, c.b, c.a);
     }
@@ -200,7 +200,7 @@ ClippingRectangle {
         bottomLeftRadius: root.bottomLeftRadius
         bottomRightRadius: root.bottomRightRadius
         color: "transparent"
-        border.color: Config.resolveColor(borderData[0])
+        border.color: Colors.resolve(borderData[0])
         border.width: borderData[1]
         visible: root.enableBorder
     }

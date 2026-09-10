@@ -221,7 +221,7 @@ Item {
                                 width: 20
                                 height: 20
                                 radius: width / 2
-                                color: root.variantConfig ? Config.resolveColor(root.variantConfig.border[0]) : Colors.outline
+                                color: root.variantConfig ? Colors.resolve(root.variantConfig.border[0]) : Colors.outline
                                 border.width: 2
                                 border.color: Colors.overBackground
                                 z: 0
@@ -232,7 +232,7 @@ Item {
                                 anchors.fill: parent
                                 icon: ""
                                 value: root.variantConfig ? root.variantConfig.border[1] / 16 : 0
-                                accentColor: root.variantConfig ? Config.resolveColor(root.variantConfig.border[0]) : Colors.outline
+                                accentColor: root.variantConfig ? Colors.resolve(root.variantConfig.border[0]) : Colors.outline
                                 isToggleable: true
                                 isToggled: false
                                 showBackground: false

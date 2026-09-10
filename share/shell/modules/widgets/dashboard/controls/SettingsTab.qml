@@ -8,7 +8,6 @@ import QtQuick.Effects
 import qs.modules.components
 import qs.modules.services
 import qs.config
-import qs.modules.globals
 
 Rectangle {
     id: root

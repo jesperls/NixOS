@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.config
+import qs.modules.components
 
 QtObject {
     id: root
@@ -68,26 +69,17 @@ QtObject {
     property ThemeFile gtk3File: ThemeFile {
         id: gtk3File
         path: Paths.configHome + "/gtk-3.0/gtk.css"
-        onWritten: Qt.callLater(root.reloadApplications)
+        onWritten: Qt.callLater(root.reloader.reload)
     }
 
     property ThemeFile gtk4File: ThemeFile {
         id: gtk4File
         path: Paths.configHome + "/gtk-4.0/gtk.css"
-        onWritten: Qt.callLater(root.reloadApplications)
+        onWritten: Qt.callLater(root.reloader.reload)
     }
 
-    property bool reloadPending: false
-
-    function reloadApplications() {
-        if ([gtk3File, gtk4File].some(file => file.saving || file.savedText === null || (file.pendingText !== null && file.pendingText !== file.savedText)))
-            return;
-        reloadPending = reloadProcess.running;
-        if (!reloadPending) reloadProcess.running = true;
-    }
-
-    property Process reloadProcess: Process {
-        onExited: if (root.reloadPending) Qt.callLater(root.reloadApplications)
+    property ThemeReloader reloader: ThemeReloader {
+        files: [gtk3File, gtk4File]
         command: ["bash", "-c", "theme=$(gsettings get org.gnome.desktop.interface gtk-theme); gsettings set org.gnome.desktop.interface gtk-theme \"''\" && gsettings set org.gnome.desktop.interface gtk-theme \"$theme\""]
     }
 }

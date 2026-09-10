@@ -259,16 +259,11 @@ Singleton {
     property var shellSnapshot: null
 
     readonly property var _shellSections: {
-        "bar": ["position", "height", "style", "margin", "spacing", "padding", "launcherIcon", "launcherIconTint", "launcherIconFullTint", "launcherIconSize", "pillStyle", "clockPosition", "launcherPosition", "flatButtons", "showWorkspaces", "enableFirefoxPlayer", "screenList", "frameEnabled", "frameThickness", "pinnedOnStartup", "hoverToReveal", "hoverRegionHeight", "hideDelay", "showPinButton", "availableOnFullscreen", "use12hFormat", "showSeconds", "showDate", "containBar", "keepBarShadow", "keepBarBorder", "splitOnCenteredLayout", "splitGapPadding"],
-        "notch": ["theme", "position", "hoverRegionHeight", "hideDelay", "hoverExpansionDelay", "showUser", "showMedia", "showNotificationIndicator", "keepHidden", "splitSide", "noMediaDisplay", "customText", "disableHoverExpansion"],
-        "workspaces": ["shown", "showAppIcons", "alwaysShowNumbers", "showNumbers", "dynamic"],
-        "overview": ["enabled", "layout", "rows", "columns", "scale", "workspaceSpacing"],
-        "dashboard": ["width", "height", "showTabRail", "tabPosition", "showWidgets", "showWallpapers", "showMetrics", "backgroundOpacity"],
-        "launcher": ["width", "height", "showAppComments", "sortByUsage"],
-        "dock": ["enabled", "theme", "position", "height", "iconSize", "spacing", "margin", "hoverRegionHeight", "hideDelay", "pinnedOnStartup", "hoverToReveal", "availableOnFullscreen", "showRunningIndicators", "showPinButton", "showOverviewButton", "screenList", "keepHidden"],
-        "lockscreen": ["position", "lockOnBoot", "showClock", "showDate", "showMediaPlayer", "showAvatar", "showUsername", "blurWallpaper", "dimOpacity"],
-        "osd": ["position", "width", "iconStyle", "showPercentage", "showSlider"],
-        "system": ["disks", "idle", "ocr", "pomodoro", "replay", "nightLight", "slideshow", "autoTheme"]
+        const names = ["bar", "notch", "workspaces", "overview", "dashboard", "launcher", "dock", "lockscreen", "osd"];
+        const sections = {};
+        for (const name of names)
+            sections[name] = Config.adapterKeys(name);
+        return sections;
     }
 
     function createShellSnapshot() {
@@ -367,23 +362,7 @@ Singleton {
     property bool compositorHasChanges: false
     property var compositorSnapshot: null
 
-    readonly property var _compositorProps: [
-        "syncBorderWidth", "borderSize",
-        "syncRoundness", "rounding",
-        "gapsIn", "gapsOut",
-        "borderAngle", "inactiveBorderAngle",
-        "syncBorderColor", "activeBorderColor", "inactiveBorderColor",
-        "shadowEnabled", "syncShadowColor", "syncShadowOpacity",
-        "shadowRange", "shadowRenderPower", "shadowScale",
-        "shadowOpacity", "shadowSharp", "shadowColor", "shadowColorInactive",
-        "blurEnabled", "blurSize", "blurPasses", "blurXray",
-        "blurNewOptimizations", "blurIgnoreOpacity",
-        "blurNoise", "blurContrast", "blurBrightness", "blurVibrancy",
-        "blurVibrancyDarkness", "blurSpecial", "blurPopups", "blurPopupsIgnorealpha",
-        "blurInputMethods", "blurInputMethodsIgnorealpha",
-        "blurExplicitIgnoreAlpha", "blurIgnoreAlphaValue",
-        "shadowOffset", "shadowColorInactive"
-    ]
+    readonly property var _compositorProps: Config.adapterKeys("compositor")
 
     function createCompositorSnapshot() {
         var snapshot = {};
@@ -448,6 +427,22 @@ Singleton {
         compositorHasChanges = false;
         compositorSnapshot = null;
         for (const group of ["theme", "shell", "compositor"]) Config.endEdit(group);
+    }
+
+    // Keep the dock and the notch from occupying the same edge.
+    Connections {
+        target: Config.notch
+        function onPositionChanged() {
+            if (!Config.initialLoadComplete)
+                return;
+            if (Config.notch.position === "bottom" && Config.dock.position === "bottom") {
+                Config.dock.position = Config.bar.position === "left" ? "right" : "left";
+                root.markShellChanged();
+            } else if (Config.notch.position === "top" && (Config.dock.position === "left" || Config.dock.position === "right")) {
+                Config.dock.position = "bottom";
+                root.markShellChanged();
+            }
+        }
     }
 
 }

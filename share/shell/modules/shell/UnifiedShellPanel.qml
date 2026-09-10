@@ -3,7 +3,6 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.modules.bar
-import qs.modules.bar.workspaces
 import qs.modules.notch
 import qs.modules.dock
 import qs.modules.frame
@@ -85,7 +84,7 @@ PanelWindow {
             return true;
         }
 
-        const wins = CompositorData.windowList;
+        const wins = Compositor.windowList;
         for (let i = 0; i < wins.length; i++) {
             if (wins[i].monitor === monId && wins[i].fullscreen && wins[i].workspace.id === activeWorkspaceId) {
                 return true;

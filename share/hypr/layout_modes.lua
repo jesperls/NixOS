@@ -33,9 +33,13 @@ local function apply(id, target)
 end
 
 for id, target in pairs(modes) do
-  if type(id) == "number" and id > 0 and id % 1 == 0 and allowed[target]
-    and (target ~= "lua:centered" or primary.workspace_id(id)) then
-    apply(id, target)
+  if type(id) == "number" and id > 0 and id % 1 == 0 and allowed[target] then
+    -- A centered mode saved for a workspace that isn't statically primary is
+    -- left in place (skipped) rather than deleted: the runtime primary check
+    -- uses the live monitor, which may differ from the generated list.
+    if target ~= "lua:centered" or primary.workspace_id(id) then
+      apply(id, target)
+    end
   else
     modes[id] = nil
   end

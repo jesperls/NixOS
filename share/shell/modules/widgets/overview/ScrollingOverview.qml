@@ -5,7 +5,6 @@ import Quickshell
 import Quickshell.Wayland
 import qs.modules.globals
 import qs.modules.theme
-import qs.modules.bar.workspaces
 import qs.modules.services
 import qs.modules.components
 import qs.config
@@ -22,7 +21,7 @@ Item {
     property var currentScreen: null
     readonly property var monitor: currentScreen ? Compositor.monitorFor(currentScreen) : Compositor.focusedMonitor
     readonly property int monitorId: monitor?.id ?? -1
-    readonly property var monitors: CompositorData.monitors
+    readonly property var monitors: Compositor.monitors.values
     readonly property var monitorData: monitors.find(m => m.id === monitorId) ?? null
 
     readonly property string barPosition: Config.bar.position
@@ -30,7 +29,7 @@ Item {
     readonly property bool isBarPinned: barPanel ? barPanel.pinned : (Config.bar.pinnedOnStartup ?? true)
     readonly property int barReserved: isBarPinned ? (Config.showBackground ? 44 : 40) : 0
 
-    readonly property var windowList: CompositorData.windowList
+    readonly property var windowList: Compositor.windowList
 
     readonly property string focusedWindowAddress: Compositor.focusedClient?.address ?? ""
 

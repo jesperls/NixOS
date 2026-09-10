@@ -1,13 +1,9 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
 
 let
-  cfg = config.mySystem.programs.lutris;
-
   shared = import ../lib/gaming.nix { inherit pkgs; };
 
   lutrisWithDeps = pkgs.lutris.override {
@@ -85,10 +81,5 @@ let
   };
 in
 {
-  options.mySystem.programs.lutris.enable =
-    lib.mkEnableOption "Lutris with bundled Wine runtime libraries";
-
-  config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ lutrisWrapped ];
-  };
+  environment.systemPackages = [ lutrisWrapped ];
 }

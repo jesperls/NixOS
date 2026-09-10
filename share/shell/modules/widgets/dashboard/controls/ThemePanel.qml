@@ -20,123 +20,11 @@ Item {
     property string currentSection: ""
     property string selectedVariant: "bg"
 
-    component SectionButton: StyledRect {
-        id: sectionBtn
-        required property string text
-        required property string sectionId
-
-        property bool isHovered: false
-
-        variant: isHovered ? "focus" : "pane"
-        Layout.fillWidth: true
-        Layout.preferredHeight: 56
-        radius: Styling.radius(0)
-
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: 16
-            spacing: 16
-
-            Text {
-                text: sectionBtn.text
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(0)
-                font.bold: true
-                color: Colors.overBackground
-                Layout.fillWidth: true
-            }
-
-            Text {
-                text: Icons.caretRight
-                font.family: Icons.font
-                font.pixelSize: 20
-                color: Colors.overSurfaceVariant
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onEntered: sectionBtn.isHovered = true
-            onExited: sectionBtn.isHovered = false
-            onClicked: root.currentSection = sectionBtn.sectionId
-        }
+    component SectionButton: SettingsSectionButton {
+        onActivated: id => root.currentSection = id
     }
 
-    component ToggleRow: RowLayout {
-        id: toggleRowRoot
-        property string label: ""
-        property bool checked: false
-        signal toggled(bool value)
-
-        property bool _updating: false
-
-        onCheckedChanged: {
-            if (!_updating && toggleSwitch.checked !== checked) {
-                _updating = true;
-                toggleSwitch.checked = checked;
-                _updating = false;
-            }
-        }
-
-        Layout.fillWidth: true
-        spacing: 8
-
-        Text {
-            text: toggleRowRoot.label
-            font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overBackground
-            Layout.fillWidth: true
-        }
-
-        Switch {
-            id: toggleSwitch
-            checked: toggleRowRoot.checked
-
-            onCheckedChanged: {
-                if (!toggleRowRoot._updating && checked !== toggleRowRoot.checked) {
-                    toggleRowRoot.toggled(checked);
-                }
-            }
-
-            indicator: Rectangle {
-                implicitWidth: 40
-                implicitHeight: 20
-                x: toggleSwitch.leftPadding
-                y: parent.height / 2 - height / 2
-                radius: height / 2
-                color: toggleSwitch.checked ? Styling.srItem("overprimary") : Colors.surfaceBright
-                border.color: toggleSwitch.checked ? Styling.srItem("overprimary") : Colors.outline
-
-                Behavior on color {
-                    enabled: Config.animDuration > 0
-                    ColorAnimation {
-                        duration: Config.animDuration / 2
-                    }
-                }
-
-                Rectangle {
-                    x: toggleSwitch.checked ? parent.width - width - 2 : 2
-                    y: 2
-                    width: parent.height - 4
-                    height: width
-                    radius: width / 2
-                    color: toggleSwitch.checked ? Colors.background : Colors.overSurfaceVariant
-
-                    Behavior on x {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration / 2
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-                }
-            }
-            background: null
-        }
-    }
+    component ToggleRow: SettingsToggleRow {}
 
     property bool colorPickerActive: false
     property var colorPickerColorNames: []
@@ -1078,7 +966,7 @@ Item {
                                             Layout.preferredWidth: 16
                                             Layout.preferredHeight: 16
                                             radius: 4
-                                            color: Config.resolveColor(Config.theme.shadowColor)
+                                            color: Colors.resolve(Config.theme.shadowColor)
                                             border.width: 1
                                             border.color: Colors.outline
                                         }

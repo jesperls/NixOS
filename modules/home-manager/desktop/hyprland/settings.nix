@@ -4,9 +4,9 @@
   ...
 }:
 let
-  cursor = import ../../lib/cursor.nix { inherit lib osConfig; };
   special = osConfig.mySystem.desktop.specialWorkspaces;
 
+  cursorTheme = osConfig.mySystem.theme.gtk.cursorTheme;
   mkCall = args: { _args = args; };
 
   monitorWidth = monitor: lib.toInt (builtins.head (lib.splitString "x" monitor.resolution));
@@ -65,13 +65,16 @@ in
   inherit activeMonitors;
 
   settings = {
-    env = lib.mapAttrsToList (
-      name: value:
-      mkCall [
-        name
-        value
-      ]
-    ) (lib.filterAttrs (name: _: lib.hasPrefix "HYPRCURSOR" name) cursor.vars);
+    env = [
+      (mkCall [
+        "HYPRCURSOR_THEME"
+        cursorTheme.name
+      ])
+      (mkCall [
+        "HYPRCURSOR_SIZE"
+        (toString cursorTheme.size)
+      ])
+    ];
 
     monitor = (map renderMonitor osConfig.mySystem.monitors) ++ [
       {

@@ -52,10 +52,12 @@ Singleton {
     Component.onCompleted: syncScreens()
 
     function getForActive() {
-        if (!Compositor.focusedMonitor) {
+        // Active modules stay on the screen they were opened on, so resolve
+        // against that screen rather than whichever monitor now has focus.
+        if (!lastFocusedScreen) {
             return null;
         }
-        return getForScreen(Compositor.focusedMonitor.name);
+        return getForScreen(lastFocusedScreen);
     }
 
     function _updateMap(map, key, value) {
