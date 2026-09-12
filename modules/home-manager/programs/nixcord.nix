@@ -8,7 +8,7 @@
 
     discord = {
       vencord.enable = true;
-      openASAR.enable = true;
+      openASAR.enable = false;
       krisp.enable = true;
     };
     config = {

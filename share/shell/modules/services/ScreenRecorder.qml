@@ -108,7 +108,7 @@ QtObject {
         root.starting = true;
 
         var outputFile = root.videosDir + "/" + new Date().toISOString().replace(/[:.]/g, "-") + ".mp4";
-        var cmd = ["gpu-screen-recorder", "-f", "60", "-w", mode];
+        var cmd = ["gpu-screen-recorder", "-f", "60", "-w", mode, "-fallback-cpu-encoding", "yes"];
         if (mode === "region" && regionStr)
             cmd.push("-region", regionStr);
 

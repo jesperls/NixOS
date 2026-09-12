@@ -177,7 +177,7 @@ Singleton {
                 Notifications.notifyInternal({summary: "Replay", body: "Could not create replay directory"});
                 return;
             }
-            var cmd = ["gpu-screen-recorder", "-f", "60"];
+            var cmd = ["gpu-screen-recorder", "-f", "60", "-fallback-cpu-encoding", "yes"];
             if (root.captureMode === "region" && root.captureRegion !== "") {
                 cmd.push("-w", "region", "-region", root.captureRegion);
             } else {

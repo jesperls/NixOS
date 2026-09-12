@@ -28,6 +28,10 @@
       url = "github:ThatOneCalculator/deltatune-linux";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    foxy = {
+      url = "github:jesperls/foxy-qs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     opencode = {
       url = "github:anomalyco/opencode";
       inputs.nixpkgs.follows = "nixpkgs";

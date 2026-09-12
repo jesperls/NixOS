@@ -12,6 +12,7 @@
     ../../modules/home-manager/programs/easyeffects.nix
     ../../modules/home-manager/programs/flatpak.nix
     ../../modules/home-manager/services/deltatune.nix
+    ../../modules/home-manager/services/foxy.nix
 
     ./packages.nix
   ];

@@ -50,6 +50,8 @@
       gp = "git push";
       gl = "git log --oneline --graph";
       gd = "git diff";
+
+      deltamod = ''protontricks -c 'wine "/home/jesperls/.steam/steam/steamapps/compatdata/1671210/pfx/drive_c/Program Files/Deltamod/Deltamod.exe" --disable-gpu --no-sandbox' 1671210'';
     }
     // lib.optionalAttrs ((osConfig.mySystem.hardware.webcam or { }) ? videoNr) {
       webcam = "scrcpy --video-source=camera --camera-facing=back --camera-size=1920x1080 --v4l2-sink=/dev/video${toString osConfig.mySystem.hardware.webcam.videoNr} --no-audio --no-playback";
