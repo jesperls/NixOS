@@ -14,6 +14,15 @@ let
       NIX_CFLAGS_COMPILE = (old.env.NIX_CFLAGS_COMPILE or "") + " -I${pkgs.minizip}/include/minizip";
     };
   });
+
+  melonds-fixed = pkgs.symlinkJoin {
+    name = "melonds-fixed";
+    paths = [ pkgs.melonds ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/melonDS --set SDL_JOYSTICK_HIDAPI 0
+    '';
+  };
 in
 {
   programs.steam = {
@@ -43,6 +52,7 @@ in
 
   environment.systemPackages = with pkgs; [
     mgba
+    melonds-fixed
     ryubing
     snes9x-gtk-fixed
   ];

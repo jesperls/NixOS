@@ -21,7 +21,9 @@ let
         {
           nixpkgs.overlays = [
             overlays
-            inputs.opencode.overlays.default
+            (_final: _prev: {
+              opencode = inputs.opencode.packages.${system}.opencode;
+            })
           ];
         }
       ]

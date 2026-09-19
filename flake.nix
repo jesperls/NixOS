@@ -32,10 +32,7 @@
       url = "github:jesperls/foxy-qs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    opencode = {
-      url = "github:anomalyco/opencode";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    opencode.url = "github:anomalyco/opencode";
   };
 
   outputs =
