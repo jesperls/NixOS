@@ -17,6 +17,7 @@ in
       modify_font = "cell_height 120%";
       window_padding_width = 10;
       confirm_os_window_close = 0;
+      remember_window_size = false;
 
       repaint_delay = 10;
       input_delay = 3;

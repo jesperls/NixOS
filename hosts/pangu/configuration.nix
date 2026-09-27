@@ -3,6 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./swap.nix
     ./theme.nix
     ./monitors.nix
     ./audio.nix

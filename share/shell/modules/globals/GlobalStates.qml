@@ -111,6 +111,35 @@ Singleton {
     property bool mirrorWindowVisible: false
 
     property bool cheatsheetVisible: false
+    property bool macrosWindowVisible: false
+    property int macrosTargetWorkspaceId: 0
+    property string macrosTargetScreenName: ""
+
+    // One-shot pointer capture for a macro click step.
+    property bool mousePickActive: false
+    property bool mousePickValid: false
+    property int mousePickX: 0
+    property int mousePickY: 0
+    property int mousePickSeq: 0
+
+    function beginMousePick() {
+        mousePickValid = false;
+        mousePickActive = true;
+    }
+
+    function finishMousePick(x, y) {
+        mousePickX = x;
+        mousePickY = y;
+        mousePickValid = true;
+        mousePickSeq++;
+        mousePickActive = false;
+    }
+
+    function cancelMousePick() {
+        mousePickValid = false;
+        mousePickSeq++;
+        mousePickActive = false;
+    }
 
     property bool settingsWindowVisible: false
     property int settingsTargetWorkspaceId: 0

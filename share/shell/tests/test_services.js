@@ -615,4 +615,133 @@ console.log('Settings search index targets match the panels');
 const configSource = fs.readFileSync(path.join(__dirname, '../config/Config.qml'), 'utf8');
 assert.match(configSource, /name: "pinnedapps"\n\s*path: Paths\.dataPath\("pinnedapps\.json"\)/,
     'pinnedapps must live in the shell data dir that nix overrides target');
+assert.match(configSource, /name: "macros"/, 'Macros must persist through a ConfigFile adapter');
 console.log('Pinned apps path matches the nix override target');
+
+const macroSource = fs.readFileSync(path.join(__dirname, '../modules/services/macro_utils.js'), 'utf8')
+    .replace(/^\.pragma library\n/, '');
+const macroContext = vm.createContext({module: {exports: {}}, console});
+vm.runInContext(macroSource
+    + '\nmodule.exports = {normalizeMacro, normalizeStep, normalizeTrigger, blankMacro, blankStep, blankTriggerFor, bindsLua, luaQuote, sanitizeCombo, isValidCombo, describeTrigger, stepTitle};',
+    macroContext, {filename: 'macro_utils.js'});
+const macroUtils = macroContext.module.exports;
+const macro = macroUtils.normalizeMacro({
+    name: 'Greet "friend"',
+    trigger: {type: 'hotkey', keys: 'SUPER + SHIFT + M'},
+    steps: [{type: 'delay', ms: 'nope'}, {type: 'key', keys: 'Return'}, {type: 'click', button: 'sideways'}]
+});
+assert.equal(macro.steps[0].ms, 500, 'Invalid delay falls back to a default');
+assert.equal(macro.steps[2].button, 'left', 'Unknown click button falls back to left');
+assert.equal(macroUtils.normalizeStep({type: 'sound', path: '/a/b/boom.mp3'}).path, '/a/b/boom.mp3');
+assert.equal(macroUtils.normalizeStep({type: 'sound'}).path, '', 'A sound step defaults to no path');
+assert.equal(macroUtils.stepTitle({type: 'sound', path: '/a/b/boom.mp3'}), 'boom.mp3');
+assert.equal(macroUtils.stepTitle({type: 'sound', path: ''}), 'Play sound');
+assert.equal(macroUtils.normalizeStep({type: 'click', button: 'left', x: 10.6, y: 20.2}).x, 11, 'Positions are rounded');
+assert.equal(macroUtils.normalizeStep({type: 'click', button: 'left', x: 10.6, y: 20.2}).y, 20);
+assert.equal(macroUtils.normalizeStep({type: 'click', button: 'left', x: 'nope', y: 1}).x, undefined, 'Non-numeric positions are dropped');
+assert.equal(macroUtils.stepTitle({type: 'click', button: 'left', x: 5, y: 6}), 'left click @ 5,6');
+assert.equal(macroUtils.describeTrigger(macroUtils.normalizeTrigger({type: 'timer', seconds: 0})), 'Every 1s');
+const binds = macroUtils.bindsLua([macro]);
+assert.ok(binds.includes('macro_bind("SUPER + SHIFT + M"'), 'Hotkey binds quote the combo');
+assert.ok(binds.includes('pangu run \\"macros-run ' + macro.id + '\\"'), 'Macro ids are passed as one run argument');
+assert.ok(binds.includes('Macro: Greet \\"friend\\"'), 'Names are escaped for Lua');
+assert.ok(binds.includes('local function macro_bind'), 'Each bind is isolated from the others');
+assert.ok(binds.includes(', false)'), 'Hotkey binds consume their key');
+const sequence = macroUtils.normalizeMacro({
+    id: 'm_seq', name: 'Seq', trigger: {type: 'sequence', keys: ['SUPER + A', 'SUPER + B']}, steps: [{type: 'text', text: 'hi'}]
+});
+const sequenceBinds = macroUtils.bindsLua([sequence]);
+assert.ok(sequenceBinds.includes('macros-seq m_seq 0') && sequenceBinds.includes('macros-seq m_seq 1'),
+    'Every sequence step gets a bind');
+assert.ok(sequenceBinds.includes(', true)'), 'Sequence steps pass the key through to the window');
+assert.ok(!macroUtils.bindsLua([Object.assign({}, sequence, {enabled: false})]).includes('macro_bind('),
+    'Disabled macros emit no binds');
+assert.ok(!macroUtils.bindsLua([{id: 'm_x', name: 'No trigger', trigger: {type: 'none'}, steps: []}]).includes('macro_bind('),
+    'Manual macros emit no binds');
+
+assert.equal(macroUtils.sanitizeCombo('CTRL + \u0009'), 'CTRL', 'Control bytes are stripped from combos');
+assert.equal(macroUtils.sanitizeCombo(' Ctrl + I '), 'Ctrl + I');
+assert.equal(macroUtils.isValidCombo('CTRL'), false, 'Modifier-only combos are rejected');
+assert.equal(macroUtils.isValidCombo('CTRL + I'), true);
+assert.equal(macroUtils.isValidCombo('CTRL + SHIFT + \u00d6'), false, 'Raw Unicode is not a keysym name');
+assert.equal(macroUtils.isValidCombo('CTRL + SHIFT + odiaeresis'), true);
+assert.equal(macroUtils.sanitizeCombo('CTRL + \u001f').indexOf('+'), -1);
+assert.ok(!macroUtils.bindsLua([{id: 'm_bad', name: 'Bad', enabled: true, trigger: {type: 'hotkey', keys: 'CTRL + \u001f'}, steps: []}]).includes('macro_bind('),
+    'Combos without a real key emit no bind');
+assert.ok(macroUtils.luaQuote('a\u0001b').includes('\\001'), 'Remaining control bytes are escaped for Lua');
+assert.ok(macroUtils.bindsLua([{id: 'm_o', name: 'O', enabled: true, trigger: {type: 'hotkey', keys: 'CTRL + SHIFT + odiaeresis'}, steps: []}])
+    .includes('"CTRL + SHIFT + odiaeresis"'), 'Non-ASCII keysym names survive generation');
+console.log('Macro normalization, Lua escaping, combo validation and bind coverage tests passed');
+
+const macroStarts = [];
+const svcMacros = {
+    a: {id: 'a', name: 'A', enabled: true, loop: {mode: 'none', count: 1, delayMs: 0}, steps: [{type: 'key', keys: 'A'}]},
+    b: {id: 'b', name: 'B', enabled: true, loop: {mode: 'none', count: 1, delayMs: 0}, steps: [{type: 'key', keys: 'B'}]},
+    c: {id: 'c', name: 'C', enabled: true, loop: {mode: 'count', count: 2, delayMs: 0}, steps: [{type: 'key', keys: 'C'}]},
+};
+const macroServiceRoot = {
+    enabled: true, playing: false, activeId: '', activeName: '', activeStep: -1,
+    repeatLeft: 0, currentMacro: null, currentStepIndex: 0, loopPending: false,
+    queue: [], runToken: 0, stepToken: -1, processes: [],
+    list: () => Object.values(svcMacros),
+    findMacro: id => svcMacros[id] || null,
+    _runStep: () => macroStarts.push(macroServiceRoot.activeId),
+    _killProcesses: () => { macroServiceRoot.processes = []; }
+};
+const macroServiceContext = {
+    root: macroServiceRoot,
+    stepTimer: {stop() {}, restart() {}, interval: 0},
+    Qt: {callLater() {}},
+    MacroUtils: {normalizeMacro: macro => JSON.parse(JSON.stringify(macro))},
+    console
+};
+serviceFunctions('MacroService.qml', ['run', 'stop', '_enqueue', '_dequeue', '_startMacro', '_start', '_resetPlayback', '_finishPass', '_reconcileActive'], macroServiceContext);
+
+macroServiceRoot.run('a', true);
+assert.equal(macroServiceRoot.playing, true);
+assert.equal(macroServiceRoot.activeId, 'a');
+macroServiceRoot.run('b', false);
+assert.equal(JSON.stringify(macroServiceRoot.queue), JSON.stringify(['b']), 'A busy channel queues non-urgent triggers');
+assert.equal(macroServiceRoot.activeId, 'a', 'A queued trigger must not interrupt playback');
+macroServiceRoot.run('a', false);
+assert.equal(macroServiceRoot.playing, true, 'A timer re-firing its own macro must not toggle it off');
+assert.equal(JSON.stringify(macroServiceRoot.queue), JSON.stringify(['b']));
+macroServiceRoot.run('b', false);
+assert.equal(JSON.stringify(macroServiceRoot.queue), JSON.stringify(['b']), 'Duplicate queue entries are collapsed');
+macroServiceRoot._finishPass();
+assert.equal(macroServiceRoot.activeId, 'b', 'Finishing a run dequeues the next macro');
+assert.equal(JSON.stringify(macroServiceRoot.queue), JSON.stringify([]));
+macroServiceRoot.run('b', true);
+assert.equal(macroServiceRoot.playing, false, 'An urgent trigger toggles the active macro off');
+assert.equal(JSON.stringify(macroServiceRoot.queue), JSON.stringify([]), 'Explicit stop clears the queue');
+macroServiceRoot.run('a', true);
+macroServiceRoot.run('c', true);
+assert.equal(macroServiceRoot.activeId, 'c', 'An urgent trigger preempts the active macro');
+assert.equal(macroServiceRoot.repeatLeft, 2);
+macroServiceRoot.currentMacro = svcMacros.c;
+macroServiceRoot.repeatLeft = 2;
+macroServiceRoot._finishPass();
+assert.equal(macroServiceRoot.playing, true, 'A count loop keeps playing until its count is spent');
+assert.equal(macroServiceRoot.repeatLeft, 1);
+macroServiceRoot._finishPass();
+assert.equal(macroServiceRoot.playing, false);
+assert.equal(macroServiceRoot.repeatLeft, 0);
+const tokensBefore = macroServiceRoot.runToken;
+macroServiceRoot.stop();
+assert.ok(macroServiceRoot.runToken > tokensBefore, 'Teardown invalidates stale async continuations');
+
+svcMacros.a.loop = {mode: 'infinite', count: 1, delayMs: 0};
+macroServiceRoot.run('a', true);
+assert.equal(macroServiceRoot.currentMacro.loop.mode, 'infinite');
+svcMacros.a.enabled = false;
+macroServiceRoot._reconcileActive();
+assert.equal(macroServiceRoot.playing, false, 'Disabling the active macro stops the running instance');
+svcMacros.a.enabled = true;
+svcMacros.a.loop = {mode: 'infinite', count: 1, delayMs: 0};
+macroServiceRoot.run('a', true);
+svcMacros.a.loop = {mode: 'none', count: 1, delayMs: 0};
+macroServiceRoot._reconcileActive();
+assert.equal(macroServiceRoot.currentMacro.loop.mode, 'none', 'A loop edit is adopted by the running instance');
+assert.equal(macroServiceRoot.repeatLeft, -1);
+assert.equal(macroServiceRoot.playing, true, 'A loop edit does not interrupt the current pass');
+console.log('Macro playback queue, loop counts, urgent toggling, run tokens and live edits are consistent');

@@ -50,6 +50,7 @@ bind_exec(mainMod, "G", "pangu run gamemode", "Shell: toggle game mode")
 bind_exec(mainMod, "X", "pangu run tools", "Shell: tools menu")
 bind_exec(mainMod, "I", "pangu run settings", "Shell: settings")
 bind_exec(mainMod, "F1", "pangu run cheatsheet", "Shell: keybind cheatsheet")
+bind_exec(mainMod .. " SHIFT", "M", "pangu run macros", "Shell: macros and hotkeys")
 
 bind_exec(mainMod, "L", "loginctl lock-session", "Session: lock")
 
@@ -217,5 +218,14 @@ end
 
 bind_exec("", "XF86MonBrightnessUp", "brightnessctl set 5%+", "Media: brightness up", { repeating = true })
 bind_exec("", "XF86MonBrightnessDown", "brightnessctl set 5%-", "Media: brightness down", { repeating = true })
+
+local dataHome = os.getenv("XDG_DATA_HOME") or ((os.getenv("HOME") or "/nonexistent") .. "/.local/share")
+local macroChunk = loadfile(dataHome .. "/pangu/macros.lua")
+if macroChunk then
+  local ok, err = pcall(macroChunk)
+  if not ok then
+    io.stderr:write("pangu: failed to apply macros.lua: " .. tostring(err) .. "\n")
+  end
+end
 
 return true

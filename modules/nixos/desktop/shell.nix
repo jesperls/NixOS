@@ -8,6 +8,8 @@
 lib.mkIf config.mySystem.desktop.shell.enable {
   programs.gpu-screen-recorder.enable = true;
 
+  programs.ydotool.enable = true;
+
   services.power-profiles-daemon.enable = true;
 
   fonts.packages = with pkgs; [

@@ -33,6 +33,7 @@
   libqalculate,
   linux-wallpaperengine,
   matugen,
+  mpv,
   mpvpaper,
   networkmanagerapplet,
   nodejs,
@@ -180,6 +181,7 @@ writeShellApplication {
     libqalculate
     linux-wallpaperengine
     matugen
+    mpv
     mpvpaper
     networkmanagerapplet # nm-connection-editor for the wifi panel
     power-profiles-daemon

@@ -23,6 +23,16 @@ let
       wrapProgram $out/bin/melonDS --set SDL_JOYSTICK_HIDAPI 0
     '';
   };
+
+  xemu-fixed = pkgs.symlinkJoin {
+    name = "xemu-fixed";
+    paths = [ pkgs.xemu ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      mv $out/bin/xemu $out/bin/xemu-gapps
+      makeWrapper $out/bin/xemu-gapps $out/bin/xemu --set SDL_JOYSTICK_HIDAPI 0
+    '';
+  };
 in
 {
   programs.steam = {
@@ -55,6 +65,7 @@ in
     melonds-fixed
     ryubing
     snes9x-gtk-fixed
+    xemu-fixed
   ];
 
   programs.gamemode = {
@@ -73,6 +84,14 @@ in
     enable = true;
     capSysNice = true;
   };
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id.indexOf("com.feralinteractive.GameMode.") === 0 &&
+          subject.isInGroup("gamemode")) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
 
   hardware.xpadneo.enable = true;
 }

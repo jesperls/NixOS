@@ -19,12 +19,7 @@ let
         ../hosts/${hostName}/configuration.nix
         home-manager.nixosModules.home-manager
         {
-          nixpkgs.overlays = [
-            overlays
-            (_final: _prev: {
-              opencode = inputs.opencode.packages.${system}.opencode;
-            })
-          ];
+          nixpkgs.overlays = [ overlays ];
         }
       ]
       ++ modules;

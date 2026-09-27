@@ -28,11 +28,8 @@ Singleton {
         Process {
             property string appId
             property string appName
-            command: root.scopedCommand(["gtk-launch", "--", appId])
+            command: root.scopedCommand(["bash", "-c", "exec gtk-launch -- \"$1\" </dev/null >/dev/null 2>&1", "bash", appId])
             workingDirectory: Paths.home
-            stderr: SplitParser {
-                onRead: data => { if (data.trim()) console.warn("Application launch:", data.trim()); }
-            }
             onExited: code => {
                 if (code === 0) UsageTracker.recordUsage(appId);
                 else {

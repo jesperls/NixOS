@@ -62,10 +62,11 @@ Singleton {
         pinnedapps: pinnedAppsFile,
         osd: osdFile,
         dashboard: dashboardFile,
-        launcher: launcherFile
+        launcher: launcherFile,
+        macros: macrosFile
     })
 
-    readonly property bool initialLoadComplete: themeFile.ready && barFile.ready && workspacesFile.ready && overviewFile.ready && notchFile.ready && compositorFile.ready && performanceFile.ready && weatherFile.ready && lockscreenFile.ready && prefixFile.ready && systemFile.ready && dockFile.ready && pinnedAppsFile.ready && osdFile.ready && dashboardFile.ready && launcherFile.ready
+    readonly property bool initialLoadComplete: themeFile.ready && barFile.ready && workspacesFile.ready && overviewFile.ready && notchFile.ready && compositorFile.ready && performanceFile.ready && weatherFile.ready && lockscreenFile.ready && prefixFile.ready && systemFile.ready && dockFile.ready && pinnedAppsFile.ready && osdFile.ready && dashboardFile.ready && launcherFile.ready && macrosFile.ready
 
     readonly property bool barReady: barFile.ready
     readonly property bool dockReady: dockFile.ready
@@ -786,6 +787,16 @@ Singleton {
         }
     }
 
+    ConfigFile {
+        id: macrosFile
+        name: "macros"
+
+        adapter: JsonAdapter {
+            property bool enabled: true
+            property list<var> macros: []
+        }
+    }
+
     readonly property QtObject theme: themeFile.adapter
     readonly property QtObject bar: barFile.adapter
     readonly property QtObject workspaces: workspacesFile.adapter
@@ -802,6 +813,7 @@ Singleton {
     readonly property QtObject osd: osdFile.adapter
     readonly property QtObject dashboard: dashboardFile.adapter
     readonly property QtObject launcher: launcherFile.adapter
+    readonly property QtObject macros: macrosFile.adapter
 
     readonly property bool lightMode: theme.lightMode
     readonly property bool oledMode: lightMode ? false : theme.oledMode

@@ -24,6 +24,7 @@ import qs.modules.globals
 import qs.modules.shell
 import qs.config
 import qs.modules.shell.osd
+import qs.modules.widgets.macros
 import "modules/tools"
 
 ShellRoot {
@@ -207,6 +208,25 @@ ShellRoot {
         source: "modules/widgets/config/SettingsWindow.qml"
     }
 
+    Loader {
+        id: macrosWindowLoader
+        active: SuspendManager.wakeReady && GlobalStates.macrosWindowVisible
+        source: "modules/widgets/macros/MacrosWindow.qml"
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        Loader {
+            id: mousePickLoader
+            active: SuspendManager.wakeReady && GlobalStates.mousePickActive
+            required property ShellScreen modelData
+            sourceComponent: MousePickOverlay {
+                targetScreen: mousePickLoader.modelData
+            }
+        }
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -230,6 +250,7 @@ ShellRoot {
         void WallpaperSlideshowService.enabled;
         void AutoThemeService.enabled;
         void ReplayService.active;
+        void MacroService.enabled;
     })
 
     function overviewEnabledFor(screenName) {

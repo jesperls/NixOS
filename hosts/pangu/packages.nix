@@ -10,8 +10,7 @@
     uv
     python314
     nodejs
-    cargo
-    rustc
+    rustup
     gcc
     openjdk25
     ydotool
@@ -60,7 +59,6 @@
     fastfetch
     helix
     lazygit
-    opencode
     linux-wallpaperengine
     pear-desktop
     phoronix-test-suite

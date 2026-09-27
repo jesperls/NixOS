@@ -39,6 +39,13 @@ hl.window_rule({
 })
 
 hl.window_rule({
+  match = { class = "^(org\\.quickshell)$", title = "^(Pangu Macros & Hotkeys)$" },
+  float = true,
+  center = true,
+  size = { 1180, 720 },
+})
+
+hl.window_rule({
   match = { title = "^(Picture-in-Picture)$" },
   float = true,
   pin = true,

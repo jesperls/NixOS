@@ -98,6 +98,9 @@ Rules:
 | Desktop palette (GTK/Qt/kitty/shell) | **Pangu**, from the wallpaper via matugen |
 | Window decoration (gaps/borders/blur/shadow) | **Pangu** (`CompositorTheme.qml`) |
 | Keybinds and window/layout rules | `share/hypr/*.lua` + `generated.lua` |
+| Macro definitions, steps, triggers | `Config.macros` (`macros.json`) + `MacroService.qml` |
+| Macro hotkey/sequence binds | `MacroService.qml` → generated `macros.lua` |
+| Synthetic input / mouse clicks | `programs.ydotool` (enabled in `desktop/shell.nix`) |
 | Monitors, workspace rules, Hyprland env | HM `desktop/hyprland/settings.nix` → `~/.config/hypr/hyprland.lua` |
 | Hyprland animations, per-app opacity | nix → `generated.lua` |
 | Shell settings | `share/shell/config/Config.qml` adapters (runtime JSON) |
@@ -106,7 +109,7 @@ Rules:
 
 ## Generation channels
 
-There are five ways configuration reaches the desktop; each has one job.
+There are six ways configuration reaches the desktop; each has one job.
 
 | Channel | Producer | Consumer |
 | ------- | -------- | -------- |
@@ -114,6 +117,7 @@ There are five ways configuration reaches the desktop; each has one job.
 | nix → `~/.config/hypr/hyprland.lua` | HM `desktop/hyprland/settings.nix` | Hyprland (`monitor`, `workspace_rule`, `env`) |
 | nix → `~/.config/pangu/config/*.json` | `desktop/shell.nix` + `lib/apply-shell-settings.nix` (`ExecStartPre`) | the shell |
 | shell → `~/.local/share/pangu/hyprland.lua` | `CompositorTheme.qml` | `share/hypr/shell.lua` |
+| shell → `~/.local/share/pangu/macros.lua` | `MacroService.qml` | `share/hypr/binds.lua` (tail load) |
 | wallpaper → `~/.cache/pangu/colors.json` | matugen (run by `WallpaperService`) | `Colors.qml` and the theme generators |
 
 `generated.lua` and the shell JSON are merge targets, not replace targets: nix
@@ -144,6 +148,15 @@ tracked automatically; the only list to maintain is the section names in
   `Visibilities` holds per-screen module visibility.
 - `modules/services/` are the backends. `Compositor.qml` wraps
   `Quickshell.Hyprland`; everything talks to Hyprland through it.
+- `MacroService.qml` owns macros: it plays steps (Hyprland
+  `send_shortcut`/`send_key_state`, `wtype`, scoped commands, delays, ydotool
+  clicks), runs timer/app/sequence/startup triggers, and writes the generated
+  hotkey binds. The editor is a workspace window (`modules/widgets/macros/`,
+  `FloatingWindow`, like the settings panel) opened from the tools menu
+  and `pangu run macros`.
+  Wayland gives the shell no global key capture, so "recording" captures keys
+  while the overlay holds keyboard focus and hotkeys are real Hyprland binds,
+  not focus-scoped QML `Shortcut`s.
 - Settings changes use `Config.beginEdit(group, files)` / `Config.save` /
   `Config.endEdit(group)` so a panel's edits are drafted and can be discarded.
   Direct writers that are not user-drafts (e.g. `AutoThemeService`) call

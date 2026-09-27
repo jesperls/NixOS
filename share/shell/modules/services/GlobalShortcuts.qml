@@ -16,6 +16,15 @@ QtObject {
     readonly property real mediaSeekStep: 5
 
     function run(command) {
+        if (command.startsWith("macros-run ")) {
+            MacroService.run(command.slice(11).trim());
+            return;
+        }
+        if (command.startsWith("macros-seq ")) {
+            const parts = command.split(/\s+/);
+            MacroService.sequenceStep(parts[1], parseInt(parts[2], 10));
+            return;
+        }
         switch (command) {
             case "launcher": toggleLauncher(); break;
             case "clipboard": toggleLauncherWithPrefix(1, Config.prefix.clipboard + " "); break;
@@ -44,6 +53,8 @@ QtObject {
                 break;
             case "mirror": GlobalStates.mirrorWindowVisible = !GlobalStates.mirrorWindowVisible; break;
             case "cheatsheet": GlobalStates.cheatsheetVisible = !GlobalStates.cheatsheetVisible; break;
+            case "macros": toggleMacros(); break;
+            case "macros-stop": MacroService.stop(); break;
             case "lockscreen": GlobalStates.lockscreenVisible = true; break;
             case "gamemode": GameModeService.toggle(); break;
             case "dnd": Notifications.silent = !Notifications.silent; break;
@@ -84,6 +95,19 @@ QtObject {
         function run(command: string) {
             root.run(command);
         }
+    }
+
+    function toggleMacros(screenName) {
+        const willOpen = !GlobalStates.macrosWindowVisible;
+        if (willOpen) {
+            const targetMonitor = screenName ? Compositor.monitorFor(screenName) : Compositor.focusedMonitor;
+            GlobalStates.macrosTargetWorkspaceId = targetMonitor?.activeWorkspace?.id || Compositor.focusedMonitor?.activeWorkspace?.id || Compositor.focusedWorkspace?.id || 0;
+            GlobalStates.macrosTargetScreenName = targetMonitor?.name || Compositor.focusedMonitor?.name || "";
+            if (targetMonitor && targetMonitor.id !== Compositor.focusedMonitor?.id)
+                Compositor.dispatch(`focusmonitor ${targetMonitor.id}`);
+            Qt.callLater(() => Visibilities.setActiveModule(""));
+        }
+        GlobalStates.macrosWindowVisible = willOpen;
     }
 
     function toggleSettings(screenName) {

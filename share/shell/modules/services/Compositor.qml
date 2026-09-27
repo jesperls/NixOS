@@ -157,6 +157,39 @@ Singleton {
         console.warn("Compositor: no dispatcher mapping for", command);
     }
 
+    function splitCombo(combo) {
+        const tokens = String(combo || "").split("+")
+            .map(token => token.replace(/[\\"\u0000-\u001f\u007f]/g, "").trim())
+            .filter(token => token.length > 0);
+        if (tokens.length === 0)
+            return null;
+        const key = tokens.pop();
+        if (!/^[A-Za-z0-9_:]+$/.test(key))
+            return null;
+        if (["SUPER", "CTRL", "ALT", "SHIFT"].indexOf(key.toUpperCase()) !== -1)
+            return null;
+        const mods = tokens.filter(token => ["SUPER", "CTRL", "ALT", "SHIFT"].indexOf(token.toUpperCase()) !== -1);
+        return { mods: mods.join(" "), key: key };
+    }
+
+    function injectShortcut(combo) {
+        const parsed = splitCombo(combo);
+        if (!parsed)
+            return;
+        Hyprland.dispatch(`hl.dsp.send_shortcut({ mods = "${parsed.mods}", key = "${parsed.key}" })`);
+    }
+
+    function moveCursor(x, y) {
+        Hyprland.dispatch(`hl.dsp.cursor.move({ x = ${Math.round(x)}, y = ${Math.round(y)} })`);
+    }
+
+    function injectKeyState(combo, state) {
+        const parsed = splitCombo(combo);
+        if (!parsed)
+            return;
+        Hyprland.dispatch(`hl.dsp.send_key_state({ mods = "${parsed.mods}", key = "${parsed.key}", state = "${state}" })`);
+    }
+
     // Quickshell's Socket never ends its stream, so a collector on one waits
     // forever; a process exit does close it.
     function request(payload, onReply) {

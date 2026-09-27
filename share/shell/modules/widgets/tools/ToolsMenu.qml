@@ -93,6 +93,11 @@ ActionGrid {
             icon: GlobalStates.mirrorWindowVisible ? Icons.webcamSlash : Icons.webcam,
             tooltip: "Mirror",
             command: ""
+        },
+        {
+            icon: Icons.keyboard,
+            tooltip: "Macros & Hotkeys",
+            command: ""
         }
     ]
 
@@ -148,6 +153,9 @@ ActionGrid {
             root.itemSelected();
         } else if (action.tooltip === "Mirror") {
             GlobalStates.mirrorWindowVisible = !GlobalStates.mirrorWindowVisible;
+            root.itemSelected();
+        } else if (action.tooltip === "Macros & Hotkeys") {
+            GlobalShortcuts.toggleMacros();
             root.itemSelected();
         }
     }
