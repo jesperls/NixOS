@@ -1,4 +1,4 @@
-{ osConfig, ... }:
+{ ... }:
 
 {
   imports = [
@@ -8,6 +8,4 @@
     ./cli/tools.nix
     ./cli/git.nix
   ];
-
-  home.stateVersion = osConfig.mySystem.home.stateVersion;
 }

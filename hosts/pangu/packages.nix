@@ -22,15 +22,9 @@
     p7zip
     parted
     yt-dlp
-    playerctl
     trash-cli
     aria2
-    grim
     ratty
-    slurp
-    swappy
-    libnotify
-    wl-clipboard
     gh
     mission-center
     pavucontrol
@@ -56,7 +50,6 @@
     fastfetch
     helix
     lazygit
-    linux-wallpaperengine
     pear-desktop
     phoronix-test-suite
     zed-editor

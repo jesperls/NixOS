@@ -36,14 +36,6 @@
       nfu = ''cd -- "$FLAKE" && nix flake update'';
 
       cat = "bat --paging=never";
-      trash = "trash-put";
-      del = "trash-put";
-
-      yt-dlp = "noglob yt-dlp";
-      ytmp3 = "noglob yt-dlp -x --audio-format mp3 --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
-      ytmp4 = "noglob yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
-      ytbest = "noglob yt-dlp -f 'bestvideo+bestaudio' --merge-output-format mkv --no-playlist --downloader aria2c --downloader-args aria2c:'-x 16 -s 16 -k 1M'";
-
       gs = "git status";
       ga = "git add";
       gc = "git commit";

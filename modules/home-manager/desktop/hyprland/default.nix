@@ -39,23 +39,6 @@ let
       browser = apps.browser.command;
       file_manager = apps.fileManager.command;
       editor = apps.editor.command;
-      shortcuts = [
-        {
-          key = "R";
-          command = "ratty";
-          description = "Apps: ratty";
-        }
-        {
-          key = "D";
-          command = "discord";
-          description = "Apps: Discord";
-        }
-        {
-          key = "M";
-          command = "easyeffects";
-          description = "Apps: EasyEffects";
-        }
-      ];
     };
     tearing = {
       enable = tearing.enable;

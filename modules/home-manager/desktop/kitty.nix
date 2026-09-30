@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   osConfig,
   ...
@@ -58,6 +59,6 @@ in
       "ctrl+shift+n" = "new_os_window_with_cwd";
     };
     # Last directive wins; the shell rewrites this with the wallpaper palette.
-    extraConfig = lib.optionalString osConfig.mySystem.desktop.shell.enable "include ~/.cache/pangu/kitty.conf";
+    extraConfig = lib.optionalString osConfig.mySystem.desktop.shell.enable "include ${config.xdg.cacheHome}/pangu/kitty.conf";
   };
 }

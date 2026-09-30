@@ -33,10 +33,9 @@ disabled. Kernel changes take effect after rebooting.
 
 - [Configuration](docs/configuration.md): where changes belong and how hosts are assembled.
 - [Desktop](docs/desktop.md): Hyprland, Pangu settings, development and debugging.
-- [Kernel](docs/kernel.md): CachyOS and the AutoFDO collection procedure.
+- [Kernel](docs/kernel.md): CachyOS build options and the fallback kernel.
 
-Pangu lives in the separate [Pangu-Shell checkout](../Source/Pangu-Shell),
-consumed through the local Git input in `flake.nix`. Commit shell changes there,
-then run `nix flake update pangu-shell` here before rebuilding. Its README
-documents standalone installation and development. Pangu is derived from Ambxst
-and licensed under AGPL-3.0.
+Pangu lives in the separate [Pangu-Shell repository](https://github.com/jesperls/Pangu-Shell),
+consumed through the pinned GitHub input in `flake.nix`. Commit and push shell
+changes there, then run `nix flake update pangu-shell` here before rebuilding.
+Its README documents standalone installation and development.

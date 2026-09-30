@@ -54,11 +54,6 @@
         default = "nixos";
         description = "The system hostname.";
       };
-      stateVersion = lib.mkOption {
-        type = lib.types.str;
-        default = "26.05";
-        description = "The system state version.";
-      };
       autoLogin = lib.mkOption {
         type = lib.types.bool;
         default = false;
@@ -111,14 +106,6 @@
       type = lib.types.listOf lib.types.port;
       default = [ ];
       description = "UDP ports to open in the firewall.";
-    };
-
-    home = {
-      stateVersion = lib.mkOption {
-        type = lib.types.str;
-        default = "26.05";
-        description = "The Home Manager state version.";
-      };
     };
 
     paths = {

@@ -15,8 +15,6 @@ in
     extraGroups = [
       "networkmanager"
       "wheel"
-      "video"
-      "input"
     ]
     ++ lib.optional config.virtualisation.docker.enable "docker"
     ++ lib.optional config.programs.gamemode.enable "gamemode"

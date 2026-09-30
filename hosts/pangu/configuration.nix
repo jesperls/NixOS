@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [
@@ -14,7 +14,6 @@
     ../../modules/nixos/hardware/vial.nix
     ../../modules/nixos/hardware/webcam.nix
 
-    ../../modules/nixos/performance/autofdo.nix
     ../../modules/nixos/performance/kernel.nix
 
     ../../modules/nixos/programs/filemanager.nix
@@ -63,7 +62,7 @@
     performance.transparentHugepages = "madvise";
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";
-    performance.autofdo.minCpuLoad = 0.1;
+    performance.earlyoom.freeSwapThreshold = 100;
 
     hardware.nvidia.enable = true;
   };
@@ -81,19 +80,29 @@
   services.flatpak.enable = true;
   programs.coolercontrol.enable = true;
 
+  services.udev.packages = [
+    (pkgs.writeTextDir "lib/udev/rules.d/70-nuphy.rules" ''
+      SUBSYSTEM=="hidraw", ATTRS{idVendor}=="19f5", TAG+="uaccess"
+    '')
+  ];
+
   swapDevices = [
     {
-      device = "/swapfile";
+      device = "/swap/swapfile";
       size = 40 * 1024;
     }
   ];
+
+  systemd.tmpfiles.rules = [ "v /swap 0700 root root -" ];
+  systemd.services.mkswap-swap-swapfile.preStart = ''
+    ${pkgs.systemd}/bin/systemd-tmpfiles --create --prefix=/swap
+    ${pkgs.btrfs-progs}/bin/btrfs subvolume show /swap >/dev/null
+  '';
 
   nix.settings = {
     max-jobs = 4;
     cores = 8;
   };
-
-  nixpkgs.config.allowInsecurePredicate = p: lib.getName p == "electron";
 
   networking.interfaces.eno1.wakeOnLan = {
     enable = true;
@@ -102,5 +111,5 @@
 
   home-manager.users.${config.mySystem.user.username}.imports = [ ./home.nix ];
 
-  system.stateVersion = config.mySystem.system.stateVersion;
+  system.stateVersion = "26.05";
 }

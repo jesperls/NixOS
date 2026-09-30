@@ -9,7 +9,7 @@
   services.sunshine = {
     enable = true;
     autoStart = true;
-    capSysAdmin = true;
+    capSysAdmin = false;
     openFirewall = true;
     package = lib.mkDefault (
       pkgs.sunshine.override {
@@ -17,4 +17,8 @@
       }
     );
   };
+
+  systemd.user.services.sunshine.serviceConfig.ExecStart = lib.mkForce (
+    "${lib.getExe config.services.sunshine.package} capture=wlr" # CLI overrides preserve mutable web UI settings.
+  );
 }

@@ -293,17 +293,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1790782527,
-        "narHash": "sha256-ZF/FG1YrCudA0I1AdhVtJOk+AHZj1o2CwHh7LBL/Dbw=",
-        "ref": "refs/heads/main",
-        "rev": "0d7b5aa88adf61ad82e06e7678f0833f0480bcf7",
-        "revCount": 3,
-        "type": "git",
-        "url": "file:///home/jesperls/Source/Pangu-Shell"
+        "lastModified": 1790785575,
+        "narHash": "sha256-/Ct+Bi/2nddItYDLpkJKzVHR+KxJPXJlPGKj+vomeOw=",
+        "owner": "jesperls",
+        "repo": "Pangu-Shell",
+        "rev": "cd08b22964a1d6109e3348fc24f256db571be18f",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:///home/jesperls/Source/Pangu-Shell"
+        "owner": "jesperls",
+        "repo": "Pangu-Shell",
+        "type": "github"
       }
     },
     "root": {

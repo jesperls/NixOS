@@ -32,6 +32,7 @@ in
       "udev.log_priority=3"
     ]
     ++ lib.optional (cfg.cpuVendor == "amd") "amd_pstate=active"
+    ++ lib.optional cfg.zram.enable "zswap.enabled=0"
     ++ lib.optional (
       cfg.transparentHugepages != null
     ) "transparent_hugepage=${cfg.transparentHugepages}";

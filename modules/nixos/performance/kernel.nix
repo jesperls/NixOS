@@ -11,14 +11,12 @@ let
 
   kernelOpts = {
     processorOpt = if cfg.processorOpt == null then "x86_64-v1" else cfg.processorOpt;
-    autofdo = cfg.autofdo;
     performanceGovernor = cfg.performanceGovernor;
     bbr3 = cfg.bbr3;
   };
 
   defaultOpts = {
     processorOpt = "x86_64-v1";
-    autofdo = false;
     performanceGovernor = false;
     bbr3 = false;
   };
@@ -46,12 +44,6 @@ in
       );
       default = null;
       description = "Microarchitecture the CachyOS kernel is compiled for; zen4 also covers Zen 5.";
-    };
-
-    autofdo = lib.mkOption {
-      type = lib.types.nullOr (lib.types.either lib.types.bool lib.types.path);
-      default = false;
-      description = "Clang AutoFDO: true enables the profiling config, a profile path applies it.";
     };
 
     performanceGovernor = lib.mkOption {

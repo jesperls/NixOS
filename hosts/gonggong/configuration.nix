@@ -49,5 +49,5 @@
 
   home-manager.users.${config.mySystem.user.username}.imports = [ ./home.nix ];
 
-  system.stateVersion = config.mySystem.system.stateVersion;
+  system.stateVersion = "26.05";
 }

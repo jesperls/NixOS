@@ -40,7 +40,7 @@ let
       standard_dialogs = "xdgdesktopportal";
     }
     // lib.optionalAttrs shellPalette {
-      color_scheme_path = "${config.home.homeDirectory}/.config/${ver}/colors/pangu.colors";
+      color_scheme_path = "${config.xdg.configHome}/${ver}/colors/pangu.colors";
     };
     Fonts = {
       general = ''"${theme.fonts.sans},${toString theme.fonts.size}"'';

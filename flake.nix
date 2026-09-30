@@ -15,7 +15,7 @@
     };
 
     pangu-shell = {
-      url = "git+file:///home/jesperls/Source/Pangu-Shell";
+      url = "github:jesperls/Pangu-Shell";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
@@ -77,5 +77,14 @@
       };
 
       formatter.${system} = pkgs.nixfmt-tree;
+
+      checks.${system} = import ./checks.nix {
+        inherit
+          lib
+          pkgs
+          hosts
+          inputs
+          ;
+      };
     };
 }

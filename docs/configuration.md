@@ -23,9 +23,22 @@ host-specific setting can use the upstream option directly in the host file;
 it does not need a module just to enable a service. Package patches, build
 steps and command wrappers belong in [pkgs](../pkgs). Pangu QML, Lua, packaging
 and reusable desktop integration live in the separate
-[Pangu-Shell checkout](../../Source/Pangu-Shell). This flake consumes its committed
-revision through the local `pangu-shell` Git input; update that input after
-committing shell changes. Machine-specific adapters remain in this repository.
+[Pangu-Shell repository](https://github.com/jesperls/Pangu-Shell). This flake pins
+its GitHub revision through the `pangu-shell` input; push shell changes before
+updating that input. Machine-specific adapters remain in this repository.
+
+Each host sets `system.stateVersion` in its system configuration and
+`home.stateVersion` in its Home Manager configuration. Keep these at the
+versions used to initialise the host rather than updating them with inputs.
+
+Pangu's application shortcuts and media aliases live in its `home.nix`.
+Shared modules provide the shell integration without selecting host applications.
+Graphical compatibility libraries for `nix-ld` belong to the desktop bundle;
+the base bundle supplies only the shared runtime libraries.
+
+Pangu grants active-session HID access to NuPhy devices through an early udev
+rule, before systemd assigns seat permissions. It does not require membership
+in the `input` group.
 
 ## Shared options
 
@@ -63,14 +76,28 @@ The host will then have a `nixosConfigurations.<name>` output and a
 
 Run `nix fmt -- --ci` and `nix flake check` before considering a change ready.
 For desktop changes, also build `.#checks.x86_64-linux.pangu-system` explicitly.
-[checks.nix](../checks.nix) defines the system builds and checks for Lua,
-monitor generation, shell-setting integration and desktop configuration.
+[checks.nix](../checks.nix) defines both system builds, monitor-generation and
+generated-Lua checks, Pangu's upstream Lua check, backup rotation, and Flatpak
+font-cache invalidation.
 
 The Pangu flake owns the shell tests and runtime-command check. Building Pangu
 runs its JavaScript and Python tests, checks shell scripts and
 QML syntax, and compiles and validates shaders. The QML gate catches syntax
 errors; it does not prove that every binding or visual interaction works.
 Session behaviour still needs a check after activation.
+
+Pangu keeps disk swap in the `/swap` Btrfs subvolume so active swap does not
+prevent root snapshots. The swap initialisation service creates the subvolume
+before creating its file. When migrating from `/swapfile`, confirm that
+`/swap/swapfile` is active with `swapon --show`, then deactivate the old file
+if it is still active and remove it. Building alone does not migrate swap.
+
+Flatpak font caches are cleared on activation only when the managed system
+fonts or their Fontconfig configuration change.
+
+With zram enabled, boot disables zswap to avoid stacking compressed swap
+layers. Pangu's earlyoom policy acts below 5% available memory without waiting
+for disk swap to fill; the server retains the shared memory-and-swap policy.
 
 [GitHub CI](../.github/workflows/check.yml) checks formatting, evaluates the
 flake and builds the lightweight configuration checks.

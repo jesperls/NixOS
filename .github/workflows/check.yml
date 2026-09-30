@@ -27,4 +27,5 @@ jobs:
           .#checks.x86_64-linux.hyprland-lua
           .#checks.x86_64-linux.hyprland-contract
           .#checks.x86_64-linux.desktop-contract
-          .#checks.x86_64-linux.shell-settings
+          .#checks.x86_64-linux.home-manager-backups
+          .#checks.x86_64-linux.flatpak-font-cache

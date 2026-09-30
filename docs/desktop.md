@@ -11,8 +11,8 @@
 | Shell defaults and JSON schema | Pangu `shell/config/Config.qml` |
 | Shell dependencies and build checks | Pangu `nix/package/default.nix` |
 
-The standalone [Pangu checkout](../../Source/Pangu-Shell) owns the shell, its
-Hyprland integration and reusable Nix modules. This configuration enables its
+The standalone [Pangu repository](https://github.com/jesperls/Pangu-Shell) owns
+the shell, its Hyprland integration and reusable Nix modules. This configuration enables its
 optional desktop preset and supplies the existing monitors, applications and
 desktop preferences. The FFmpeg 8 recorder override remains in this repository
 for the installed NVIDIA driver.
@@ -74,11 +74,17 @@ pangu help
 
 Use `pangu run launcher`, `pangu run dashboard` or `pangu lock` to exercise
 controls. `pangu reload` restarts the service using its installed package.
-Commit shell edits in the Pangu checkout, run `nix flake update pangu-shell`
-here, then rebuild and activate the configuration. The local Git input is pinned
-to a commit; editing the checkout alone does not change the installed shell.
+Commit and push shell edits to the Pangu repository, run
+`nix flake update pangu-shell` here, then rebuild and activate the configuration.
+The GitHub input is pinned to a commit; editing a local checkout alone does not
+change the installed shell.
 For development without activation, use `nix run .#dev` in the Pangu checkout
 after stopping the installed service.
+
+Sunshine's user service forces `capture=wlr` through a command-line override
+to use Hyprland's direct capture protocol without portal selection dialogs.
+It runs without `CAP_SYS_ADMIN`; other settings and applications remain
+editable in Sunshine's web UI and persist under `~/.config/sunshine`.
 
 For a package build without activation:
 

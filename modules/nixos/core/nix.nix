@@ -19,7 +19,6 @@
         "nix-command"
         "flakes"
       ];
-      keep-outputs = true;
       trusted-users = [
         "root"
         "@wheel"
@@ -84,32 +83,11 @@
     libraries = with pkgs; [
       stdenv.cc.cc.lib
       icu
-      libICE
-      libSM
-      libXext
-      vulkan-loader
       zlib
       libffi
       openssl
-      libGL
-      libxkbcommon
-      fontconfig
-      freetype
       dbus
       glib
-      libx11
-      libxcursor
-      libxrandr
-      libxi
-      libxcb
-      xcbutilwm
-      xcbutilimage
-      xcbutilkeysyms
-      xcbutilrenderutil
-      xcbutilcursor
-      wayland
-      qt6.qtwayland
-      alsa-lib
     ];
   };
 }

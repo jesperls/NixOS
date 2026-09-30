@@ -57,7 +57,7 @@ let
   mkWorkspaceRule = index: {
     workspace = toString (index + 1);
     monitor = (builtins.elemAt activeMonitors (lib.mod index numMonitors)).name;
-    default = true;
+    default = index < numMonitors;
   };
   workspaceRules = lib.optionals (numMonitors > 0) (lib.genList mkWorkspaceRule 10);
   primary = if activeMonitors == [ ] then null else (builtins.head activeMonitors).name;
