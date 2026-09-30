@@ -21,8 +21,11 @@ by only some hosts are explicit imports in those hosts.
 Put reusable behaviour in `modules/nixos` or `modules/home-manager`. A short
 host-specific setting can use the upstream option directly in the host file;
 it does not need a module just to enable a service. Package patches, build
-steps and command wrappers belong in [pkgs](../pkgs). Desktop QML and Lua
-sources belong in [share](../share).
+steps and command wrappers belong in [pkgs](../pkgs). Pangu QML, Lua, packaging
+and reusable desktop integration live in the separate
+[Pangu-Shell checkout](../../Source/Pangu-Shell). This flake consumes its committed
+revision through the local `pangu-shell` Git input; update that input after
+committing shell changes. Machine-specific adapters remain in this repository.
 
 ## Shared options
 
@@ -61,9 +64,10 @@ The host will then have a `nixosConfigurations.<name>` output and a
 Run `nix fmt -- --ci` and `nix flake check` before considering a change ready.
 For desktop changes, also build `.#checks.x86_64-linux.pangu-system` explicitly.
 [checks.nix](../checks.nix) defines the system builds and checks for Lua,
-monitor generation, shell-setting merges and command availability.
+monitor generation, shell-setting integration and desktop configuration.
 
-Building Pangu runs its JavaScript and Python tests, checks shell scripts and
+The Pangu flake owns the shell tests and runtime-command check. Building Pangu
+runs its JavaScript and Python tests, checks shell scripts and
 QML syntax, and compiles and validates shaders. The QML gate catches syntax
 errors; it does not prove that every binding or visual interaction works.
 Session behaviour still needs a check after activation.

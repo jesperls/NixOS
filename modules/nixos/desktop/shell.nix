@@ -1,28 +1,16 @@
 {
   config,
-  lib,
+  inputs,
   pkgs,
   ...
 }:
 
-lib.mkIf config.mySystem.desktop.shell.enable {
-  programs.gpu-screen-recorder.enable = true;
+{
+  imports = [ inputs.pangu-shell.nixosModules.default ];
 
-  programs.ydotool.enable = true;
-
-  services.power-profiles-daemon.enable = true;
-
-  fonts.packages = with pkgs; [
-    ttf-phosphor-icons
-    inter
-    roboto
-    roboto-mono
-    terminus_font_ttf
-    nerd-fonts.symbols-only
-    (nerd-fonts.iosevka.overrideAttrs (old: {
-      postInstall = (old.postInstall or "") + ''
-        find $out -name '*.ttf' ! -name 'IosevkaNerdFontMono-*' -delete
-      '';
-    }))
-  ];
+  programs.pangu = {
+    enable = config.mySystem.desktop.shell.enable;
+    package = pkgs.pangu;
+    users = [ config.mySystem.user.username ];
+  };
 }

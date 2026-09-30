@@ -1,6 +1,5 @@
 {
-  config,
-  lib,
+  inputs,
   osConfig,
   pkgs,
   ...
@@ -8,59 +7,15 @@
 
 let
   cfg = osConfig.mySystem.desktop.shell;
-
-  settings = lib.filterAttrs (_: value: value != { }) cfg.settings;
-  hasSettings = settings != { };
-
-  overridePaths =
-    prefix: value:
-    if builtins.isAttrs value then
-      lib.concatLists (lib.mapAttrsToList (name: child: overridePaths (prefix ++ [ name ]) child) value)
-    else
-      [ (lib.concatStringsSep "." prefix) ];
-  overrideMetadata = pkgs.writeText "pangu-nix-overrides.json" (
-    builtins.toJSON (overridePaths [ ] settings)
-  );
-
-  configQml = builtins.readFile ../../../share/shell/config/Config.qml;
-  validFiles = builtins.concatLists (
-    builtins.filter builtins.isList (builtins.split "ConfigFile[^}]*name: \"([a-z]+)\"" configQml)
-  );
-
-  applySettings = import ../lib/apply-shell-settings.nix {
-    inherit pkgs lib settings;
-    configDir = "${config.xdg.configHome}/pangu/config";
-    dataDir = "${config.xdg.dataHome}/pangu";
-  };
 in
-lib.mkIf cfg.enable {
-  home.packages = [ pkgs.pangu ];
+{
+  imports = [ inputs.pangu-shell.homeManagerModules.default ];
 
-  assertions = [
-    {
-      assertion = builtins.all (name: builtins.elem name validFiles) (builtins.attrNames settings);
-      message = ''
-        mySystem.desktop.shell.settings uses unknown config file(s):
-        ${lib.concatStringsSep ", " (
-          builtins.filter (name: !builtins.elem name validFiles) (builtins.attrNames settings)
-        )}
-        Valid files: ${lib.concatStringsSep ", " validFiles}
-      '';
-    }
-  ];
-
-  systemd.user.services.pangu = import ../lib/autostart.nix {
-    description = "Pangu — desktop shell";
-    execStart = lib.getExe pkgs.pangu;
-    unit.ConditionEnvironment = "WAYLAND_DISPLAY";
-    service = {
-      ExecStartPre = lib.optional hasSettings (lib.getExe applySettings);
-      RuntimeDirectory = "pangu";
-      Slice = "session.slice";
-      Environment = [
-        "PANGU_WALLPAPERS='${cfg.wallpapers}'"
-      ]
-      ++ lib.optional hasSettings "PANGU_NIX_OVERRIDES=${overrideMetadata}";
-    };
+  programs.pangu = {
+    inherit (cfg) enable wallpapers settings;
+    package = pkgs.pangu;
+    fonts.enable = false;
+    theme.gtk.enable = false;
+    theme.qt.enable = false;
   };
 }

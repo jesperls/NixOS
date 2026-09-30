@@ -6,15 +6,21 @@
 | --- | --- |
 | Monitors, scale and placement | [hosts/pangu/monitors.nix](../hosts/pangu/monitors.nix) |
 | Input, layout defaults, tearing and default applications | `mySystem` options in the host configuration |
-| Keybindings, window rules and layout behaviour | [share/hypr](../share/hypr) |
-| Shell controls and visual components | [share/shell/modules](../share/shell/modules) |
-| Shell defaults and JSON schema | [Config.qml](../share/shell/config/Config.qml) |
-| Shell dependencies and build checks | [pkgs/pangu/default.nix](../pkgs/pangu/default.nix) |
+| Keybindings, window rules and layout behaviour | Pangu `hyprland/pangu`, configured through the local Hyprland adapter |
+| Shell controls and visual components | Pangu `shell/modules` |
+| Shell defaults and JSON schema | Pangu `shell/config/Config.qml` |
+| Shell dependencies and build checks | Pangu `nix/package/default.nix` |
+
+The standalone [Pangu checkout](../../Source/Pangu-Shell) owns the shell, its
+Hyprland integration and reusable Nix modules. This configuration enables its
+optional desktop preset and supplies the existing monitors, applications and
+desktop preferences. The FFmpeg 8 recorder override remains in this repository
+for the installed NVIDIA driver.
 
 Home Manager writes `~/.config/hypr/hyprland.lua` and
 `~/.config/hypr/pangu/generated.lua`. The first contains monitors, workspace
 rules and cursor environment, then loads `pangu.init`. The second exports Nix
-values to the Lua files in `share/hypr`. Edit their sources in the repo rather
+values to Pangu's Lua files. Edit their sources in the Pangu checkout rather
 than either generated file.
 
 Pangu controls gaps, borders, rounding, blur, shadows and wallpaper colours.
@@ -68,8 +74,11 @@ pangu help
 
 Use `pangu run launcher`, `pangu run dashboard` or `pangu lock` to exercise
 controls. `pangu reload` restarts the service using its installed package.
-Repository edits become part of that package only after rebuilding and
-activating the configuration.
+Commit shell edits in the Pangu checkout, run `nix flake update pangu-shell`
+here, then rebuild and activate the configuration. The local Git input is pinned
+to a commit; editing the checkout alone does not change the installed shell.
+For development without activation, use `nix run .#dev` in the Pangu checkout
+after stopping the installed service.
 
 For a package build without activation:
 
@@ -82,8 +91,8 @@ Those outputs are not committed. To prepare shaders for running QML from a
 checkout, use the flake's Qt tools:
 
 ```sh
-nix shell --inputs-from . nixpkgs#qt6.qtshadertools \
-  -c bash pkgs/pangu/rebake-shaders.sh
+cd /home/jesperls/Source/Pangu-Shell
+nix develop -c bash scripts/rebake-shaders.sh
 ```
 
 Most external commands are pinned in the wrapper's `runtimeInputs`. Add new
@@ -92,7 +101,7 @@ EasyEffects and pywal integrations use the session PATH.
 
 ## Changing shell code
 
-[shell.qml](../share/shell/shell.qml) starts the services and creates surfaces
+Pangu's `shell/shell.qml` starts the services and creates surfaces
 per screen. `UnifiedShellPanel` assembles the bar, notch, dock and frame.
 Backends live in `modules/services`; UI components consume them. `Config`
 contains settings and must not import services. Hyprland access goes through
@@ -108,5 +117,5 @@ autosave for whole files: keep one drafting owner per file. The `system`
 section is excluded from shell drafts so OCR changes save immediately.
 
 When adding a searchable setting, update both its adapter and
-`SettingsIndex.qml`. Shell tests live in [share/shell/tests](../share/shell/tests);
-configuration-level Lua and Nix tests live in [tests](../tests).
+`SettingsIndex.qml`. Shell and reusable-module tests live in the Pangu checkout;
+host configuration tests live in [tests](../tests).

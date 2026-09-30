@@ -31,7 +31,7 @@ Never comment `#!` shebangs or `//@ pragma` lines away; they are load-bearing.
 
 `nix flake check` evaluates and builds the checks. Also run
 `nix build .#checks.x86_64-linux.pangu-system` for the desktop system.
-`pkgs/pangu` gates on qmllint, so a QML syntax error fails the build instead of
-the shell at startup.
+The Pangu input gates on qmllint, so a QML syntax error fails the build instead
+of the shell at startup.
 
 Building is not switching. `snis` is the user's call.

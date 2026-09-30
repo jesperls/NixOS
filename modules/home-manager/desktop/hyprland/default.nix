@@ -6,7 +6,6 @@
 }:
 
 let
-  toLua = lib.generators.toLua { };
   theme = osConfig.mySystem.theme;
   hyprlandConfig = import ./settings.nix {
     inherit
@@ -40,6 +39,23 @@ let
       browser = apps.browser.command;
       file_manager = apps.fileManager.command;
       editor = apps.editor.command;
+      shortcuts = [
+        {
+          key = "R";
+          command = "ratty";
+          description = "Apps: ratty";
+        }
+        {
+          key = "D";
+          command = "discord";
+          description = "Apps: Discord";
+        }
+        {
+          key = "M";
+          command = "easyeffects";
+          description = "Apps: EasyEffects";
+        }
+      ];
     };
     tearing = {
       enable = tearing.enable;
@@ -79,22 +95,19 @@ in
     enable = true;
     configType = "lua";
     settings = hyprlandConfig.settings;
-    extraConfig = ''
-      require("pangu.init")
-    '';
   };
 
   xdg.configFile = {
-    "hypr/pangu" = {
-      source = ../../../../share/hypr;
-      recursive = true;
-    };
-    "hypr/pangu/generated.lua".text = "return ${toLua generatedState}\n";
     "hypr/xdph.conf".text = ''
       screencopy {
         allow_token_by_default = true
       }
     '';
+  };
+
+  programs.pangu.hyprland.preset = {
+    enable = osConfig.mySystem.desktop.shell.enable;
+    settings = generatedState;
   };
 
   home.packages = with pkgs; [

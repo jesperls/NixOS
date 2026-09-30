@@ -81,11 +81,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790775610,
-        "narHash": "sha256-vIexOe2vzi+l0TStoe2EiSTN3C/3gI3+P6Y5vcabui8=",
+        "lastModified": 1790779675,
+        "narHash": "sha256-wswYlVaovcex/IMSqGrN/GLlvHN29bgoIXMBoMyLmTI=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "bf3f7a120d14e1bc51f4e1c3739fa6f3a98e9233",
+        "rev": "b75a0703c9ef757386ec3807a55106c2ca64f770",
         "type": "github"
       },
       "original": {
@@ -283,6 +283,29 @@
         "type": "github"
       }
     },
+    "pangu-shell": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790782527,
+        "narHash": "sha256-ZF/FG1YrCudA0I1AdhVtJOk+AHZj1o2CwHh7LBL/Dbw=",
+        "ref": "refs/heads/main",
+        "rev": "0d7b5aa88adf61ad82e06e7678f0833f0480bcf7",
+        "revCount": 3,
+        "type": "git",
+        "url": "file:///home/jesperls/Source/Pangu-Shell"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///home/jesperls/Source/Pangu-Shell"
+      }
+    },
     "root": {
       "inputs": {
         "deltatune": "deltatune",
@@ -292,6 +315,7 @@
         "nix-index-database": "nix-index-database",
         "nixcord": "nixcord",
         "nixpkgs": "nixpkgs_2",
+        "pangu-shell": "pangu-shell",
         "spicetify-nix": "spicetify-nix"
       }
     },

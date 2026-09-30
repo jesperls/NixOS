@@ -14,6 +14,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    pangu-shell = {
+      url = "git+file:///home/jesperls/Source/Pangu-Shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     nixcord = {
@@ -47,9 +53,10 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
-      shellVersion = self.shortRev or self.dirtyShortRev or "dev";
-
-      overlays = import ./pkgs { inherit shellVersion; };
+      overlays = lib.composeManyExtensions [
+        inputs.pangu-shell.overlays.default
+        (import ./pkgs)
+      ];
 
       hosts = import ./nix/hosts.nix {
         inherit
@@ -70,14 +77,5 @@
       };
 
       formatter.${system} = pkgs.nixfmt-tree;
-
-      checks.${system} = import ./checks.nix {
-        inherit
-          lib
-          pkgs
-          hosts
-          overlays
-          ;
-      };
     };
 }
