@@ -14,12 +14,10 @@ QtObject {
 
     property Process bootProbe: Process {
         running: true
-        command: ["bash", "-c", "marker=\"${XDG_RUNTIME_DIR:-/tmp}/pangu/session-started\"; mkdir -p \"${XDG_RUNTIME_DIR:-/tmp}/pangu\"; if [ -e \"$marker\" ]; then echo repeat; else touch \"$marker\"; echo first; fi"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root._firstStartOfSession = text.trim() === "first";
-                root.maybeBootLock();
-            }
+        command: ["mkdir", "--", (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/pangu-session-started"]
+        onExited: code => {
+            root._firstStartOfSession = code === 0;
+            root.maybeBootLock();
         }
     }
 

@@ -1,9 +1,5 @@
 import QtQuick
 
-// Delete/rename mode state machine shared by the dashboard list tabs. The tab
-// owns the list and selection; it aliases selectedIndex in and supplies the
-// model-specific callbacks. Rename is the generic action; Clipboard uses it for
-// aliasing.
 QtObject {
     id: ctrl
 

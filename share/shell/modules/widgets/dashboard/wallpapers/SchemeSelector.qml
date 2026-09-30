@@ -306,7 +306,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             Behavior on x {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 200
                                     easing.type: Easing.OutCubic
@@ -420,9 +420,9 @@ Item {
                                 leftPadding: 8
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -459,9 +459,9 @@ Item {
                             z: -1
                         }
 
-                        highlightMoveDuration: Config.animDuration > 0 ? Config.animDuration / 2 : 0
+                        highlightMoveDuration: Styling.animDuration > 0 ? Styling.animDuration / 2 : 0
                         highlightMoveVelocity: -1
-                        highlightResizeDuration: Config.animDuration / 2
+                        highlightResizeDuration: Styling.animDuration / 2
                         highlightResizeVelocity: -1
                     }
                 }

@@ -3,9 +3,6 @@ import qs.modules.theme
 import qs.modules.components
 import qs.config
 
-// Cancel/confirm bar shared by the dashboard list tabs (delete and rename).
-// The owner owns the active state and the highlighted button index; this
-// reports clicks and hover.
 Rectangle {
     id: root
     property bool active: false
@@ -30,18 +27,18 @@ Rectangle {
         x: root.active ? 0 : 80
 
         Behavior on x {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
     }
 
     Behavior on opacity {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration / 2
+            duration: Styling.animDuration / 2
             easing.type: Easing.OutQuart
         }
     }
@@ -72,16 +69,16 @@ Rectangle {
         height: 32 - activeButtonMargin * 2
 
         Behavior on idx1X {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 3
+                duration: Styling.animDuration / 3
                 easing.type: Easing.OutSine
             }
         }
         Behavior on idx2X {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutSine
             }
         }
@@ -123,9 +120,9 @@ Rectangle {
                 textFormat: Text.RichText
 
                 Behavior on color {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -161,9 +158,9 @@ Rectangle {
                 textFormat: Text.RichText
 
                 Behavior on color {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutQuart
                     }
                 }

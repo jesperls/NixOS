@@ -57,7 +57,7 @@ Item {
             } else {
                 stop();
                 cascadeItems = [];  // Clear
-                const totalDelay = Config.animDuration + 50;
+                const totalDelay = Styling.animDuration + 50;
                 discardAllTimer.interval = totalDelay;
                 discardAllTimer.restart();
             }
@@ -66,7 +66,7 @@ Item {
 
     Timer {
         id: discardAllTimer
-        interval: Config.animDuration + 50
+        interval: Styling.animDuration + 50
         repeat: false
         onTriggered: Notifications.discardAllNotifications()
     }

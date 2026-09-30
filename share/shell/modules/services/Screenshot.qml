@@ -24,7 +24,7 @@ QtObject {
     property string screenshotsDir: ""
     property string finalPath: ""
     
-    property var monitors: []  // List of monitor objects
+    property var monitors: []
     
     property int selectionX: 0
     property int selectionY: 0
@@ -43,31 +43,27 @@ QtObject {
 
     property Process xdgProcess: Process {
         id: xdgProcess
-        command: ["bash", "-c", "xdg-user-dir PICTURES"]
+        command: ["xdg-user-dir", "PICTURES"]
         stdout: StdioCollector {}
         running: false
         onExited: exitCode => {
-            if (exitCode === 0) {
-                var dir = xdgProcess.stdout.text.trim()
-                if (dir === "") {
-                    dir = Paths.picturesDir
-                }
-                root.screenshotsDir = dir + "/Screenshots"
-                ensureDirProcess.running = true
-            }
+            const dir = exitCode === 0 ? xdgProcess.stdout.text.trim() : "";
+            root.screenshotsDir = (dir || Paths.picturesDir) + "/Screenshots";
+            ensureDirProcess.running = true;
         }
     }
 
     property Process ensureDirProcess: Process {
         id: ensureDirProcess
-        command: ["mkdir", "-p", root.screenshotsDir]
+        command: ["mkdir", "-p", "--", root.screenshotsDir]
+        onExited: code => { if (code !== 0) root.errorOccurred("Cannot create screenshot directory"); }
     }
 
     property Process freezeProcess: Process {
         id: freezeProcess
         command: [] 
         onExited: exitCode => {
-            root._freezing = false;  // Reset lock flag
+            root._freezing = false;
             if (exitCode === 0) {
                 for (var i = 0; i < root.monitors.length; i++) {
                     var m = root.monitors[i];
@@ -76,7 +72,6 @@ QtObject {
                 }
             } else {
                 root.errorOccurred("Failed to capture screen (grim)")
-                root._freezing = false;
             }
         }
     }
@@ -100,7 +95,7 @@ QtObject {
 
     property Process copyProcess: Process {
         id: copyProcess
-        command: ["bash", "-c", `cat "${root.finalPath}" | wl-copy --type image/png`]
+        command: ["bash", "-c", 'wl-copy --type image/png < "$1"', "pangu-copy", root.finalPath]
         stderr: StdioCollector {
             onStreamFinished: {
                 if (text.length > 0) console.warn("Screenshot Copy Error: " + text)
@@ -138,7 +133,7 @@ QtObject {
              var s = qsScreens[i];
              var scale = s.devicePixelRatio || 1; // ShellScreen has no `scale`; reading it yields NaN geometry
              mappedMonitors.push({
-                 id: i,  // Dummy ID
+                 id: i,
                  name: s.name,
                  x: s.x,
                  y: s.y,
@@ -185,16 +180,12 @@ QtObject {
             return;
         }
         
-        var cmd = "";
-        for (var i = 0; i < root.monitors.length; i++) {
-            var m = root.monitors[i];
-            var path = root.tempPathBase + "_" + m.name + ".png";
-            cmd += `grim -o "${m.name}" "${path}" & `;
-        }
-        cmd += "wait";
-        
-        console.log("Screenshot: Executing freeze batch: " + cmd);
-        freezeProcess.command = ["bash", "-c", cmd];
+        const captures = root.monitors.flatMap(m => [m.name, root.tempPathBase + "_" + m.name + ".png"]);
+        freezeProcess.command = ["bash", "-c",
+            'mkdir -p -- "$1" || exit; shift; pids=(); status=0; '
+            + 'while (( $# )); do grim -o "$1" "$2" & pids+=("$!"); shift 2; done; '
+            + 'for pid in "${pids[@]}"; do wait "$pid" || status=1; done; exit "$status"',
+            "pangu-freeze", Paths.runtimeDir].concat(captures);
         freezeProcess.running = true;
     }
 

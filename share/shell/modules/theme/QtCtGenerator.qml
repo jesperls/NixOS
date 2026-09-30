@@ -1,4 +1,5 @@
 import QtQuick
+import qs.modules.components
 import Quickshell
 import Quickshell.Io
 import qs.config
@@ -89,12 +90,12 @@ QtObject {
         qt6File.write(ini);
     }
 
-    property ThemeFile qt5File: ThemeFile {
+    property GeneratedFile qt5File: GeneratedFile {
         id: qt5File
         path: Paths.configHome + "/qt5ct/colors/pangu.colors"
     }
 
-    property ThemeFile qt6File: ThemeFile {
+    property GeneratedFile qt6File: GeneratedFile {
         id: qt6File
         path: Paths.configHome + "/qt6ct/colors/pangu.colors"
     }

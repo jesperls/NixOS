@@ -1,4 +1,5 @@
 import QtQuick
+import qs.modules.components
 import Quickshell
 import Quickshell.Io
 import qs.config
@@ -72,7 +73,7 @@ QtObject {
         discordFile.write(css);
     }
 
-    property ThemeFile discordFile: ThemeFile {
+    property GeneratedFile discordFile: GeneratedFile {
         id: discordFile
         path: Paths.configHome + "/vesktop/themes/pangu.css"
     }

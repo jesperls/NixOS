@@ -6,14 +6,12 @@
 }:
 
 let
-  # home-manager's default backup clobbers the previous one every rebuild;
-  # rotate so a bad generation stays recoverable.
   rotatingBackup = pkgs.writeShellApplication {
     name = "hm-rotating-backup";
     runtimeInputs = [ pkgs.coreutils ];
     text = ''
       target="''${1:?target path required}"
-      keep=3
+      keep=3 # Home Manager's default backup overwrites the previous generation.
 
       rm -f -- "$target.hm-backup.$keep"
       i=$((keep - 1))

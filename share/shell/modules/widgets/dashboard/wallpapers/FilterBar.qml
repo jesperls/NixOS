@@ -133,7 +133,7 @@ FocusScope {
 
         NumberAnimation on contentX {
             id: scrollAnimation
-            duration: Config.animDuration / 2
+            duration: Styling.animDuration / 2
             easing.type: Easing.OutQuart
         }
 
@@ -245,18 +245,18 @@ FocusScope {
                                     opacity: isActive ? 1 : 0
 
                                     Behavior on opacity {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         NumberAnimation {
-                                            duration: Config.animDuration / 3
+                                            duration: Styling.animDuration / 3
                                             easing.type: Easing.OutCubic
                                         }
                                     }
                                 }
 
                                 Behavior on width {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     NumberAnimation {
-                                        duration: Config.animDuration / 3
+                                        duration: Styling.animDuration / 3
                                         easing.type: Easing.OutCubic
                                     }
                                 }
@@ -270,9 +270,9 @@ FocusScope {
                                 color: filterTag.item
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 3
+                                        duration: Styling.animDuration / 3
                                         easing.type: Easing.OutCubic
                                     }
                                 }
@@ -304,9 +304,9 @@ FocusScope {
                     }
 
                     Behavior on width {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration / 3
+                            duration: Styling.animDuration / 3
                             easing.type: Easing.OutCubic
                         }
                     }

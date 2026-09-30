@@ -113,30 +113,30 @@ FocusScope {
             property real t1h: th
 
             Behavior on t1x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 3
+                    duration: Styling.animDuration / 3
                     easing.type: Easing.OutSine
                 }
             }
             Behavior on t1y {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 3
+                    duration: Styling.animDuration / 3
                     easing.type: Easing.OutSine
                 }
             }
             Behavior on t1w {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 3
+                    duration: Styling.animDuration / 3
                     easing.type: Easing.OutSine
                 }
             }
             Behavior on t1h {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 3
+                    duration: Styling.animDuration / 3
                     easing.type: Easing.OutSine
                 }
             }
@@ -147,30 +147,30 @@ FocusScope {
             property real t2h: th
 
             Behavior on t2x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutSine
                 }
             }
             Behavior on t2y {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutSine
                 }
             }
             Behavior on t2w {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutSine
                 }
             }
             Behavior on t2h {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutSine
                 }
             }
@@ -264,9 +264,9 @@ FocusScope {
                                 verticalAlignment: Text.AlignVCenter
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -286,9 +286,9 @@ FocusScope {
                                 verticalAlignment: Text.AlignVCenter
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }

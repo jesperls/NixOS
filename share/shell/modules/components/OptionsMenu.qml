@@ -124,25 +124,25 @@ Menu {
             }
 
             Behavior on y {
-                enabled: root.previousHoveredIndex !== -1 && root.hoveredIndex !== -1 && Config.animDuration > 0
+                enabled: root.previousHoveredIndex !== -1 && root.hoveredIndex !== -1 && Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
 
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
 
             Behavior on color {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 ColorAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
@@ -231,9 +231,9 @@ Menu {
                                 textFormat: Text.RichText
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -276,9 +276,9 @@ Menu {
                         width: root.menuWidth - 32 - iconLoader.width - (root.hasIcons ? parent.spacing : 0)
 
                         Behavior on color {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             ColorAnimation {
-                                duration: Config.animDuration / 2
+                                duration: Styling.animDuration / 2
                                 easing.type: Easing.OutQuart
                             }
                         }

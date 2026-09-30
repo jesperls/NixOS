@@ -9,7 +9,8 @@
 let
   cfg = osConfig.mySystem.desktop.shell;
 
-  settings = cfg.settings;
+  settings = lib.filterAttrs (_: value: value != { }) cfg.settings;
+  hasSettings = settings != { };
 
   overridePaths =
     prefix: value:
@@ -53,16 +54,13 @@ lib.mkIf cfg.enable {
     execStart = lib.getExe pkgs.pangu;
     unit.ConditionEnvironment = "WAYLAND_DISPLAY";
     service = {
-      ExecStartPre = [
-        "-${lib.getExe' pkgs.systemd "systemctl"} --user stop wallpaperengine-*.service" # Stop renderers detached by older shell versions.
-        (lib.getExe applySettings)
-      ];
+      ExecStartPre = lib.optional hasSettings (lib.getExe applySettings);
       RuntimeDirectory = "pangu";
       Slice = "session.slice";
       Environment = [
         "PANGU_WALLPAPERS='${cfg.wallpapers}'"
-        "PANGU_NIX_OVERRIDES=${overrideMetadata}"
-      ];
+      ]
+      ++ lib.optional hasSettings "PANGU_NIX_OVERRIDES=${overrideMetadata}";
     };
   };
 }

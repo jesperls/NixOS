@@ -56,9 +56,9 @@ Button {
     scale: root.pressed ? 0.97 : (root.hovered ? 1.03 : 1.0)
 
     Behavior on scale {
-        enabled: (Config.animDuration ?? 0) > 0
+        enabled: (Styling.animDuration ?? 0) > 0
         NumberAnimation {
-            duration: (Config.animDuration ?? 0) / 3
+            duration: (Styling.animDuration ?? 0) / 3
             easing.type: Easing.OutCubic
         }
     }
@@ -80,9 +80,9 @@ Button {
             radius: bg.radius
 
             Behavior on opacity {
-                enabled: (Config.animDuration ?? 0) > 0
+                enabled: (Styling.animDuration ?? 0) > 0
                 NumberAnimation {
-                    duration: (Config.animDuration ?? 0) / 2
+                    duration: (Styling.animDuration ?? 0) / 2
                 }
             }
         }

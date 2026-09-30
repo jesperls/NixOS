@@ -55,7 +55,7 @@ QtObject {
             case "cheatsheet": GlobalStates.cheatsheetVisible = !GlobalStates.cheatsheetVisible; break;
             case "macros": toggleMacros(); break;
             case "macros-stop": MacroService.stop(); break;
-            case "lockscreen": GlobalStates.lockscreenVisible = true; break;
+            case "lockscreen": LockscreenService.lock(); break;
             case "gamemode": GameModeService.toggle(); break;
             case "dnd": Notifications.silent = !Notifications.silent; break;
             case "caffeine": CaffeineService.toggleInhibit(); break;

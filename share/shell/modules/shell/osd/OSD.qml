@@ -58,18 +58,18 @@ PanelWindow {
             transformOrigin: root.onTop ? Item.Top : Item.Bottom
 
             Behavior on scale {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutBack
                     easing.overshoot: 1.2
                 }
             }
 
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutCubic
                 }
             }
@@ -169,9 +169,9 @@ PanelWindow {
 
                             scale: root.percentPulse
                             Behavior on scale {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                     easing.type: Easing.OutBack
                                     easing.overshoot: 1.2
                                 }

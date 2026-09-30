@@ -11,10 +11,10 @@
 
   nix = {
     registry.nixpkgs.flake = inputs.nixpkgs;
-    nixPath = [ "nixpkgs=flake:nixpkgs" ];
     channel.enable = false;
 
     settings = {
+      nix-path = [ "nixpkgs=flake:nixpkgs" ];
       experimental-features = [
         "nix-command"
         "flakes"

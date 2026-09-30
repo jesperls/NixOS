@@ -2,10 +2,12 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import qs.modules.components
 import Quickshell
 import Quickshell.Io
 import qs.config
 import qs.modules.services
+import qs.modules.theme
 import "macro_utils.js" as MacroUtils
 
 Singleton {
@@ -340,7 +342,6 @@ Singleton {
         }
     }
 
-    // ---- triggers ----
 
     property var timerObjects: ({})
     property var knownClients: ({})
@@ -542,27 +543,18 @@ Singleton {
         }
     }
 
-    // ---- generated Hyprland binds ----
-
     readonly property string bindsText: MacroUtils.bindsLua(Config.macros.enabled ? root.macros : [])
-    property string writtenBinds: ""
 
-    FileView {
+    GeneratedFile {
         id: bindsFile
         path: Paths.dataPath("macros.lua")
-        atomicWrites: true
-        onSaved: Compositor.reloadConfig()
+        onWritten: Compositor.reloadConfig()
     }
 
     Timer {
         id: bindDebounce
         interval: 300
-        onTriggered: {
-            if (root.bindsText === root.writtenBinds)
-                return;
-            root.writtenBinds = root.bindsText;
-            bindsFile.setText(root.bindsText);
-        }
+        onTriggered: bindsFile.write(root.bindsText)
     }
 
     onBindsTextChanged: bindDebounce.restart()

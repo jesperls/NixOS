@@ -10,12 +10,7 @@ let
 in
 {
   options.mySystem.theme = lib.mkOption {
-    description = ''
-      Base palette and toolkit settings: the colors, fonts and GTK/Qt themes
-      every app inherits. Window decoration (borders, gaps, blur, shadows,
-      rounding) belongs to the desktop shell, which owns it live through its own
-      settings UI — see mySystem.desktop.shell.
-    '';
+    description = "Base palette, fonts, and toolkit theme settings.";
     type = lib.types.submodule (
       { config, ... }:
       let
@@ -26,7 +21,7 @@ in
           preset = lib.mkOption {
             type = lib.types.enum (builtins.attrNames presets);
             default = "muted-rose";
-            description = "Named palette preset. Individual colors can still be overridden.";
+            description = "Named palette preset with individually overridable colors.";
           };
 
           colors = {
@@ -81,7 +76,7 @@ in
 
           opacity = {
             translucent = lib.mkOption {
-              type = lib.types.float;
+              type = lib.types.numbers.between 0 1;
               default = 0.85;
               description = "Window opacity applied to translucentApps.";
             };
@@ -105,7 +100,7 @@ in
             };
 
             speed = lib.mkOption {
-              type = lib.types.float;
+              type = lib.types.addCheck lib.types.number (value: value > 0);
               default = 2.0;
               description = "Base animation speed (Hyprland deciseconds).";
             };
@@ -154,7 +149,7 @@ in
               };
 
               size = lib.mkOption {
-                type = lib.types.int;
+                type = lib.types.ints.positive;
                 default = 24;
                 description = "Cursor size in pixels.";
               };
@@ -165,7 +160,7 @@ in
             style = lib.mkOption {
               type = lib.types.str;
               default = "Fusion";
-              description = "Qt widget style. Fusion respects the palette generated from the theme colors.";
+              description = "Qt widget style.";
             };
           };
 
@@ -183,7 +178,7 @@ in
             };
 
             size = lib.mkOption {
-              type = lib.types.int;
+              type = lib.types.ints.positive;
               default = 11;
               description = "Default font size.";
             };
@@ -197,7 +192,7 @@ in
                 font-awesome
                 nerd-fonts.jetbrains-mono
               ];
-              description = "Font packages to install. Override to match your font choices.";
+              description = "Font packages to install.";
             };
           };
         };

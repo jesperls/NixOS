@@ -94,17 +94,17 @@ PopupWindow {
     }
 
     Behavior on popupOpacity {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutCubic
         }
     }
 
     Behavior on popupScale {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -187,7 +187,7 @@ PopupWindow {
 
     Timer {
         id: closeTimer
-        interval: Config.animDuration > 0 ? Config.animDuration + 50 : 50
+        interval: Styling.animDuration > 0 ? Styling.animDuration + 50 : 50
         onTriggered: {
             root.visible = false;
         }

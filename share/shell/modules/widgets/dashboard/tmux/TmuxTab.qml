@@ -56,12 +56,11 @@ Item {
     property int selectedOptionIndex: 0
     property bool keyboardNavigation: false
 
-    property var sessionWindows: []
-    property var sessionPanes: []
-    property bool loadingSessionInfo: false
+    TmuxSessionInfo { id: sessionInfo }
+    readonly property var sessionWindows: sessionInfo.windows
+    readonly property var sessionPanes: sessionInfo.panes
+    readonly property bool loadingSessionInfo: sessionInfo.loading
 
-    onExpandedItemIndexChanged:
-    {}
 
     onVisibleChanged: {
         if (visible) {
@@ -69,31 +68,6 @@ Item {
         }
     }
 
-    function adjustScrollForExpandedItem(index) {
-        if (index < 0 || index >= sessionsModel.count)
-            return;
-
-        var itemY = 0;
-        for (var i = 0; i < index; i++) {
-            itemY += 48;  // All items before are collapsed (base height)
-        }
-
-        var listHeight = 36 * 3;
-        var expandedHeight = 48 + 4 + listHeight + 8;
-
-        var maxContentY = Math.max(0, resultsList.contentHeight - resultsList.height);
-
-        var viewportTop = resultsList.contentY;
-        var viewportBottom = viewportTop + resultsList.height;
-
-        var itemBottom = itemY + expandedHeight;
-
-        if (itemY < viewportTop) {
-            resultsList.contentY = itemY;
-        } else if (itemBottom > viewportBottom) {
-            resultsList.contentY = Math.min(itemBottom - resultsList.height, maxContentY);
-        }
-    }
 
     onSelectedIndexChanged: {
         if (selectedIndex === -1 && resultsList.count > 0) {
@@ -111,12 +85,10 @@ Item {
             if (session && !session.isCreateButton && !session.isCreateSpecificButton) {
                 loadSessionInfo(session.name);
             } else {
-                sessionWindows = [];
-                sessionPanes = [];
+                loadSessionInfo("");
             }
         } else {
-            sessionWindows = [];
-            sessionPanes = [];
+            loadSessionInfo("");
         }
     }
 
@@ -256,17 +228,10 @@ Item {
     }
 
     function loadSessionInfo(sessionName) {
-        if (!sessionName)
-            return;
-        loadingSessionInfo = true;
-        sessionWindows = [];
-        sessionPanes = [];
-
-        windowsProcess.command = ["tmux", "list-windows", "-t", sessionName, "-F", "#{window_index}:#{window_name}:#{window_active}"];
-        windowsProcess.running = true;
-
-        panesProcess.command = ["tmux", "list-panes", "-t", sessionName, "-F", "#{pane_index}:#{pane_width}:#{pane_height}:#{pane_top}:#{pane_left}:#{pane_active}:#{pane_current_command}"];
-        panesProcess.running = true;
+        if (sessionInfo.sessionName !== sessionName)
+            sessionInfo.sessionName = sessionName;
+        else
+            sessionInfo.refresh();
     }
 
     function createTmuxSession(sessionName) {
@@ -291,7 +256,7 @@ Item {
     function focusPane(sessionName, paneIndex) {
         if (!sessionName || paneIndex === undefined)
             return;
-        focusPaneProcess.command = ["tmux", "select-pane", "-t", `${sessionName}.${paneIndex}`];
+        focusPaneProcess.command = ["tmux", "select-pane", "-t", `${sessionName}:.${paneIndex}`];
         focusPaneProcess.running = true;
     }
 
@@ -313,9 +278,9 @@ Item {
     }
 
     Behavior on height {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
@@ -375,92 +340,6 @@ Item {
                 root.refreshTmuxSessions();
             }
             root.cancelRenameMode();
-        }
-    }
-
-    Process {
-        id: windowsProcess
-        running: false
-
-        stdout: StdioCollector {
-            id: windowsCollector
-            waitForEnd: true
-
-            onStreamFinished: {
-                let windows = [];
-                let lines = text.trim().split('\n');
-                for (let line of lines) {
-                    if (line.trim().length > 0) {
-                        let parts = line.split(':');
-                        if (parts.length >= 3) {
-                            windows.push({
-                                index: parts[0],
-                                name: parts[1],
-                                active: parts[2] === '1'
-                            });
-                        }
-                    }
-                }
-                root.sessionWindows = windows;
-            }
-        }
-    }
-
-    Process {
-        id: panesProcess
-        running: false
-
-        stdout: StdioCollector {
-            id: panesCollector
-            waitForEnd: true
-
-            onStreamFinished: {
-                let panes = [];
-                let lines = text.trim().split('\n');
-
-                let maxWidth = 0;
-                let maxHeight = 0;
-
-                for (let line of lines) {
-                    if (line.trim().length > 0) {
-                        let parts = line.split(':');
-                        if (parts.length >= 7) {
-                            let width = parseInt(parts[1]);
-                            let height = parseInt(parts[2]);
-                            let top = parseInt(parts[3]);
-                            let left = parseInt(parts[4]);
-
-                            maxWidth = Math.max(maxWidth, left + width);
-                            maxHeight = Math.max(maxHeight, top + height);
-
-                            panes.push({
-                                index: parts[0],
-                                width: width,
-                                height: height,
-                                top: top,
-                                left: left,
-                                active: parts[5] === '1',
-                                command: parts[6]
-                            });
-                        }
-                    }
-                }
-
-                for (let pane of panes) {
-                    pane.totalWidth = maxWidth;
-                    pane.totalHeight = maxHeight;
-                }
-
-                root.sessionPanes = panes;
-                root.loadingSessionInfo = false;
-            }
-        }
-
-        onExited: function (code) {
-            if (code !== 0) {
-                root.sessionPanes = [];
-                root.loadingSessionInfo = false;
-            }
         }
     }
 
@@ -687,9 +566,9 @@ Item {
                 property bool enableScrollAnimation: true
 
                 Behavior on contentY {
-                    enabled: Config.animDuration > 0 && resultsList.enableScrollAnimation && !resultsList.moving
+                    enabled: Styling.animDuration > 0 && resultsList.enableScrollAnimation && !resultsList.moving
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -747,17 +626,17 @@ Item {
                     radius: 16
 
                     Behavior on y {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     Behavior on height {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -912,9 +791,9 @@ Item {
                         opacity: (isExpanded && !isInDeleteMode && !isInRenameMode) ? 1 : 0
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -926,9 +805,9 @@ Item {
                             radius: Styling.radius(0)
 
                             Behavior on Layout.preferredHeight {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutQuart
                                 }
                             }
@@ -998,9 +877,9 @@ Item {
                         spacing: 8
 
                         Behavior on anchors.rightMargin {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -1134,89 +1013,11 @@ Item {
                     }
                 }
 
-                highlight: Item {
-                    width: resultsList.width
-                    height: {
-                        let baseHeight = 48;
-                        if (resultsList.currentIndex === root.expandedItemIndex && !root.deleteMode && !root.renameMode) {
-                            var listHeight = 36 * 3;
-                            return baseHeight + 4 + listHeight + 8;
-                        }
-                        return baseHeight;
-                    }
-
-                    y: {
-                        var yPos = 0;
-                        for (var i = 0; i < resultsList.currentIndex && i < sessionsModel.count; i++) {
-                            var itemData = sessionsModel.get(i).sessionData;
-                            var itemHeight = 48;
-                            if (i === root.expandedItemIndex && !root.deleteMode && !root.renameMode) {
-                                var listHeight = 36 * 3;
-                                itemHeight = 48 + 4 + listHeight + 8;
-                            }
-                            yPos += itemHeight;
-                        }
-                        return yPos;
-                    }
-
-                    Behavior on y {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration / 2
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-
-                    Behavior on height {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration
-                            easing.type: Easing.OutQuart
-                        }
-                    }
-
-                    onHeightChanged: {
-                        if (root.expandedItemIndex >= 0 && height > 48) {
-                            Qt.callLater(() => {
-                                adjustScrollForExpandedItem(root.expandedItemIndex);
-                            });
-                        }
-                    }
-
-                    StyledRect {
-                        anchors.fill: parent
-                        anchors.topMargin: 0
-                        anchors.bottomMargin: 0
-                        variant: {
-                            if (root.deleteMode) {
-                                return "error";
-                            } else if (root.renameMode) {
-                                return "secondary";
-                            } else if (root.expandedItemIndex >= 0 && root.selectedIndex === root.expandedItemIndex) {
-                                return "pane";
-                            } else {
-                                return "primary";
-                            }
-                        }
-                        radius: Styling.radius(4)
-                        visible: root.selectedIndex >= 0
-
-                        Behavior on color {
-                            enabled: Config.animDuration > 0
-                            ColorAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutQuart
-                            }
-                        }
-
-                        Behavior on opacity {
-                            enabled: Config.animDuration > 0
-                            NumberAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutQuart
-                            }
-                        }
-                    }
+                highlight: ResultsHighlight {
+                    view: resultsList
+                    expandedIndex: root.expandedItemIndex
+                    variant: root.deleteMode ? "error" : root.renameMode ? "secondary"
+                        : root.expandedItemIndex >= 0 && root.selectedIndex === root.expandedItemIndex ? "pane" : "primary"
                 }
 
                 highlightFollowsCurrentItem: false
@@ -1386,17 +1187,17 @@ Item {
                                     radius: paneRect.radius
 
                                     Behavior on border.width {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         NumberAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
 
                                     Behavior on border.color {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         ColorAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
@@ -1419,9 +1220,9 @@ Item {
                                         visible: parent.parent.height > 35
 
                                         Behavior on color {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             ColorAnimation {
-                                                duration: Config.animDuration / 2
+                                                duration: Styling.animDuration / 2
                                                 easing.type: Easing.OutQuart
                                             }
                                         }
@@ -1437,9 +1238,9 @@ Item {
                                         visible: parent.parent.height > 70
 
                                         Behavior on color {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             ColorAnimation {
-                                                duration: Config.animDuration / 2
+                                                duration: Styling.animDuration / 2
                                                 easing.type: Easing.OutQuart
                                             }
                                         }
@@ -1595,9 +1396,9 @@ Item {
                                             color: modelData.active ? Colors.overPrimary : Colors.overSurface
 
                                             Behavior on color {
-                                                enabled: Config.animDuration > 0
+                                                enabled: Styling.animDuration > 0
                                                 ColorAnimation {
-                                                    duration: Config.animDuration / 2
+                                                    duration: Styling.animDuration / 2
                                                     easing.type: Easing.OutQuart
                                                 }
                                             }

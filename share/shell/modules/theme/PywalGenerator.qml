@@ -112,25 +112,25 @@ QtObject {
         }
     }
 
-    property ThemeFile colorsFile: ThemeFile {
+    property GeneratedFile colorsFile: GeneratedFile {
         id: colorsFile
         path: Paths.cacheHome + "/wal/colors"
         onWritten: Qt.callLater(root.reloader.reload)
     }
 
-    property ThemeFile jsonFile: ThemeFile {
+    property GeneratedFile jsonFile: GeneratedFile {
         id: jsonFile
         path: Paths.cacheHome + "/wal/colors.json"
         onWritten: Qt.callLater(root.reloader.reload)
     }
 
-    property ThemeFile shellFile: ThemeFile {
+    property GeneratedFile shellFile: GeneratedFile {
         id: shellFile
         path: Paths.cacheHome + "/wal/colors.sh"
         onWritten: Qt.callLater(root.reloader.reload)
     }
 
-    property ThemeFile imageFile: ThemeFile {
+    property GeneratedFile imageFile: GeneratedFile {
         id: imageFile
         path: Paths.cacheHome + "/wal/wal"
         onWritten: Qt.callLater(root.reloader.reload)

@@ -45,7 +45,7 @@ Item {
             property int pulseDuration: root.recording ? 800 : 2000
 
             SequentialAnimation on opacity {
-                running: root.visible && Config.animDuration > 0
+                running: root.visible && Styling.animDuration > 0
                 loops: Animation.Infinite
                 NumberAnimation {
                     from: 1

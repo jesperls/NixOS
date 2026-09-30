@@ -13,7 +13,7 @@
     openFirewall = true;
     package = lib.mkDefault (
       pkgs.sunshine.override {
-        cudaSupport = config.mySystem.hardware.nvidia.enable;
+        cudaSupport = config.mySystem.hardware.nvidia.enable or false;
       }
     );
   };

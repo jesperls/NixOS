@@ -16,9 +16,7 @@ function M.on_change(callback)
   listeners[#listeners + 1] = callback
 end
 
--- Rules are recreated on every enable: hyprland only re-applies rules when
--- a new rule object is added; set_enabled alone does not re-evaluate windows.
-local function enable(id)
+local function enable(id) -- Recreate rules because set_enabled does not re-evaluate windows.
   active[id] = {
     hl.workspace_rule({
       workspace = "r[" .. id .. "-" .. id .. "]s[0]",

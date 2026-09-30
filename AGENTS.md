@@ -1,8 +1,8 @@
 # Working on this repo
 
-The design contract — layers, ownership, conventions, and known seams — is in
-`docs/architecture.md`. Read it before adding a mechanism; if a change does not
-fit it, change the document first.
+Read `docs/configuration.md` before adding a mechanism, and `docs/desktop.md`
+for desktop changes. If a change alters the documented structure or ownership,
+update the documentation first.
 
 ## Comments
 
@@ -29,8 +29,9 @@ Never comment `#!` shebangs or `//@ pragma` lines away; they are load-bearing.
 
 ## Verify before claiming
 
-`nix flake check` for evaluation, `nix build .#checks.x86_64-linux.pangu-system`
-for the real thing. `pkgs/pangu` gates on qmllint, so a QML syntax error fails
-the build instead of the shell at startup.
+`nix flake check` evaluates and builds the checks. Also run
+`nix build .#checks.x86_64-linux.pangu-system` for the desktop system.
+`pkgs/pangu` gates on qmllint, so a QML syntax error fails the build instead of
+the shell at startup.
 
 Building is not switching. `snis` is the user's call.

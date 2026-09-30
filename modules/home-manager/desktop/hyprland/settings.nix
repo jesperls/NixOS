@@ -9,7 +9,24 @@ let
   cursorTheme = osConfig.mySystem.theme.gtk.cursorTheme;
   mkCall = args: { _args = args; };
 
-  monitorWidth = monitor: lib.toInt (builtins.head (lib.splitString "x" monitor.resolution));
+  monitorWidth =
+    monitor:
+    let
+      dimensions = lib.splitString "x" monitor.resolution;
+      axis =
+        if
+          builtins.elem monitor.transform [
+            1
+            3
+            5
+            7
+          ]
+        then
+          1
+        else
+          0;
+    in
+    (lib.toInt (builtins.elemAt dimensions axis)) / monitor.scale;
 
   renderMonitor =
     monitor:
@@ -42,6 +59,8 @@ let
     monitor = (builtins.elemAt activeMonitors (lib.mod index numMonitors)).name;
     default = true;
   };
+  workspaceRules = lib.optionals (numMonitors > 0) (lib.genList mkWorkspaceRule 10);
+  primary = if activeMonitors == [ ] then null else (builtins.head activeMonitors).name;
 
   specialWorkspaceRules =
     let
@@ -62,7 +81,10 @@ let
 
 in
 {
-  inherit activeMonitors;
+  primaryWorkspaces = map (rule: lib.toInt rule.workspace) (
+    builtins.filter (rule: rule.monitor == primary) workspaceRules
+  );
+  inherit primary;
 
   settings = {
     env = [
@@ -85,7 +107,6 @@ in
       }
     ];
 
-    workspace_rule =
-      lib.optionals (numMonitors > 0) (lib.genList mkWorkspaceRule 10) ++ specialWorkspaceRules;
+    workspace_rule = workspaceRules ++ specialWorkspaceRules;
   };
 }

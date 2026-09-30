@@ -64,9 +64,9 @@ Item {
             radius: parent.radius ?? 0
 
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                 }
             }
         }
@@ -135,7 +135,7 @@ Item {
             }
 
             Behavior on angle {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
                     duration: 400
                     easing.type: Easing.OutCubic
@@ -152,9 +152,9 @@ Item {
             color: root.popupOpen ? buttonBg.item : Colors.overBackground
 
             Behavior on color {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 ColorAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                 }
             }
 

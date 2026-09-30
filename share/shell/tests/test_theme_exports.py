@@ -20,8 +20,9 @@ class ThemeExportsTest(unittest.TestCase):
             (root / "runtime").chmod(0o700)
             for source in (SHELL / "modules/theme").glob("*.qml"):
                 shutil.copy(source, root / "theme" / source.name)
-            shutil.copy(SHELL / "modules/components/ThemeReloader.qml", root / "modules/components/ThemeReloader.qml")
-            (root / "modules/components/qmldir").write_text("ThemeReloader 1.0 ThemeReloader.qml\n")
+            for component in ("ThemeReloader", "GeneratedFile"):
+                shutil.copy(SHELL / f"modules/components/{component}.qml", root / f"modules/components/{component}.qml")
+            (root / "modules/components/qmldir").write_text("ThemeReloader 1.0 ThemeReloader.qml\nGeneratedFile 1.0 GeneratedFile.qml\n")
             (root / "theme/qmldir").write_text("".join(
                 ("singleton " if file.stem == "Colors" else "")
                 + f"{file.stem} 1.0 {file.name}\n"
@@ -94,6 +95,14 @@ ShellRoot {
                        XDG_CACHE_HOME=str(root / "cache"), QT_QPA_PLATFORM="offscreen",
                        QML_DISABLE_DISK_CACHE="1", PATH=str(root / "bin") + ":" + os.environ["PATH"])
             env.pop("WAYLAND_DISPLAY", None)
+            entrypoints = []
+            for version in (3, 4):
+                entrypoint = root / f"output/gtk-{version}.0/gtk.css"
+                entrypoint.parent.mkdir(parents=True)
+                source = root / f"gtk-{version}.css"
+                source.write_text(f'@import url("file://{root}/cache/pangu/gtk.css");\n')
+                entrypoint.symlink_to(source)
+                entrypoints.append((entrypoint, source))
             result = subprocess.run(["qs", "-p", str(root / "shell.qml")], env=env,
                                     capture_output=True, text=True, timeout=15)
             log = result.stdout + result.stderr
@@ -103,7 +112,7 @@ ShellRoot {
                 "set org.gnome.desktop.interface color-scheme prefer-dark",
                 "set org.gnome.desktop.interface color-scheme prefer-light",
             ])
-            for error in ("TypeError", "ReferenceError", "Failed to load configuration", "Theme export failed"):
+            for error in ("TypeError", "ReferenceError", "Failed to load configuration", "Generated file write failed"):
                 self.assertNotIn(error, log)
             self.assertIn("background #123456", (root / "cache/pangu/kitty.conf").read_text())
             self.assertIn("background_opacity 0.5", (root / "cache/pangu/kitty.conf").read_text())
@@ -111,15 +120,17 @@ ShellRoot {
             self.assertEqual((root / "cache/wal/wal").read_text(), wallpaper)
             self.assertTrue((root / "cache/wal/base46-dark.lua").read_text().endswith("return M"))
             json.loads((root / "cache/wal/colors.json").read_text())
-            for family in ("gtk", "qt"):
-                files = ([root / f"output/gtk-{version}.0/gtk.css" for version in (3, 4)]
-                         if family == "gtk" else [root / f"output/qt{version}ct/colors/pangu.colors" for version in (5, 6)])
-                self.assertTrue(files[0].read_text())
-                self.assertEqual(files[0].read_text(), files[1].read_text())
-                if family == "qt":
-                    qt = files[0].read_text()
-                    self.assertEqual(qt.count("[Colors:"), 8)
-                    for section in ("Button", "Complementary", "Header", "Selection", "Tooltip", "View", "Window"):
-                        self.assertIn(f"[Colors:{section}]", qt)
-                    self.assertIn("[Colors:Header][Inactive]", qt)
-                    self.assertIn("[General]", qt)
+            gtk = (root / "cache/pangu/gtk.css").read_text()
+            self.assertIn("@define-color window_bg_color rgba(18, 52, 86, 0.5);", gtk)
+            for entrypoint, source in entrypoints:
+                self.assertTrue(entrypoint.is_symlink())
+                self.assertEqual(entrypoint.readlink(), source)
+                self.assertEqual(entrypoint.read_text(), f'@import url("file://{root}/cache/pangu/gtk.css");\n')
+            qt = (root / "output/qt5ct/colors/pangu.colors").read_text()
+            self.assertTrue(qt)
+            self.assertEqual(qt, (root / "output/qt6ct/colors/pangu.colors").read_text())
+            self.assertEqual(qt.count("[Colors:"), 8)
+            for section in ("Button", "Complementary", "Header", "Selection", "Tooltip", "View", "Window"):
+                self.assertIn(f"[Colors:{section}]", qt)
+            self.assertIn("[Colors:Header][Inactive]", qt)
+            self.assertIn("[General]", qt)

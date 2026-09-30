@@ -41,25 +41,27 @@ let
     }).config;
 
   valid = config: builtins.all (entry: entry.assertion) config.assertions;
+  user = host.config.mySystem.user.username;
+  emptyService = emptyShellConfig.home-manager.users.${user}.systemd.user.services.pangu.Service;
   overrideFile =
     config:
     lib.removePrefix "PANGU_NIX_OVERRIDES=" (
       lib.findFirst (entry: lib.hasPrefix "PANGU_NIX_OVERRIDES=" entry)
         (throw "Pangu override metadata is missing")
-        config.home-manager.users.jesperls.systemd.user.services.pangu.Service.Environment
+        config.home-manager.users.${user}.systemd.user.services.pangu.Service.Environment
     );
 in
 assert valid shellConfig;
 assert !(valid invalidShellConfig);
+assert emptyService.ExecStartPre == [ ];
+assert !(builtins.any (entry: lib.hasPrefix "PANGU_NIX_OVERRIDES=" entry) emptyService.Environment);
 pkgs.runCommand "shell-settings-check" { nativeBuildInputs = [ pkgs.python3 ]; } ''
   python3 ${./test_shell_settings.py} ${lib.getExe apply}
-  python3 - ${lib.escapeShellArg (overrideFile shellConfig)} ${lib.escapeShellArg (overrideFile emptyShellConfig)} <<'PY'
+  python3 - ${lib.escapeShellArg (overrideFile shellConfig)} <<'PY'
   import json
   import sys
   with open(sys.argv[1]) as stream:
       assert json.load(stream) == ["pinnedapps.apps", "system.ocr.eng"]
-  with open(sys.argv[2]) as stream:
-      assert json.load(stream) == []
   PY
   touch "$out"
 ''

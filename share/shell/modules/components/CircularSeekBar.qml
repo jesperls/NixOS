@@ -42,8 +42,8 @@ Item {
     property real currentDashLen: dashedActive ? baseDashLength : (baseDashLength + targetSpacing)
     property real currentGapLen: dashedActive ? targetSpacing : 0
     
-    Behavior on currentDashLen { NumberAnimation { duration: Config.animDuration; easing.type: Easing.InOutQuad } }
-    Behavior on currentGapLen { NumberAnimation { duration: Config.animDuration; easing.type: Easing.InOutQuad } }
+    Behavior on currentDashLen { NumberAnimation { duration: Styling.animDuration; easing.type: Easing.InOutQuad } }
+    Behavior on currentGapLen { NumberAnimation { duration: Styling.animDuration; easing.type: Easing.InOutQuad } }
 
     property real phase: 0
     readonly property real cycleLength: baseDashLength + targetSpacing

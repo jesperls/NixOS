@@ -20,6 +20,15 @@ Item {
     property real smallAppIconSize: size * smallAppIconScale
     property bool usingAppIconFallback: false
 
+    function iconSource() {
+        const icon = String(root.appIcon || "");
+        if (!icon) return "";
+        if (/^(data:|file:|image:|https?:|\/)/.test(icon)) return icon;
+        return Quickshell.iconPath(icon, "image-missing");
+    }
+
+    onImageChanged: usingAppIconFallback = false
+
     implicitWidth: size
     implicitHeight: size
     property real radius: Styling.radius(-8)
@@ -76,7 +85,7 @@ Item {
                 mipmap: true
                 id: appIconImage
                 anchors.fill: parent
-                source: root.appIcon ? "image://icon/" + root.appIcon : ""
+                source: root.iconSource()
                 fillMode: Image.PreserveAspectCrop
                 smooth: true
             }
@@ -100,7 +109,7 @@ Item {
                         id: notifImage
                         anchors.fill: parent
                         property bool failed: false
-                        source: failed && root.appIcon ? "image://icon/" + root.appIcon : root.image
+                        source: failed && root.appIcon ? root.iconSource() : root.image
                         fillMode: Image.PreserveAspectCrop
                         smooth: true
                         onStatusChanged: {
@@ -132,7 +141,7 @@ Item {
             Image {
                 mipmap: true
                 anchors.fill: parent
-                source: root.appIcon ? "image://icon/" + root.appIcon : ""
+                source: root.iconSource()
                 fillMode: Image.PreserveAspectCrop
                 smooth: true
             }

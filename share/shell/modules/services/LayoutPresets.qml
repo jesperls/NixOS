@@ -59,106 +59,21 @@ Singleton {
         return presets.find(p => p.id === id) || null;
     }
 
-    function assign(src, dst) {
-        if (!src || !dst)
-            return;
-        for (const key in src) {
-            const s = src[key];
-            if (s === undefined)
-                continue;
-            if (Array.isArray(s)) {
-                dst[key] = JSON.parse(JSON.stringify(s));
-            } else if (s !== null && typeof s === 'object') {
-                if (dst[key] === undefined || dst[key] === null) {
-                    dst[key] = JSON.parse(JSON.stringify(s));
-                } else {
-                    assign(s, dst[key]);
-                }
-            } else {
-                dst[key] = s;
-            }
-        }
-    }
-
-    // Simple theme fields only; the sr* variants are captured separately.
-    readonly property var _themeKeys: ["oledMode", "dynamicColors", "roundness", "font", "fontSize", "monoFont", "monoFontSize", "tintIcons", "enableCorners", "animDuration", "shadowOpacity", "shadowColor", "shadowXOffset", "shadowYOffset", "shadowBlur"]
-    readonly property var _barKeys: Config.adapterKeys("bar")
-    readonly property var _dockKeys: Config.adapterKeys("dock")
-    readonly property var _notchKeys: Config.adapterKeys("notch")
-    readonly property var _workspacesKeys: Config.adapterKeys("workspaces")
-    readonly property var _overviewKeys: Config.adapterKeys("overview")
-    readonly property var _dashboardKeys: Config.adapterKeys("dashboard")
-    readonly property var _launcherKeys: Config.adapterKeys("launcher")
-    readonly property var _lockscreenKeys: Config.adapterKeys("lockscreen")
-    readonly property var _osdKeys: Config.adapterKeys("osd")
-    readonly property var _compositorKeys: Config.adapterKeys("compositor")
-
-    function deepCopy(value) {
-        if (value === null || value === undefined)
-            return value;
-        if (Array.isArray(value))
-            return value.map(deepCopy);
-        if (typeof value === 'object') {
-            // QML list<...> is indexable and supports slice() but is not a JS Array.
-            if (typeof value.slice === 'function') {
-                const out = [];
-                for (let i = 0; i < value.length; i++)
-                    out.push(deepCopy(value[i]));
-                return out;
-            }
-            const out = {};
-            for (const k in value) {
-                if (k.endsWith("Changed") || k === "objectName")
-                    continue;
-                out[k] = deepCopy(value[k]);
-            }
-            return out;
-        }
-        return value;
-    }
-
-    function captureSection(adapter, keys) {
-        const out = {};
-        for (let i = 0; i < keys.length; i++) {
-            const k = keys[i];
-            if (adapter[k] !== undefined)
-                out[k] = deepCopy(adapter[k]);
-        }
-        return out;
-    }
-
-    function captureTheme() {
-        const out = captureSection(Config.theme, _themeKeys);
-        const keys = Object.keys(Config.theme);
-        for (let i = 0; i < keys.length; i++) {
-            const k = keys[i];
-            if (k.indexOf("sr") === 0)
-                out[k] = deepCopy(Config.theme[k]);
-        }
-        return out;
-    }
+    readonly property var _sections: ["theme", "bar", "dock", "notch", "workspaces", "overview", "dashboard", "launcher", "lockscreen", "osd", "compositor"]
 
     function captureCurrent(name, description) {
         const manager = GlobalStates.wallpaperManager;
-        return {
+        const preset = {
             id: slugify(name),
             name: name,
             description: description || "",
             icon: Icons.cube,
             lightMode: Config.theme.lightMode,
-            colorPreset: manager ? (manager.activeColorPreset || "") : "",
-            theme: captureTheme(),
-            bar: captureSection(Config.bar, _barKeys),
-            dock: captureSection(Config.dock, _dockKeys),
-            notch: captureSection(Config.notch, _notchKeys),
-            workspaces: captureSection(Config.workspaces, _workspacesKeys),
-            overview: captureSection(Config.overview, _overviewKeys),
-            dashboard: captureSection(Config.dashboard, _dashboardKeys),
-            launcher: captureSection(Config.launcher, _launcherKeys),
-            lockscreen: captureSection(Config.lockscreen, _lockscreenKeys),
-            osd: captureSection(Config.osd, _osdKeys),
-            compositor: captureSection(Config.compositor, _compositorKeys)
+            colorPreset: manager ? (manager.activeColorPreset || "") : ""
         };
+        for (const section of _sections)
+            preset[section] = Config.snapshot(section);
+        return preset;
     }
 
     function slugify(name) {
@@ -208,16 +123,8 @@ Singleton {
         Config.pauseAutoSave = true;
 
         try {
-            assign(preset.bar, Config.bar);
-            assign(preset.dock, Config.dock);
-            assign(preset.notch, Config.notch);
-            assign(preset.workspaces, Config.workspaces);
-            assign(preset.overview, Config.overview);
-            assign(preset.dashboard, Config.dashboard);
-            assign(preset.launcher, Config.launcher);
-            assign(preset.lockscreen, Config.lockscreen);
-            assign(preset.osd, Config.osd);
-            assign(preset.compositor, Config.compositor);
+            for (const section of _sections)
+                if (section !== "theme") Config.restore(section, preset[section]);
 
             if (preset.colorPreset !== undefined) {
                 const manager = GlobalStates.wallpaperManager;
@@ -225,7 +132,7 @@ Singleton {
                     manager.setColorPreset(preset.colorPreset);
             }
 
-            assign(preset.theme, Config.theme);
+            Config.restore("theme", preset.theme);
 
             if (preset.lightMode !== undefined)
                 Config.theme.lightMode = preset.lightMode;
@@ -233,7 +140,7 @@ Singleton {
             Config.pauseAutoSave = false;
         }
 
-        for (const name of ["theme", "bar", "dock", "notch", "workspaces", "overview", "dashboard", "launcher", "lockscreen", "osd", "compositor"])
+        for (const name of _sections)
             Config.save(name);
 
         GlobalStates.resetChangeTracking();

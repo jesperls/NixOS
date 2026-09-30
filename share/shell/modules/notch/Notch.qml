@@ -51,18 +51,18 @@ Item {
     implicitHeight: Config.notchTheme === "default" ? defaultHeight : (Config.notchTheme === "island" ? islandHeight : defaultHeight)
 
     Behavior on implicitWidth {
-        enabled: (screenNotchOpen || stackViewInternal.busy) && Config.animDuration > 0
+        enabled: (screenNotchOpen || stackViewInternal.busy) && Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: isExpanded ? Easing.OutBack : Easing.OutQuart
             easing.overshoot: isExpanded ? 1.2 : 1.0
         }
     }
 
     Behavior on implicitHeight {
-        enabled: (screenNotchOpen || stackViewInternal.busy) && Config.animDuration > 0
+        enabled: (screenNotchOpen || stackViewInternal.busy) && Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: isExpanded ? Easing.OutBack : Easing.OutQuart
             easing.overshoot: isExpanded ? 1.2 : 1.0
         }
@@ -88,36 +88,36 @@ Item {
         bottomRightRadius: notchContainer.position === "top" ? defaultRadius : 0
 
         Behavior on bottomLeftRadius {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: screenNotchOpen || hasActiveNotifications ? Easing.OutBack : Easing.OutQuart
                 easing.overshoot: screenNotchOpen || hasActiveNotifications ? 1.2 : 1.0
             }
         }
 
         Behavior on bottomRightRadius {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: screenNotchOpen || hasActiveNotifications ? Easing.OutBack : Easing.OutQuart
                 easing.overshoot: screenNotchOpen || hasActiveNotifications ? 1.2 : 1.0
             }
         }
 
         Behavior on topLeftRadius {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: screenNotchOpen || hasActiveNotifications ? Easing.OutBack : Easing.OutQuart
                 easing.overshoot: screenNotchOpen || hasActiveNotifications ? 1.2 : 1.0
             }
         }
 
         Behavior on topRightRadius {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: screenNotchOpen || hasActiveNotifications ? Easing.OutBack : Easing.OutQuart
                 easing.overshoot: screenNotchOpen || hasActiveNotifications ? 1.2 : 1.0
             }
@@ -234,36 +234,36 @@ Item {
             bottomRightRadius: parent.bottomRightRadius
 
             Behavior on topLeftRadius {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: screenNotchOpen || hasActiveNotifications ? Easing.OutBack : Easing.OutQuart
                     easing.overshoot: screenNotchOpen || hasActiveNotifications ? 1.2 : 1.0
                 }
             }
 
             Behavior on topRightRadius {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: screenNotchOpen || hasActiveNotifications ? Easing.OutBack : Easing.OutQuart
                     easing.overshoot: screenNotchOpen || hasActiveNotifications ? 1.2 : 1.0
                 }
             }
 
             Behavior on bottomLeftRadius {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: screenNotchOpen || hasActiveNotifications ? Easing.OutBack : Easing.OutQuart
                     easing.overshoot: screenNotchOpen || hasActiveNotifications ? 1.2 : 1.0
                 }
             }
 
             Behavior on bottomRightRadius {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: screenNotchOpen || hasActiveNotifications ? Easing.OutBack : Easing.OutQuart
                     easing.overshoot: screenNotchOpen || hasActiveNotifications ? 1.2 : 1.0
                 }
@@ -301,7 +301,7 @@ Item {
                 property: "transitionBlur"
                 from: 1.0
                 to: 0.0
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
 
@@ -327,14 +327,14 @@ Item {
                         property: "opacity"
                         from: 0
                         to: 1
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                     PropertyAnimation {
                         property: "scale"
                         from: 0.8
                         to: 1
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutBack
                         easing.overshoot: 1.2
                     }
@@ -345,14 +345,14 @@ Item {
                         property: "opacity"
                         from: 1
                         to: 0
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                     PropertyAnimation {
                         property: "scale"
                         from: 1
                         to: 1.05
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -362,14 +362,14 @@ Item {
                         property: "opacity"
                         from: 0
                         to: 1
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                     PropertyAnimation {
                         property: "scale"
                         from: 1.05
                         to: 1
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -379,14 +379,14 @@ Item {
                         property: "opacity"
                         from: 1
                         to: 0
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                     PropertyAnimation {
                         property: "scale"
                         from: 1
                         to: 0.95
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -396,14 +396,14 @@ Item {
                         property: "opacity"
                         from: 0
                         to: 1
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                     PropertyAnimation {
                         property: "scale"
                         from: 0.8
                         to: 1
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutBack
                         easing.overshoot: 1.2
                     }
@@ -414,14 +414,14 @@ Item {
                         property: "opacity"
                         from: 1
                         to: 0
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                     PropertyAnimation {
                         property: "scale"
                         from: 1
                         to: 1.05
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }

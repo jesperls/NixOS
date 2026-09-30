@@ -16,6 +16,10 @@ lib.mapAttrs' (
   hostName: host: lib.nameValuePair "${hostName}-system" host.config.system.build.toplevel
 ) hosts
 // {
+  desktop-contract = import ./tests/desktop-contract.nix {
+    inherit lib pkgs;
+  };
+
   shell-settings = import ./tests/shell-settings.nix {
     inherit lib pkgs;
     host = hosts.pangu;
@@ -51,7 +55,8 @@ lib.mapAttrs' (
         export PATH="$runtimePath"
         for cmd in bash find python3 jq grep sed awk pkill pgrep hypridle gtk-launch \
           xdg-terminal-exec matugen mpvpaper grim slurp wl-copy ddcutil brightnessctl \
-          tesseract zbarimg swappy notify-send wtype mpv; do
+          tesseract zbarimg swappy notify-send wtype mpv ydotool \
+          nmcli bluetoothctl hyprpicker playerctl; do
           command -v "$cmd" >/dev/null || { echo "pangu runtime is missing: $cmd" >&2; exit 1; }
         done
         touch "$out"

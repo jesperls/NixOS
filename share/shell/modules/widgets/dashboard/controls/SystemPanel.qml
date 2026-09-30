@@ -396,7 +396,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Max Persistent Tabs"
                             value: Config.performance.dashboardMaxPersistentTabs
                             minValue: 1
@@ -613,7 +613,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Lock After"
                             value: Config.system.idle.lock.timeout ?? 300
                             minValue: 10
@@ -632,7 +632,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Screen Off After"
                             value: Config.system.idle.screenOff.timeout ?? 330
                             minValue: 10
@@ -651,7 +651,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Suspend After"
                             value: Config.system.idle.suspend.timeout ?? 1800
                             minValue: 60
@@ -662,7 +662,7 @@ Item {
                             }
                         }
 
-                        TextInputRow {
+                        SettingsTextInputRow {
                             label: "Lock Cmd"
                             value: Config.system.idle.general.lock_cmd ?? ""
                             placeholder: "Command to lock screen"
@@ -673,7 +673,7 @@ Item {
                             }
                         }
 
-                        TextInputRow {
+                        SettingsTextInputRow {
                             label: "After Sleep"
                             value: Config.system.idle.general.after_sleep_cmd ?? ""
                             placeholder: "Command after sleep"
@@ -751,7 +751,7 @@ Item {
                                     }
                                 }
 
-                                NumberInputRow {
+                                SettingsNumberInputRow {
                                     label: "Timeout (s)"
                                     value: modelData.timeout || 0
                                     minValue: 1
@@ -765,7 +765,7 @@ Item {
                                     }
                                 }
 
-                                TextInputRow {
+                                SettingsTextInputRow {
                                     label: "On Timeout"
                                     value: modelData.onTimeout || ""
                                     onValueEdited: val => {
@@ -777,7 +777,7 @@ Item {
                                     }
                                 }
 
-                                TextInputRow {
+                                SettingsTextInputRow {
                                     label: "On Resume"
                                     value: modelData.onResume || ""
                                     onValueEdited: val => {
@@ -842,7 +842,7 @@ Item {
                             Layout.bottomMargin: -4
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Replay Buffer Length"
                             value: Config.system.replay.seconds
                             minValue: 5
@@ -889,7 +889,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Interval"
                             value: Config.system.slideshow.minutes
                             minValue: 1
@@ -934,7 +934,7 @@ Item {
                             onToggled: checked => Config.system.autoTheme.useSunriseSunset = checked
                         }
 
-                        TextInputRow {
+                        SettingsTextInputRow {
                             label: "Day Starts"
                             value: Config.system.autoTheme.dayStart
                             placeholder: "HH:MM"
@@ -945,7 +945,7 @@ Item {
                             }
                         }
 
-                        TextInputRow {
+                        SettingsTextInputRow {
                             label: "Night Starts"
                             value: Config.system.autoTheme.nightStart
                             placeholder: "HH:MM"
@@ -956,7 +956,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Night Light Temperature"
                             value: Config.system.nightLight.temperature
                             minValue: 1000
@@ -1009,7 +1009,7 @@ Item {
                             Layout.bottomMargin: -4
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Work Session"
                             value: Config.system.pomodoro.workTime
                             minValue: 60
@@ -1020,7 +1020,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Rest Session"
                             value: Config.system.pomodoro.restTime
                             minValue: 60
@@ -1061,113 +1061,21 @@ Item {
         }
     }
 
-    component NumberInputRow: SettingsNumberInputRow {}
-    component TextInputRow: RowLayout {
-        id: textInputRowRoot
-        property string label: ""
-        property string value: ""
-        property string placeholder: ""
-        signal valueEdited(string newValue)
 
-        Layout.fillWidth: true
-        spacing: 8
 
-        Text {
-            text: textInputRowRoot.label
-            font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overBackground
-            Layout.preferredWidth: 100
-        }
-
-        StyledRect {
-            variant: "common"
-            Layout.fillWidth: true
-            Layout.preferredHeight: 32
-            radius: Styling.radius(-2)
-
-            TextInput {
-                id: textInputField
-                anchors.fill: parent
-                anchors.margins: 8
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(0)
-                color: Colors.overBackground
-                selectByMouse: true
-                clip: true
-                verticalAlignment: TextInput.AlignVCenter
-
-                readonly property string configValue: textInputRowRoot.value
-                onConfigValueChanged: {
-                    if (!activeFocus && text !== configValue) {
-                        text = configValue;
-                    }
-                }
-                Component.onCompleted: text = configValue
-
-                Text {
-                    anchors.fill: parent
-                    verticalAlignment: Text.AlignVCenter
-                    text: textInputRowRoot.placeholder
-                    font.family: Config.theme.font
-                    font.pixelSize: Styling.fontSize(0)
-                    color: Colors.overSurfaceVariant
-                    visible: textInputField.text === ""
-                }
-
-                onEditingFinished: {
-                    textInputRowRoot.valueEdited(text);
-                }
-            }
-        }
-    }
-
-    component PrefixRow: RowLayout {
+    component PrefixRow: SettingsTextInputRow {
         id: prefixRow
-        property string label: ""
-        property string prefixValue: ""
+        property alias prefixValue: prefixRow.value
         signal prefixEdited(string newValue)
-
-        spacing: 8
-
-        Text {
-            text: prefixRow.label
-            font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overBackground
-            Layout.preferredWidth: 100
-        }
-
-        StyledRect {
-            variant: "common"
-            Layout.preferredWidth: 80
-            Layout.preferredHeight: 36
-            radius: Styling.radius(-2)
-
-            TextInput {
-                id: prefixInput
-                anchors.fill: parent
-                anchors.margins: 8
-                font.family: Config.theme.monoFont
-                font.pixelSize: Styling.monoFontSize(0)
-                color: Colors.overBackground
-                selectByMouse: true
-                clip: true
-                verticalAlignment: TextInput.AlignVCenter
-                horizontalAlignment: TextInput.AlignHCenter
-                text: prefixRow.prefixValue
-                maximumLength: 4
-
-                onEditingFinished: {
-                    if (text !== prefixRow.prefixValue && text.trim() !== "") {
-                        prefixRow.prefixEdited(text.trim());
-                    }
-                }
-            }
-        }
-
-        Item {
-            Layout.fillWidth: true
+        inputWidth: 80
+        inputHeight: 36
+        monospace: true
+        maximumLength: 4
+        alignment: TextInput.AlignHCenter
+        trimValue: true
+        allowEmpty: false
+        onValueEdited: newValue => {
+            if (newValue !== prefixValue) prefixEdited(newValue);
         }
     }
 
@@ -1205,9 +1113,9 @@ Item {
                     border.color: toggleRowRoot.checked ? Styling.srItem("overprimary") : Colors.outline
 
                     Behavior on color {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         ColorAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                         }
                     }
 
@@ -1220,9 +1128,9 @@ Item {
                         color: toggleRowRoot.checked ? Colors.background : Colors.overSurfaceVariant
 
                         Behavior on x {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration / 2
+                                duration: Styling.animDuration / 2
                                 easing.type: Easing.OutCubic
                             }
                         }

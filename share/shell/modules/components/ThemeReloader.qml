@@ -2,8 +2,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Runs a reload command once every tracked ThemeFile has finished writing,
-// coalescing overlapping requests.
 QtObject {
     id: root
 

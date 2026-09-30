@@ -1,4 +1,5 @@
 import QtQuick
+import qs.modules.theme
 import qs.config
 
 Item {
@@ -19,7 +20,7 @@ Item {
             target: root.targetItem?.anchors
             property: "leftMargin"
             to: root.parentWidth / 8 + root.dismissOvershoot
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutBack
             easing.overshoot: 1.1
         }
@@ -29,7 +30,7 @@ Item {
             property: "scale"
             from: 1.0
             to: 0.8
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuad
         }
 
@@ -38,7 +39,7 @@ Item {
             property: "opacity"
             from: 1.0
             to: 0.0
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuad
         }
 

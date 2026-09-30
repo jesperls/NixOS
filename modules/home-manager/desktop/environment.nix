@@ -1,4 +1,6 @@
 {
+  config,
+  pkgs,
   osConfig,
   ...
 }:
@@ -21,4 +23,9 @@ in
 
     ELECTRON_OZONE_PLATFORM_HINT = "auto";
   };
+
+  xdg.systemDirs.data = [
+    "${config.home.homeDirectory}/.local/share"
+    "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
+  ];
 }

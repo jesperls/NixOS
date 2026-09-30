@@ -34,16 +34,37 @@ end
 
 for id, target in pairs(modes) do
   if type(id) == "number" and id > 0 and id % 1 == 0 and allowed[target] then
-    -- A centered mode saved for a workspace that isn't statically primary is
-    -- left in place (skipped) rather than deleted: the runtime primary check
-    -- uses the live monitor, which may differ from the generated list.
-    if target ~= "lua:centered" or primary.workspace_id(id) then
+    local workspace = hl.get_workspace(id)
+    local is_primary = workspace and primary.workspace(workspace) or (not workspace and primary.workspace_id(id))
+    if target ~= "lua:centered" or is_primary then
       apply(id, target)
     end
   else
     modes[id] = nil
   end
 end
+
+local function restore_workspace(workspace)
+  if not workspace then
+    return
+  end
+  local target = modes[workspace.id]
+  if not target then
+    return
+  end
+  if target == "lua:centered" and not primary.workspace(workspace) then
+    local previous = rules[workspace.id]
+    if previous then
+      previous.rule:set_enabled(false)
+    end
+  else
+    apply(workspace.id, target)
+  end
+  layouts_module.schedule_scan()
+end
+
+hl.on("workspace.move_to_monitor", restore_workspace)
+hl.on("workspace.created", restore_workspace)
 
 local function next_layout(current)
   for i, layout in ipairs(cycle) do

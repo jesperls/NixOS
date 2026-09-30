@@ -111,7 +111,7 @@ Singleton {
 
     Process {
         id: outputPresetsProcess
-        command: ["sh", "-c", 'ls -1 "${XDG_DATA_HOME:-$HOME/.local/share}/easyeffects/output" 2>/dev/null']
+        command: ["ls", "-1", "--", Paths.dataHome + "/easyeffects/output"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: root.outputPresets = text.split("\n").filter(n => n.endsWith(".json")).map(n => n.slice(0, -5))
@@ -120,7 +120,7 @@ Singleton {
 
     Process {
         id: inputPresetsProcess
-        command: ["sh", "-c", 'ls -1 "${XDG_DATA_HOME:-$HOME/.local/share}/easyeffects/input" 2>/dev/null']
+        command: ["ls", "-1", "--", Paths.dataHome + "/easyeffects/input"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: root.inputPresets = text.split("\n").filter(n => n.endsWith(".json")).map(n => n.slice(0, -5))

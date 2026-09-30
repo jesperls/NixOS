@@ -106,7 +106,7 @@ Rectangle {
                         anchors.fill: parent
 
                         Behavior on variant {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                         }
 
                         Text {
@@ -126,19 +126,19 @@ Rectangle {
                             property real syncIconRotation: 0
 
                             Behavior on text {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                             }
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                     easing.type: Easing.OutCubic
                                 }
                             }
 
                             Behavior on opacity {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutCubic
@@ -146,7 +146,7 @@ Rectangle {
                             }
 
                             Behavior on rotation {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 400
                                     easing.type: Easing.OutCubic
@@ -154,7 +154,7 @@ Rectangle {
                             }
 
                             Behavior on scale {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 400
                                     easing.type: Easing.OutCubic

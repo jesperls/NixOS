@@ -10,6 +10,7 @@
   qt6,
 
   bash,
+  bluez,
   brightnessctl,
   cava,
   coreutils,
@@ -25,6 +26,7 @@
   gpu-screen-recorder,
   grim,
   hypridle,
+  hyprpicker,
   imagemagick,
   inetutils,
   jq,
@@ -32,11 +34,14 @@
   libnotify,
   libqalculate,
   linux-wallpaperengine,
+  lua,
   matugen,
   mpv,
   mpvpaper,
+  networkmanager,
   networkmanagerapplet,
   nodejs,
+  playerctl,
   power-profiles-daemon,
   procps,
   python3,
@@ -55,6 +60,7 @@
   xdg-utils,
   zbar,
   zenity,
+  ydotool,
 
   version ? "1.1.5",
   ocrLanguages ? [
@@ -82,15 +88,23 @@ let
       bash
       python3
       nodejs
+      lua
       quickshell
       gtk3
       xvfb-run
       jq
       qt6.qtdeclarative # qmllint
+      qt6.qtshadertools
     ];
 
     dontConfigure = true;
-    dontBuild = true;
+    buildPhase = ''
+      runHook preBuild
+      while IFS= read -r -d $'\0' shader; do
+        qsb --qt6 "$shader" -o "$shader.qsb"
+      done < <(find . \( -name '*.frag' -o -name '*.vert' \) -print0)
+      runHook postBuild
+    '';
     dontWrapQtApps = true; # qtdeclarative is here for qmllint only
 
     doCheck = true;
@@ -113,13 +127,6 @@ let
         exit 1
       fi
       rm -f qmllint.log
-
-      while read -r shader; do
-        [ -f "$shader.qsb" ] || { echo "pangu: $shader has no baked .qsb — run pkgs/pangu/rebake-shaders.sh" >&2; missing_shader=1; }
-      done < <(find . \( -name '*.frag' -o -name '*.vert' \))
-      if [ -n "$missing_shader" ]; then
-        exit 1
-      fi
 
       runHook postCheck
     '';
@@ -157,7 +164,8 @@ writeShellApplication {
   runtimeInputs = [
     quickshell
 
-    bash # the shell spawns `bash -c` constantly and gets a bare systemd PATH
+    bash
+    bluez
     brightnessctl
     cava
     coreutils
@@ -173,6 +181,7 @@ writeShellApplication {
     (gpu-screen-recorder.override { wrapperDir = "/run/wrappers/bin"; }) # execs the setcap gsr-kms-server for promptless capture
     grim
     hypridle
+    hyprpicker
     imagemagick
     inetutils # hostname
     jq
@@ -183,8 +192,10 @@ writeShellApplication {
     matugen
     mpv
     mpvpaper
+    networkmanager
     networkmanagerapplet # nm-connection-editor for the wifi panel
     power-profiles-daemon
+    playerctl
     procps # pgrep/pkill
     python3
     slurp
@@ -201,6 +212,7 @@ writeShellApplication {
     xdg-utils
     zbar
     zenity
+    ydotool
   ];
 
   text = ''
@@ -208,8 +220,7 @@ writeShellApplication {
     version=${version}
     export PANGU_VERSION="$version"
 
-    # Tools the shell shells out to re-invoke `pangu` (hypridle lock_cmd,
-    # `pangu run ...`); keep the wrapper's own bin on PATH.
+    # hypridle invokes pangu through PATH.
     pangu_bin="$(dirname -- "$(readlink -f -- "$0")")"
     export PATH="$pangu_bin''${PATH:+:$PATH}"
 
@@ -218,8 +229,7 @@ writeShellApplication {
     export QT_PLUGIN_PATH="${qmlEnv}/lib/qt-6/plugins''${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
 
     if [ -d /run/wrappers/bin ]; then
-      # Wrappers first so the setuid gpu-screen-recorder wins over our
-      # unprivileged copy.
+      # Prefer the privileged screen-recorder wrapper.
       export PATH="/run/wrappers/bin:$PATH"
     fi
   ''

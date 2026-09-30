@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.config
+import qs.modules.components
 
 Singleton {
     id: root
@@ -29,14 +30,12 @@ Singleton {
     }
 
     function publish() {
-        file.setText(`return { ${root.workspaces.join(", ")} }\n`);
+        file.write(`return { ${root.workspaces.join(", ")} }\n`);
     }
 
-    FileView {
+    GeneratedFile {
         id: file
         path: Paths.dataPath("gamemode.lua")
-        atomicWrites: true
-        printErrors: false
     }
 
     Component.onCompleted: if (StateService.initialized) restore()

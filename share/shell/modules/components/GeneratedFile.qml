@@ -14,6 +14,7 @@ FileView {
     property bool resyncing: false
     property int writeFailures: 0
     signal written()
+    signal failed()
 
     function write(text) {
         writeFailures = 0;
@@ -22,7 +23,7 @@ FileView {
     }
 
     function startWrite() {
-        if (saving || pendingText === null)
+        if (saving || resyncing || pendingText === null)
             return;
         if (!directoryReady) {
             prepareDirectory.running = true;
@@ -30,13 +31,13 @@ FileView {
         }
         if (pendingText === savedText) {
             pendingText = null;
+            written();
             return;
         }
         const text = pendingText;
         pendingText = null;
         if (text === "") {
-            // FileView.setText("") is a no-op against its empty initial state, so
-            // it would never emit saved(); report success without writing.
+            // FileView.setText("") would not emit saved() from its empty initial state.
             savedText = "";
             written();
             return;
@@ -63,14 +64,14 @@ FileView {
             Qt.callLater(root.startWrite); // FileView must finish its saved signal before starting another write.
             return;
         }
-        // FileView keeps the failed text in memory, so re-writing the same
-        // content would be short-circuited; reload from disk to resync first.
-        if (writingText !== "")
+        // FileView caches failed writes; reload before retrying the same text.
+        if (pendingText === null && writingText !== "")
             pendingText = writingText;
         writingText = "";
         saving = false;
         if (++writeFailures >= 3) {
-            console.warn("Giving up on theme export:", path);
+            console.warn("Giving up on generated file:", path);
+            failed();
             return;
         }
         resyncing = true;
@@ -80,7 +81,7 @@ FileView {
 
     onSaved: finishWrite(true)
     onSaveFailed: error => {
-        console.warn("Theme export failed:", path, error);
+        console.warn("Generated file write failed:", path, error);
         finishWrite(false);
     }
     onLoaded: finishResync()
@@ -93,8 +94,10 @@ FileView {
             root.directoryReady = code === 0;
             if (root.directoryReady)
                 Qt.callLater(root.startWrite);
-            else
-                console.warn("Cannot create theme export directory:", root.path);
+            else {
+                console.warn("Cannot create generated file directory:", root.path);
+                root.failed();
+            }
         }
     }
 }

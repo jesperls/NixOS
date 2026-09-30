@@ -1,8 +1,8 @@
 pragma Singleton
 
 import QtQuick
+import qs.modules.components
 import Quickshell
-import Quickshell.Io
 import qs.config
 import qs.modules.theme
 Singleton {
@@ -97,8 +97,6 @@ Singleton {
     },
 })
 
--- Hyprland matches layer rules by regex, so a bare "pangu" covers every
--- surface the shell opens: bar, reservations, wallpaper, overview, popups.
 hl.layer_rule({
     match = { namespace = "pangu" },
     no_anim = true,
@@ -107,29 +105,20 @@ hl.layer_rule({
     ignore_alpha = ${ignoreAlpha.toFixed(2)},
 })
 
--- slurp's selection overlay: animating it lags the drag.
-hl.layer_rule({ match = { namespace = "selection" }, no_anim = true })
+hl.layer_rule({ match = { namespace = "selection" }, no_anim = true }) -- Animations lag behind slurp's drag.
 `;
     }
 
-    FileView {
+    GeneratedFile {
         id: file
         path: root.outputPath
-        atomicWrites: true
-        onSaved: Compositor.reloadConfig()
+        onWritten: Compositor.reloadConfig()
     }
-
-    property string written: ""
 
     Timer {
         id: debounce
         interval: 100
-        onTriggered: {
-            if (root.lua === root.written)
-                return;
-            root.written = root.lua;
-            file.setText(root.lua);
-        }
+        onTriggered: file.write(root.lua)
     }
 
     onLuaChanged: debounce.restart()

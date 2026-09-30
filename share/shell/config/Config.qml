@@ -4,8 +4,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.modules.services as Services
 import qs.config
+import "SettingsData.js" as SettingsData
 
 Singleton {
     id: root
@@ -17,7 +17,7 @@ Singleton {
     property var nixOverridePaths: []
 
     FileView {
-        path: Quickshell.env("PANGU_NIX_OVERRIDES") || "/dev/null"
+        path: Quickshell.env("PANGU_NIX_OVERRIDES") || ""
         onLoaded: {
             try {
                 const paths = JSON.parse(text() || "[]");
@@ -72,9 +72,17 @@ Singleton {
     readonly property bool dockReady: dockFile.ready
 
     function adapterKeys(name) {
-        const section = root[name];
+        const section = root.files[name]?.adapter;
         if (!section) return [];
-        return Object.keys(section).filter(key => key !== "objectName" && key !== "adapterUpdated" && !key.endsWith("Changed"));
+        return SettingsData.keys(section);
+    }
+
+    function snapshot(name) {
+        return SettingsData.copy(root.files[name]?.adapter || {});
+    }
+
+    function restore(name, values) {
+        SettingsData.assign(values, root.files[name]?.adapter);
     }
 
     function save(name) {
@@ -820,7 +828,6 @@ Singleton {
     readonly property int roundness: theme.roundness
     readonly property string defaultFont: theme.font
     readonly property bool tintIcons: theme.tintIcons
-    readonly property int animDuration: Services.GameModeService.toggled ? 0 : theme.animDuration
     readonly property bool showBackground: theme.srBarBg.opacity > 0
     readonly property bool blurTransition: performance.blurTransition
     readonly property string notchTheme: notch.theme

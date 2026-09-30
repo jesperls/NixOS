@@ -11,7 +11,7 @@
 
     package = lib.mkDefault (
       pkgs.obs-studio.override {
-        cudaSupport = osConfig.mySystem.hardware.nvidia.enable;
+        cudaSupport = osConfig.mySystem.hardware.nvidia.enable or false;
       }
     );
 

@@ -122,94 +122,7 @@ Item {
     }
 
     component ToggleRow: SettingsToggleRow {}
-    component NumberInputRow: SettingsNumberInputRow {}
-    component TextInputRow: RowLayout {
-        id: textInputRowRoot
-        property string label: ""
-        property string value: ""
-        property string placeholder: ""
-        property string actionText: ""
-        signal valueEdited(string newValue)
-        signal actionClicked()
 
-        Layout.fillWidth: true
-        spacing: 8
-
-        Text {
-            text: textInputRowRoot.label
-            font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overBackground
-            Layout.preferredWidth: 100
-        }
-
-        StyledRect {
-            variant: "common"
-            Layout.fillWidth: true
-            Layout.preferredHeight: 32
-            radius: Styling.radius(-2)
-
-            TextInput {
-                id: textInputField
-                anchors.fill: parent
-                anchors.margins: 8
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(0)
-                color: Colors.overBackground
-                selectByMouse: true
-                clip: true
-                verticalAlignment: TextInput.AlignVCenter
-
-                readonly property string configValue: textInputRowRoot.value
-                onConfigValueChanged: {
-                    if (!activeFocus && text !== configValue) {
-                        text = configValue;
-                    }
-                }
-                Component.onCompleted: text = configValue
-
-                Text {
-                    anchors.fill: parent
-                    verticalAlignment: Text.AlignVCenter
-                    text: textInputRowRoot.placeholder
-                    font.family: Config.theme.font
-                    font.pixelSize: Styling.fontSize(0)
-                    color: Colors.overSurfaceVariant
-                    visible: textInputField.text === ""
-                }
-
-                onEditingFinished: {
-                    textInputRowRoot.valueEdited(text);
-                }
-            }
-        }
-
-        StyledRect {
-            id: textActionButton
-            variant: textInputRowRoot.actionText === "" ? "common" : "primary"
-            Layout.preferredWidth: actionLabel.implicitWidth + 20
-            Layout.preferredHeight: 32
-            radius: Styling.radius(-2)
-            visible: textInputRowRoot.actionText !== ""
-
-            Text {
-                id: actionLabel
-                anchors.centerIn: parent
-                text: textInputRowRoot.actionText
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(0)
-                font.bold: true
-                color: textActionButton.item
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: textInputRowRoot.actionClicked()
-            }
-        }
-    }
 
     component SelectorRow: ColumnLayout {
         id: selectorRowRoot
@@ -391,18 +304,18 @@ Item {
             x: root.colorPickerActive ? -30 : 0
 
             Behavior on x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuart
             }
         }
@@ -920,7 +833,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Bar Height (0 = auto)"
                             value: Config.bar.height ?? 0
                             minValue: 0
@@ -955,7 +868,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Bar Margin"
                             value: Config.bar.margin ?? 4
                             minValue: 0
@@ -969,7 +882,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Bar Spacing"
                             value: Config.bar.spacing ?? 4
                             minValue: 0
@@ -983,7 +896,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Bar Padding"
                             value: Config.bar.padding ?? 4
                             minValue: 0
@@ -997,7 +910,7 @@ Item {
                             }
                         }
 
-                        TextInputRow {
+                        SettingsTextInputRow {
                             label: "Launcher Icon"
                             value: Config.bar.launcherIcon ?? ""
                             placeholder: "Symbol, icon name, or path..."
@@ -1033,7 +946,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Launcher Icon Size"
                             value: Config.bar.launcherIconSize ?? 24
                             minValue: 12
@@ -1191,7 +1104,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Split Gap Padding"
                             value: Config.bar.splitGapPadding ?? 4
                             minValue: 0
@@ -1240,7 +1153,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Hover Region Height"
                             value: Config.bar.hoverRegionHeight ?? 8
                             minValue: 0
@@ -1254,7 +1167,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Hide Delay"
                             value: Config.bar.hideDelay ?? 1000
                             minValue: 0
@@ -1326,7 +1239,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Thickness"
                             value: Config.bar.frameThickness ?? 6
                             minValue: 0
@@ -1463,7 +1376,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Hover Region Height"
                             value: Config.notch.hoverRegionHeight ?? 8
                             minValue: 0
@@ -1477,7 +1390,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Hide Delay"
                             value: Config.notch.hideDelay ?? 1000
                             minValue: 0
@@ -1491,7 +1404,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Hover Expansion Delay"
                             value: Config.notch.hoverExpansionDelay ?? 400
                             minValue: 0
@@ -1614,7 +1527,7 @@ Item {
                             }
                         }
 
-                        TextInputRow {
+                        SettingsTextInputRow {
                             label: "Custom Text"
                             visible: Config.notch.noMediaDisplay === "custom"
                             value: Config.notch.customText ?? "Pangu"
@@ -1648,7 +1561,7 @@ Item {
                             Layout.bottomMargin: -4
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Shown"
                             value: Config.workspaces.shown ?? 10
                             minValue: 1
@@ -1758,7 +1671,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Rows"
                             value: Config.overview.rows ?? 2
                             minValue: 1
@@ -1771,7 +1684,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Columns"
                             value: Config.overview.columns ?? 5
                             minValue: 1
@@ -1835,7 +1748,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Workspace Spacing"
                             value: Config.overview.workspaceSpacing ?? 4
                             minValue: 0
@@ -1865,7 +1778,7 @@ Item {
                             Layout.bottomMargin: -4
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Dashboard Width (0 = auto)"
                             value: Config.dashboard.width ?? 0
                             minValue: 0
@@ -1879,7 +1792,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Dashboard Height (0 = auto)"
                             value: Config.dashboard.height ?? 0
                             minValue: 0
@@ -1996,7 +1909,7 @@ Item {
                             Layout.bottomMargin: -4
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Background Opacity"
                             value: Math.round((Config.dashboard.backgroundOpacity ?? 1.0) * 100)
                             minValue: 0
@@ -2027,7 +1940,7 @@ Item {
                             Layout.bottomMargin: -4
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Launcher Width (0 = auto)"
                             value: Config.launcher.width ?? 0
                             minValue: 0
@@ -2041,7 +1954,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Launcher Height (0 = auto)"
                             value: Config.launcher.height ?? 0
                             minValue: 0
@@ -2167,7 +2080,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Height"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
                             value: Config.dock.height ?? 56
@@ -2182,7 +2095,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Icon Size"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
                             value: Config.dock.iconSize ?? 40
@@ -2197,7 +2110,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Spacing"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
                             value: Config.dock.spacing ?? 4
@@ -2212,7 +2125,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Margin"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
                             value: Config.dock.margin ?? 8
@@ -2239,7 +2152,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Hover Region"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
                             value: Config.dock.hoverRegionHeight ?? 8
@@ -2254,7 +2167,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Hide Delay"
                             visible: (Config.dock.theme ?? "default") !== "integrated"
                             value: Config.dock.hideDelay ?? 1000
@@ -2472,7 +2385,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Dim Strength"
                             value: Config.lockscreen.dimOpacity ?? 25
                             minValue: 0
@@ -2530,7 +2443,7 @@ Item {
                             }
                         }
 
-                        NumberInputRow {
+                        SettingsNumberInputRow {
                             label: "Width"
                             value: Config.osd.width ?? 260
                             minValue: 180
@@ -2617,82 +2530,25 @@ Item {
                             Layout.topMargin: 8
                         }
 
-                        ToggleRow {
-                            label: "English"
-                            checked: Config.system.ocr.eng ?? true
-                            onToggled: value => {
-                                if (value !== Config.system.ocr.eng) {
-                                    GlobalStates.markShellChanged();
-                                    Config.system.ocr.eng = value;
-                                }
+                        Repeater {
+                            model: [
+                                {label: "English", language: "eng"},
+                                {label: "Spanish", language: "spa"},
+                                {label: "Latin", language: "lat"},
+                                {label: "Japanese", language: "jpn"},
+                                {label: "Chinese (Simplified)", language: "chi_sim"},
+                                {label: "Chinese (Traditional)", language: "chi_tra"},
+                                {label: "Korean", language: "kor"}
+                            ]
+
+                            delegate: ToggleRow {
+                                required property var modelData
+                                label: modelData.label
+                                checked: Config.system.ocr[modelData.language]
+                                onToggled: value => Config.system.ocr[modelData.language] = value
                             }
                         }
 
-                        ToggleRow {
-                            label: "Spanish"
-                            checked: Config.system.ocr.spa ?? true
-                            onToggled: value => {
-                                if (value !== Config.system.ocr.spa) {
-                                    GlobalStates.markShellChanged();
-                                    Config.system.ocr.spa = value;
-                                }
-                            }
-                        }
-
-                        ToggleRow {
-                            label: "Latin"
-                            checked: Config.system.ocr.lat ?? false
-                            onToggled: value => {
-                                if (value !== Config.system.ocr.lat) {
-                                    GlobalStates.markShellChanged();
-                                    Config.system.ocr.lat = value;
-                                }
-                            }
-                        }
-
-                        ToggleRow {
-                            label: "Japanese"
-                            checked: Config.system.ocr.jpn ?? false
-                            onToggled: value => {
-                                if (value !== Config.system.ocr.jpn) {
-                                    GlobalStates.markShellChanged();
-                                    Config.system.ocr.jpn = value;
-                                }
-                            }
-                        }
-
-                        ToggleRow {
-                            label: "Chinese (Simplified)"
-                            checked: Config.system.ocr.chi_sim ?? false
-                            onToggled: value => {
-                                if (value !== Config.system.ocr.chi_sim) {
-                                    GlobalStates.markShellChanged();
-                                    Config.system.ocr.chi_sim = value;
-                                }
-                            }
-                        }
-
-                        ToggleRow {
-                            label: "Chinese (Traditional)"
-                            checked: Config.system.ocr.chi_tra ?? false
-                            onToggled: value => {
-                                if (value !== Config.system.ocr.chi_tra) {
-                                    GlobalStates.markShellChanged();
-                                    Config.system.ocr.chi_tra = value;
-                                }
-                            }
-                        }
-
-                        ToggleRow {
-                            label: "Korean"
-                            checked: Config.system.ocr.kor ?? false
-                            onToggled: value => {
-                                if (value !== Config.system.ocr.kor) {
-                                    GlobalStates.markShellChanged();
-                                    Config.system.ocr.kor = value;
-                                }
-                            }
-                        }
                     }
 
                     ColumnLayout {
@@ -2794,18 +2650,18 @@ Item {
             x: root.colorPickerActive ? 0 : 30
 
             Behavior on x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuart
             }
         }

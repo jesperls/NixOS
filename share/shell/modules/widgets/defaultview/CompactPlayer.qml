@@ -128,9 +128,9 @@ Item {
             z: 5
 
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutQuart
                 }
             }
@@ -161,9 +161,9 @@ Item {
                 autoPaddingEnabled: false
                 opacity: (hasArtwork || wallpaperPath !== "") ? 1.0 : 0.0
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -175,9 +175,9 @@ Item {
                 opacity: (hasArtwork || wallpaperPath !== "") ? 0.5 : 0.0
                 radius: Styling.radius(-4)
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -193,9 +193,9 @@ Item {
                 active: Config.performance.audioVisualizer && compactPlayer.isPlaying
                 opacity: active ? ((compactPlayer.notchHovered && compactPlayer.player) ? 0.25 : 0.5) : 0.0
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -212,16 +212,16 @@ Item {
             opacity: (compactPlayer.notchHovered && compactPlayer.player) ? 1.0 : 0.0
             visible: opacity > 0
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutQuart
                 }
             }
             Behavior on spacing {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutQuart
                 }
             }
@@ -254,9 +254,9 @@ Item {
                         blur: 0.75
                         opacity: (hasArtwork || wallpaperPath !== "") ? 1.0 : 0.0
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -268,9 +268,9 @@ Item {
                         opacity: ((hasArtwork || wallpaperPath !== "") && compactPlayer.notchHovered) ? 0.5 : 0.0
                         radius: artworkClip.radius
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -290,23 +290,23 @@ Item {
                         layer.effect: BgShadow {}
                         visible: opacity > 0
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
                         Behavior on color {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             ColorAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
                         Behavior on scale {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutBack
                                 easing.overshoot: 1.5
                             }
@@ -348,23 +348,23 @@ Item {
                 readonly property real naturalWidth: implicitWidth
                 Layout.preferredWidth: (compactPlayer.player !== null && compactPlayer.notchHovered) ? naturalWidth : 0
                 Behavior on Layout.preferredWidth {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on color {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on scale {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutBack
                         easing.overshoot: 1.5
                     }
@@ -415,23 +415,23 @@ Item {
                 readonly property real naturalWidth: implicitWidth
                 Layout.preferredWidth: (compactPlayer.player !== null && compactPlayer.notchHovered) ? naturalWidth : 0
                 Behavior on Layout.preferredWidth {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on color {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on scale {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutBack
                         easing.overshoot: 1.5
                     }
@@ -489,23 +489,23 @@ Item {
                 readonly property real naturalWidth: implicitWidth
                 Layout.preferredWidth: (compactPlayer.player !== null && compactPlayer.notchHovered) ? naturalWidth : 0
                 Behavior on Layout.preferredWidth {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on color {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on scale {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutBack
                         easing.overshoot: 1.5
                     }
@@ -552,23 +552,23 @@ Item {
                 Layout.preferredWidth: (compactPlayer.player !== null && compactPlayer.notchHovered) ? implicitWidth : 0
                 Layout.rightMargin: (compactPlayer.player !== null && compactPlayer.notchHovered) ? 4 : 0
                 Behavior on Layout.preferredWidth {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on Layout.rightMargin {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on color {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }

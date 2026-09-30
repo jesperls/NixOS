@@ -26,11 +26,7 @@
       );
       default = null;
       example = "scx_lavd";
-      description = ''
-        sched_ext scheduler to load instead of EEVDF; needs a kernel with
-        CONFIG_SCHED_CLASS_EXT. scx_lavd is latency-first, scx_rusty is
-        topology-aware. null keeps EEVDF.
-      '';
+      description = "sched_ext scheduler to load on a supporting kernel; null keeps EEVDF.";
     };
 
     transparentHugepages = lib.mkOption {
@@ -45,30 +41,6 @@
       description = "transparent_hugepage= kernel parameter; null keeps the kernel default.";
     };
 
-    ananicy = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Auto-nice daemon with the CachyOS rule set, so background jobs cannot starve the compositor.";
-      };
-    };
-
-    irqbalance = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Spread hardware interrupts across cores instead of leaving them on CPU0.";
-      };
-    };
-
-    noatime = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Mount the root filesystem noatime.";
-      };
-    };
-
     zram = {
       enable = lib.mkOption {
         type = lib.types.bool;
@@ -78,7 +50,7 @@
       memoryPercent = lib.mkOption {
         type = lib.types.ints.between 1 200;
         default = 50;
-        description = "Ceiling on zram size as a percentage of RAM. Lazily allocated.";
+        description = "Ceiling on lazily allocated zram as a percentage of RAM.";
       };
       algorithm = lib.mkOption {
         type = lib.types.str;
@@ -91,7 +63,7 @@
       enable = lib.mkOption {
         type = lib.types.bool;
         default = true;
-        description = "Userspace OOM killer. Disables systemd-oomd, which kills on cgroup pressure instead of free memory.";
+        description = "Use earlyoom instead of systemd-oomd to act on free memory and swap.";
       };
       freeMemThreshold = lib.mkOption {
         type = lib.types.ints.between 1 100;

@@ -71,27 +71,7 @@ PanelWindow {
     readonly property bool reveal: barEnabled ? barContent.reveal : false
     readonly property alias hoverActive: barContent.hoverActive
 
-    readonly property var compositorMonitor: Compositor.monitorFor(targetScreen)
-    readonly property bool hasFullscreenWindow: {
-        if (!compositorMonitor || !compositorMonitor.activeWorkspace)
-            return false;
-
-        const activeWorkspaceId = compositorMonitor.activeWorkspace.id;
-        const monId = compositorMonitor.id;
-
-        const toplevel = ToplevelManager.activeToplevel;
-        if (toplevel && toplevel.fullscreen && Compositor.focusedMonitor && Compositor.focusedMonitor.id === monId) {
-            return true;
-        }
-
-        const wins = Compositor.windowList;
-        for (let i = 0; i < wins.length; i++) {
-            if (wins[i].monitor === monId && wins[i].fullscreen && wins[i].workspace.id === activeWorkspaceId) {
-                return true;
-            }
-        }
-        return false;
-    }
+    readonly property bool hasFullscreenWindow: Compositor.hasFullscreenWindow(targetScreen)
 
     readonly property bool keepBarShadow: Config.bar.keepBarShadow ?? false
     readonly property bool keepBarBorder: Config.bar.keepBarBorder ?? false

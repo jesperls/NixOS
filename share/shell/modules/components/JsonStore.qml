@@ -1,9 +1,6 @@
 import QtQuick
 import Quickshell.Io
 
-// JSON store for dynamic-key state. Creates the parent directory, loads the
-// object, and writes atomically. `normalize` maps the parsed file to the value
-// the owner expects; the default requires an object.
 FileView {
     id: root
 

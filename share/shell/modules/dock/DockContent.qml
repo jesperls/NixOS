@@ -160,32 +160,32 @@ Item {
         }
 
         Behavior on x {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 4
+                duration: Styling.animDuration / 4
                 easing.type: Easing.OutCubic
             }
         }
         Behavior on y {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 4
+                duration: Styling.animDuration / 4
                 easing.type: Easing.OutCubic
             }
         }
 
         Behavior on width {
-            enabled: Config.animDuration > 0 && root.isVertical
+            enabled: Styling.animDuration > 0 && root.isVertical
             NumberAnimation {
-                duration: Config.animDuration / 4
+                duration: Styling.animDuration / 4
                 easing.type: Easing.OutCubic
             }
         }
 
         Behavior on height {
-            enabled: Config.animDuration > 0 && !root.isVertical
+            enabled: Styling.animDuration > 0 && !root.isVertical
             NumberAnimation {
-                duration: Config.animDuration / 4
+                duration: Styling.animDuration / 4
                 easing.type: Easing.OutCubic
             }
         }
@@ -223,25 +223,25 @@ Item {
             }
 
             Behavior on x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 4
+                    duration: Styling.animDuration / 4
                     easing.type: Easing.OutCubic
                 }
             }
             Behavior on y {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 4
+                    duration: Styling.animDuration / 4
                     easing.type: Easing.OutCubic
                 }
             }
 
             opacity: root.reveal ? 1 : 0
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutCubic
                 }
             }
@@ -250,16 +250,16 @@ Item {
                 x: root.isVertical ? (root.reveal ? 0 : (root.isLeft ? -(dockContainer.width + root.edgeSideMargin) : (dockContainer.width + root.edgeSideMargin))) : 0
                 y: root.isBottom ? (root.reveal ? 0 : (dockContainer.height + root.edgeSideMargin)) : 0
                 Behavior on x {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutCubic
                     }
                 }
                 Behavior on y {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -424,16 +424,16 @@ Item {
 
                             rotation: root.pinned ? 0 : 45
                             Behavior on rotation {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                 }
                             }
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                 }
                             }
                         }
@@ -557,16 +557,16 @@ Item {
 
                             rotation: root.pinned ? 0 : 45
                             Behavior on rotation {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                 }
                             }
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                 }
                             }
                         }

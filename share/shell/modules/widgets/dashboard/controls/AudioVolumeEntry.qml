@@ -63,9 +63,9 @@ Item {
                         color: root.isMuted ? Colors.error : Colors.overBackground
 
                         Behavior on color {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             ColorAnimation {
-                                duration: Config.animDuration / 2
+                                duration: Styling.animDuration / 2
                             }
                         }
                     }
@@ -104,9 +104,9 @@ Item {
                 }
 
                 Behavior on progressColor {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                     }
                 }
             }

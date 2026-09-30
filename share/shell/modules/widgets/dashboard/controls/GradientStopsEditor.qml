@@ -229,9 +229,9 @@ Item {
                             }
 
                             Behavior on border.width {
-                                enabled: (Config.animDuration ?? 0) > 0
+                                enabled: (Styling.animDuration ?? 0) > 0
                                 NumberAnimation {
-                                    duration: (Config.animDuration ?? 0) / 3
+                                    duration: (Styling.animDuration ?? 0) / 3
                                 }
                             }
                         }

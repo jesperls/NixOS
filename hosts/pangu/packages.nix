@@ -13,7 +13,6 @@
     rustup
     gcc
     openjdk25
-    ydotool
     jq
     yq
     fd
@@ -32,9 +31,7 @@
     swappy
     libnotify
     wl-clipboard
-    gsettings-desktop-schemas
     gh
-    networkmanagerapplet
     mission-center
     pavucontrol
     overskride

@@ -148,10 +148,7 @@ Item {
     readonly property real workspaceWidth: {
         if (!monitorData)
             return 800;
-        const isRotated = (monitorData.transform % 2 === 1);
-        const monitorScale = monitorData.scale || 1.0;
-        const width = isRotated ? (monitor?.height || 1920) : (monitor?.width || 1920);
-        let scaledWidth = (width / monitorScale) * scale;
+        let scaledWidth = monitorData.logicalWidth * scale;
         if (barPosition === "left" || barPosition === "right") {
             scaledWidth -= barReserved * scale;
         }
@@ -161,10 +158,7 @@ Item {
     readonly property real workspaceHeight: {
         if (!monitorData)
             return 150;
-        const isRotated = (monitorData.transform % 2 === 1);
-        const monitorScale = monitorData.scale || 1.0;
-        const height = isRotated ? (monitor?.width || 1080) : (monitor?.height || 1080);
-        let scaledHeight = (height / monitorScale) * scale;
+        let scaledHeight = monitorData.logicalHeight * scale;
         if (barPosition === "top" || barPosition === "bottom") {
             scaledHeight -= barReserved * scale;
         }
@@ -209,9 +203,9 @@ Item {
         flickableDirection: Flickable.VerticalFlick
 
         Behavior on contentY {
-            enabled: Config.animDuration > 0 && !scrollingOverviewRoot.isManualScrolling
+            enabled: Styling.animDuration > 0 && !scrollingOverviewRoot.isManualScrolling
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
@@ -295,9 +289,9 @@ Item {
                 z: 10
 
                 Behavior on y {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }

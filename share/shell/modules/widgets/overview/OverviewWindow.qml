@@ -64,6 +64,16 @@ Item {
     signal windowClicked
     signal windowClosed
 
+    function moveFloatingWindow(workspace, relativeX, relativeY) {
+        if (!root.monitorData || root.scale <= 0)
+            return;
+        const left = root.barPosition === "left" ? root.barReserved : 0;
+        const top = root.barPosition === "top" ? root.barReserved : 0;
+        Compositor.moveFloatingWindow(root.windowData.address, workspace,
+            (relativeX / root.scale + left) / root.monitorData.logicalWidth,
+            (relativeY / root.scale + top) / root.monitorData.logicalHeight);
+    }
+
     x: initX
     y: initY
     width: targetWindowWidth
@@ -91,30 +101,30 @@ Item {
     }
 
     Behavior on x {
-        enabled: Config.animDuration > 0 && !root.useOverridePosition
+        enabled: Styling.animDuration > 0 && !root.useOverridePosition
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
     Behavior on y {
-        enabled: Config.animDuration > 0 && !root.useOverridePosition
+        enabled: Styling.animDuration > 0 && !root.useOverridePosition
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
     Behavior on width {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
     Behavior on height {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
@@ -145,16 +155,16 @@ Item {
         visible: !windowPreview.hasContent || !Config.performance.windowPreview
 
         Behavior on color {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             ColorAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
             }
         }
 
         Behavior on border.width {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
             }
         }
     }
@@ -184,9 +194,9 @@ Item {
         z: 5
 
         Behavior on border.width {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
             }
         }
     }
@@ -291,11 +301,7 @@ Item {
                         const relativeX = root.x - targetXOffset;
                         const relativeY = root.y - targetYOffset;
                         
-                        const percentageX = Math.round((relativeX / root.availableWorkspaceWidth) * 100);
-                        const percentageY = Math.round((relativeY / root.availableWorkspaceHeight) * 100);
-                        
-                        Compositor.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${windowData?.address}`);
-                        Compositor.dispatch(`movewindowpixel exact ${percentageX}% ${percentageY}%, address:${windowData?.address}`);
+                        root.moveFloatingWindow(targetWorkspace, relativeX, relativeY);
                         
                     } else {
                         Compositor.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${windowData?.address}`);
@@ -308,13 +314,10 @@ Item {
                     const relativeX = root.x - root.xOffset;
                     const relativeY = root.y - root.yOffset;
                     
-                    const percentageX = Math.round((relativeX / root.availableWorkspaceWidth) * 100);
-                    const percentageY = Math.round((relativeY / root.availableWorkspaceHeight) * 100);
-                    
                     const draggedX = root.x;
                     const draggedY = root.y;
                     
-                    Compositor.dispatch(`movewindowpixel exact ${percentageX}% ${percentageY}%, address:${windowData?.address}`);
+                    root.moveFloatingWindow(windowData.workspace.id, relativeX, relativeY);
                     
                     
                     root.overrideX = draggedX;

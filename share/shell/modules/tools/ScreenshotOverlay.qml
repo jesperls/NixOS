@@ -33,7 +33,7 @@ PanelWindow {
 
     property Process copyOverlayProcess: Process {
         id: copyOverlayProcess
-        command: ["bash", "-c", "cat \"" + root.imagePath + "\" | wl-copy --type image/png"]
+        command: ["bash", "-c", 'wl-copy --type image/png < "$1"', "pangu-copy", root.imagePath]
         onExited: exitCode => {
             if (exitCode !== 0) console.warn("Overlay Copy Failed (Exit code: " + exitCode + ")")
         }

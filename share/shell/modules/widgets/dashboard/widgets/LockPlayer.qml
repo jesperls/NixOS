@@ -30,9 +30,9 @@ StyledRect {
     backgroundOpacity: (MprisController.activePlayer || wallpaperPath !== "") ? 0.0 : 1.0
 
     Behavior on backgroundOpacity {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
@@ -61,9 +61,9 @@ StyledRect {
             blur: 0.75
             opacity: (MprisController.activePlayer || wallpaperPath !== "") ? 1.0 : 0.0
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutQuart
                 }
             }
@@ -145,9 +145,9 @@ StyledRect {
                     blur: playPauseHover.hovered ? 0.75 : 0
 
                     Behavior on blur {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -159,9 +159,9 @@ StyledRect {
                     opacity: playPauseHover.hovered ? 0.5 : 0.0
 
                     Behavior on opacity {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -179,9 +179,9 @@ StyledRect {
                 visible: MprisController.canTogglePlaying
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -250,9 +250,9 @@ StyledRect {
                     opacity: MprisController.canGoPrevious ? 1.0 : 0.3
 
                     Behavior on color {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         ColorAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -290,9 +290,9 @@ StyledRect {
                     opacity: MprisController.canGoNext ? 1.0 : 0.3
 
                     Behavior on color {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         ColorAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -336,9 +336,9 @@ StyledRect {
                     }
 
                     Behavior on color {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         ColorAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -376,9 +376,9 @@ StyledRect {
                     opacity: MprisController.activePlayer ? 1.0 : 0.3
 
                     Behavior on color {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         ColorAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }

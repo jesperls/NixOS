@@ -125,9 +125,9 @@ StyledRect {
         opacity: (player.hasArtwork || player.wallpaperPath !== "") ? 0.25 : 0.0
         visible: player.hasArtwork || player.wallpaperPath !== ""
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
@@ -155,9 +155,9 @@ StyledRect {
         opacity: (player.hasArtwork || player.wallpaperPath !== "") ? 1.0 : 0.0
         visible: player.hasArtwork || player.wallpaperPath !== ""
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
@@ -192,9 +192,9 @@ StyledRect {
         opacity: active ? 0.45 : 0.0
         visible: opacity > 0
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }

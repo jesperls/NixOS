@@ -313,9 +313,9 @@ Item {
                     rotation: root.variantConfig ? root.variantConfig.gradientAngle : 0
 
                     Behavior on rotation {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -539,9 +539,9 @@ Item {
                                 rotation: root.variantConfig ? root.variantConfig.gradientAngle : 0
 
                                 Behavior on rotation {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     NumberAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }

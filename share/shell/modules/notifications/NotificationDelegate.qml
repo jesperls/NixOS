@@ -80,9 +80,9 @@ Item {
             visible: root.isValid
 
             Behavior on height {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutCubic
                 }
             }
@@ -415,9 +415,9 @@ Item {
                                 radius: Styling.radius(4)
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration
+                                        duration: Styling.animDuration
                                     }
                                 }
                             }

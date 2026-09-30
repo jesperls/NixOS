@@ -208,23 +208,23 @@ Item {
                 y: 0
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Math.max(0, Config.animDuration - 100)
+                        duration: Math.max(0, Styling.animDuration - 100)
                         easing.type: Easing.OutQuad
                     }
                 }
                 Behavior on x {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Math.max(0, Config.animDuration - 100)
+                        duration: Math.max(0, Styling.animDuration - 100)
                         easing.type: Easing.OutQuad
                     }
                 }
                 Behavior on width {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Math.max(0, Config.animDuration - 100)
+                        duration: Math.max(0, Styling.animDuration - 100)
                         easing.type: Easing.OutQuad
                     }
                 }
@@ -259,23 +259,23 @@ Item {
                 y: modelData.start * workspaceButtonWidth
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Math.max(0, Config.animDuration - 100)
+                        duration: Math.max(0, Styling.animDuration - 100)
                         easing.type: Easing.OutQuad
                     }
                 }
                 Behavior on y {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Math.max(0, Config.animDuration - 100)
+                        duration: Math.max(0, Styling.animDuration - 100)
                         easing.type: Easing.OutQuad
                     }
                 }
                 Behavior on height {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Math.max(0, Config.animDuration - 100)
+                        duration: Math.max(0, Styling.animDuration - 100)
                         easing.type: Easing.OutQuad
                     }
                 }
@@ -310,28 +310,28 @@ Item {
 
         Behavior on activeWorkspaceMargin {
 
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
 
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuad
             }
         }
         Behavior on idx1 {
 
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
 
             NumberAnimation {
-                duration: Config.animDuration / 3
+                duration: Styling.animDuration / 3
                 easing.type: Easing.OutSine
             }
         }
         Behavior on idx2 {
 
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
 
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutSine
             }
         }
@@ -364,28 +364,28 @@ Item {
 
         Behavior on activeWorkspaceMargin {
 
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
 
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuad
             }
         }
         Behavior on idx1 {
 
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
 
             NumberAnimation {
-                duration: Config.animDuration / 3
+                duration: Styling.animDuration / 3
                 easing.type: Easing.OutSine
             }
         }
         Behavior on idx2 {
 
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
 
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutSine
             }
         }
@@ -447,7 +447,7 @@ Item {
                         color: ((monitor && monitor.activeWorkspace ? monitor.activeWorkspace.id : undefined) == button.workspaceValue) ? Styling.srItem("primary") : (workspaceOccupied[index] ? Colors.overBackground : Colors.overSecondaryFixedVariant)
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
                                 duration: 150
                                 easing.type: Easing.OutQuad
@@ -464,7 +464,7 @@ Item {
                         color: ((monitor && monitor.activeWorkspace ? monitor.activeWorkspace.id : undefined) == button.workspaceValue) ? Styling.srItem("primary") : Colors.overBackground
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
                                 duration: 150
                                 easing.type: Easing.OutQuad
@@ -488,28 +488,28 @@ Item {
                             implicitSize: (!Config.workspaces.alwaysShowNumbers && Config.workspaces.showAppIcons) ? workspaceIconSize : workspaceIconSizeShrinked
 
                             Behavior on opacity {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutQuad
                                 }
                             }
                             Behavior on anchors.bottomMargin {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutQuad
                                 }
                             }
                             Behavior on anchors.rightMargin {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutQuad
                                 }
                             }
                             Behavior on implicitSize {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutQuad
@@ -583,7 +583,7 @@ Item {
                         color: ((monitor && monitor.activeWorkspace ? monitor.activeWorkspace.id : undefined) == buttonVert.workspaceValue) ? Styling.srItem("primary") : (workspaceOccupied[index] ? Colors.overBackground : Colors.overSecondaryFixedVariant)
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
                                 duration: 150
                                 easing.type: Easing.OutQuad
@@ -600,7 +600,7 @@ Item {
                         color: ((monitor && monitor.activeWorkspace ? monitor.activeWorkspace.id : undefined) == buttonVert.workspaceValue) ? Styling.srItem("primary") : Colors.overBackground
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
                                 duration: 150
                                 easing.type: Easing.OutQuad
@@ -624,28 +624,28 @@ Item {
                             implicitSize: (!Config.workspaces.alwaysShowNumbers && Config.workspaces.showAppIcons) ? workspaceIconSize : workspaceIconSizeShrinked
 
                             Behavior on opacity {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutQuad
                                 }
                             }
                             Behavior on anchors.bottomMargin {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutQuad
                                 }
                             }
                             Behavior on anchors.rightMargin {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutQuad
                                 }
                             }
                             Behavior on implicitSize {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
                                     duration: 150
                                     easing.type: Easing.OutQuad

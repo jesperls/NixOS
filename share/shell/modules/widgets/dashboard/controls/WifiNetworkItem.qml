@@ -18,9 +18,9 @@ Item {
     implicitHeight: contentColumn.implicitHeight + 16
 
     Behavior on implicitHeight {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -116,9 +116,9 @@ Item {
                     elide: Text.ElideRight
 
                     Behavior on opacity {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                         }
                     }
                 }
@@ -133,9 +133,9 @@ Item {
             opacity: root.expanded ? 1 : 0
 
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                 }
             }
 

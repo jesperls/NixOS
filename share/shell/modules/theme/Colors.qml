@@ -276,7 +276,6 @@ FileView {
         return normalized.startsWith("#") || normalized.startsWith("rgb");
     }
 
-    // Resolve a palette name (or pass through a literal color) to a color.
     function resolve(value) {
         if (!value)
             return "transparent";

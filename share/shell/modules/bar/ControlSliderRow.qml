@@ -26,28 +26,28 @@ Item {
     property real _animatedIconScale: iconScale
 
     Behavior on _animatedWavyAmplitude {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
     Behavior on _animatedWavyFrequency {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
     Behavior on _animatedIconRotation {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
             duration: 400
             easing.type: Easing.OutCubic
         }
     }
     Behavior on _animatedIconScale {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
             duration: 400
             easing.type: Easing.OutCubic
@@ -82,9 +82,9 @@ Item {
                 scale: root._animatedIconScale
 
                 Behavior on color {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                     }
                 }
             }
@@ -108,9 +108,9 @@ Item {
             property real animatedProgress: root.sliderValue
 
             Behavior on animatedProgress {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutQuart
                 }
             }
@@ -167,16 +167,16 @@ Item {
                 z: 2
 
                 Behavior on width {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on height {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }

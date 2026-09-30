@@ -3,7 +3,6 @@ import QtQuick.Effects
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import Quickshell.Widgets
 import qs.modules.theme
 import qs.modules.components
@@ -24,11 +23,11 @@ Rectangle {
     property bool showResults: searchText.length > 0
     property int selectedIndex: -1
     property int selectedRecentIndex: -1
-    property var recentEmojis: []
+    readonly property var recentEmojis: EmojiService.recent
     property var filteredEmojis: []
     property real recentX: selectedRecentIndex >= 0 ? (selectedRecentIndex * 56) + 16 : 0
     property real recentContentX: 0
-    property var emojiData: []
+    readonly property var emojiData: EmojiService.emojis
     readonly property bool isAtRecent: selectedIndex === 0 && emojisModel.count > 0 && emojisModel.get(0).isRecentContainer
 
     property var skinTones: [
@@ -80,35 +79,6 @@ Rectangle {
         id: recentModel
     }
 
-    function adjustScrollForExpandedItem(index) {
-        if (index < 0 || index >= emojisModel.count)
-            return;
-        var itemY = 0;
-        for (var i = 0; i < index && i < emojisModel.count; i++) {
-            var h = 48;
-            if (i === root.expandedItemIndex) {
-                var item = emojisModel.get(i);
-                if (item && item.emojiData && item.emojiData.skin_tone_support) {
-                    h = 48 + 4 + (36 * Math.min(3, root.skinTones.length)) + 8;
-                }
-            }
-            itemY += h;
-        }
-        var currentItemHeight = 48;
-        var item = emojisModel.get(index);
-        if (item && item.emojiData && item.emojiData.skin_tone_support && index === root.expandedItemIndex) {
-            currentItemHeight = 48 + 4 + (36 * Math.min(3, root.skinTones.length)) + 8;
-        }
-        var maxContentY = Math.max(0, emojiList.contentHeight - emojiList.height);
-        var viewportTop = emojiList.contentY;
-        var viewportBottom = viewportTop + emojiList.height;
-        var itemBottom = itemY + currentItemHeight;
-
-        if (itemY < viewportTop)
-            emojiList.contentY = itemY;
-        else if (itemBottom > viewportBottom)
-            emojiList.contentY = Math.min(itemBottom - emojiList.height, maxContentY);
-    }
 
     onSelectedIndexChanged: {
         if (selectedIndex === -1 && emojiList.count > 0) {
@@ -150,10 +120,7 @@ Rectangle {
     }
 
     function clearRecentEmojis() {
-        recentEmojis = [];
-        saveRecentEmojis();
-        updateRecentModel();
-        loadInitialEmojis();
+        EmojiService.clearRecent();
         clearButtonFocused = false;
         resetClearButton();
         searchInput.focusInput();
@@ -168,6 +135,9 @@ Rectangle {
     }
 
     function performSearch() {
+        expandedItemIndex = -1;
+        selectedOptionIndex = 0;
+        keyboardNavigation = false;
         if (searchText.length === 0) {
             loadInitialEmojis();
             selectedIndex = -1;
@@ -198,9 +168,7 @@ Rectangle {
                 isRecentContainer: false
             });
         }
-        if (searchText.length > 0 && filteredEmojis.length > 0) {
-            selectedIndex = 0;
-        }
+        selectedIndex = filteredEmojis.length > 0 ? 0 : -1;
     }
 
     function updateRecentModel() {
@@ -211,11 +179,6 @@ Rectangle {
                 emojiData: recentEmojis[i]
             });
         }
-    }
-
-    function loadEmojiData() {
-        emojiProcess.command = ["bash", "-c", "cat " + Paths.asset("emojis.json")];
-        emojiProcess.running = true;
     }
 
     function loadInitialEmojis() {
@@ -240,29 +203,6 @@ Rectangle {
         filteredEmojis = initial;
     }
 
-    function loadRecentEmojis() {
-        recentProcess.command = ["bash", "-c", "cat " + Paths.cachePath("emojis.json") + " 2>/dev/null || echo '[]'"];
-        recentProcess.running = true;
-    }
-
-    function saveRecentEmojis() {
-        var jsonData = JSON.stringify(recentEmojis, null, 2);
-        saveProcess.command = ["bash", "-c", "echo '" + jsonData.replace(/'/g, "'\\''") + "' > " + Paths.cachePath("emojis.json")];
-        saveProcess.running = true;
-    }
-
-    function addToRecent(emoji) {
-        recentEmojis = recentEmojis.filter(item => item.emoji !== emoji.emoji);
-        emoji.usage = (emoji.usage || 0) + 1;
-        emoji.lastUsed = Date.now();
-        recentEmojis.unshift(emoji);
-        if (recentEmojis.length > 50)
-            recentEmojis = recentEmojis.slice(0, 50);
-        recentEmojis.sort((a, b) => b.usage !== a.usage ? b.usage - a.usage : b.lastUsed - a.lastUsed);
-        updateRecentModel();
-        saveRecentEmojis();
-    }
-
     function copyEmoji(emoji, skinToneModifier) {
         var emojiToCopy = emoji.emoji;
         if (skinToneModifier && skinToneModifier !== "")
@@ -275,7 +215,7 @@ Rectangle {
             search: emoji.name + " " + emoji.slug + (skinToneModifier ? " " + getSkinToneName(skinToneModifier) : ""),
             skin_tone_support: emoji.skin_tone_support
         };
-        root.addToRecent(emojiForRecent);
+        EmojiService.remember(emojiForRecent);
         Visibilities.setActiveModule("");
         ClipboardService.copyAndTypeEmoji(emojiToCopy);
     }
@@ -315,61 +255,25 @@ Rectangle {
     color: "transparent"
 
     Behavior on height {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }
 
-    Process {
-        id: emojiProcess
-        stdout: StdioCollector {
-            waitForEnd: true
-            onStreamFinished: {
-                try {
-                    var jsonData = JSON.parse(text.trim());
-                    var data = [];
-                    for (var emoji in jsonData) {
-                        var emojiInfo = jsonData[emoji];
-                        data.push({
-                            emoji: emoji,
-                            name: emojiInfo.name,
-                            slug: emojiInfo.slug,
-                            group: emojiInfo.group,
-                            search: emojiInfo.name + " " + emojiInfo.slug,
-                            skin_tone_support: emojiInfo.skin_tone_support || false
-                        });
-                    }
-                    emojiData = data;
-                    loadInitialEmojis();
-                } catch (e) {
-                    emojiData = [];
-                    loadInitialEmojis();
-                }
-            }
+    onRecentEmojisChanged: {
+        updateRecentModel();
+        const hadRecent = emojisModel.count > 0 && emojisModel.get(0).isRecentContainer;
+        if (searchText === "" && hadRecent !== (recentEmojis.length > 0)) {
+            loadInitialEmojis();
+            selectedIndex = -1;
+            selectedRecentIndex = -1;
+            expandedItemIndex = -1;
         }
+        if (selectedRecentIndex >= recentEmojis.length) selectedRecentIndex = recentEmojis.length - 1;
     }
-
-    Process {
-        id: recentProcess
-        stdout: StdioCollector {
-            waitForEnd: true
-            onStreamFinished: {
-                try {
-                    recentEmojis = JSON.parse(text.trim());
-                    updateRecentModel();
-                } catch (e) {
-                    recentEmojis = [];
-                    updateRecentModel();
-                }
-            }
-        }
-    }
-
-    Process {
-        id: saveProcess
-    }
+    onEmojiDataChanged: performSearch()
 
     Item {
         id: mainLayout
@@ -474,7 +378,7 @@ Rectangle {
 
                 Behavior on width {
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
@@ -526,7 +430,7 @@ Rectangle {
                         verticalAlignment: Text.AlignVCenter
                         Behavior on opacity {
                             NumberAnimation {
-                                duration: Config.animDuration / 2
+                                duration: Styling.animDuration / 2
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -568,9 +472,9 @@ Rectangle {
             property bool enableScrollAnimation: true
 
             Behavior on contentY {
-                enabled: Config.animDuration > 0 && emojiList.enableScrollAnimation && !emojiList.moving
+                enabled: Styling.animDuration > 0 && emojiList.enableScrollAnimation && !emojiList.moving
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutCubic
                 }
             }
@@ -644,9 +548,9 @@ Rectangle {
                             property bool enableScrollAnimation: true
 
                             Behavior on contentX {
-                                enabled: Config.animDuration > 0 && horizontalRecent.enableScrollAnimation && !horizontalRecent.moving
+                                enabled: Styling.animDuration > 0 && horizontalRecent.enableScrollAnimation && !horizontalRecent.moving
                                 NumberAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                     easing.type: Easing.OutCubic
                                 }
                             }
@@ -786,7 +690,7 @@ Rectangle {
                             opacity: visible ? 1 : 0
                             Behavior on opacity {
                                 NumberAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutQuart
                                 }
                             }
@@ -843,77 +747,23 @@ Rectangle {
                 }
             }
 
-            highlight: Item {
-                id: listHighlight
+            highlight: ResultsHighlight {
+                view: emojiList
+                expandedIndex: root.expandedItemIndex
                 z: -1
                 width: root.isAtRecent ? 40 : emojiList.width
                 x: root.isAtRecent ? root.recentX - root.recentContentX : 0
-                y: {
-                    var yPos = 0;
-                    for (var i = 0; i < emojiList.currentIndex && i < emojisModel.count; i++) {
-                        var h = 48;
-                        var item = emojisModel.get(i);
-                        if (i === root.expandedItemIndex && item && item.emojiData && item.emojiData.skin_tone_support) {
-                            h = 48 + 4 + (36 * Math.min(3, root.skinTones.length)) + 8;
-                        }
-                        yPos += h;
-                    }
-                    if (root.isAtRecent)
-                        yPos += 4;
-                    return yPos;
-                }
-                height: {
-                    if (emojiList.currentIndex === -1)
-                        return 0;
-                    var item = emojisModel.get(emojiList.currentIndex);
-                    if (item && item.isRecentContainer)
-                        return 40;
-                    if (item && item.emojiData && item.emojiData.skin_tone_support && emojiList.currentIndex === root.expandedItemIndex) {
-                        return 48 + 4 + (36 * Math.min(3, root.skinTones.length)) + 8;
-                    }
-                    return 48;
-                }
-
-                Behavior on x {
-                    enabled: Config.animDuration > 0 && !emojiList.moving
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                        easing.type: Easing.OutCubic
-                    }
-                }
-                Behavior on y {
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                        easing.type: Easing.OutCubic
-                    }
-                }
-                Behavior on width {
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                        easing.type: Easing.OutCubic
-                    }
-                }
-                Behavior on height {
-                    NumberAnimation {
-                        duration: Config.animDuration
-                        easing.type: Easing.OutQuart
-                    }
-                }
-
-                StyledRect {
-                    anchors.fill: parent
-                    radius: Styling.radius(4)
-                    variant: root.expandedItemIndex === emojiList.currentIndex ? "pane" : "primary"
-                    visible: root.selectedIndex >= 0
-                }
+                y: (emojiList.currentItem ? emojiList.currentItem.y : 0) + (root.isAtRecent ? 4 : 0)
+                height: root.isAtRecent ? 40 : (emojiList.currentItem ? emojiList.currentItem.height : 0)
+                variant: root.expandedItemIndex === emojiList.currentIndex ? "pane" : "primary"
             }
             highlightFollowsCurrentItem: false
         }
     }
 
     Component.onCompleted: {
-        loadEmojiData();
-        loadRecentEmojis();
+        updateRecentModel();
+        performSearch();
         Qt.callLater(() => focusSearchInput());
     }
 

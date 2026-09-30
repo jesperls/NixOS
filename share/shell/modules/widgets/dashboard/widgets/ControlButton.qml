@@ -38,9 +38,9 @@ StyledRect {
         verticalAlignment: Text.AlignVCenter
 
         Behavior on color {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             ColorAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuart
             }
         }

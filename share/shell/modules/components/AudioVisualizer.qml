@@ -58,7 +58,7 @@ Item {
                 anchors.bottom: visualizer.mirrored ? undefined : parent.bottom
 
                 Behavior on height {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
                         duration: 90
                         easing.type: Easing.OutQuad

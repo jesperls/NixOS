@@ -61,8 +61,6 @@ Singleton {
         }
     }
 
-    Component.onCompleted: void LockscreenService.ipc
-
     property string launcherSearchText: ""
     property int launcherSelectedIndex: -1
     property int launcherCurrentTab: 0
@@ -115,7 +113,6 @@ Singleton {
     property int macrosTargetWorkspaceId: 0
     property string macrosTargetScreenName: ""
 
-    // One-shot pointer capture for a macro click step.
     property bool mousePickActive: false
     property bool mousePickValid: false
     property int mousePickX: 0
@@ -148,119 +145,9 @@ Singleton {
     property bool themeHasChanges: false
     property var themeSnapshot: null
 
-    function _getSrVariantNames() {
-        var names = [];
-        var keys = Object.keys(Config.theme);
-        for (var i = 0; i < keys.length; i++) {
-            if (keys[i].startsWith("sr")) {
-                names.push(keys[i]);
-            }
-        }
-        return names;
-    }
-
-    readonly property var _simpleThemeProps: [
-        "roundness", "oledMode", "lightMode", "dynamicColors", "font", "fontSize", "monoFont", "monoFontSize",
-        "tintIcons", "enableCorners", "animDuration",
-        "shadowOpacity", "shadowColor", "shadowXOffset", "shadowYOffset", "shadowBlur"
-    ]
-    readonly property var _srVariantProps: [
-        "gradientType", "gradientAngle", "gradientCenterX", "gradientCenterY",
-        "halftoneDotMin", "halftoneDotMax", "halftoneStart", "halftoneEnd",
-        "halftoneDotColor", "halftoneBackgroundColor", "itemColor", "opacity"
-    ]
-
-    // Deep-copies plain objects, QML lists and JS arrays. JSON.stringify can't
-    // round-trip a QML list<...>, so those are walked element by element.
-    function _cloneValue(value) {
-        if (value === null || value === undefined)
-            return value;
-        if (Array.isArray(value))
-            return value.map(_cloneValue);
-        if (typeof value === 'object') {
-            if (typeof value.slice === 'function') {
-                const out = [];
-                for (let i = 0; i < value.length; i++)
-                    out.push(_cloneValue(value[i]));
-                return out;
-            }
-            const out = {};
-            for (const k in value) {
-                if (k.endsWith("Changed") || k === "objectName")
-                    continue;
-                out[k] = _cloneValue(value[k]);
-            }
-            return out;
-        }
-        return value;
-    }
-
-    function _copySrVariant(src) {
-        var copy = {};
-        for (var i = 0; i < _srVariantProps.length; i++) {
-            if (src[_srVariantProps[i]] !== undefined) {
-                copy[_srVariantProps[i]] = src[_srVariantProps[i]];
-            }
-        }
-        copy.gradient = (src.gradient !== undefined) ? _cloneValue(src.gradient) : [];
-        copy.border = (src.border !== undefined) ? _cloneValue(src.border) : [];
-        return copy;
-    }
-
-    function _restoreSrVariant(src, dest) {
-        for (var i = 0; i < _srVariantProps.length; i++) {
-            if (src[_srVariantProps[i]] !== undefined) {
-                dest[_srVariantProps[i]] = src[_srVariantProps[i]];
-            }
-        }
-        if (src.gradient !== undefined) {
-            dest.gradient = _cloneValue(src.gradient);
-        }
-        if (src.border !== undefined) {
-            dest.border = _cloneValue(src.border);
-        }
-    }
-
-    function createThemeSnapshot() {
-        var snapshot = {};
-        var theme = Config.theme;
-        var srVariantNames = _getSrVariantNames();
-
-        for (var i = 0; i < _simpleThemeProps.length; i++) {
-            var prop = _simpleThemeProps[i];
-            snapshot[prop] = theme[prop];
-        }
-
-        for (var j = 0; j < srVariantNames.length; j++) {
-            var name = srVariantNames[j];
-            snapshot[name] = _copySrVariant(theme[name]);
-        }
-
-        return snapshot;
-    }
-
-    function restoreThemeSnapshot(snapshot) {
-        if (!snapshot) return;
-
-        var theme = Config.theme;
-        var srVariantNames = _getSrVariantNames();
-
-        for (var i = 0; i < _simpleThemeProps.length; i++) {
-            var prop = _simpleThemeProps[i];
-            theme[prop] = snapshot[prop];
-        }
-
-        for (var j = 0; j < srVariantNames.length; j++) {
-            var name = srVariantNames[j];
-            if (snapshot[name]) {
-                _restoreSrVariant(snapshot[name], theme[name]);
-            }
-        }
-    }
-
     function markThemeChanged() {
         if (!themeHasChanges) {
-            themeSnapshot = createThemeSnapshot();
+            themeSnapshot = Config.snapshot("theme");
             Config.beginEdit("theme", ["theme"]);
         }
         themeHasChanges = true;
@@ -277,7 +164,7 @@ Singleton {
 
     function discardThemeChanges() {
         if (themeHasChanges && themeSnapshot) {
-            restoreThemeSnapshot(themeSnapshot);
+            Config.restore("theme", themeSnapshot);
             themeHasChanges = false;
             themeSnapshot = null;
             Config.endEdit("theme");
@@ -287,90 +174,31 @@ Singleton {
     property bool shellHasChanges: false
     property var shellSnapshot: null
 
-    readonly property var _shellSections: {
-        const names = ["bar", "notch", "workspaces", "overview", "dashboard", "launcher", "dock", "lockscreen", "osd"];
-        const sections = {};
-        for (const name of names)
-            sections[name] = Config.adapterKeys(name);
-        return sections;
-    }
+    readonly property var _shellSections: ["bar", "notch", "workspaces", "overview", "dashboard", "launcher", "dock", "lockscreen", "osd"]
 
     function createShellSnapshot() {
-        var snapshot = {};
-        var sections = Object.keys(_shellSections);
-        for (var i = 0; i < sections.length; i++) {
-            var section = sections[i];
-            var props = _shellSections[section];
-            snapshot[section] = {};
-            for (var j = 0; j < props.length; j++) {
-                var prop = props[j];
-                snapshot[section][prop] = _cloneValue(Config[section][prop]);
-            }
-        }
+        const snapshot = {};
+        for (const section of _shellSections)
+            snapshot[section] = Config.snapshot(section);
         return snapshot;
     }
 
-    function _restoreObject(src, dst) {
-        for (const key in src) {
-            const s = src[key];
-            if (s === undefined)
-                continue;
-            if (Array.isArray(s)) {
-                dst[key] = _cloneValue(s);
-            } else if (s !== null && typeof s === 'object') {
-                if (dst[key] === undefined) {
-                    dst[key] = _cloneValue(s);
-                } else {
-                    _restoreObject(s, dst[key]);
-                }
-            } else {
-                dst[key] = s;
-            }
-        }
-    }
-
     function restoreShellSnapshot(snapshot) {
-        if (!snapshot) return;
-        var sections = Object.keys(_shellSections);
-        for (var i = 0; i < sections.length; i++) {
-            var section = sections[i];
-            var props = _shellSections[section];
-            for (var j = 0; j < props.length; j++) {
-                var prop = props[j];
-                var val = snapshot[section][prop];
-
-                if (section === "system") {
-                    var dst = Config.system[prop];
-                    if (dst === undefined || val === undefined || val === null)
-                        continue;
-                    if (Array.isArray(val)) {
-                        Config.system[prop] = _cloneValue(val);
-                    } else if (typeof val === 'object') {
-                        _restoreObject(val, dst);
-                    } else {
-                        Config.system[prop] = val;
-                    }
-                }
-                else if (typeof val === 'object' && val !== null) {
-                    Config[section][prop] = _cloneValue(val);
-                } else {
-                    Config[section][prop] = val;
-                }
-            }
-        }
+        for (const section of _shellSections)
+            Config.restore(section, snapshot[section]);
     }
 
     function markShellChanged() {
         if (!shellHasChanges) {
             shellSnapshot = createShellSnapshot();
-            Config.beginEdit("shell", Object.keys(_shellSections));
+            Config.beginEdit("shell", _shellSections);
         }
         shellHasChanges = true;
     }
 
     function applyShellChanges() {
         if (shellHasChanges) {
-            for (const name of Object.keys(_shellSections))
+            for (const name of _shellSections)
                 Config.save(name);
 
             shellHasChanges = false;
@@ -391,40 +219,9 @@ Singleton {
     property bool compositorHasChanges: false
     property var compositorSnapshot: null
 
-    readonly property var _compositorProps: Config.adapterKeys("compositor")
-
-    function createCompositorSnapshot() {
-        var snapshot = {};
-        for (var i = 0; i < _compositorProps.length; i++) {
-            var prop = _compositorProps[i];
-            var val = Config.compositor[prop];
-            if (Array.isArray(val)) {
-                snapshot[prop] = JSON.parse(JSON.stringify(val));
-            } else {
-                snapshot[prop] = val;
-            }
-        }
-        return snapshot;
-    }
-
-    function restoreCompositorSnapshot(snapshot) {
-        if (!snapshot) return;
-        for (var i = 0; i < _compositorProps.length; i++) {
-            var prop = _compositorProps[i];
-            if (snapshot[prop] !== undefined) {
-                var val = snapshot[prop];
-                if (Array.isArray(val)) {
-                    Config.compositor[prop] = JSON.parse(JSON.stringify(val));
-                } else {
-                    Config.compositor[prop] = val;
-                }
-            }
-        }
-    }
-
     function markCompositorChanged() {
         if (!compositorHasChanges) {
-            compositorSnapshot = createCompositorSnapshot();
+            compositorSnapshot = Config.snapshot("compositor");
             Config.beginEdit("compositor", ["compositor"]);
         }
         compositorHasChanges = true;
@@ -441,7 +238,7 @@ Singleton {
 
     function discardCompositorChanges() {
         if (compositorHasChanges && compositorSnapshot) {
-            restoreCompositorSnapshot(compositorSnapshot);
+            Config.restore("compositor", compositorSnapshot);
             compositorHasChanges = false;
             compositorSnapshot = null;
             Config.endEdit("compositor");
@@ -458,7 +255,6 @@ Singleton {
         for (const group of ["theme", "shell", "compositor"]) Config.endEdit(group);
     }
 
-    // Keep the dock and the notch from occupying the same edge.
     Connections {
         target: Config.notch
         function onPositionChanged() {
@@ -466,10 +262,8 @@ Singleton {
                 return;
             if (Config.notch.position === "bottom" && Config.dock.position === "bottom") {
                 Config.dock.position = Config.bar.position === "left" ? "right" : "left";
-                root.markShellChanged();
             } else if (Config.notch.position === "top" && (Config.dock.position === "left" || Config.dock.position === "right")) {
                 Config.dock.position = "bottom";
-                root.markShellChanged();
             }
         }
     }

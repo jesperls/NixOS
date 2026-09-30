@@ -23,12 +23,10 @@ let
     bbr3 = false;
   };
 
-  # x86_64-v1 is the flake default; untouched options keep hitting the pinned
-  # binary cache, anything else forces a local build.
   customKernel = pkgs.cachyosKernels.linux-cachyos-latest-lto.override kernelOpts;
 
   kernelPackages =
-    if kernelOpts == defaultOpts then
+    if kernelOpts == defaultOpts then # Preserve the cached package when no build options change.
       pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto
     else
       (pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { }).kernelModuleLLVMOverride (

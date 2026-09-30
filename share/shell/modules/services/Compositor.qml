@@ -42,7 +42,6 @@ Singleton {
         return map;
     }
 
-    // Centered-layout master gap, published per screen by the compositor.
     property var gaps: ({})
 
     function gapFor(screenName) {
@@ -53,21 +52,25 @@ Singleton {
         if (event.name !== "custom" || !event.data)
             return;
         const parts = event.data.split(",");
-        if (parts.length < 4 || parts[0] !== "centergap")
+        if (parts[0] !== "centergap")
             return;
+        if (parts.length < 4)
+            return true;
         const name = parts[1];
-        const x = parseInt(parts[2], 10);
-        const width = parseInt(parts[3], 10);
+        const x = Number(parts[2]);
+        const width = Number(parts[3]);
+        if (!name || !Number.isFinite(x) || !Number.isFinite(width))
+            return true;
         const square = parts[4] === "1";
         const next = Object.assign({}, root.gaps);
         if (!width || width <= 0) {
             if (!(name in next))
-                return;
+                return true;
             delete next[name];
         } else {
             const prev = next[name];
             if (prev && prev.x === x && prev.width === width && prev.square === square)
-                return;
+                return true;
             next[name] = {
                 x: x,
                 width: width,
@@ -75,6 +78,50 @@ Singleton {
             };
         }
         root.gaps = next;
+        return true;
+    }
+
+    function logicalSize(monitor) {
+        const rotated = (monitor.transform || 0) % 2 === 1;
+        const scale = monitor.scale || 1;
+        return {
+            width: (rotated ? monitor.height : monitor.width) / scale,
+            height: (rotated ? monitor.width : monitor.height) / scale
+        };
+    }
+
+    function luaString(value) {
+        return '"' + String(value).replace(/["\\\u0000-\u001f\u007f]/g, c => {
+            if (c === '"' || c === "\\") return "\\" + c;
+            return "\\" + String(c.charCodeAt(0)).padStart(3, "0");
+        }) + '"';
+    }
+
+    function windowTarget(address) {
+        const value = String(address).replace(/^address:/, "");
+        return "address:" + (/^[0-9a-f]+$/i.test(value) ? "0x" + value : value);
+    }
+
+    function moveFloatingWindow(address, workspace, xRatio, yRatio) {
+        if (!address || !Number.isInteger(workspace) || workspace <= 0
+                || !Number.isFinite(xRatio) || !Number.isFinite(yRatio))
+            return;
+        root.request(`eval local w = hl.get_window(${root.luaString(root.windowTarget(address))})
+if w then
+    hl.dispatch(hl.dsp.window.move({ workspace = ${workspace}, follow = false, window = w }))
+    local m = w.workspace and w.workspace.monitor
+    if m and w.floating then
+        local width, height = m.width, m.height
+        if m.transform % 2 == 1 then width, height = height, width end
+        hl.dispatch(hl.dsp.window.move({
+            x = m.x + math.floor(width / m.scale * ${xRatio} + 0.5),
+            y = m.y + math.floor(height / m.scale * ${yRatio} + 0.5),
+            window = w,
+        }))
+    end
+end`, reply => {
+            if (reply.trim() !== "ok") console.warn("Floating-window move failed:", reply);
+        });
     }
 
     function monitorFor(screen) {
@@ -105,51 +152,28 @@ Singleton {
         const action = (split === -1 ? command : command.slice(0, split)).trim();
         const rest = split === -1 ? "" : command.slice(split + 1).trim();
 
-        const target = str => {
-            const match = str.match(/address:([^\s,]+)/);
-            const address = match ? match[1] : str.trim();
-            return `address:${/^[0-9a-f]+$/i.test(address) ? "0x" + address : address}`;
-        };
+        const target = str => root.luaString(root.windowTarget(str.trim()));
 
         switch (action) {
         case "workspace":
-            return Hyprland.dispatch(`hl.dsp.focus({ workspace = "${rest}" })`);
+            return Hyprland.dispatch(`hl.dsp.focus({ workspace = ${root.luaString(rest)} })`);
         case "focuswindow":
-            return Hyprland.dispatch(`hl.dsp.focus({ window = "${target(rest)}" })`);
+            return Hyprland.dispatch(`hl.dsp.focus({ window = ${target(rest)} })`);
         case "focusmonitor":
-            return Hyprland.dispatch(`hl.dsp.focus({ monitor = "${rest}" })`);
+            return Hyprland.dispatch(`hl.dsp.focus({ monitor = ${root.luaString(rest)} })`);
         case "closewindow":
-            return Hyprland.dispatch(rest ? `hl.dsp.window.close({ window = "${target(rest)}" })` : "hl.dsp.window.close()");
+            return Hyprland.dispatch(rest ? `hl.dsp.window.close({ window = ${target(rest)} })` : "hl.dsp.window.close()");
         case "togglespecialworkspace":
-            return Hyprland.dispatch(rest ? `hl.dsp.workspace.toggle_special("${rest}")` : "hl.dsp.workspace.toggle_special()");
+            return Hyprland.dispatch(rest ? `hl.dsp.workspace.toggle_special(${root.luaString(rest)})` : "hl.dsp.workspace.toggle_special()");
         case "movetoworkspacesilent": {
             const parts = rest.split(",");
-            const window = parts.length > 1 ? `, window = "${target(parts[1])}"` : "";
-            return Hyprland.dispatch(`hl.dsp.window.move({ workspace = "${parts[0].trim()}", follow = false${window} })`);
-        }
-        case "movepixel": {
-            const parts = rest.split(",");
-            const coords = parts[0].trim().split(/\s+/);
-            const window = parts.length > 1 ? `, window = "${target(parts[1])}"` : "";
-            const px = parseInt(coords[0]);
-            const py = parseInt(coords[1]);
-            if (isNaN(px) || isNaN(py))
-                return;
-            return Hyprland.dispatch(`hl.dsp.window.move({ x = ${px}, y = ${py}${window} })`);
-        }
-        case "movewindowpixel": {
-            // Overview floating-window drags: "movewindowpixel exact X% Y%, address:..."
-            const m = rest.match(/^(?:exact\s+)?(-?\d+(?:\.\d+)?)%\s+(-?\d+(?:\.\d+)?)%,?\s*(address:[^\s,]+)?/);
-            const mon = root.focusedMonitor;
-            if (!m || !mon)
-                return;
-            const x = mon.x + Math.round(mon.width * parseFloat(m[1]) / 100);
-            const y = mon.y + Math.round(mon.height * parseFloat(m[2]) / 100);
-            const window = m[3] ? `, window = "${target(m[3])}"` : "";
-            return Hyprland.dispatch(`hl.dsp.window.move({ x = ${x}, y = ${y}${window} })`);
+            const window = parts.length > 1 ? `, window = ${target(parts[1])}` : "";
+            return Hyprland.dispatch(`hl.dsp.window.move({ workspace = ${root.luaString(parts[0].trim())}, follow = false${window} })`);
         }
         case "dpms":
-            return Hyprland.dispatch(`hl.dsp.dpms({ action = "${rest}" })`);
+            if (rest === "on" || rest === "off")
+                return Hyprland.dispatch(`hl.dsp.dpms({ action = "${rest}" })`);
+            return;
         case "exit":
             return Hyprland.dispatch("hl.dsp.exit()");
         }
@@ -180,18 +204,19 @@ Singleton {
     }
 
     function moveCursor(x, y) {
+        if (!Number.isFinite(x) || !Number.isFinite(y))
+            return;
         Hyprland.dispatch(`hl.dsp.cursor.move({ x = ${Math.round(x)}, y = ${Math.round(y)} })`);
     }
 
     function injectKeyState(combo, state) {
         const parsed = splitCombo(combo);
-        if (!parsed)
+        if (!parsed || !["down", "up", "repeat"].includes(state))
             return;
         Hyprland.dispatch(`hl.dsp.send_key_state({ mods = "${parsed.mods}", key = "${parsed.key}", state = "${state}" })`);
     }
 
-    // Quickshell's Socket never ends its stream, so a collector on one waits
-    // forever; a process exit does close it.
+    // A Socket collector never finishes; a process collector finishes on exit.
     function request(payload, onReply) {
         const proc = requestComponent.createObject(root, {
             payload: payload,
@@ -213,11 +238,14 @@ Singleton {
             required property string payload
             required property var handler
 
-            command: ["sh", "-c", 'printf %s "$1" | socat - "UNIX-CONNECT:$2"', "sh", payload, Hyprland.requestSocketPath]
+            command: ["sh", "-c", 'printf %s "$1" | socat -T 3 - "UNIX-CONNECT:$2"', "sh", payload, Hyprland.requestSocketPath]
             stdout: StdioCollector {
                 onStreamFinished: proc.handler(text)
             }
-            onExited: proc.destroy()
+            onExited: code => {
+                if (code !== 0) console.warn("Compositor request failed:", payload, code);
+                proc.destroy();
+            }
         }
     }
 
@@ -249,12 +277,16 @@ Singleton {
 
         root.monitors.values = Hyprland.monitors.values.map(monitor => {
             const raw = monitor.lastIpcObject ?? {};
+            const size = root.logicalSize({width: monitor.width, height: monitor.height,
+                scale: monitor.scale, transform: raw.transform});
             return {
                 id: monitor.id,
                 name: monitor.name,
                 focused: monitor === Hyprland.focusedMonitor,
                 width: monitor.width,
                 height: monitor.height,
+                logicalWidth: size.width,
+                logicalHeight: size.height,
                 scale: monitor.scale,
                 x: monitor.x,
                 y: monitor.y,
@@ -275,6 +307,14 @@ Singleton {
         }));
     }
 
+    function scheduleRefresh() {
+        if (!refresh.running) refresh.start();
+    }
+
+    function scheduleSnapshot() {
+        if (!snapshot.running) snapshot.start();
+    }
+
     Timer {
         id: refresh
         interval: 30
@@ -282,7 +322,7 @@ Singleton {
             Hyprland.refreshToplevels();
             Hyprland.refreshWorkspaces();
             Hyprland.refreshMonitors();
-            snapshot.restart();
+            root.scheduleSnapshot();
         }
     }
 
@@ -296,38 +336,46 @@ Singleton {
         target: Hyprland
 
         function onRawEvent(event) {
-            root.handleRawEvent(event);
-            refresh.restart();
+            if (!root.handleRawEvent(event)) root.scheduleRefresh();
         }
         function onFocusedMonitorChanged() {
-            snapshot.restart();
+            root.scheduleSnapshot();
         }
         function onFocusedWorkspaceChanged() {
-            snapshot.restart();
+            root.scheduleSnapshot();
         }
         function onActiveToplevelChanged() {
-            snapshot.restart();
+            root.scheduleSnapshot();
         }
     }
 
     Connections {
         target: Hyprland.toplevels
         function onValuesChanged() {
-            snapshot.restart();
+            root.scheduleSnapshot();
         }
     }
 
     Connections {
         target: Hyprland.monitors
         function onValuesChanged() {
-            snapshot.restart();
+            root.scheduleSnapshot();
         }
     }
 
     Connections {
         target: Hyprland.workspaces
         function onValuesChanged() {
-            snapshot.restart();
+            root.scheduleSnapshot();
+        }
+    }
+
+    Variants {
+        model: Hyprland.toplevels.values.concat(Hyprland.monitors.values, Hyprland.workspaces.values)
+        Connections {
+            required property var modelData
+            target: modelData
+            function onLastIpcObjectChanged() { root.scheduleSnapshot(); }
         }
     }
 

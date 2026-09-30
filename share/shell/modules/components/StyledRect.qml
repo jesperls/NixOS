@@ -96,9 +96,9 @@ ClippingRectangle {
     }
 
     Behavior on radius {
-        enabled: root.animateRadius && Config.animDuration > 0
+        enabled: root.animateRadius && Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration / 4
+            duration: Styling.animDuration / 4
         }
     }
 

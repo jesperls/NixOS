@@ -25,9 +25,9 @@ StyledRect {
     }
     
     Behavior on implicitHeight {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -135,13 +135,13 @@ StyledRect {
             opacity: root.expandedPanel !== -1 ? 1 : 0
             
             Behavior on Layout.preferredHeight {
-                enabled: Config.animDuration > 0
-                NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart }
+                enabled: Styling.animDuration > 0
+                NumberAnimation { duration: Styling.animDuration; easing.type: Easing.OutQuart }
             }
             
             Behavior on opacity {
-                enabled: Config.animDuration > 0
-                NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart }
+                enabled: Styling.animDuration > 0
+                NumberAnimation { duration: Styling.animDuration; easing.type: Easing.OutQuart }
             }
             
             StyledRect {
@@ -172,8 +172,8 @@ StyledRect {
                             }
                         }
 
-                        Behavior on opacity { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart } }
-                        Behavior on x { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart } }
+                        Behavior on opacity { enabled: Styling.animDuration > 0; NumberAnimation { duration: Styling.animDuration; easing.type: Easing.OutQuart } }
+                        Behavior on x { enabled: Styling.animDuration > 0; NumberAnimation { duration: Styling.animDuration; easing.type: Easing.OutQuart } }
                     }
 
                     Loader {
@@ -192,8 +192,8 @@ StyledRect {
                             }
                         }
 
-                        Behavior on opacity { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart } }
-                        Behavior on x { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart } }
+                        Behavior on opacity { enabled: Styling.animDuration > 0; NumberAnimation { duration: Styling.animDuration; easing.type: Easing.OutQuart } }
+                        Behavior on x { enabled: Styling.animDuration > 0; NumberAnimation { duration: Styling.animDuration; easing.type: Easing.OutQuart } }
                     }
                 }
             }

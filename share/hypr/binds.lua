@@ -52,17 +52,15 @@ bind_exec(mainMod, "I", "pangu run settings", "Shell: settings")
 bind_exec(mainMod, "F1", "pangu run cheatsheet", "Shell: keybind cheatsheet")
 bind_exec(mainMod .. " SHIFT", "M", "pangu run macros", "Shell: macros and hotkeys")
 
-bind_exec(mainMod, "L", "loginctl lock-session", "Session: lock")
+bind_exec(mainMod, "L", "pangu lock", "Session: lock")
 
 bind(mainMod, "Q", hl.dsp.window.close(), "Window: close")
 bind(mainMod, "W", hl.dsp.window.float({ action = "toggle" }), "Window: toggle floating")
--- Dispatch through the suppress flag so events.lua never demotes
--- keybind-initiated fullscreen.
 local fullscreen = require("pangu.fullscreen")
 local real_fullscreen = hl.dsp.window.fullscreen({ mode = "fullscreen" })
 local real_maximize = hl.dsp.window.fullscreen({ mode = "maximized" })
 bind(mainMod, "F", function()
-  fullscreen.dispatch_real(real_fullscreen)
+  fullscreen.dispatch_real(real_fullscreen) -- Suppress automatic demotion for explicit fullscreen.
 end, "Window: fullscreen")
 bind(mainMod .. " SHIFT", "F", function()
   fullscreen.dispatch_real(real_maximize)

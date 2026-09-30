@@ -4,6 +4,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
+import qs.modules.components
 
 Singleton {
     id: root
@@ -24,11 +26,18 @@ Singleton {
         refCount = Math.max(0, refCount - 1);
     }
 
+    function start() {
+        if (!root.shouldRun || !root.available || cavaProc.running) return;
+        configFile.write("[general]\nbars = " + root.bars
+            + "\nframerate = 30\n[output]\nmethod = raw\nraw_target = /dev/stdout"
+            + "\ndata_format = ascii\nascii_max_range = 100\n");
+    }
+
     onShouldRunChanged: {
         if (shouldRun) {
             retried = false;
             available = true;
-            cavaProc.running = true;
+            root.start();
         } else {
             retryTimer.stop();
             cavaProc.running = false;
@@ -36,10 +45,17 @@ Singleton {
         }
     }
 
+    GeneratedFile {
+        id: configFile
+        path: Paths.runtimePath("cava.conf")
+        onWritten: if (root.shouldRun && root.available) cavaProc.running = true
+        onFailed: root.available = false
+    }
+
     Process {
         id: cavaProc
 
-        command: ["bash", "-c", "printf '%s\\n' '[general]' 'bars = " + root.bars + "' 'framerate = 30' '[output]' 'method = raw' 'raw_target = /dev/stdout' 'data_format = ascii' 'ascii_max_range = 100' > \"$XDG_RUNTIME_DIR/pangu/cava.conf\" && exec cava -p \"$XDG_RUNTIME_DIR/pangu/cava.conf\""]
+        command: ["cava", "-p", configFile.path]
 
         stdout: SplitParser {
             onRead: data => {
@@ -69,6 +85,6 @@ Singleton {
     Timer {
         id: retryTimer
         interval: 1000
-        onTriggered: if (root.shouldRun && root.available) cavaProc.running = true
+        onTriggered: root.start()
     }
 }

@@ -129,9 +129,9 @@ Item {
                                         bottomPadding: 6
 
                                         Behavior on spacing {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             NumberAnimation {
-                                                duration: Config.animDuration / 3
+                                                duration: Styling.animDuration / 3
                                                 easing.type: Easing.OutCubic
                                             }
                                         }
@@ -143,9 +143,9 @@ Item {
                                             clip: true
 
                                             Behavior on width {
-                                                enabled: Config.animDuration > 0
+                                                enabled: Styling.animDuration > 0
                                                 NumberAnimation {
-                                                    duration: Config.animDuration / 3
+                                                    duration: Styling.animDuration / 3
                                                     easing.type: Easing.OutCubic
                                                 }
                                             }
@@ -159,9 +159,9 @@ Item {
                                                 opacity: presetButton.isActive ? 1 : 0
 
                                                 Behavior on opacity {
-                                                    enabled: Config.animDuration > 0
+                                                    enabled: Styling.animDuration > 0
                                                     NumberAnimation {
-                                                        duration: Config.animDuration / 3
+                                                        duration: Styling.animDuration / 3
                                                         easing.type: Easing.OutCubic
                                                     }
                                                 }
@@ -224,9 +224,9 @@ Item {
                                         bottomPadding: 6
 
                                         Behavior on spacing {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             NumberAnimation {
-                                                duration: Config.animDuration / 3
+                                                duration: Styling.animDuration / 3
                                                 easing.type: Easing.OutCubic
                                             }
                                         }
@@ -238,9 +238,9 @@ Item {
                                             clip: true
 
                                             Behavior on width {
-                                                enabled: Config.animDuration > 0
+                                                enabled: Styling.animDuration > 0
                                                 NumberAnimation {
-                                                    duration: Config.animDuration / 3
+                                                    duration: Styling.animDuration / 3
                                                     easing.type: Easing.OutCubic
                                                 }
                                             }
@@ -254,9 +254,9 @@ Item {
                                                 opacity: inputPresetButton.isActive ? 1 : 0
 
                                                 Behavior on opacity {
-                                                    enabled: Config.animDuration > 0
+                                                    enabled: Styling.animDuration > 0
                                                     NumberAnimation {
-                                                        duration: Config.animDuration / 3
+                                                        duration: Styling.animDuration / 3
                                                         easing.type: Easing.OutCubic
                                                     }
                                                 }

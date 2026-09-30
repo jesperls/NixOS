@@ -1,9 +1,11 @@
 pragma Singleton
 import QtQuick
 import qs.config
+import qs.modules.services
 
 QtObject {
     readonly property string defaultFont: Config.defaultFont
+    readonly property int animDuration: GameModeService.toggled ? 0 : Config.theme.animDuration
 
     function radius(offset) {
         return Config.roundness > 0 ? Math.max(Config.roundness + offset, 0) : 0;

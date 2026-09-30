@@ -1,35 +1,13 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
 
-let
-  cfg = config.mySystem.hardware.sensors;
-in
 {
-  options.mySystem.hardware.sensors = {
-    modules = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      example = [
-        "k10temp"
-        "nct6775"
-      ];
-      description = "Kernel modules for the motherboard's sensor chips.";
-    };
-  };
+  hardware.i2c.enable = true; # ddcutil needs access to the monitor's I2C bus.
 
-  config = {
-    boot.kernelModules = cfg.modules;
-
-    # ddcutil in the shell reads monitor brightness over the i2c bus.
-    hardware.i2c.enable = true;
-
-    environment.systemPackages = with pkgs; [
-      lm_sensors
-      nvtopPackages.full
-    ];
-  };
+  environment.systemPackages = with pkgs; [
+    lm_sensors
+    nvtopPackages.full
+  ];
 }

@@ -1,4 +1,5 @@
 import QtQuick
+import qs.modules.theme
 import qs.config
 
 Item {
@@ -11,18 +12,18 @@ Item {
     visible: opacity > 0
 
     Behavior on scale {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutBack
             easing.overshoot: 1.2
         }
     }
 
     Behavior on opacity {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutQuart
         }
     }

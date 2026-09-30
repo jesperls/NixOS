@@ -6,33 +6,6 @@
 
 let
   shared = import ../lib/gaming.nix { inherit pkgs; };
-
-  # nixpkgs snes9x-gtk 1.63 misses minizip's headers, which moved to
-  # include/minizip/.
-  snes9x-gtk-fixed = pkgs.snes9x-gtk.overrideAttrs (old: {
-    env = (old.env or { }) // {
-      NIX_CFLAGS_COMPILE = (old.env.NIX_CFLAGS_COMPILE or "") + " -I${pkgs.minizip}/include/minizip";
-    };
-  });
-
-  melonds-fixed = pkgs.symlinkJoin {
-    name = "melonds-fixed";
-    paths = [ pkgs.melonds ];
-    buildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/melonDS --set SDL_JOYSTICK_HIDAPI 0
-    '';
-  };
-
-  xemu-fixed = pkgs.symlinkJoin {
-    name = "xemu-fixed";
-    paths = [ pkgs.xemu ];
-    buildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      mv $out/bin/xemu $out/bin/xemu-gapps
-      makeWrapper $out/bin/xemu-gapps $out/bin/xemu --set SDL_JOYSTICK_HIDAPI 0
-    '';
-  };
 in
 {
   programs.steam = {
@@ -62,10 +35,10 @@ in
 
   environment.systemPackages = with pkgs; [
     mgba
-    melonds-fixed
+    melonds
     ryubing
-    snes9x-gtk-fixed
-    xemu-fixed
+    snes9x-gtk
+    xemu
   ];
 
   programs.gamemode = {

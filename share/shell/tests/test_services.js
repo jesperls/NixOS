@@ -21,6 +21,77 @@ function serviceFunctions(filename, names, context) {
     }
 }
 
+let emojiSaves = 0;
+const emojiContext = {
+    root: {}, pending: [], Date: {now: () => 100},
+    history: {ready: false, data: [], save() { emojiSaves++; }}
+};
+serviceFunctions('EmojiService.qml', ['normalizeCatalog', 'normalizeRecent', 'addRecent', 'remember', 'clearRecent', 'finishLoad'], emojiContext);
+const smile = {emoji: '😀', name: 'grinning face', slug: 'grinning_face'};
+assert.equal(emojiContext.normalizeCatalog({'😀': smile, broken: null}).length, 1);
+assert.equal(emojiContext.normalizeRecent({invalid: true}).length, 0);
+assert.equal(emojiContext.normalizeRecent([null, {}, smile, smile]).length, 1);
+emojiContext.remember(smile);
+emojiContext.remember(smile);
+assert.equal(emojiContext.pending.length, 2);
+assert.equal(emojiSaves, 0);
+emojiContext.history.data = emojiContext.normalizeRecent([{...smile, usage: 5}]);
+emojiContext.history.ready = true;
+emojiContext.finishLoad();
+assert.equal(emojiContext.history.data[0].usage, 7);
+assert.equal(smile.usage, undefined);
+assert.equal(emojiSaves, 1);
+emojiContext.remember({emoji: '👍🏽', name: 'thumbs up (medium)', usage: 90});
+assert.equal(emojiContext.history.data[1].usage, 1);
+emojiContext.history.ready = false;
+emojiContext.remember(smile);
+emojiContext.clearRecent();
+emojiContext.remember({emoji: '👍🏽', name: 'thumbs up (medium)'});
+emojiContext.history.ready = true;
+emojiContext.finishLoad();
+assert.equal(emojiContext.history.data.length, 1);
+assert.equal(emojiContext.history.data[0].emoji, '👍🏽');
+assert.equal(emojiContext.history.data[0].usage, 1);
+const manyEmojis = Array.from({length: 60}, (_, i) => ({emoji: String(i), usage: i + 1}));
+const limited = emojiContext.normalizeRecent(manyEmojis);
+assert.equal(limited.length, 50);
+assert.equal(limited[0].usage, 60);
+console.log('Shared emoji history counts repeated copies and replays startup changes in order');
+
+const emojiSearchContext = {
+    root: {}, searchText: 'no match', expandedItemIndex: 0, selectedOptionIndex: 3,
+    keyboardNavigation: true, selectedIndex: 0, filteredEmojis: [],
+    emojiData: emojiContext.normalizeCatalog({'😀': smile}),
+    emojisModel: {clear() {}, append() {}}, emojiList: {contentY: 0}
+};
+serviceFunctions('../widgets/dashboard/emoji/EmojiTab.qml', ['performSearch', 'updateFilteredEmojis'], emojiSearchContext);
+emojiSearchContext.performSearch();
+assert.equal(emojiSearchContext.selectedIndex, -1);
+assert.equal(emojiSearchContext.expandedItemIndex, -1);
+assert.equal(emojiSearchContext.selectedOptionIndex, 0);
+assert.equal(emojiSearchContext.keyboardNavigation, false);
+emojiSearchContext.searchText = 'grinning';
+emojiSearchContext.performSearch();
+assert.equal(emojiSearchContext.selectedIndex, 0);
+assert.equal(emojiSearchContext.filteredEmojis.length, 1);
+
+const tmuxContext = {root: {}};
+serviceFunctions('TmuxSessionInfo.qml', ['parseWindows', 'parsePanes'], tmuxContext);
+const tmuxWindows = tmuxContext.parseWindows('0:1:editor:project\n1:0:server\ninvalid\n');
+assert.equal(tmuxWindows[0].name, 'editor:project');
+assert.equal(tmuxWindows[0].active, true);
+assert.equal(tmuxWindows.length, 2);
+const tmuxPanes = tmuxContext.parsePanes('0:80:20:0:0:1:editor:project\n1:80:10:20:0:0:shell\n2:bad:10:0:0:0:bad\n');
+assert.equal(tmuxPanes.length, 2);
+assert.equal(tmuxPanes[0].command, 'editor:project');
+assert.equal(tmuxPanes[0].totalWidth, 80);
+assert.equal(tmuxPanes[0].totalHeight, 30);
+const paneFocusContext = {root: {}, focusPaneProcess: {running: false}};
+serviceFunctions('../widgets/dashboard/tmux/TmuxTab.qml', ['focusPane'], paneFocusContext);
+paneFocusContext.focusPane('selected-session', 2);
+assert.deepEqual(Array.from(paneFocusContext.focusPaneProcess.command), ['tmux', 'select-pane', '-t', 'selected-session:.2']);
+console.log('Tmux details preserve colon names and pane selection targets the selected session');
+
 const notices = [1, 2].map(id => ({id, popup: true, timer: {destroy() {}}, closeTimer: {
     running: false, start() { this.running = true; }
 }}));
@@ -42,6 +113,27 @@ notificationContext.finishTimeout(1);
 notificationContext.finishTimeout(2);
 assert.ok(notices.every(notice => !notice.popup && notice.timer === null));
 assert.deepEqual(expired, [1, 2]);
+
+const historyContext = {root: {}, notifComponent: {createObject(parent, properties) { return properties; }}};
+serviceFunctions('Notifications.qml', ['historyImage', 'notifToJSON', 'jsonToNotif'], historyContext);
+const transient = 'image://qsimage/230/1';
+const history = historyContext.notifToJSON({id: 42, appIcon: 'firefox', image: transient, cachedImage: transient});
+assert.equal(history.image, '');
+assert.equal(history.cachedImage, '');
+assert.equal(history.appIcon, 'firefox');
+const restoredHistory = historyContext.jsonToNotif({id: 42, appIcon: 'firefox', image: transient, cachedImage: transient});
+assert.equal(restoredHistory.image, '');
+assert.equal(restoredHistory.appIcon, 'firefox');
+const dataImage = 'data:image/png;base64,abcd';
+assert.equal(historyContext.historyImage(dataImage), dataImage);
+const iconContext = {root: {appIcon: dataImage}, Quickshell: {iconPath(name) { return 'image://icon/' + name; }}};
+serviceFunctions('../notifications/NotificationAppIcon.qml', ['iconSource'], iconContext);
+assert.equal(iconContext.iconSource(), dataImage);
+iconContext.root.appIcon = '/path/to/icon.png';
+assert.equal(iconContext.iconSource(), '/path/to/icon.png');
+iconContext.root.appIcon = 'firefox';
+assert.equal(iconContext.iconSource(), 'image://icon/firefox');
+console.log('Notification history drops expired provider handles and preserves usable icon sources');
 
 const clipboardContext = {root: {}};
 serviceFunctions('ClipboardService.qml', ['enqueue', 'startNext'], clipboardContext);
@@ -69,6 +161,60 @@ assert.ok(command.includes('default_output|default_input'));
 assert.ok(command.at(-1).startsWith('/tmp/space and "quote"/'));
 assert.ok(recorderContext.prepareProcess.running);
 console.log('Notification timing, clipboard request queue and recording argument tests passed');
+
+let replayNotices = 0;
+const replayContext = {
+    root: {_pendingStart: true, _scanned: true, videosDir: '/tmp/Replays', active: false},
+    ScreenRecorder: {capabilitiesReady: false, canRecordDirectly: false},
+    Notifications: {notifyInternal() { replayNotices++; }}, prepareProcess: {running: false}
+};
+serviceFunctions('ReplayService.qml', ['maybeStart'], replayContext);
+replayContext.maybeStart();
+assert.equal(replayContext.root._pendingStart, true);
+assert.equal(replayContext.prepareProcess.running, false);
+replayContext.ScreenRecorder.capabilitiesReady = true;
+replayContext.maybeStart();
+assert.equal(replayNotices, 1);
+assert.equal(replayContext.root._pendingStart, false);
+assert.equal(replayContext.prepareProcess.running, false);
+replayContext.ScreenRecorder.canRecordDirectly = true;
+replayContext.root._pendingStart = true;
+replayContext.maybeStart();
+assert.equal(replayContext.prepareProcess.running, true);
+console.log('Replay waits for capture capabilities before starting its daemon');
+
+const captureDirectory = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'pangu-capture-'));
+try {
+    const {spawnSync} = require('node:child_process');
+    const captureContext = {
+        root: {monitors: [], tempPathBase: path.join(captureDirectory, 'runtime/freeze')},
+        Paths: {runtimeDir: path.join(captureDirectory, 'runtime')},
+        freezeProcess: {}, _freezing: true, console: {warn() {}}
+    };
+    serviceFunctions('Screenshot.qml', ['executeFreezeBatch'], captureContext);
+    captureContext.executeFreezeBatch();
+    assert.equal(captureContext._freezing, false);
+    const literal = 'DP-"$HOME"$(false)';
+    captureContext.root.monitors = [{name: literal}, {name: 'failed'}];
+    captureContext.executeFreezeBatch();
+    const bash = spawnSync('bash', ['-c', 'command -v bash'], {encoding: 'utf8'}).stdout.trim();
+    fs.writeFileSync(path.join(captureDirectory, 'grim'), `#!${bash}\n`
+        + 'printf "%s\\0" "$2" >> "$PANGU_TEST_CAPTURE_LOG"\n'
+        + 'if [ "$2" = failed ]; then exit 4; fi\n'
+        + 'printf png > "$3"\n', {mode: 0o755});
+    const result = spawnSync(captureContext.freezeProcess.command[0], captureContext.freezeProcess.command.slice(1), {
+        encoding: 'utf8', env: {...require('node:process').env,
+            PATH: captureDirectory + ':' + require('node:process').env.PATH,
+            PANGU_TEST_CAPTURE_LOG: path.join(captureDirectory, 'calls')}
+    });
+    assert.equal(result.status, 1, result.stderr);
+    assert.deepEqual(fs.readFileSync(path.join(captureDirectory, 'calls'), 'utf8').split('\0').filter(Boolean).sort(),
+        [literal, 'failed'].sort());
+    assert.equal(fs.readFileSync(captureContext.root.tempPathBase + '_' + literal + '.png', 'utf8'), 'png');
+} finally {
+    fs.rmSync(captureDirectory, {recursive: true});
+}
+console.log('Screenshot batches preserve literal arguments and report a failed monitor capture');
 
 const firstScreen = {}, removedScreen = {}, newScreen = {};
 let destroyed = 0, created = 0;
@@ -198,8 +344,8 @@ assert.equal(settingsContext.isPaused('system'), false);
 console.log('Independent settings drafts and batch-save inhibition tests passed');
 
 const globalsSource = fs.readFileSync(path.join(__dirname, '../modules/globals/GlobalStates.qml'), 'utf8');
-assert.match(globalsSource, /Config\.adapterKeys\(/, 'GlobalStates must derive tracked keys from the adapters');
-const sectionNames = JSON.parse(globalsSource.match(/const names = (\[[^\]]*\]);/)[1]);
+assert.match(globalsSource, /Config\.snapshot\(/, 'GlobalStates must snapshot the adapters');
+const sectionNames = JSON.parse(globalsSource.match(/_shellSections: (\[[^\]]*\])/)[1]);
 const shellPanelSource = fs.readFileSync(path.join(__dirname, '../modules/widgets/dashboard/controls/ShellPanel.qml'), 'utf8');
 for (const match of shellPanelSource.matchAll(/Config\.(\w+)\.(\w+)\s*=(?!=)/g)) {
     assert.ok(sectionNames.includes(match[1]), `Shell section is not drafted: ${match[1]}.${match[2]}`);
@@ -379,10 +525,14 @@ console.log('Wallpaper Engine keeps process ownership, false overrides, and lite
 const exportWrites = [], exportNotifications = [];
 const exportContext = {
     root: {}, pendingText: null, savedText: null, writingText: '', saving: false,
+    resyncing: false, writeFailures: 0, reloadCount: 0, path: '/test/generated.conf',
     directoryReady: true, Qt: {callLater(callback) { callback(); }},
+    reload() { exportContext.reloadCount++; },
+    failed() { exportContext.failureCount = (exportContext.failureCount || 0) + 1; },
+    console: {warn() {}},
     setText(text) { exportWrites.push(text); }, written() { exportNotifications.push(exportContext.savedText); }
 };
-serviceFunctions('../theme/ThemeFile.qml', ['write', 'startWrite', 'finishWrite'], exportContext);
+serviceFunctions('../components/GeneratedFile.qml', ['write', 'startWrite', 'finishWrite', 'finishResync'], exportContext);
 exportContext.write('first');
 exportContext.write('discarded');
 exportContext.write('latest');
@@ -393,11 +543,34 @@ exportContext.finishWrite(true);
 assert.deepEqual(exportNotifications, ['latest']);
 exportContext.write('latest');
 assert.equal(exportWrites.length, 2);
+assert.deepEqual(exportNotifications, ['latest', 'latest']);
 exportContext.write('retry');
 exportContext.finishWrite(false);
-exportContext.write('retry');
+assert.equal(exportContext.reloadCount, 1);
+assert.equal(exportWrites.length, 3);
+exportContext.finishResync();
 assert.equal(exportWrites.length, 4);
-console.log('Theme exports coalesce edits, skip unchanged content, and retry failed writes');
+exportContext.finishWrite(true);
+exportContext.write('outdated');
+exportContext.write('newer');
+exportContext.finishWrite(false);
+assert.equal(exportContext.pendingText, 'newer');
+exportContext.write('newest');
+assert.equal(exportWrites.at(-1), 'outdated');
+exportContext.finishResync();
+assert.equal(exportWrites.at(-1), 'newest');
+exportContext.finishWrite(true);
+assert.equal(exportNotifications.at(-1), 'newest');
+exportContext.write('unwritable');
+for (let failure = 1; failure <= 3; failure++) {
+    exportContext.finishWrite(false);
+    assert.equal(exportContext.writeFailures, failure);
+    exportContext.finishResync();
+}
+assert.equal(exportContext.saving, false);
+assert.equal(exportContext.resyncing, false);
+assert.equal(exportContext.failureCount, 1);
+console.log('Generated files coalesce edits, retain newer output across failures, and stop after three retries');
 
 const nightTimer = {interval: 0, running: false, stop() { this.running = false; }, restart() { this.running = true; }};
 const nightContext = {
@@ -512,6 +685,7 @@ const themeContext = {
     Qt: {callLater(callback) {}},
     directoryReady: true,
     saving: false,
+    resyncing: false,
     pendingText: "",
     savedText: null,
     writingText: "",
@@ -519,7 +693,7 @@ const themeContext = {
     setText(text) { themeWrites.push(text); },
     written() { themeContext.writeCount = (themeContext.writeCount || 0) + 1; }
 };
-serviceFunctions('../theme/ThemeFile.qml', ['startWrite'], themeContext);
+serviceFunctions('../components/GeneratedFile.qml', ['startWrite'], themeContext);
 themeContext.startWrite();
 assert.deepEqual(themeWrites, []);
 assert.equal(themeContext.savedText, "");
@@ -545,6 +719,78 @@ composerContext.handleRawEvent({name: 'custom', data: 'centergap,DP-2,0,0,0'});
 composerContext.handleRawEvent({name: 'workspace', data: 'ignored'});
 assert.equal(Object.keys(composerContext.root.gaps).length, 0);
 console.log('Centered-layout gap events are parsed and cleared per screen');
+
+const compositorCalls = [];
+const compositorContext = {
+    root: {request(payload) { compositorCalls.push(payload); }},
+    Hyprland: {dispatch(command) { compositorCalls.push(command); }}, console,
+    refresh: {running: false, start() { this.running = true; }},
+    snapshot: {running: false, start() { this.running = true; }}
+};
+serviceFunctions('Compositor.qml', ['logicalSize', 'luaString', 'windowTarget', 'moveFloatingWindow',
+    'dispatch', 'moveCursor', 'injectKeyState', 'splitCombo', 'scheduleRefresh', 'scheduleSnapshot'], compositorContext);
+for (const transform of [0, 1, 3, 5, 7]) {
+    const size = compositorContext.logicalSize({width: 3840, height: 1440, scale: 2, transform});
+    assert.equal(size.width, transform % 2 ? 720 : 1920);
+    assert.equal(size.height, transform % 2 ? 1920 : 720);
+}
+const {spawnSync} = require('node:child_process');
+const literalLua = 'a"\\b\n\u0001' + '2 Ö';
+const quoted = spawnSync('lua', ['-e', 'io.write(' + compositorContext.luaString(literalLua) + ')'], {encoding: 'utf8', timeout: 3000});
+assert.equal(quoted.status, 0, quoted.stderr);
+assert.equal(quoted.stdout, literalLua);
+compositorContext.dispatch('focusmonitor DP-"quoted"');
+assert.ok(compositorCalls.pop().includes('DP-\\"quoted\\"'));
+compositorContext.moveFloatingWindow('abc', 2, 0.25, 0.5);
+const transaction = compositorCalls.pop();
+const moved = spawnSync('lua', ['-e', `
+local source = {x = 0, y = 0, width = 1920, height = 1080, transform = 0, scale = 1}
+local destination = {x = -100, y = 50, width = 3840, height = 1440, transform = 1, scale = 2}
+local w = {floating = true, workspace = {id = 1, monitor = source}}
+local calls = 0
+hl = {get_window = function(selector) assert(selector == 'address:0xabc'); return w end,
+    dsp = {window = {move = function(args) return args end}},
+    dispatch = function(args)
+        calls = calls + 1
+        assert(args.window == w)
+        if calls == 1 then
+            assert(args.workspace == 2 and args.follow == false)
+            w.workspace = {id = 2, monitor = destination}
+        else assert(args.x == 80 and args.y == 1010) end
+    end}
+${transaction.slice('eval '.length)}
+assert(calls == 2)
+`], {encoding: 'utf8', timeout: 3000});
+assert.equal(moved.status, 0, moved.stderr);
+compositorContext.moveFloatingWindow('abc', 2, Infinity, 0.5);
+compositorContext.moveCursor(NaN, 5);
+compositorContext.injectKeyState('CTRL+A', 'invalid');
+assert.equal(compositorCalls.length, 0);
+compositorContext.injectKeyState('CTRL+A', 'down');
+assert.ok(compositorCalls.pop().includes('state = "down"'));
+compositorContext.scheduleRefresh();
+compositorContext.scheduleSnapshot();
+assert.equal(compositorContext.refresh.running, true);
+assert.equal(compositorContext.snapshot.running, true);
+composerContext.handleRawEvent({name: 'custom', data: 'centergap,DP-1,NaN,500,1'});
+assert.equal(composerContext.gapFor('DP-1'), null);
+assert.equal(composerContext.handleRawEvent({name: 'custom', data: 'centergap,DP-1,100,500,1'}), true);
+console.log('Compositor moves use ordered Lua, destination geometry and literal selectors');
+
+const previewMoves = [];
+for (const file of ['OverviewWindow.qml', 'ScrollingWorkspace.qml']) {
+    const previewContext = {
+        root: {windowData: {address: 'abc'}, monitorData: {logicalWidth: 1920, logicalHeight: 1080},
+            scale: 0.25, scale_: 0.25, barPosition: 'left', barReserved: 44},
+        Compositor: {moveFloatingWindow(...args) { previewMoves.push(args); }}
+    };
+    serviceFunctions('../widgets/overview/' + file, ['moveFloatingWindow'], previewContext);
+    if (file === 'OverviewWindow.qml') previewContext.moveFloatingWindow(2, 20, 14);
+    else previewContext.moveFloatingWindow('abc', 2, 20, 14);
+}
+assert.deepEqual(previewMoves[0], ['abc', 2, 124 / 1920, 56 / 1080]);
+assert.deepEqual(previewMoves[1], previewMoves[0]);
+console.log('Both overview modes restore reserved bar space before placing floating windows');
 
 const detailState = {
     selectedIndex: 2, renameHighlightsCancel: false,
@@ -622,7 +868,7 @@ const macroSource = fs.readFileSync(path.join(__dirname, '../modules/services/ma
     .replace(/^\.pragma library\n/, '');
 const macroContext = vm.createContext({module: {exports: {}}, console});
 vm.runInContext(macroSource
-    + '\nmodule.exports = {normalizeMacro, normalizeStep, normalizeTrigger, blankMacro, blankStep, blankTriggerFor, bindsLua, luaQuote, sanitizeCombo, isValidCombo, describeTrigger, stepTitle};',
+    + '\nmodule.exports = {normalizeMacro, normalizeStep, normalizeTrigger, blankMacro, blankStep, blankTriggerFor, bindsLua, luaQuote, runCommand, sequenceCommand, sanitizeCombo, isValidCombo, describeTrigger, stepTitle};',
     macroContext, {filename: 'macro_utils.js'});
 const macroUtils = macroContext.module.exports;
 const macro = macroUtils.normalizeMacro({
@@ -643,7 +889,7 @@ assert.equal(macroUtils.stepTitle({type: 'click', button: 'left', x: 5, y: 6}), 
 assert.equal(macroUtils.describeTrigger(macroUtils.normalizeTrigger({type: 'timer', seconds: 0})), 'Every 1s');
 const binds = macroUtils.bindsLua([macro]);
 assert.ok(binds.includes('macro_bind("SUPER + SHIFT + M"'), 'Hotkey binds quote the combo');
-assert.ok(binds.includes('pangu run \\"macros-run ' + macro.id + '\\"'), 'Macro ids are passed as one run argument');
+assert.ok(binds.includes("pangu run 'macros-run " + macro.id + "'"), 'Macro ids are passed as one run argument');
 assert.ok(binds.includes('Macro: Greet \\"friend\\"'), 'Names are escaped for Lua');
 assert.ok(binds.includes('local function macro_bind'), 'Each bind is isolated from the others');
 assert.ok(binds.includes(', false)'), 'Hotkey binds consume their key');
@@ -672,6 +918,17 @@ assert.ok(macroUtils.luaQuote('a\u0001b').includes('\\001'), 'Remaining control 
 assert.ok(macroUtils.bindsLua([{id: 'm_o', name: 'O', enabled: true, trigger: {type: 'hotkey', keys: 'CTRL + SHIFT + odiaeresis'}, steps: []}])
     .includes('"CTRL + SHIFT + odiaeresis"'), 'Non-ASCII keysym names survive generation');
 console.log('Macro normalization, Lua escaping, combo validation and bind coverage tests passed');
+
+const literalId = 'm_\'$HOME $(printf unexpected) "Ö"';
+for (const [command, expected] of [
+    [macroUtils.runCommand(literalId), 'macros-run ' + literalId],
+    [macroUtils.sequenceCommand(literalId, 2), 'macros-seq ' + literalId + ' 2']
+]) {
+    const ran = spawnSync('bash', ['-c', 'pangu() { [ "$#" = 2 ] && [ "$1" = run ] || exit 1; printf %s "$2"; }; ' + command], {encoding: 'utf8'});
+    assert.equal(ran.status, 0, ran.stderr);
+    assert.equal(ran.stdout, expected);
+}
+console.log('Macro hotkeys preserve literal IDs through the command shell');
 
 const macroStarts = [];
 const svcMacros = {

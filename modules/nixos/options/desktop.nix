@@ -21,14 +21,7 @@
         example = {
           bar.position = "top";
         };
-        description = ''
-          Per-file overrides for ~/.config/pangu/config/<name>.json, merged in
-          every time the shell starts. The shell writes those files back at
-          runtime, so they cannot be store symlinks: anything declared here is
-          re-asserted on start and left editable in between. Keys not mentioned
-          keep whatever the user set in the GUI, and keys in neither fall back
-          to the schema in share/shell/config/Config.qml.
-        '';
+        description = "Per-file shell settings merged into runtime JSON on every shell start.";
       };
     };
 
@@ -36,11 +29,7 @@
       maxWidth = lib.mkOption {
         type = lib.types.ints.unsigned;
         default = 2560;
-        description = ''
-          Width special workspaces are padded down to on wider monitors, so
-          they stay a readable centered column instead of spanning an
-          ultrawide. 0 lets them use the full width.
-        '';
+        description = "Maximum logical width of special workspaces; zero uses the full monitor.";
       };
       verticalGap = lib.mkOption {
         type = lib.types.ints.unsigned;
@@ -58,10 +47,7 @@
           ]
         );
         default = null;
-        description = ''
-          Pointer acceleration. "flat" is 1:1 raw movement, "adaptive" is
-          libinput's speed-dependent curve, null keeps the device default.
-        '';
+        description = "Pointer acceleration profile; null keeps the device default.";
       };
       repeatRate = lib.mkOption {
         type = lib.types.ints.unsigned;
@@ -88,10 +74,7 @@
           2
         ];
         default = 2;
-        description = ''
-          Scan fullscreen buffers out directly, skipping composition.
-          0 off, 1 always, 2 only for game content type.
-        '';
+        description = "Direct scanout mode: zero disables it, one allows all fullscreen apps, two allows games.";
       };
     };
 
@@ -112,7 +95,7 @@
       default = lib.mkOption {
         type = lib.types.str;
         default = "dwindle";
-        description = "Layout workspaces start in. Lua-defined layouts use the lua: prefix.";
+        description = "Initial workspace layout, with a lua: prefix for Lua-defined layouts.";
       };
       cycle = lib.mkOption {
         type = lib.types.nonEmptyListOf lib.types.str;
@@ -131,7 +114,7 @@
         fullHeight = lib.mkOption {
           type = lib.types.bool;
           default = false;
-          description = "Make the centered master span the full monitor height at a fixed aspect ratio, extending over the bar's reserved area. The bar is expected to split around it (Pangu listens for the centergap event).";
+          description = "Extend the centered master to the full monitor height at a fixed aspect ratio.";
         };
         fullHeightAspect = lib.mkOption {
           type = lib.types.addCheck (lib.types.listOf lib.types.ints.positive) (
@@ -160,7 +143,7 @@
       classes = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
-        description = "Window classes this applies to. Empty means the default browser.";
+        description = "Affected window classes; an empty list uses the default browser.";
       };
     };
   };

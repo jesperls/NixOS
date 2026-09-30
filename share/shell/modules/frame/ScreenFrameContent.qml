@@ -55,20 +55,20 @@ Item {
 
     property real _barAnimProgress: barReveal ? 1.0 : 0.0
     Behavior on _barAnimProgress {
-        enabled: Config.animDuration > 0
-        NumberAnimation { duration: Config.animDuration / 2; easing.type: Easing.OutCubic }
+        enabled: Styling.animDuration > 0
+        NumberAnimation { duration: Styling.animDuration / 2; easing.type: Easing.OutCubic }
     }
 
     property real _dockAnimProgress: dockReveal ? 1.0 : 0.0
     Behavior on _dockAnimProgress {
-        enabled: Config.animDuration > 0
-        NumberAnimation { duration: Config.animDuration / 2; easing.type: Easing.OutCubic }
+        enabled: Styling.animDuration > 0
+        NumberAnimation { duration: Styling.animDuration / 2; easing.type: Easing.OutCubic }
     }
 
     property real _notchAnimProgress: notchReveal ? 1.0 : 0.0
     Behavior on _notchAnimProgress {
-        enabled: Config.animDuration > 0
-        NumberAnimation { duration: Config.animDuration / 2; easing.type: Easing.OutCubic }
+        enabled: Styling.animDuration > 0
+        NumberAnimation { duration: Styling.animDuration / 2; easing.type: Easing.OutCubic }
     }
 
     readonly property int barExpansion: (frameEnabled && configContainBar) ? Math.round((barSize + baseThickness) * _barAnimProgress) : 0

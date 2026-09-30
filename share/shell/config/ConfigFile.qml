@@ -11,9 +11,7 @@ FileView {
     property bool reloading: true
     property bool reloadPending: false
 
-    // reload() is a no-op while a write is in flight; without a watchdog the
-    // reloading flag could latch and silently disable autosave for this file.
-    property Timer reloadWatchdog: Timer {
+    property Timer reloadWatchdog: Timer { // reload() during a write can leave reloading latched.
         interval: 3000
         running: root.reloading
         onTriggered: {
@@ -48,9 +46,9 @@ FileView {
     }
     onLoadFailed: error => {
         reloading = false;
+        ready = true;
         if (error === FileViewError.FileNotFound) {
             writeAdapter();
-            ready = true;
         }
     }
     onFileChanged: reloadConfig()

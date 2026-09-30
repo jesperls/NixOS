@@ -3,6 +3,35 @@ for file in io.popen("find '" .. source .. "' -name '*.lua'"):lines() do
   assert(loadfile(file))
 end
 
+local session_dir = os.tmpname()
+os.remove(session_dir)
+local getenv = os.getenv
+local instance = 'first-instance'
+os.getenv = function(name)
+  if name == 'XDG_DATA_HOME' then return session_dir end
+  if name == 'HYPRLAND_INSTANCE_SIGNATURE' then return instance end
+  return getenv(name)
+end
+local first_session = dofile(source .. '/session.lua')
+first_session.table('slots')[1] = {master = 0, left = {1}, right = {2}}
+first_session.table('weights')[0] = 1.25
+first_session.table('layout_modes')[1] = 'lua:centered'
+first_session.save()
+local reloaded_session = dofile(source .. '/session.lua')
+assert(reloaded_session.table('slots')[1].master == 0, 'Reload lost live window slots')
+assert(reloaded_session.table('weights')[0] == 1.25, 'Reload lost live window weights')
+instance = 'second-instance'
+local new_session = dofile(source .. '/session.lua')
+assert(next(new_session.table('slots')) == nil, 'A new compositor inherited slots for reused window IDs')
+assert(next(new_session.table('weights')) == nil, 'A new compositor inherited weights for reused window IDs')
+assert(new_session.table('layout_modes')[1] == 'lua:centered', 'A new compositor lost workspace layout choices')
+new_session.save()
+assert(dofile(source .. '/session.lua').data.instance == instance, 'The compositor instance was not persisted')
+os.getenv = getenv
+os.remove(session_dir .. '/pangu/hypr-layout-state.lua')
+os.remove(session_dir .. '/pangu')
+os.remove(session_dir)
+
 local state = {
   apps = {},
   layouts = { centered = { master_width = 0.5, full_height = false, aspect = {16, 9}, height_resize_step = 0.15 } },
@@ -65,11 +94,10 @@ floating = false
 binds['Mouse: resize window']()
 assert(dispatched == 2, 'Tiled centered window used the floating resize dispatcher')
 
--- Restore must keep a centered mode for a workspace that is primary per the
--- live monitor but absent from the generated static list, and must still drop
--- structurally invalid entries.
-local modes = { [1] = 'lua:centered', [2] = 'dwindle', [3] = 'bogus' }
+local modes = { [1] = 'lua:centered', [2] = 'dwindle', [3] = 'bogus', [4] = 'lua:centered' }
 local ruled = {}
+local handlers = {}
+local live = {[1] = {id = 1, monitor = {name = 'primary'}}, [4] = {id = 4, monitor = {name = 'secondary'}}}
 for _, name in ipairs({ 'pangu.generated', 'pangu.session', 'pangu.layouts', 'pangu.primary' }) do
   package.loaded[name] = nil
 end
@@ -78,18 +106,30 @@ package.preload['pangu.generated'] = function()
 end
 package.preload['pangu.session'] = function() return { table = function() return modes end } end
 package.preload['pangu.layouts'] = function() return { center_active = function() end, schedule_scan = function() end } end
-package.preload['pangu.primary'] = function()
-  return { workspace_id = function(id) return id == 2 end, workspace = function() return false end }
-end
 hl = {
+  get_workspace = function(id) return live[id] end,
+  on = function(event, callback) handlers[event] = callback end,
   workspace_rule = function(rule)
     ruled[#ruled + 1] = rule
-    return { set_enabled = function() end }
+    return { set_enabled = function(_, enabled) rule.enabled = enabled end }
   end,
 }
+package.preload['pangu.primary'] = function()
+  return {workspace_id = function(id) return id == 4 end,
+    workspace = function(workspace) return workspace.monitor.name == 'primary' end}
+end
 dofile(source .. '/layout_modes.lua')
 assert(modes[1] == 'lua:centered', 'A live-primary centered mode was deleted on restore')
 assert(modes[2] == 'dwindle')
 assert(modes[3] == nil, 'An invalid layout mode target was not discarded')
-assert(#ruled == 1, 'Only the valid non-centered mode should be applied')
+assert(#ruled == 2, 'Restore must use the live monitor before the static mapping')
+live[4].monitor.name = 'primary'
+handlers['workspace.move_to_monitor'](live[4])
+assert(#ruled == 3 and ruled[3].layout == 'lua:centered', 'A preserved mode was not restored on the primary monitor')
+live[4].monitor.name = 'secondary'
+handlers['workspace.move_to_monitor'](live[4])
+assert(ruled[3].enabled == false, 'Centered layout stayed enabled on the secondary monitor')
+live[4].monitor.name = 'primary'
+handlers['workspace.move_to_monitor'](live[4])
+assert(ruled[3].enabled == true and #ruled == 3, 'The existing rule should be re-enabled on return')
 print('Hyprland syntax, workspace isolation, floating resize and layout-mode restore tests passed')

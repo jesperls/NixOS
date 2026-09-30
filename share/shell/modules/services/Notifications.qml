@@ -81,21 +81,25 @@ Singleton {
         }
     }
 
+    function historyImage(image) {
+        return typeof image === "string" && !image.startsWith("image://qsimage/") ? image : "";
+    }
+
     function notifToJSON(notif) {
         return {
             "id": notif.id,
             "actions": notif.actions,
-            "appIcon": notif.appIcon,
+            "appIcon": root.historyImage(notif.appIcon),
             "appName": notif.appName,
             "body": notif.body,
-            "image": notif.image,
+            "image": root.historyImage(notif.image),
             "summary": notif.summary,
             "time": notif.time,
             "urgency": notif.urgency,
             "historyPriority": notif.historyPriority,
             "replaceKey": notif.replaceKey,
-            "cachedAppIcon": notif.cachedAppIcon,
-            "cachedImage": notif.cachedImage,
+            "cachedAppIcon": root.historyImage(notif.cachedAppIcon),
+            "cachedImage": root.historyImage(notif.cachedImage),
             "isCached": notif.isCached
         };
     }
@@ -159,17 +163,17 @@ Singleton {
         return notifComponent.createObject(root, {
             "id": json.id,
             "actions": [],
-            "appIcon": json.cachedAppIcon || json.appIcon,
+            "appIcon": root.historyImage(json.cachedAppIcon) || root.historyImage(json.appIcon),
             "appName": json.appName,
             "body": json.body,
-            "image": json.cachedImage || json.image,
+            "image": root.historyImage(json.cachedImage) || root.historyImage(json.image),
             "summary": json.summary,
             "time": json.time,
             "urgency": json.urgency,
             "historyPriority": json.historyPriority || 0,
             "replaceKey": json.replaceKey || "",
-            "cachedAppIcon": json.cachedAppIcon || "",
-            "cachedImage": json.cachedImage || "",
+            "cachedAppIcon": root.historyImage(json.cachedAppIcon),
+            "cachedImage": root.historyImage(json.cachedImage),
             "isCached": true,
             "popup": false
         });

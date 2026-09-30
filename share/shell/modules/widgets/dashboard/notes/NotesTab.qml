@@ -375,30 +375,6 @@ Item {
     }
 
 
-    function adjustScrollForExpandedItem(index) {
-        if (index < 0 || index >= notesModel.count)
-            return;
-
-        var itemY = 0;
-        for (var i = 0; i < index; i++) {
-            itemY += 48;
-        }
-
-        var listHeight = 36 * 3;
-        var expandedHeight = 48 + 4 + listHeight + 8;
-
-        var maxContentY = Math.max(0, resultsList.contentHeight - resultsList.height);
-        var viewportTop = resultsList.contentY;
-        var viewportBottom = viewportTop + resultsList.height;
-        var itemBottom = itemY + expandedHeight;
-
-        if (itemY < viewportTop) {
-            resultsList.contentY = itemY;
-        } else if (itemBottom > viewportBottom) {
-            resultsList.contentY = Math.min(itemBottom - resultsList.height, maxContentY);
-        }
-    }
-
     onSelectedIndexChanged: if (initialized && !updatingNotes) syncSelection()
 
     function syncSelection() {
@@ -900,9 +876,9 @@ Item {
                 property bool enableScrollAnimation: true
 
                 Behavior on contentY {
-                    enabled: resultsList.enableScrollAnimation && Config.animDuration > 0
+                    enabled: resultsList.enableScrollAnimation && Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -917,82 +893,11 @@ Item {
                     active: true
                 }
 
-                highlight: Item {
-                    width: resultsList.width
-                    height: {
-                        let baseHeight = 48;
-                        if (resultsList.currentIndex === root.expandedItemIndex && !root.deleteMode && !root.renameMode) {
-                            var isCreateBtn = resultsList.currentIndex >= 0 && resultsList.currentIndex < filteredNotes.length && filteredNotes[resultsList.currentIndex].isCreateButton;
-                            var optionCount = isCreateBtn ? 2 : 3;
-                            var listHeight = 36 * optionCount;
-                            return baseHeight + 4 + listHeight + 8;
-                        }
-                        return baseHeight;
-                    }
-
-                    y: {
-                        var yPos = 0;
-                        for (var i = 0; i < resultsList.currentIndex && i < notesModel.count; i++) {
-                            var itemHeight = 48;
-                            if (i === root.expandedItemIndex && !root.deleteMode && !root.renameMode) {
-                                var isCreateBtn = i < filteredNotes.length && filteredNotes[i].isCreateButton;
-                                var optionCount = isCreateBtn ? 2 : 3;
-                                var listHeight = 36 * optionCount;
-                                itemHeight = 48 + 4 + listHeight + 8;
-                            }
-                            yPos += itemHeight;
-                        }
-                        return yPos;
-                    }
-
-                    Behavior on y {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration / 2
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-
-                    Behavior on height {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration
-                            easing.type: Easing.OutQuart
-                        }
-                    }
-
-                    onHeightChanged: {
-                        if (root.expandedItemIndex >= 0 && height > 48) {
-                            Qt.callLater(() => {
-                                root.adjustScrollForExpandedItem(root.expandedItemIndex);
-                            });
-                        }
-                    }
-
-                    StyledRect {
-                        anchors.fill: parent
-                        variant: {
-                            if (root.deleteMode) {
-                                return "error";
-                            } else if (root.renameMode) {
-                                return "secondary";
-                            } else if (root.expandedItemIndex >= 0 && root.selectedIndex === root.expandedItemIndex) {
-                                return "pane";
-                            } else {
-                                return "primary";
-                            }
-                        }
-                        radius: Styling.radius(4)
-                        visible: root.selectedIndex >= 0
-
-                        Behavior on color {
-                            enabled: Config.animDuration > 0
-                            ColorAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutQuart
-                            }
-                        }
-                    }
+                highlight: ResultsHighlight {
+                    view: resultsList
+                    expandedIndex: root.expandedItemIndex
+                    variant: root.deleteMode ? "error" : root.renameMode ? "secondary"
+                        : root.expandedItemIndex >= 0 && root.selectedIndex === root.expandedItemIndex ? "pane" : "primary"
                 }
 
                 highlightFollowsCurrentItem: false
@@ -1018,9 +923,9 @@ Item {
                     radius: 16
 
                     Behavior on height {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -1134,9 +1039,9 @@ Item {
                         spacing: 8
 
                         Behavior on anchors.rightMargin {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -1210,9 +1115,9 @@ Item {
                                     elide: Text.ElideRight
 
                                     Behavior on color {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         ColorAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
@@ -1300,9 +1205,9 @@ Item {
                         opacity: (isExpanded && !isInDeleteMode && !isInRenameMode) ? 1 : 0
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -1369,9 +1274,9 @@ Item {
                             radius: Styling.radius(0)
 
                             Behavior on Layout.preferredHeight {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutQuart
                                 }
                             }

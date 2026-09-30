@@ -33,6 +33,16 @@ Item {
     property Item dragOverlay: null
     property Item overviewRoot: null
 
+    function moveFloatingWindow(address, workspace, workspaceX, workspaceY) {
+        if (!root.monitorData || root.scale_ <= 0)
+            return;
+        const left = root.barPosition === "left" ? root.barReserved : 0;
+        const top = root.barPosition === "top" ? root.barReserved : 0;
+        Compositor.moveFloatingWindow(address, workspace,
+            (workspaceX / root.scale_ + left) / root.monitorData.logicalWidth,
+            (workspaceY / root.scale_ + top) / root.monitorData.logicalHeight);
+    }
+
     property var checkWindowMatched: function (addr) {
         return false;
     }
@@ -117,9 +127,9 @@ Item {
     }
 
     Behavior on horizontalScrollOffset {
-        enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0 && !root.isScrollDragging && !root.isWheelScrolling
+        enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0 && !root.isScrollDragging && !root.isWheelScrolling
         NumberAnimation {
-            duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+            duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
             easing.type: Easing.OutQuart
         }
     }
@@ -318,16 +328,16 @@ Item {
                     }
 
                     Behavior on x {
-                        enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0 && !windowDelegate.dragging && !windowDelegate.useOverridePosition
+                        enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0 && !windowDelegate.dragging && !windowDelegate.useOverridePosition
                         NumberAnimation {
-                            duration: (Config.animDuration !== undefined ? Config.animDuration : 0)
+                            duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0)
                             easing.type: Easing.OutQuart
                         }
                     }
                     Behavior on y {
-                        enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0 && !windowDelegate.dragging && !windowDelegate.useOverridePosition
+                        enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0 && !windowDelegate.dragging && !windowDelegate.useOverridePosition
                         NumberAnimation {
-                            duration: (Config.animDuration !== undefined ? Config.animDuration : 0)
+                            duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0)
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -359,9 +369,9 @@ Item {
                         visible: !Config.performance.windowPreview
 
                         Behavior on color {
-                            enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                            enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                             ColorAnimation {
-                                duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                                duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                             }
                         }
                     }
@@ -510,15 +520,8 @@ Item {
                                             const workspaceX = relativeX - root.horizontalScrollOffset - root.viewportOffset;
                                             const workspaceY = relativeY;
                                             
-                                            const actualX = workspaceX / scale_;
-                                            const actualY = workspaceY / scale_;
-                                            
-                                            const globalX = Math.round(actualX + ((monitorData && monitorData.x) || 0));
-                                            const globalY = Math.round(actualY + ((monitorData && monitorData.y) || 0));
-
                                             const address = (windowDelegate.windowData && windowDelegate.windowData.address !== undefined ? windowDelegate.windowData.address : "");
-                                            Compositor.dispatch(`movetoworkspacesilent ${targetWs}, address:${address}`);
-                                            Compositor.dispatch(`movepixel ${globalX} ${globalY}, address:${address}`);
+                                            root.moveFloatingWindow(address, targetWs, workspaceX, workspaceY);
                                             
                                         } else {
                                             Compositor.dispatch(`movetoworkspacesilent ${targetWs}, address:${(windowDelegate.windowData && windowDelegate.windowData.address !== undefined ? windowDelegate.windowData.address : "")}`);
@@ -545,13 +548,7 @@ Item {
                                         const workspaceX = relativeX - root.horizontalScrollOffset - root.viewportOffset;
                                         const workspaceY = relativeY;
                                         
-                                        const actualX = workspaceX / scale_;
-                                        const actualY = workspaceY / scale_;
-                                        
-                                        const globalX = Math.round(actualX + ((monitorData && monitorData.x) || 0));
-                                        const globalY = Math.round(actualY + ((monitorData && monitorData.y) || 0));
-
-                                        Compositor.dispatch(`movepixel ${globalX} ${globalY}, address:${(windowDelegate.windowData && windowDelegate.windowData.address !== undefined ? windowDelegate.windowData.address : "")}`);
+                                        root.moveFloatingWindow(windowDelegate.windowData.address, root.workspaceId, workspaceX, workspaceY);
                                         
                                         
                                         if (windowDelegate.originalParent) {

@@ -48,13 +48,6 @@ Singleton {
     function start() {
         if (root.active || root._pendingStart || prepareProcess.running || daemonProcess.running)
             return;
-        if (!ScreenRecorder.canRecordDirectly) {
-            Notifications.notifyInternal({
-                summary: "Replay",
-                body: "Direct screen capture is unavailable without the NixOS gpu-screen-recorder wrapper"
-            });
-            return;
-        }
         root._pendingStart = true;
         initialize();
         maybeStart();
@@ -91,9 +84,16 @@ Singleton {
     }
 
     function maybeStart() {
-        if (!root._pendingStart || !root._scanned || root.videosDir === "")
+        if (!root._pendingStart || !root._scanned || root.videosDir === "" || !ScreenRecorder.capabilitiesReady)
             return;
         root._pendingStart = false;
+        if (!ScreenRecorder.canRecordDirectly) {
+            Notifications.notifyInternal({
+                summary: "Replay",
+                body: "Direct screen capture is unavailable without the NixOS gpu-screen-recorder wrapper"
+            });
+            return;
+        }
         if (!root.active)
             prepareProcess.running = true;
     }
@@ -127,9 +127,14 @@ Singleton {
         }
     }
 
+    Connections {
+        target: ScreenRecorder
+        function onCapabilitiesReadyChanged() { root.maybeStart(); }
+    }
+
     Process {
         id: xdgVideosProcess
-        command: ["bash", "-c", "xdg-user-dir VIDEOS"]
+        command: ["xdg-user-dir", "VIDEOS"]
         running: false
         stdout: StdioCollector {}
         onExited: exitCode => {

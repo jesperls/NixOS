@@ -180,7 +180,7 @@ StyledRect {
         }
 
         Behavior on angle {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
                 duration: 200
                 easing.type: Easing.OutCubic
@@ -198,15 +198,15 @@ StyledRect {
         scale: root.iconScale
 
         Behavior on color {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             ColorAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuart
             }
         }
 
         Behavior on rotation {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
                 duration: 400
                 easing.type: Easing.OutCubic
@@ -214,7 +214,7 @@ StyledRect {
         }
 
         Behavior on scale {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
                 duration: 400
                 easing.type: Easing.OutCubic

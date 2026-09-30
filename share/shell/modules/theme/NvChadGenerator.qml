@@ -1,4 +1,5 @@
 import QtQuick
+import qs.modules.components
 import Quickshell
 import Quickshell.Io
 import qs.config
@@ -124,12 +125,12 @@ QtObject {
         (mode === "light" ? lightFile : darkFile).write(lua);
     }
 
-    property ThemeFile lightFile: ThemeFile {
+    property GeneratedFile lightFile: GeneratedFile {
         id: lightFile
         path: Paths.cacheHome + "/wal/base46-light.lua"
     }
 
-    property ThemeFile darkFile: ThemeFile {
+    property GeneratedFile darkFile: GeneratedFile {
         id: darkFile
         path: Paths.cacheHome + "/wal/base46-dark.lua"
     }

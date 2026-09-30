@@ -61,7 +61,6 @@ in
       script = ''
         set -e
 
-        # Gate: skip when the desktop is (mostly) idle so profiles capture real work
         ${lib.optionalString (cfg.minCpuLoad != null) ''
           load=$(cut -d' ' -f1 /proc/loadavg)
           threshold=$(awk -v l=${toString cfg.minCpuLoad} -v c="$(nproc)" 'BEGIN { printf "%.1f", l * c }')
@@ -87,8 +86,7 @@ in
           exit 0
         fi
 
-        # AMD Zen5 (amd_lbr_v2): taken-branch sampling + branch stack. The kernel
-        # docs' --pfm-events name isn't in nixpkgs' libpfm4, branches:k is equivalent.
+        # libpfm4 lacks the Zen 5 event name; branches:k selects the equivalent event.
         perf record -e branches:k \
           -a -N -b -c ${lib.escapeShellArg cfg.samplePeriod} -o "$raw" -- sleep ${lib.escapeShellArg cfg.duration}
 

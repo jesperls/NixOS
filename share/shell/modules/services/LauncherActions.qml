@@ -218,7 +218,7 @@ Singleton {
                 icon: Icons.lock,
                 comment: "Lock the session",
                 keywords: ["lock", "away"],
-                run: () => GlobalStates.lockscreenVisible = true
+                run: () => LockscreenService.lock()
             },
             {
                 name: "Suspend",

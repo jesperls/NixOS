@@ -52,242 +52,11 @@ Item {
     }
 
     component ToggleRow: SettingsToggleRow {}
-    component NumberInputRow: RowLayout {
-        id: numberInputRowRoot
-        property string label: ""
-        property int value: 0
-        property int minValue: 0
-        property int maxValue: 100
-        property string suffix: ""
-        signal valueEdited(int newValue)
-
-        Layout.fillWidth: true
-        spacing: 8
-        opacity: enabled ? 1.0 : 0.5
-
-        Text {
-            text: numberInputRowRoot.label
-            font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overBackground
-            Layout.fillWidth: true
-        }
-
-        StyledRect {
-            id: inputBackground
-            variant: "common"
-            Layout.preferredWidth: 60
-            Layout.preferredHeight: 32
-            radius: Styling.radius(-2)
 
 
-            Rectangle {
-                id: rejectOverlay
-                anchors.fill: parent
-                radius: inputBackground.radius
-                color: Colors.error
-                opacity: 0
-            }
-
-            SequentialAnimation {
-                id: rejectFlash
-                loops: 2
-                NumberAnimation {
-                    target: rejectOverlay
-                    property: "opacity"
-                    to: 0.4
-                    duration: 90
-                }
-                NumberAnimation {
-                    target: rejectOverlay
-                    property: "opacity"
-                    to: 0
-                    duration: 140
-                }
-            }
-
-            TextInput {
-                id: numberTextInput
-                anchors.fill: parent
-                anchors.margins: 8
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(0)
-                color: Colors.overBackground
-                selectByMouse: true
-                clip: true
-                verticalAlignment: TextInput.AlignVCenter
-                horizontalAlignment: TextInput.AlignHCenter
-                validator: IntValidator {
-                    bottom: numberInputRowRoot.minValue
-                    top: numberInputRowRoot.maxValue
-                }
-
-                readonly property int configValue: numberInputRowRoot.value
-                onConfigValueChanged: {
-                    if (!activeFocus && text !== configValue.toString()) {
-                        text = configValue.toString();
-                    }
-                }
-                Component.onCompleted: text = configValue.toString()
-
-                Keys.onReturnPressed: event => {
-                    if (acceptableInput) {
-                        event.accepted = false;
-                    } else {
-                        rejectFlash.restart();
-                    }
-                }
-                Keys.onEnterPressed: event => {
-                    if (acceptableInput) {
-                        event.accepted = false;
-                    } else {
-                        rejectFlash.restart();
-                    }
-                }
-                onActiveFocusChanged: {
-                    if (!activeFocus && !acceptableInput) {
-                        rejectFlash.restart();
-                        text = configValue.toString();
-                    }
-                }
-
-                onEditingFinished: {
-                    let newVal = parseInt(text);
-                    if (!isNaN(newVal)) {
-                        newVal = Math.max(numberInputRowRoot.minValue, Math.min(numberInputRowRoot.maxValue, newVal));
-                        numberInputRowRoot.valueEdited(newVal);
-                    }
-                }
-            }
-        }
-
-        Text {
-            text: numberInputRowRoot.suffix
-            font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overSurfaceVariant
-            visible: suffix !== ""
-        }
-    }
-
-    component DecimalInputRow: RowLayout {
-        id: decimalInputRowRoot
-        property string label: ""
-        property real value: 0.0
-        property real minValue: 0.0
-        property real maxValue: 1.0
-        property string suffix: ""
-        signal valueEdited(real newValue)
-
-        Layout.fillWidth: true
-        spacing: 8
-        opacity: enabled ? 1.0 : 0.5
-
-        Text {
-            text: decimalInputRowRoot.label
-            font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overBackground
-            Layout.fillWidth: true
-        }
-
-        StyledRect {
-            id: inputBackground
-            variant: "common"
-            Layout.preferredWidth: 60
-            Layout.preferredHeight: 32
-            radius: Styling.radius(-2)
-
-
-            Rectangle {
-                id: rejectOverlay
-                anchors.fill: parent
-                radius: inputBackground.radius
-                color: Colors.error
-                opacity: 0
-            }
-
-            SequentialAnimation {
-                id: rejectFlash
-                loops: 2
-                NumberAnimation {
-                    target: rejectOverlay
-                    property: "opacity"
-                    to: 0.4
-                    duration: 90
-                }
-                NumberAnimation {
-                    target: rejectOverlay
-                    property: "opacity"
-                    to: 0
-                    duration: 140
-                }
-            }
-
-            TextInput {
-                id: decimalTextInput
-                anchors.fill: parent
-                anchors.margins: 8
-                font.family: Config.theme.font
-                font.pixelSize: Styling.fontSize(0)
-                color: Colors.overBackground
-                selectByMouse: true
-                clip: true
-                verticalAlignment: TextInput.AlignVCenter
-                horizontalAlignment: TextInput.AlignHCenter
-                validator: DoubleValidator {
-                    bottom: decimalInputRowRoot.minValue
-                    top: decimalInputRowRoot.maxValue
-                    decimals: 2
-                }
-
-                readonly property real configValue: decimalInputRowRoot.value
-                onConfigValueChanged: {
-                    if (!activeFocus) {
-                        if (Math.abs(parseFloat(text) - configValue) > 0.001 || text === "")
-                            text = configValue.toFixed(1);
-                    }
-                }
-                Component.onCompleted: text = configValue.toFixed(1)
-
-                Keys.onReturnPressed: event => {
-                    if (acceptableInput) {
-                        event.accepted = false;
-                    } else {
-                        rejectFlash.restart();
-                    }
-                }
-                Keys.onEnterPressed: event => {
-                    if (acceptableInput) {
-                        event.accepted = false;
-                    } else {
-                        rejectFlash.restart();
-                    }
-                }
-                onActiveFocusChanged: {
-                    if (!activeFocus && !acceptableInput) {
-                        rejectFlash.restart();
-                        text = configValue.toFixed(1);
-                    }
-                }
-
-                onEditingFinished: {
-                    let newVal = parseFloat(text);
-                    if (!isNaN(newVal)) {
-                        newVal = Math.max(decimalInputRowRoot.minValue, Math.min(decimalInputRowRoot.maxValue, newVal));
-                        decimalInputRowRoot.valueEdited(newVal);
-                    }
-                }
-            }
-        }
-
-        Text {
-            text: decimalInputRowRoot.suffix
-            font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overSurfaceVariant
-            visible: suffix !== ""
-        }
+    component DecimalInputRow: SettingsNumberInputRow {
+        decimals: 2
+        maxValue: 1
     }
 
     component BorderGradientRow: ColumnLayout {
@@ -482,18 +251,18 @@ Item {
             x: root.colorPickerActive ? -30 : 0
 
             Behavior on x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuart
             }
         }
@@ -628,7 +397,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Border Size"
                                 value: Config.compositor.borderSize ?? 2
                                 minValue: 0
@@ -650,7 +419,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Rounding"
                                 value: Config.compositor.rounding ?? 16
                                 minValue: 0
@@ -663,7 +432,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Gaps In"
                                 value: Config.compositor.gapsIn ?? 5
                                 minValue: 0
@@ -675,7 +444,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Gaps Out"
                                 value: Config.compositor.gapsOut ?? 10
                                 minValue: 0
@@ -687,7 +456,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Border Angle"
                                 value: Config.compositor.borderAngle ?? 45
                                 minValue: 0
@@ -699,7 +468,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Inactive Angle"
                                 value: Config.compositor.inactiveBorderAngle ?? 45
                                 minValue: 0
@@ -810,7 +579,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Range"
                                 value: Config.compositor.shadowRange ?? 4
                                 minValue: 0
@@ -822,7 +591,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Offset X"
                                 value: parseInt((Config.compositor.shadowOffset ?? "0 0").split(" ")[0]) || 0
                                 minValue: -50
@@ -836,7 +605,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Offset Y"
                                 value: parseInt((Config.compositor.shadowOffset ?? "0 0").split(" ")[1]) || 0
                                 minValue: -50
@@ -850,7 +619,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Render Power"
                                 value: Config.compositor.shadowRenderPower ?? 3
                                 minValue: 1
@@ -923,7 +692,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Size"
                                 value: Config.compositor.blurSize ?? 8
                                 minValue: 0
@@ -934,7 +703,7 @@ Item {
                                 }
                             }
 
-                            NumberInputRow {
+                            SettingsNumberInputRow {
                                 label: "Passes"
                                 value: Config.compositor.blurPasses ?? 1
                                 minValue: 0
@@ -1076,18 +845,18 @@ Item {
             x: root.colorPickerActive ? 0 : 30
 
             Behavior on x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuart
             }
         }

@@ -327,9 +327,9 @@ FocusScope {
                     opacity: 1.0
 
                     Behavior on opacity {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -357,9 +357,9 @@ FocusScope {
                                 elide: Text.ElideRight
                                 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -416,9 +416,9 @@ FocusScope {
                                     opacity: perScreenCheckbox.checked ? 1.0 : 0.0
 
                                     Behavior on opacity {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         NumberAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
@@ -432,9 +432,9 @@ FocusScope {
                                         scale: perScreenCheckbox.checked ? 1.0 : 0.0
 
                                         Behavior on scale {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             NumberAnimation {
-                                                duration: Config.animDuration / 2
+                                                duration: Styling.animDuration / 2
                                                 easing.type: Easing.OutBack
                                                 easing.overshoot: 1.5
                                             }
@@ -469,9 +469,9 @@ FocusScope {
                     opacity: oledCheckbox.enabled ? 1.0 : 0.5
 
                     Behavior on opacity {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -498,9 +498,9 @@ FocusScope {
                                 leftPadding: 8
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -567,9 +567,9 @@ FocusScope {
                                     opacity: oledCheckbox.checked ? 1.0 : 0.0
 
                                     Behavior on opacity {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         NumberAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
@@ -583,9 +583,9 @@ FocusScope {
                                         scale: oledCheckbox.checked ? 1.0 : 0.0
 
                                         Behavior on scale {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             NumberAnimation {
-                                                duration: Config.animDuration / 2
+                                                duration: Styling.animDuration / 2
                                                 easing.type: Easing.OutBack
                                                 easing.overshoot: 1.5
                                             }
@@ -696,9 +696,9 @@ FocusScope {
                                     opacity: tintCheckbox.checked ? 1.0 : 0.0
 
                                     Behavior on opacity {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         NumberAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
@@ -712,9 +712,9 @@ FocusScope {
                                         scale: tintCheckbox.checked ? 1.0 : 0.0
 
                                         Behavior on scale {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             NumberAnimation {
-                                                duration: Config.animDuration / 2
+                                                duration: Styling.animDuration / 2
                                                 easing.type: Easing.OutBack
                                                 easing.overshoot: 1.5
                                             }
@@ -840,17 +840,17 @@ FocusScope {
                     z: 100
 
                     Behavior on x {
-                        enabled: Config.animDuration > 0 && !wallpaperGrid.isScrolling
+                        enabled: Styling.animDuration > 0 && !wallpaperGrid.isScrolling
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutQuart
                         }
                     }
 
                     Behavior on y {
-                        enabled: Config.animDuration > 0 && !wallpaperGrid.isScrolling
+                        enabled: Styling.animDuration > 0 && !wallpaperGrid.isScrolling
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -1106,17 +1106,17 @@ FocusScope {
                     }
 
                     Behavior on color {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         ColorAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     Behavior on scale {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration / 3
+                            duration: Styling.animDuration / 3
                             easing.type: Easing.OutCubic
                         }
                     }

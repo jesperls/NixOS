@@ -1,4 +1,5 @@
 import QtQuick
+import qs.modules.components
 import Quickshell
 import Quickshell.Io
 import qs.config
@@ -91,7 +92,7 @@ QtObject {
         kittyFile.write(conf);
     }
 
-    property ThemeFile kittyFile: ThemeFile {
+    property GeneratedFile kittyFile: GeneratedFile {
         id: kittyFile
         path: Paths.cachePath("kitty.conf")
         onWritten: reloadProcess.running = true

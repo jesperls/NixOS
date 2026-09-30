@@ -19,9 +19,9 @@ StyledRect {
     Component.onCompleted: EasyEffectsService.initialize()
 
     Behavior on implicitHeight {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutCubic
         }
     }

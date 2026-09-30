@@ -78,43 +78,10 @@ Item {
     property int selectedOptionIndex: 0
     property bool keyboardNavigation: false
 
-    onExpandedItemIndexChanged:
-    {}
 
     onVisibleChanged: {
         if (visible) {
             ClipboardService.list();
-        }
-    }
-
-    function adjustScrollForExpandedItem(index) {
-        if (index < 0 || index >= itemsModel.count)
-            return;
-
-        var itemY = 0;
-        for (var i = 0; i < index; i++) {
-            itemY += 48;  // All items before are collapsed (base height)
-        }
-
-        var itemData = itemsModel.get(index).itemData;
-        var optionsCount = 4;
-        if (itemData.isFile || itemData.isImage || ClipboardUtils.isUrl(itemData.preview)) {
-            optionsCount++;
-        }
-        var listHeight = 36 * Math.min(3, optionsCount);
-        var expandedHeight = 48 + 4 + listHeight + 8;
-
-        var maxContentY = Math.max(0, resultsList.contentHeight - resultsList.height);
-
-        var viewportTop = resultsList.contentY;
-        var viewportBottom = viewportTop + resultsList.height;
-
-        var itemBottom = itemY + expandedHeight;
-
-        if (itemY < viewportTop) {
-            resultsList.contentY = itemY;
-        } else if (itemBottom > viewportBottom) {
-            resultsList.contentY = Math.min(itemBottom - resultsList.height, maxContentY);
         }
     }
 
@@ -762,9 +729,9 @@ Item {
                     activeFocusOnTab: true
 
                     Behavior on width {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -823,9 +790,9 @@ Item {
                             verticalAlignment: Text.AlignVCenter
 
                             Behavior on opacity {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                     easing.type: Easing.OutQuart
                                 }
                             }
@@ -879,138 +846,24 @@ Item {
                     property bool enableScrollAnimation: true
 
                     Behavior on contentY {
-                        enabled: Config.animDuration > 0 && resultsList.enableScrollAnimation && !resultsList.moving
+                        enabled: Styling.animDuration > 0 && resultsList.enableScrollAnimation && !resultsList.moving
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     onCurrentIndexChanged: {
-                        if (currentIndex !== root.selectedIndex) {
-                            root.selectedIndex = currentIndex;
-                        }
-
-                        if (currentIndex >= 0) {
-                            var itemY = 0;
-                            for (var i = 0; i < currentIndex && i < itemsModel.count; i++) {
-                                var itemData = itemsModel.get(i).itemData;
-                                var itemHeight = 48;
-                                if (i === root.expandedItemIndex && !root.deleteMode && !root.aliasMode) {
-                                    var optionsCount = 4;
-                                    if (itemData.isFile || itemData.isImage || ClipboardUtils.isUrl(itemData.preview)) {
-                                        optionsCount++;
-                                    }
-                                    var listHeight = 36 * Math.min(3, optionsCount);
-                                    itemHeight = 48 + 4 + listHeight + 8;
-                                }
-                                itemY += itemHeight;
-                            }
-
-                            var currentItemHeight = 48;
-                            if (currentIndex === root.expandedItemIndex && !root.deleteMode && !root.aliasMode && currentIndex < itemsModel.count) {
-                                var itemData = itemsModel.get(currentIndex).itemData;
-                                var optionsCount = 4;
-                                if (itemData.isFile || itemData.isImage || ClipboardUtils.isUrl(itemData.preview)) {
-                                    optionsCount++;
-                                }
-                                var listHeight = 36 * Math.min(3, optionsCount);
-                                currentItemHeight = 48 + 4 + listHeight + 8;
-                            }
-
-                            var viewportTop = resultsList.contentY;
-                            var viewportBottom = viewportTop + resultsList.height;
-
-                            if (itemY < viewportTop) {
-                                resultsList.contentY = itemY;
-                            } else if (itemY + currentItemHeight > viewportBottom) {
-                                resultsList.contentY = itemY + currentItemHeight - resultsList.height;
-                            }
-                        }
+                        if (currentIndex !== root.selectedIndex) root.selectedIndex = currentIndex;
+                        if (currentIndex >= 0 && currentIndex < count)
+                            positionViewAtIndex(currentIndex, ListView.Contain);
                     }
 
-                    highlight: Item {
-                        width: resultsList.width
-                        height: {
-                            let baseHeight = 48;
-                            if (resultsList.currentIndex === root.expandedItemIndex && !root.deleteMode && !root.aliasMode) {
-                                var itemData = itemsModel.get(resultsList.currentIndex).itemData;
-                                var optionsCount = 4;
-                                if (itemData.isFile || itemData.isImage || ClipboardUtils.isUrl(itemData.preview)) {
-                                    optionsCount++;
-                                }
-                                var listHeight = 36 * Math.min(3, optionsCount);
-                                return baseHeight + 4 + listHeight + 8;
-                            }
-                            return baseHeight;
-                        }
-
-                        y: {
-                            var yPos = 0;
-                            for (var i = 0; i < resultsList.currentIndex && i < itemsModel.count; i++) {
-                                var itemHeight = 48;
-                                if (i === root.expandedItemIndex && !root.deleteMode && !root.aliasMode) {
-                                    var itemData = itemsModel.get(i).itemData;
-                                    var optionsCount = 4;
-                                    if (itemData.isFile || itemData.isImage || ClipboardUtils.isUrl(itemData.preview)) {
-                                        optionsCount++;
-                                    }
-                                    var listHeight = 36 * Math.min(3, optionsCount);
-                                    itemHeight = 48 + 4 + listHeight + 8;
-                                }
-                                yPos += itemHeight;
-                            }
-                            return yPos;
-                        }
-
-                        Behavior on y {
-                            enabled: Config.animDuration > 0
-                            NumberAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-
-                        Behavior on height {
-                            enabled: Config.animDuration > 0
-                            NumberAnimation {
-                                duration: Config.animDuration
-                                easing.type: Easing.OutQuart
-                            }
-                        }
-
-                        onHeightChanged: {
-                            if (root.expandedItemIndex >= 0 && height > 48) {
-                                Qt.callLater(() => {
-                                    root.adjustScrollForExpandedItem(root.expandedItemIndex);
-                                });
-                            }
-                        }
-
-                        StyledRect {
-                            anchors.fill: parent
-                            variant: {
-                                if (root.deleteMode) {
-                                    return "error";
-                                } else if (root.aliasMode) {
-                                    return "secondary";
-                                } else if (root.expandedItemIndex >= 0 && root.selectedIndex === root.expandedItemIndex) {
-                                    return "pane";
-                                } else {
-                                    return "primary";
-                                }
-                            }
-                            radius: Styling.radius(4)
-                            visible: root.selectedIndex >= 0
-
-                            Behavior on color {
-                                enabled: Config.animDuration > 0
-                                ColorAnimation {
-                                    duration: Config.animDuration / 2
-                                    easing.type: Easing.OutQuart
-                                }
-                            }
-                        }
+                    highlight: ResultsHighlight {
+                        view: resultsList
+                        expandedIndex: root.expandedItemIndex
+                        variant: root.deleteMode ? "error" : root.aliasMode ? "secondary"
+                            : root.expandedItemIndex >= 0 && root.selectedIndex === root.expandedItemIndex ? "pane" : "primary"
                     }
 
                     highlightFollowsCurrentItem: false
@@ -1039,17 +892,17 @@ Item {
                         radius: 16
 
                         Behavior on y {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration / 2
+                                duration: Styling.animDuration / 2
                                 easing.type: Easing.OutCubic
                             }
                         }
 
                         Behavior on height {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -1217,18 +1070,18 @@ Item {
                                     x: isInAliasMode ? 0 : 80
 
                                     Behavior on x {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         NumberAnimation {
-                                            duration: Config.animDuration
+                                            duration: Styling.animDuration
                                             easing.type: Easing.OutQuart
                                         }
                                     }
                                 }
 
                                 Behavior on opacity {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     NumberAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -1259,16 +1112,16 @@ Item {
                                     height: 32 - activeButtonMargin * 2
 
                                     Behavior on idx1X {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         NumberAnimation {
-                                            duration: Config.animDuration / 3
+                                            duration: Styling.animDuration / 3
                                             easing.type: Easing.OutSine
                                         }
                                     }
                                     Behavior on idx2X {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         NumberAnimation {
-                                            duration: Config.animDuration
+                                            duration: Styling.animDuration
                                             easing.type: Easing.OutSine
                                         }
                                     }
@@ -1308,9 +1161,9 @@ Item {
                                             textFormat: Text.RichText
 
                                             Behavior on color {
-                                                enabled: Config.animDuration > 0
+                                                enabled: Styling.animDuration > 0
                                                 ColorAnimation {
-                                                    duration: Config.animDuration / 2
+                                                    duration: Styling.animDuration / 2
                                                     easing.type: Easing.OutQuart
                                                 }
                                             }
@@ -1346,9 +1199,9 @@ Item {
                                             textFormat: Text.RichText
 
                                             Behavior on color {
-                                                enabled: Config.animDuration > 0
+                                                enabled: Styling.animDuration > 0
                                                 ColorAnimation {
-                                                    duration: Config.animDuration / 2
+                                                    duration: Styling.animDuration / 2
                                                     easing.type: Easing.OutQuart
                                                 }
                                             }
@@ -1414,9 +1267,9 @@ Item {
                             opacity: (isExpanded && !isInDeleteMode && !isInAliasMode) ? 1 : 0
 
                             Behavior on opacity {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutQuart
                                 }
                             }
@@ -1434,9 +1287,9 @@ Item {
                                 radius: Styling.radius(0)
 
                                 Behavior on Layout.preferredHeight {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     NumberAnimation {
-                                        duration: Config.animDuration
+                                        duration: Styling.animDuration
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -1590,9 +1443,9 @@ Item {
                             spacing: 8
 
                             Behavior on anchors.rightMargin {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 NumberAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutQuart
                                 }
                             }
@@ -1859,9 +1712,9 @@ Item {
                                     opacity: 0.8
 
                                     Behavior on color {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         ColorAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
@@ -2154,9 +2007,9 @@ Item {
                                 bottomRightRadius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -2533,9 +2386,9 @@ Item {
                                     radius: Styling.radius(4)
 
                                     Behavior on color {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         ColorAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
@@ -2933,9 +2786,9 @@ Item {
                                 }
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -2962,9 +2815,9 @@ Item {
                                     textFormat: Text.RichText
 
                                     Behavior on color {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         ColorAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }
@@ -2980,9 +2833,9 @@ Item {
                                 radius: Styling.radius(0)
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutQuart
                                     }
                                 }
@@ -3025,9 +2878,9 @@ Item {
                                     textFormat: Text.RichText
 
                                     Behavior on color {
-                                        enabled: Config.animDuration > 0
+                                        enabled: Styling.animDuration > 0
                                         ColorAnimation {
-                                            duration: Config.animDuration / 2
+                                            duration: Styling.animDuration / 2
                                             easing.type: Easing.OutQuart
                                         }
                                     }

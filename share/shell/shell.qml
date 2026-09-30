@@ -244,6 +244,9 @@ ShellRoot {
     Component.onCompleted: Qt.callLater(() => {
         void CaffeineService.inhibit;
         void IdleService.lockCmd;
+        void LockscreenService.ipc;
+        void NightLightService.active;
+        void GameModeService.workspaces;
         void GlobalShortcuts.appId;
         void ClipboardService.active;
         void CompositorTheme.outputPath;

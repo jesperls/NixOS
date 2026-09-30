@@ -3,5 +3,6 @@ __pycache__
 deltatune-linux
 wallpaper-picker
 
-/result
-/result-*
+result
+result-*
+*.qsb

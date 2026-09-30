@@ -27,7 +27,7 @@ ActionGrid {
         {
             icon: Icons.lock,
             tooltip: "Lock Session",
-            command: "loginctl lock-session"
+            run: () => LockscreenService.lock()
         },
         {
             icon: Icons.suspend,
@@ -57,10 +57,12 @@ ActionGrid {
     ]
 
     onActionTriggered: action => {
-        if (action.dispatch) {
+        if (action.run) {
+            action.run();
+        } else if (action.dispatch) {
             Compositor.dispatch(action.dispatch);
         } else if (action.command) {
-            actionProcess.command = ["/bin/bash", "-c", action.command];
+            actionProcess.command = ["bash", "-c", action.command];
             actionProcess.running = true;
         }
         root.itemSelected();

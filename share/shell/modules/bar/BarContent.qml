@@ -213,31 +213,31 @@ Item {
         }
 
         Behavior on x {
-            enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0 && root.orientation === "vertical"
+            enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0 && root.orientation === "vertical"
             NumberAnimation {
-                duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 4
+                duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 4
                 easing.type: Easing.OutCubic
             }
         }
         Behavior on y {
-            enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0 && root.orientation === "horizontal"
+            enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0 && root.orientation === "horizontal"
             NumberAnimation {
-                duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 4
+                duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 4
                 easing.type: Easing.OutCubic
             }
         }
 
         Behavior on width {
-            enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0 && root.orientation === "vertical"
+            enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0 && root.orientation === "vertical"
             NumberAnimation {
-                duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 4
+                duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 4
                 easing.type: Easing.OutCubic
             }
         }
         Behavior on height {
-            enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0 && root.orientation === "horizontal"
+            enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0 && root.orientation === "horizontal"
             NumberAnimation {
-                duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 4
+                duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 4
                 easing.type: Easing.OutCubic
             }
         }
@@ -260,9 +260,9 @@ Item {
 
             opacity: root.reveal ? 1 : 0
             Behavior on opacity {
-                enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                 NumberAnimation {
-                    duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                    duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                     easing.type: Easing.OutCubic
                 }
             }
@@ -287,16 +287,16 @@ Item {
                     return 0;
                 }
                 Behavior on x {
-                    enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                    enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                     NumberAnimation {
-                        duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                        duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                         easing.type: Easing.OutCubic
                     }
                 }
                 Behavior on y {
-                    enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                    enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                     NumberAnimation {
-                        duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                        duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -402,9 +402,9 @@ Item {
                                         radius: (parent.radius !== undefined ? parent.radius : 0)
 
                                         Behavior on opacity {
-                                            enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                                            enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                                             NumberAnimation {
-                                                duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                                                duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                                             }
                                         }
                                     }
@@ -420,16 +420,16 @@ Item {
 
                                     rotation: root.pinned ? 0 : 45
                                     Behavior on rotation {
-                                        enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                                        enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                                         NumberAnimation {
-                                            duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                                            duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                                         }
                                     }
 
                                     Behavior on color {
-                                        enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                                        enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                                         ColorAnimation {
-                                            duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                                            duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                                         }
                                     }
                                 }
@@ -661,9 +661,9 @@ Item {
                                                 radius: (parent.radius !== undefined ? parent.radius : 0)
 
                                                 Behavior on opacity {
-                                                    enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                                                    enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                                                     NumberAnimation {
-                                                        duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                                                        duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                                                     }
                                                 }
                                             }
@@ -679,16 +679,16 @@ Item {
 
                                             rotation: root.pinned ? 0 : 45
                                             Behavior on rotation {
-                                                enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                                                enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                                                 NumberAnimation {
-                                                    duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                                                    duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                                                 }
                                             }
 
                                             Behavior on color {
-                                                enabled: (Config.animDuration !== undefined ? Config.animDuration : 0) > 0
+                                                enabled: (Styling.animDuration !== undefined ? Styling.animDuration : 0) > 0
                                                 ColorAnimation {
-                                                    duration: (Config.animDuration !== undefined ? Config.animDuration : 0) / 2
+                                                    duration: (Styling.animDuration !== undefined ? Styling.animDuration : 0) / 2
                                                 }
                                             }
                                         }

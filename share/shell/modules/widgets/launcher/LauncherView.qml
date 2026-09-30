@@ -419,9 +419,9 @@ Rectangle {
         }
 
         Behavior on height {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
@@ -615,9 +615,9 @@ Rectangle {
                 property bool enableScrollAnimation: true
 
                 Behavior on contentY {
-                    enabled: Config.animDuration > 0 && resultsList.enableScrollAnimation && !resultsList.moving
+                    enabled: Styling.animDuration > 0 && resultsList.enableScrollAnimation && !resultsList.moving
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -681,9 +681,9 @@ Rectangle {
                     radius: 16
 
                     Behavior on height {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }
@@ -778,9 +778,9 @@ Rectangle {
                                 color: appLauncher.selectedIndex === index ? Styling.srItem("primary") : Colors.overBackground
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutCubic
                                     }
                                 }
@@ -809,9 +809,9 @@ Rectangle {
                                 elide: Text.ElideRight
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutCubic
                                     }
                                 }
@@ -835,9 +835,9 @@ Rectangle {
                                 visible: (Config.launcher.showAppComments ?? true) && text !== ""
 
                                 Behavior on color {
-                                    enabled: Config.animDuration > 0
+                                    enabled: Styling.animDuration > 0
                                     ColorAnimation {
-                                        duration: Config.animDuration / 2
+                                        duration: Styling.animDuration / 2
                                         easing.type: Easing.OutCubic
                                     }
                                 }
@@ -857,9 +857,9 @@ Rectangle {
                         opacity: isExpanded ? 1 : 0
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration
+                                duration: Styling.animDuration
                                 easing.type: Easing.OutQuart
                             }
                         }
@@ -924,9 +924,9 @@ Rectangle {
                                     z: -1
                                 }
 
-                                highlightMoveDuration: Config.animDuration > 0 ? Config.animDuration / 2 : 0
+                                highlightMoveDuration: Styling.animDuration > 0 ? Styling.animDuration / 2 : 0
                                 highlightMoveVelocity: -1
-                                highlightResizeDuration: Config.animDuration / 2
+                                highlightResizeDuration: Styling.animDuration / 2
                                 highlightResizeVelocity: -1
 
                                 delegate: Item {
@@ -959,9 +959,9 @@ Rectangle {
                                                 }
 
                                                 Behavior on color {
-                                                    enabled: Config.animDuration > 0
+                                                    enabled: Styling.animDuration > 0
                                                     ColorAnimation {
-                                                        duration: Config.animDuration / 2
+                                                        duration: Styling.animDuration / 2
                                                         easing.type: Easing.OutQuart
                                                     }
                                                 }
@@ -983,9 +983,9 @@ Rectangle {
                                                 maximumLineCount: 1
 
                                                 Behavior on color {
-                                                    enabled: Config.animDuration > 0
+                                                    enabled: Styling.animDuration > 0
                                                     ColorAnimation {
-                                                        duration: Config.animDuration / 2
+                                                        duration: Styling.animDuration / 2
                                                         easing.type: Easing.OutQuart
                                                     }
                                                 }
@@ -1041,17 +1041,17 @@ Rectangle {
                     }
 
                     Behavior on y {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     Behavior on height {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         NumberAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutQuart
                         }
                     }

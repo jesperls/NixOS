@@ -27,11 +27,7 @@
         type = lib.types.nullOr lib.types.str;
         default = null;
         example = "sv_SE.UTF-8";
-        description = ''
-          Locale used for the regional LC_* categories (dates, numbers, paper,
-          addresses) while messages stay in `locale`. Null keeps `locale`
-          everywhere.
-        '';
+        description = "Locale for regional LC_* categories; null uses the system locale.";
       };
       timeZone = lib.mkOption {
         type = lib.types.str;
@@ -139,19 +135,19 @@
       type = lib.types.listOf (
         lib.types.submodule {
           options = {
-            name = lib.mkOption { type = lib.types.str; };
-            resolution = lib.mkOption { type = lib.types.str; };
-            refreshRate = lib.mkOption { type = lib.types.int; };
+            name = lib.mkOption { type = lib.types.nonEmptyStr; };
+            resolution = lib.mkOption { type = lib.types.strMatching "[1-9][0-9]*x[1-9][0-9]*"; };
+            refreshRate = lib.mkOption { type = lib.types.ints.positive; };
             position = lib.mkOption {
               type = lib.types.str;
               default = "0x0";
             };
             scale = lib.mkOption {
-              type = lib.types.float;
+              type = lib.types.addCheck lib.types.number (value: value > 0);
               default = 1.0;
             };
             transform = lib.mkOption {
-              type = lib.types.nullOr lib.types.int;
+              type = lib.types.nullOr (lib.types.ints.between 0 7);
               default = null;
             };
             vrr = lib.mkOption {

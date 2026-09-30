@@ -138,9 +138,9 @@ PanelWindow {
         opacity: GlobalStates.cheatsheetVisible ? 0.5 : 0
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
@@ -166,17 +166,17 @@ PanelWindow {
         scale: GlobalStates.cheatsheetVisible ? 1 : 0.9
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
 
         Behavior on scale {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutBack
                 easing.overshoot: 1.2
             }

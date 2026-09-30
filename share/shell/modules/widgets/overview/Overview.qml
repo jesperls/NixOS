@@ -162,10 +162,7 @@ Item {
     readonly property real workspaceImplicitWidth: {
         if (!monitorData)
             return 200;
-        const isRotated = (monitorData.transform % 2 === 1);
-        const monitorScale = monitorData.scale || 1.0;
-        const width = isRotated ? (monitor?.height || 1920) : (monitor?.width || 1920);
-        let scaledWidth = (width / monitorScale) * scale;
+        let scaledWidth = monitorData.logicalWidth * scale;
         if (barPosition === "left" || barPosition === "right") {
             scaledWidth -= barReserved * scale;
         }
@@ -175,10 +172,7 @@ Item {
     readonly property real workspaceImplicitHeight: {
         if (!monitorData)
             return 150;
-        const isRotated = (monitorData.transform % 2 === 1);
-        const monitorScale = monitorData.scale || 1.0;
-        const height = isRotated ? (monitor?.width || 1080) : (monitor?.height || 1080);
-        let scaledHeight = (height / monitorScale) * scale;
+        let scaledHeight = monitorData.logicalHeight * scale;
         if (barPosition === "top" || barPosition === "bottom") {
             scaledHeight -= barReserved * scale;
         }
@@ -334,9 +328,6 @@ Item {
                     onDragStarted: overviewRoot.draggingFromWorkspace = windowData?.workspace.id || -1
                     onDragFinished: targetWorkspace => {
                         overviewRoot.draggingFromWorkspace = -1;
-                        if (targetWorkspace !== -1 && targetWorkspace !== windowData?.workspace.id) {
-                            Compositor.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${windowData?.address}`);
-                        }
                     }
                     onWindowClicked: {
                         Visibilities.setActiveModule("", true);
@@ -366,16 +357,16 @@ Item {
                 border.color: overviewRoot.activeBorderColor
 
                 Behavior on x {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }
                 Behavior on y {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }

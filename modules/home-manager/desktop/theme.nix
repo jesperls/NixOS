@@ -28,6 +28,9 @@ let
       '';
 
   shellPalette = osConfig.mySystem.desktop.shell.enable;
+  paletteImport = lib.optionalString shellPalette ''
+    @import url("file://${config.xdg.cacheHome}/pangu/gtk.css");
+  '';
 
   qtctSettings = ver: {
     Appearance = {
@@ -60,6 +63,8 @@ in
     };
     gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
     gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
+    gtk3.extraCss = paletteImport;
+    gtk4.extraCss = paletteImport;
   };
 
   qt = {
@@ -86,8 +91,6 @@ in
     pkgs.libappindicator-gtk3
   ];
 
-  # The gtk module owns the theme/icon/cursor names and the sans font; only
-  # the keys it does not set live here.
   dconf.settings."org/gnome/desktop/interface" = {
     color-scheme = lib.mkIf (!shellPalette) "prefer-dark";
     monospace-font-name = "${theme.fonts.monospace} ${toString theme.fonts.size}";

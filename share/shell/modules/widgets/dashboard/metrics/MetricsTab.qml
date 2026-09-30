@@ -853,9 +853,9 @@ Rectangle {
                             }
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutCubic
                                 }
                             }
@@ -897,9 +897,9 @@ Rectangle {
                             }
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutCubic
                                 }
                             }

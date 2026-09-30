@@ -19,8 +19,6 @@ WlSessionLockSurface {
 
     property bool startAnim: false
     property bool authenticating: false
-    property string errorMessage: ""
-    property int failLockSecondsLeft: 0
 
     color: "transparent"
 
@@ -43,9 +41,9 @@ WlSessionLockSurface {
         visible: true
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutQuint
             }
         }
@@ -66,36 +64,9 @@ WlSessionLockSurface {
         }
 
         Behavior on zoomScale {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
-                easing.type: Easing.OutExpo
-            }
-        }
-    }
-
-    ScreencopyView {
-        id: screencopyBackground
-        anchors.fill: parent
-        captureSource: root.screen
-        live: false
-        paintCursor: false
-        visible: startAnim  // Visible solo cuando startAnim es true
-        z: 0
-
-        property real zoomScale: startAnim ? 1.25 : 1.0
-
-        transform: Scale {
-            origin.x: screencopyBackground.width / 2
-            origin.y: screencopyBackground.height / 2
-            xScale: screencopyBackground.zoomScale
-            yScale: screencopyBackground.zoomScale
-        }
-
-        Behavior on zoomScale {
-            enabled: Config.animDuration > 0
-            NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutExpo
             }
         }
@@ -118,17 +89,17 @@ WlSessionLockSurface {
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutQuint
             }
         }
 
         Behavior on zoomScale {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutExpo
             }
         }
@@ -177,17 +148,17 @@ WlSessionLockSurface {
                         layer.effect: BgShadow {}
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration * 2
+                                duration: Styling.animDuration * 2
                                 easing.type: Easing.OutExpo
                             }
                         }
 
                         Behavior on slideOffset {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration * 2
+                                duration: Styling.animDuration * 2
                                 easing.type: Easing.OutExpo
                             }
                         }
@@ -215,17 +186,17 @@ WlSessionLockSurface {
                         layer.effect: BgShadow {}
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration * 2
+                                duration: Styling.animDuration * 2
                                 easing.type: Easing.OutExpo
                             }
                         }
 
                         Behavior on slideOffset {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration * 2
+                                duration: Styling.animDuration * 2
                                 easing.type: Easing.OutExpo
                             }
                         }
@@ -253,17 +224,17 @@ WlSessionLockSurface {
                         layer.effect: BgShadow {}
 
                         Behavior on opacity {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration * 2
+                                duration: Styling.animDuration * 2
                                 easing.type: Easing.OutExpo
                             }
                         }
 
                         Behavior on slideOffset {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration * 2
+                                duration: Styling.animDuration * 2
                                 easing.type: Easing.OutExpo
                             }
                         }
@@ -291,17 +262,17 @@ WlSessionLockSurface {
                 }
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration * 2
+                        duration: Styling.animDuration * 2
                         easing.type: Easing.OutExpo
                     }
                 }
 
                 Behavior on slideOffset {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration * 2
+                        duration: Styling.animDuration * 2
                         easing.type: Easing.OutExpo
                     }
                 }
@@ -320,9 +291,9 @@ WlSessionLockSurface {
                 visible: (Config.lockscreen.showUsername ?? true) && usernameCollector.text.trim() !== ""
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration * 2
+                        duration: Styling.animDuration * 2
                         easing.type: Easing.OutExpo
                     }
                 }
@@ -358,17 +329,17 @@ WlSessionLockSurface {
         opacity: startAnim ? 1 : 0
 
         Behavior on anchors.leftMargin {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutExpo
             }
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutQuad
             }
         }
@@ -399,33 +370,33 @@ WlSessionLockSurface {
         scale: startAnim ? 1 : 0.92
 
         Behavior on anchors.topMargin {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutExpo
             }
         }
 
         Behavior on anchors.bottomMargin {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutExpo
             }
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutQuad
             }
         }
 
         Behavior on scale {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration * 2
+                duration: Styling.animDuration * 2
                 easing.type: Easing.OutBack
                 easing.overshoot: 1.2
             }
@@ -523,9 +494,9 @@ WlSessionLockSurface {
                             rotation: 0
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutCubic
                                 }
                             }
@@ -562,17 +533,17 @@ WlSessionLockSurface {
                             enabled: !authenticating
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutCubic
                                 }
                             }
 
                             Behavior on placeholderTextColor {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration
+                                    duration: Styling.animDuration
                                     easing.type: Easing.OutQuad
                                 }
                             }
@@ -585,7 +556,6 @@ WlSessionLockSurface {
                                 passwordInput.text = "";
 
                                 authenticating = true;
-                                errorMessage = "";
                                 pamAuth.start();
                             }
                         }
@@ -641,7 +611,7 @@ WlSessionLockSurface {
 
     Timer {
         id: unlockTimer
-        interval: Config.animDuration * 2  // Wait for zoom out (1x) + fade out (1x)
+        interval: Styling.animDuration * 2  // Wait for zoom out (1x) + fade out (1x)
         onTriggered: {
             GlobalStates.lockscreenVisible = false;
         }
@@ -658,58 +628,9 @@ WlSessionLockSurface {
         }
     }
 
-    Process {
-        id: hostnameProc
-        command: ["hostname"]
-        running: true
-
-        stdout: StdioCollector {
-            id: hostnameCollector
-            waitForEnd: true
-        }
-    }
-
     QtObject {
         id: authPasswordHolder
         property string password: ""
-    }
-
-    Process {
-        id: failLockCheck
-        command: ["bash", "-c", `faillock --user '${usernameCollector.text.trim()}' 2>/dev/null | grep -oP 'left \\K[0-9]+' | head -1`]
-        running: false
-
-        stdout: StdioCollector {
-            id: failLockCollector
-
-            onStreamFinished: {
-                const output = text.trim();
-                const seconds = parseInt(output);
-
-                if (!isNaN(seconds) && seconds > 0) {
-                    failLockSecondsLeft = seconds;
-                    failLockCountdown.start();
-                } else {
-                    failLockSecondsLeft = 0;
-                }
-            }
-        }
-    }
-
-    Timer {
-        id: failLockCountdown
-        interval: 1000
-        repeat: true
-        running: false
-
-        onTriggered: {
-            if (failLockSecondsLeft > 0) {
-                failLockSecondsLeft--;
-            } else {
-                stop();
-                errorMessage = "";
-            }
-        }
     }
 
     PamContext {
@@ -732,12 +653,10 @@ WlSessionLockSurface {
 
                 unlockTimer.start();
 
-                errorMessage = "";
                 authenticating = false;
             } else {
-                errorMessage = "Authentication failed";
                 console.warn("PAM auth failed with result:", result);
-                if (Config.animDuration > 0) {
+                if (Styling.animDuration > 0) {
                     wrongPasswordAnim.start();
                 } else {
                     passwordInput.text = "";
@@ -785,8 +704,6 @@ WlSessionLockSurface {
     }
 
     Component.onCompleted: {
-        screencopyBackground.captureFrame();
-
         startAnim = true;
         passwordInput.forceActiveFocus();
     }

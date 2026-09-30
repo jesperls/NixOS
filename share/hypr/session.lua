@@ -1,5 +1,3 @@
--- Layout state lives under XDG_DATA_HOME so layout_modes survive relogin;
--- stale slots/weights are pruned on each scan (layouts.lua).
 local data = os.getenv("XDG_DATA_HOME") or (os.getenv("HOME") .. "/.local/share")
 local dir = data .. "/pangu"
 local path = dir .. "/hypr-layout-state.lua"
@@ -13,6 +11,13 @@ if chunk then
     M.data = result
   end
 end
+
+local instance = os.getenv("HYPRLAND_INSTANCE_SIGNATURE") or ""
+if M.data.instance ~= instance then -- Window IDs are reused across compositor instances.
+  M.data.slots = nil
+  M.data.weights = nil
+end
+M.data.instance = instance
 
 function M.table(key)
   local value = M.data[key]

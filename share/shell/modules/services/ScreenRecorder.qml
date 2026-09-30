@@ -9,7 +9,8 @@ QtObject {
 
     property bool isRecording: false
     property string duration: ""
-    property bool canRecordDirectly: true  // Optimistic default
+    property bool canRecordDirectly: false
+    property bool capabilitiesReady: false
 
     property bool _initialized: false
 
@@ -25,10 +26,10 @@ QtObject {
         id: checkCapabilitiesProcess
         command: ["bash", "-c", "if [ -f /run/current-system/sw/bin/nixos-version ]; then if [ -x /run/wrappers/bin/gsr-kms-server ]; then echo true; else echo false; fi; else echo true; fi"]
         running: false
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root.canRecordDirectly = (text.trim() === "true");
-            }
+        stdout: StdioCollector {}
+        onExited: code => {
+            root.canRecordDirectly = code === 0 && checkCapabilitiesProcess.stdout.text.trim() === "true";
+            root.capabilitiesReady = true;
         }
     }
 
@@ -37,7 +38,7 @@ QtObject {
 
     property Process xdgVideosProcess: Process {
         id: xdgVideosProcess
-        command: ["bash", "-c", "xdg-user-dir VIDEOS"]
+        command: ["xdg-user-dir", "VIDEOS"]
         running: false
         stdout: StdioCollector {
         }

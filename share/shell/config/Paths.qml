@@ -13,10 +13,11 @@ Singleton {
 
     readonly property string configHome: Quickshell.env("XDG_CONFIG_HOME") || (home + "/.config")
     readonly property string cacheHome: Quickshell.env("XDG_CACHE_HOME") || (home + "/.cache")
+    readonly property string dataHome: Quickshell.env("XDG_DATA_HOME") || (home + "/.local/share")
 
     readonly property string configDir: configHome + "/pangu"
     readonly property string cacheDir: cacheHome + "/pangu"
-    readonly property string dataDir: (Quickshell.env("XDG_DATA_HOME") || (home + "/.local/share")) + "/pangu"
+    readonly property string dataDir: dataHome + "/pangu"
 
     readonly property string notesDir: dataDir + "-notes"
 

@@ -230,9 +230,9 @@ Rectangle {
                     boundsBehavior: Flickable.StopAtBounds
 
                     Behavior on contentY {
-                        enabled: Config.animDuration > 0 && !sidebarFlickable.moving
+                        enabled: Styling.animDuration > 0 && !sidebarFlickable.moving
                         NumberAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                             easing.type: Easing.OutCubic
                         }
                     }
@@ -256,9 +256,9 @@ Rectangle {
                         visible: root.selectedIndex >= 0 && root.selectedIndex < root.filteredSections.length
 
                         Behavior on y {
-                            enabled: Config.animDuration > 0
+                            enabled: Styling.animDuration > 0
                             NumberAnimation {
-                                duration: Config.animDuration / 2
+                                duration: Styling.animDuration / 2
                                 easing.type: Easing.OutCubic
                             }
                         }
@@ -303,9 +303,9 @@ Rectangle {
                                         visible: sidebarButton.modelData.isIcon && (root.searchQuery.length === 0 || !sidebarButton.modelData.subSection)
 
                                         Behavior on color {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             ColorAnimation {
-                                                duration: Config.animDuration
+                                                duration: Styling.animDuration
                                                 easing.type: Easing.OutCubic
                                             }
                                         }
@@ -348,9 +348,9 @@ Rectangle {
                                             color: sidebarButton.isActive ? Styling.srItem("overprimary") : Styling.srItem("common")
 
                                             Behavior on color {
-                                                enabled: Config.animDuration > 0
+                                                enabled: Styling.animDuration > 0
                                                 ColorAnimation {
-                                                    duration: Config.animDuration
+                                                    duration: Styling.animDuration
                                                     easing.type: Easing.OutCubic
                                                 }
                                             }
@@ -490,9 +490,9 @@ Rectangle {
 
                 opacity: status === Loader.Ready ? 1 : 0
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutCubic
                     }
                 }

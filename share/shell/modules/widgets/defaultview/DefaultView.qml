@@ -61,9 +61,9 @@ Item {
     property real mainRowMargin: 16
 
     Behavior on mainRowMargin {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutBack
             easing.overshoot: 1.2
         }
@@ -86,9 +86,9 @@ Item {
     implicitHeight: hasActiveNotifications ? mainRowHeight + notificationContainerHeight : mainRowHeight
 
     Behavior on implicitWidth {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutBack
             easing.overshoot: 1.2
         }
@@ -192,9 +192,9 @@ Item {
                 onIsNavigatingChanged: root.isNavigating = isNavigating
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }

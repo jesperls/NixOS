@@ -3,8 +3,6 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./swap.nix
-    ./theme.nix
     ./monitors.nix
     ./audio.nix
 
@@ -19,13 +17,11 @@
     ../../modules/nixos/performance/autofdo.nix
     ../../modules/nixos/performance/kernel.nix
 
-    ../../modules/nixos/programs/coolercontrol.nix
     ../../modules/nixos/programs/filemanager.nix
     ../../modules/nixos/programs/gaming.nix
     ../../modules/nixos/programs/lutris.nix
 
     ../../modules/nixos/services/dlna.nix
-    ../../modules/nixos/services/flatpak.nix
     ../../modules/nixos/services/sunshine.nix
   ];
 
@@ -63,29 +59,34 @@
     desktop.tearing.enable = true;
     desktop.layouts.centered.fullHeight = true;
     desktop.input.accelProfile = "flat";
+    theme.preset = "obsidian-mocha";
     performance.transparentHugepages = "madvise";
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";
-    # Tuned kernel — re-enable once you have a merged profile (docs/autofdo.md):
-    #   performance.kernel = {
-    #     processorOpt = "zen4";
-    #     autofdo = ./profiles/merged.afdo;
-    #     performanceGovernor = true;
-    #     bbr3 = true;
-    #   };
     performance.autofdo.minCpuLoad = 0.1;
 
     hardware.nvidia.enable = true;
-    hardware.sensors.modules = [
-      "k10temp"
-      "nct6775"
-    ];
-
-    services.dlna = {
-      friendlyName = "DLNA MEDIA";
-      mediaDirs = [ "V,/srv/media/videos" ];
-    };
   };
+
+  boot.kernelModules = [
+    "k10temp"
+    "nct6775"
+  ];
+
+  services.minidlna.settings = {
+    friendly_name = "DLNA MEDIA";
+    media_dir = [ "V,/srv/media/videos" ];
+  };
+
+  services.flatpak.enable = true;
+  programs.coolercontrol.enable = true;
+
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 40 * 1024;
+    }
+  ];
 
   nix.settings = {
     max-jobs = 4;

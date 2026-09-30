@@ -130,9 +130,9 @@ Item {
     }
 
     Behavior on notchCenterFrac {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration / 2
+            duration: Styling.animDuration / 2
             easing.type: Easing.OutCubic
         }
     }
@@ -178,9 +178,9 @@ Item {
         y: root.notchPosition === "top" ? 0 : parent.height - height
 
         Behavior on height {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 4
+                duration: Styling.animDuration / 4
                 easing.type: Easing.OutCubic
             }
         }
@@ -216,9 +216,9 @@ Item {
 
             opacity: root.reveal ? 1 : 0
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutCubic
                 }
             }
@@ -232,9 +232,9 @@ Item {
                         return (Math.max(notchContainer.height, 50) + 16);
                 }
                 Behavior on y {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -282,9 +282,9 @@ Item {
 
             opacity: root.reveal ? 1 : 0
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutCubic
                 }
             }
@@ -298,9 +298,9 @@ Item {
                         return (notchContainer.height + 16);
                 }
                 Behavior on y {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -323,18 +323,18 @@ Item {
             }
 
             Behavior on width {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutBack
                     easing.overshoot: 1.2
                 }
             }
 
             Behavior on height {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration
+                    duration: Styling.animDuration
                     easing.type: Easing.OutQuart
                 }
             }
@@ -357,9 +357,9 @@ Item {
                 notchHovered: notificationPopupContainer.popupHovered
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutQuart
                     }
                 }

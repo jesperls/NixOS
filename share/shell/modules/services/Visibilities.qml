@@ -52,8 +52,7 @@ Singleton {
     Component.onCompleted: syncScreens()
 
     function getForActive() {
-        // Active modules stay on the screen they were opened on, so resolve
-        // against that screen rather than whichever monitor now has focus.
+        // An open surface stays on its original screen when monitor focus changes.
         if (!lastFocusedScreen) {
             return null;
         }

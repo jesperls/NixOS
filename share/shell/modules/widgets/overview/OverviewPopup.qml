@@ -69,9 +69,9 @@ PanelWindow {
         opacity: overviewOpen ? 0.5 : 0
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
@@ -94,17 +94,17 @@ PanelWindow {
         scale: overviewOpen ? 1 : 0.9
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutQuart
             }
         }
 
         Behavior on scale {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration
+                duration: Styling.animDuration
                 easing.type: Easing.OutBack
                 easing.overshoot: 1.2
             }
@@ -352,9 +352,9 @@ PanelWindow {
                     color: externalScrollBar.pressed ? Styling.srItem("overprimary") : (externalScrollBar.hovered ? Qt.lighter(Styling.srItem("overprimary"), 1.2) : Styling.srItem("overprimary"))
 
                     Behavior on color {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         ColorAnimation {
-                            duration: Config.animDuration / 2
+                            duration: Styling.animDuration / 2
                         }
                     }
                 }

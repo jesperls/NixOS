@@ -111,9 +111,9 @@ RowLayout {
             border.color: toggleSwitch.checked ? Styling.srItem("overprimary") : Colors.outline
 
             Behavior on color {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 ColorAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                 }
             }
 
@@ -126,9 +126,9 @@ RowLayout {
                 color: toggleSwitch.checked ? Colors.background : Colors.overSurfaceVariant
 
                 Behavior on x {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration / 2
+                        duration: Styling.animDuration / 2
                         easing.type: Easing.OutCubic
                     }
                 }

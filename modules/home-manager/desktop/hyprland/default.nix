@@ -18,19 +18,12 @@ let
   tearing = osConfig.mySystem.desktop.tearing;
   layouts = osConfig.mySystem.desktop.layouts;
   autoFakeFullscreen = osConfig.mySystem.desktop.autoFakeFullscreen;
-  primaryMonitor =
-    if hyprlandConfig.activeMonitors == [ ] then null else lib.head hyprlandConfig.activeMonitors;
-  numMonitors = builtins.length hyprlandConfig.activeMonitors;
   input = osConfig.mySystem.desktop.input;
   generatedState = {
     shell = osConfig.mySystem.desktop.shell.enable;
     monitors = {
-      primary = if primaryMonitor == null then null else primaryMonitor.name;
-      primary_workspaces =
-        if numMonitors == 0 then
-          [ ]
-        else
-          lib.filter (workspace: lib.mod (workspace - 1) numMonitors == 0) (lib.range 1 10);
+      inherit (hyprlandConfig) primary;
+      primary_workspaces = hyprlandConfig.primaryWorkspaces;
     };
     keyboard_layout = osConfig.mySystem.system.keyboardLayout;
     input = {

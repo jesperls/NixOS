@@ -47,15 +47,15 @@ Button {
             opacity: root.pressed ? 1 : (root.appIsActive ? 0.3 : 0.7)
 
             Behavior on color {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 ColorAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                 }
             }
             Behavior on opacity {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                 }
             }
         }
@@ -124,9 +124,9 @@ Button {
                             color: root.appIsActive ? Styling.srItem("overprimary") : Qt.rgba(Colors.overBackground.r, Colors.overBackground.g, Colors.overBackground.b, 0.4)
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                 }
                             }
                         }
@@ -150,9 +150,9 @@ Button {
                             color: root.appIsActive ? Styling.srItem("overprimary") : Qt.rgba(Colors.overBackground.r, Colors.overBackground.g, Colors.overBackground.b, 0.4)
 
                             Behavior on color {
-                                enabled: Config.animDuration > 0
+                                enabled: Styling.animDuration > 0
                                 ColorAnimation {
-                                    duration: Config.animDuration / 2
+                                    duration: Styling.animDuration / 2
                                 }
                             }
                         }

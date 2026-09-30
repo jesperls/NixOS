@@ -96,18 +96,18 @@ Item {
             x: root.colorPickerActive ? -30 : 0
 
             Behavior on x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuart
             }
         }
@@ -305,9 +305,9 @@ Item {
                                         border.color: tintIconsSwitch.checked ? Styling.srItem("overprimary") : Colors.outline
 
                                         Behavior on color {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             ColorAnimation {
-                                                duration: Config.animDuration / 2
+                                                duration: Styling.animDuration / 2
                                             }
                                         }
 
@@ -320,9 +320,9 @@ Item {
                                             color: tintIconsSwitch.checked ? Colors.background : Colors.overSurfaceVariant
 
                                             Behavior on x {
-                                                enabled: Config.animDuration > 0
+                                                enabled: Styling.animDuration > 0
                                                 NumberAnimation {
-                                                    duration: Config.animDuration / 2
+                                                    duration: Styling.animDuration / 2
                                                     easing.type: Easing.OutCubic
                                                 }
                                             }
@@ -373,9 +373,9 @@ Item {
                                         border.color: enableCornersSwitch.checked ? Styling.srItem("overprimary") : Colors.outline
 
                                         Behavior on color {
-                                            enabled: Config.animDuration > 0
+                                            enabled: Styling.animDuration > 0
                                             ColorAnimation {
-                                                duration: Config.animDuration / 2
+                                                duration: Styling.animDuration / 2
                                             }
                                         }
 
@@ -388,9 +388,9 @@ Item {
                                             color: enableCornersSwitch.checked ? Colors.background : Colors.overSurfaceVariant
 
                                             Behavior on x {
-                                                enabled: Config.animDuration > 0
+                                                enabled: Styling.animDuration > 0
                                                 NumberAnimation {
-                                                    duration: Config.animDuration / 2
+                                                    duration: Styling.animDuration / 2
                                                     easing.type: Easing.OutCubic
                                                 }
                                             }
@@ -988,9 +988,9 @@ Item {
                                         opacity: shadowColorButton.isHovered ? 0.15 : 0
 
                                         Behavior on opacity {
-                                            enabled: (Config.animDuration ?? 0) > 0
+                                            enabled: (Styling.animDuration ?? 0) > 0
                                             NumberAnimation {
-                                                duration: (Config.animDuration ?? 0) / 2
+                                                duration: (Styling.animDuration ?? 0) / 2
                                             }
                                         }
                                     }
@@ -1025,9 +1025,9 @@ Item {
                         property bool variantExpanded: false
 
                         Behavior on Layout.preferredHeight {
-                            enabled: (Config.animDuration ?? 0) > 0
+                            enabled: (Styling.animDuration ?? 0) > 0
                             NumberAnimation {
-                                duration: (Config.animDuration ?? 0) / 2
+                                duration: (Styling.animDuration ?? 0) / 2
                                 easing.type: Easing.OutCubic
                             }
                         }
@@ -1104,9 +1104,9 @@ Item {
                                                     radius: isSelected ? Styling.radius(0) / 2 : Styling.radius(0)
 
                                                     Behavior on width {
-                                                        enabled: (Config.animDuration ?? 0) > 0
+                                                        enabled: (Styling.animDuration ?? 0) > 0
                                                         NumberAnimation {
-                                                            duration: (Config.animDuration ?? 0) / 3
+                                                            duration: (Styling.animDuration ?? 0) / 3
                                                             easing.type: Easing.OutCubic
                                                         }
                                                     }
@@ -1134,18 +1134,18 @@ Item {
                                                                     opacity: variantTagRow.isSelected ? 1 : 0
 
                                                                     Behavior on opacity {
-                                                                        enabled: (Config.animDuration ?? 0) > 0
+                                                                        enabled: (Styling.animDuration ?? 0) > 0
                                                                         NumberAnimation {
-                                                                            duration: (Config.animDuration ?? 0) / 3
+                                                                            duration: (Styling.animDuration ?? 0) / 3
                                                                             easing.type: Easing.OutCubic
                                                                         }
                                                                     }
                                                                 }
 
                                                                 Behavior on width {
-                                                                    enabled: (Config.animDuration ?? 0) > 0
+                                                                    enabled: (Styling.animDuration ?? 0) > 0
                                                                     NumberAnimation {
-                                                                        duration: (Config.animDuration ?? 0) / 3
+                                                                        duration: (Styling.animDuration ?? 0) / 3
                                                                         easing.type: Easing.OutCubic
                                                                     }
                                                                 }
@@ -1160,9 +1160,9 @@ Item {
                                                                 color: variantTagRow.item
 
                                                                 Behavior on color {
-                                                                    enabled: (Config.animDuration ?? 0) > 0
+                                                                    enabled: (Styling.animDuration ?? 0) > 0
                                                                     ColorAnimation {
-                                                                        duration: (Config.animDuration ?? 0) / 3
+                                                                        duration: (Styling.animDuration ?? 0) / 3
                                                                         easing.type: Easing.OutCubic
                                                                     }
                                                                 }
@@ -1177,9 +1177,9 @@ Item {
                                                         opacity: variantTagRow.isHovered ? 0.15 : 0
 
                                                         Behavior on opacity {
-                                                            enabled: (Config.animDuration ?? 0) > 0
+                                                            enabled: (Styling.animDuration ?? 0) > 0
                                                             NumberAnimation {
-                                                                duration: (Config.animDuration ?? 0) / 2
+                                                                duration: (Styling.animDuration ?? 0) / 2
                                                             }
                                                         }
                                                     }
@@ -1259,9 +1259,9 @@ Item {
                                             radius: isSelected ? Styling.radius(0) / 2 : Styling.radius(0)
 
                                             Behavior on width {
-                                                enabled: (Config.animDuration ?? 0) > 0
+                                                enabled: (Styling.animDuration ?? 0) > 0
                                                 NumberAnimation {
-                                                    duration: (Config.animDuration ?? 0) / 3
+                                                    duration: (Styling.animDuration ?? 0) / 3
                                                     easing.type: Easing.OutCubic
                                                 }
                                             }
@@ -1289,18 +1289,18 @@ Item {
                                                             opacity: variantTag.isSelected ? 1 : 0
 
                                                             Behavior on opacity {
-                                                                enabled: (Config.animDuration ?? 0) > 0
+                                                                enabled: (Styling.animDuration ?? 0) > 0
                                                                 NumberAnimation {
-                                                                    duration: (Config.animDuration ?? 0) / 3
+                                                                    duration: (Styling.animDuration ?? 0) / 3
                                                                     easing.type: Easing.OutCubic
                                                                 }
                                                             }
                                                         }
 
                                                         Behavior on width {
-                                                            enabled: (Config.animDuration ?? 0) > 0
+                                                            enabled: (Styling.animDuration ?? 0) > 0
                                                             NumberAnimation {
-                                                                duration: (Config.animDuration ?? 0) / 3
+                                                                duration: (Styling.animDuration ?? 0) / 3
                                                                 easing.type: Easing.OutCubic
                                                             }
                                                         }
@@ -1315,9 +1315,9 @@ Item {
                                                         color: variantTag.item
 
                                                         Behavior on color {
-                                                            enabled: (Config.animDuration ?? 0) > 0
+                                                            enabled: (Styling.animDuration ?? 0) > 0
                                                             ColorAnimation {
-                                                                duration: (Config.animDuration ?? 0) / 3
+                                                                duration: (Styling.animDuration ?? 0) / 3
                                                                 easing.type: Easing.OutCubic
                                                             }
                                                         }
@@ -1333,9 +1333,9 @@ Item {
                                                 opacity: variantTag.isHovered ? 0.15 : 0
 
                                                 Behavior on opacity {
-                                                    enabled: (Config.animDuration ?? 0) > 0
+                                                    enabled: (Styling.animDuration ?? 0) > 0
                                                     NumberAnimation {
-                                                        duration: (Config.animDuration ?? 0) / 2
+                                                        duration: (Styling.animDuration ?? 0) / 2
                                                     }
                                                 }
                                             }
@@ -1435,18 +1435,18 @@ Item {
             x: root.colorPickerActive ? 0 : 30
 
             Behavior on x {
-                enabled: Config.animDuration > 0
+                enabled: Styling.animDuration > 0
                 NumberAnimation {
-                    duration: Config.animDuration / 2
+                    duration: Styling.animDuration / 2
                     easing.type: Easing.OutQuart
                 }
             }
         }
 
         Behavior on opacity {
-            enabled: Config.animDuration > 0
+            enabled: Styling.animDuration > 0
             NumberAnimation {
-                duration: Config.animDuration / 2
+                duration: Styling.animDuration / 2
                 easing.type: Easing.OutQuart
             }
         }

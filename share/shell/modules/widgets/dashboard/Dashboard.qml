@@ -232,16 +232,16 @@ NotchAnimationBehavior {
                 height: root.railVertical ? (Math.abs(animated2 - animated1) + root.tabWidth) : parent.height
 
                 Behavior on animated1 {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration / 3
+                        duration: Styling.animDuration / 3
                         easing.type: Easing.OutSine
                     }
                 }
                 Behavior on animated2 {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutSine
                     }
                 }
@@ -291,9 +291,9 @@ NotchAnimationBehavior {
                 opacity: GlobalStates.settingsWindowVisible ? 0 : 1
 
                 Behavior on opacity {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     NumberAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -323,9 +323,9 @@ NotchAnimationBehavior {
                     verticalAlignment: Text.AlignVCenter
 
                     Behavior on color {
-                        enabled: Config.animDuration > 0
+                        enabled: Styling.animDuration > 0
                         ColorAnimation {
-                            duration: Config.animDuration
+                            duration: Styling.animDuration
                             easing.type: Easing.OutCubic
                         }
                     }
@@ -398,14 +398,14 @@ NotchAnimationBehavior {
                     transform: Translate {
                         y: visible ? 0 : (root.state.currentTab > root.visibleIndexOf(index) ? -20 : 20)
                         Behavior on y {
-                             enabled: Config.animDuration > 0
-                             NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart } 
+                             enabled: Styling.animDuration > 0
+                             NumberAnimation { duration: Styling.animDuration; easing.type: Easing.OutQuart }
                         }
                     }
 
                     Behavior on opacity {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart }
+                        enabled: Styling.animDuration > 0
+                        NumberAnimation { duration: Styling.animDuration; easing.type: Easing.OutQuart }
                     }
 
                     onLoaded: {
@@ -527,18 +527,18 @@ NotchAnimationBehavior {
     onImplicitHeightChanged: animatedHeight = implicitHeight
 
     Behavior on animatedWidth {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutBack
             easing.overshoot: 1.1
         }
     }
 
     Behavior on animatedHeight {
-        enabled: Config.animDuration > 0
+        enabled: Styling.animDuration > 0
         NumberAnimation {
-            duration: Config.animDuration
+            duration: Styling.animDuration
             easing.type: Easing.OutBack
             easing.overshoot: 1.1
         }
@@ -571,9 +571,9 @@ NotchAnimationBehavior {
                 verticalAlignment: Text.AlignVCenter
 
                 Behavior on color {
-                    enabled: Config.animDuration > 0
+                    enabled: Styling.animDuration > 0
                     ColorAnimation {
-                        duration: Config.animDuration
+                        duration: Styling.animDuration
                         easing.type: Easing.OutCubic
                     }
                 }

@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   osConfig,
   ...
 }:
@@ -16,10 +15,5 @@
 
   home.sessionPath = [
     "${config.home.homeDirectory}/.local/bin"
-  ];
-
-  xdg.systemDirs.data = [
-    "${config.home.homeDirectory}/.local/share"
-    "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
   ];
 }
