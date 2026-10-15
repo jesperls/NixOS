@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -15,12 +14,6 @@
   ];
 
   mySystem = {
-    user = {
-      username = "jesperls";
-      fullName = "Jesper Lönn Stråle";
-      email = "jesper.ls@hotmail.com";
-    };
-
     system = {
       hostName = "gonggong";
       regionalLocale = "sv_SE.UTF-8";

@@ -1,18 +1,17 @@
 {
   description,
   execStart,
+  target ? "hyprland-session.target",
   unit ? { },
   service ? { },
 }:
 
-let
-  target = "hyprland-session.target";
-in
 {
   Unit = {
     Description = description;
     After = [ target ];
     PartOf = [ target ];
+    ConditionEnvironment = "WAYLAND_DISPLAY";
   }
   // unit;
 
@@ -20,6 +19,7 @@ in
     ExecStart = execStart;
     Restart = "on-failure";
     RestartSec = 2;
+    Slice = "session.slice";
   }
   // service;
 

@@ -9,8 +9,6 @@ let
   cfg = config.mySystem.hardware.nvidia;
 in
 {
-  options.mySystem.hardware.nvidia.enable = lib.mkEnableOption "the NVIDIA driver stack";
-
   config = lib.mkIf cfg.enable {
     hardware.graphics.extraPackages = [ pkgs.nvidia-vaapi-driver ];
 
@@ -39,6 +37,8 @@ in
 
     environment.sessionVariables = {
       LIBVA_DRIVER_NAME = "nvidia";
+      NVD_BACKEND = "direct";
+      MOZ_DISABLE_RDD_SANDBOX = "1";
       __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     };
 

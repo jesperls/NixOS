@@ -1,5 +1,4 @@
 {
-  lib,
   pkgs,
   ...
 }:
@@ -8,6 +7,8 @@ let
   shared = import ../lib/gaming.nix { inherit pkgs; };
 in
 {
+  boot.kernelParams = [ "split_lock_detect=off" ]; # Avoid kernel traps on unaligned locks in Wine/Proton games.
+
   programs.steam = {
     enable = true;
     protontricks.enable = true;
@@ -43,10 +44,9 @@ in
 
   programs.gamemode = {
     enable = true;
-    enableRenice = true;
+    enableRenice = false; # ananicy-cpp manages process nice levels.
     settings = {
       general = {
-        renice = 10;
         ioprio = 0;
         inhibit_screensaver = 1;
       };

@@ -41,6 +41,7 @@ let
     (monitor "three" { })
   ];
   scaled = layout [ (monitor "scaled" { scale = 2; }) ];
+  fractional = layout [ (monitor "fractional" { scale = 1.5; }) ];
   rotated = layout [ (monitor "rotated" { transform = 1; }) ];
   numericRules = builtins.filter (rule: builtins.match "[0-9]+" rule.workspace != null);
 in
@@ -84,6 +85,8 @@ assert
     "3"
   ];
 assert (lib.last single.settings.workspace_rule).gaps_out.left == 1280;
+assert builtins.isInt (lib.last fractional.settings.workspace_rule).gaps_out.left;
+assert (lib.last fractional.settings.workspace_rule).gaps_out.left == 426;
 assert builtins.length scaled.settings.workspace_rule == 10;
 assert builtins.length rotated.settings.workspace_rule == 10;
 pkgs.runCommand "desktop-contract-check" { } ''

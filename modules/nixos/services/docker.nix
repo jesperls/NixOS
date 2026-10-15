@@ -1,6 +1,6 @@
-{ config, lib, ... }:
+{ config, ... }:
 
 {
   virtualisation.docker.enable = true;
-  hardware.nvidia-container-toolkit.enable = lib.elem "nvidia" config.services.xserver.videoDrivers;
+  hardware.nvidia-container-toolkit.enable = config.mySystem.hardware.nvidia.enable;
 }

@@ -33,8 +33,8 @@
       isDefault = true;
 
       settings = {
-        "gfx.webrender.all" = false;
-        "media.hardware-video-decoding.force-enabled" = false;
+        "gfx.webrender.all" = true;
+        "media.hardware-video-decoding.force-enabled" = true;
         "media.ffmpeg.vaapi.enabled" = true;
 
         "widget.use-xdg-desktop-portal.file-picker" = 1;

@@ -48,10 +48,10 @@ mySystem.desktop.shell.settings = {
 };
 ```
 
-Only the specified keys are overwritten; sibling settings survive. Changes to
-those keys in the GUI last until the next shell start. Removing a Nix override
-leaves its last saved value in the JSON. No current host uses this override
-channel.
+Only the specified keys are overwritten; sibling settings survive. The shell UI
+receives the overridden key paths via `PANGU_NIX_OVERRIDES` and marks them as
+managed by Nix. Removing a Nix override leaves its last saved value in the JSON.
+No current host uses this override channel.
 
 `~/.local/share/pangu` also holds persistent shell state, while
 `~/.cache/pangu` holds generated palettes and caches. Idle and audio-visualizer

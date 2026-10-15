@@ -14,29 +14,22 @@ in
     userDirs = {
       enable = true;
       createDirectories = true;
+      setSessionVariables = true;
       desktop = "${homeDir}/Desktop";
       documents = "${homeDir}/Documents";
       download = "${homeDir}/Downloads";
       music = "${homeDir}/Music";
       pictures = "${homeDir}/Pictures";
       publicShare = "${homeDir}/Public";
+      projects = "${homeDir}/Projects";
       templates = "${homeDir}/Templates";
       videos = "${homeDir}/Videos";
       extraConfig = {
-        XDG_SCREENSHOTS_DIR = "${homeDir}/Pictures/Screenshots";
-        XDG_WALLPAPERS_DIR = osConfig.mySystem.desktop.shell.wallpapers;
-        XDG_PROJECTS_DIR = "${homeDir}/Projects";
-        XDG_GAMES_DIR = "${homeDir}/Games";
+        SCREENSHOTS = "${homeDir}/Pictures/Screenshots";
+        WALLPAPERS = osConfig.mySystem.desktop.shell.wallpapers;
+        GAMES = "${homeDir}/Games";
       };
     };
-
-  };
-
-  home.file = {
-    "Pictures/Screenshots/.keep".text = "";
-    "Pictures/Wallpapers/.keep".text = "";
-    "Projects/.keep".text = "";
-    "Games/.keep".text = "";
   };
 
   xdg.configFile."xfce4/helpers.rc".text = ''

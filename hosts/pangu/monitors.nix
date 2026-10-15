@@ -7,7 +7,7 @@
       resolution = "5120x1440";
       refreshRate = 240;
       position = "0x0";
-      vrr = 1;
+      vrr = 2;
       bitdepth = 10;
       cm = "auto";
     }
@@ -16,9 +16,15 @@
       resolution = "2560x1440";
       refreshRate = 240;
       position = "1280x-1440";
-      vrr = 1;
+      vrr = 2;
       bitdepth = 10;
       cm = "auto";
+    }
+    {
+      name = "desc:Microstep MAG271CQP 0x3030304B";
+      resolution = "2560x1440";
+      refreshRate = 144;
+      position = "auto";
     }
   ];
 }

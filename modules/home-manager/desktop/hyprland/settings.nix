@@ -26,7 +26,7 @@ let
         else
           0;
     in
-    (lib.toInt (builtins.elemAt dimensions axis)) / monitor.scale;
+    builtins.floor ((lib.toInt (builtins.elemAt dimensions axis)) / monitor.scale);
 
   renderMonitor =
     monitor:
@@ -65,7 +65,7 @@ let
   specialWorkspaceRules =
     let
       width = monitorWidth (builtins.head activeMonitors);
-      sideGap = (width - special.maxWidth) / 2;
+      sideGap = builtins.floor ((width - special.maxWidth) / 2);
     in
     lib.optionals (numMonitors > 0 && special.maxWidth > 0 && width > special.maxWidth) (
       map (workspace: {

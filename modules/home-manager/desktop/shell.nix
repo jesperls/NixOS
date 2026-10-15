@@ -15,7 +15,6 @@ in
     inherit (cfg) enable wallpapers settings;
     package = pkgs.pangu;
     fonts.enable = false;
-    theme.gtk.enable = false;
-    theme.qt.enable = false;
+    theme.kitty.enable = true;
   };
 }

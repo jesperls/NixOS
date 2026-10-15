@@ -6,7 +6,7 @@
     ../../modules/home-manager/desktop/bundle.nix
 
     ../../modules/home-manager/programs/firefox.nix
-    ../../modules/home-manager/programs/nixcord.nix
+    ../../modules/home-manager/programs/vesktop.nix
     ../../modules/home-manager/programs/obs.nix
     ../../modules/home-manager/programs/spicetify.nix
     ../../modules/home-manager/programs/flatpak.nix
@@ -28,8 +28,8 @@
     }
     {
       key = "D";
-      command = "discord";
-      description = "Apps: Discord";
+      command = "vesktop";
+      description = "Apps: Vesktop";
     }
     {
       key = "M";

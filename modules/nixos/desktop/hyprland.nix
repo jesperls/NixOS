@@ -30,8 +30,5 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [
-    pamixer
-    brightnessctl
-  ];
+  environment.systemPackages = [ pkgs.pamixer ];
 }

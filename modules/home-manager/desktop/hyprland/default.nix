@@ -1,5 +1,4 @@
 {
-  pkgs,
   osConfig,
   lib,
   ...
@@ -92,8 +91,4 @@ in
     enable = osConfig.mySystem.desktop.shell.enable;
     settings = generatedState;
   };
-
-  home.packages = with pkgs; [
-    hyprpicker
-  ];
 }

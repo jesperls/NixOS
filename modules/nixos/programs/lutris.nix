@@ -75,7 +75,6 @@ let
     buildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       wrapProgram $out/bin/lutris \
-        --set __GL_THREADED_OPTIMIZATIONS 0 \
         --set WINE_LARGE_ADDRESS_AWARE 1
     '';
   };

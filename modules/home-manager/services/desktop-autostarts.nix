@@ -22,6 +22,7 @@
       Service = {
         Restart = "on-failure";
         RestartSec = 2;
+        Slice = "session.slice";
       };
     };
   };

@@ -8,16 +8,13 @@
     nixd
     vscode
     uv
-    python314
     nodejs
     rustup
     gcc
     openjdk25
-    jq
     yq
     fd
     ripgrep
-    tmux
     ncdu
     p7zip
     parted
@@ -53,6 +50,7 @@
     pear-desktop
     phoronix-test-suite
     zed-editor
+    antigravity-cli
     nvme-cli
     wget
     ungoogled-chromium

@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   pkgs,
   osConfig,
@@ -28,19 +27,13 @@ let
       '';
 
   shellPalette = osConfig.mySystem.desktop.shell.enable;
-  paletteImport = lib.optionalString shellPalette ''
-    @import url("file://${config.xdg.cacheHome}/pangu/gtk.css");
-  '';
 
-  qtctSettings = ver: {
+  qtctSettings = {
     Appearance = {
       style = theme.qt.style;
-      custom_palette = shellPalette;
+      custom_palette = lib.mkDefault false;
       icon_theme = theme.gtk.iconTheme.name;
       standard_dialogs = "xdgdesktopportal";
-    }
-    // lib.optionalAttrs shellPalette {
-      color_scheme_path = "${config.xdg.configHome}/${ver}/colors/pangu.colors";
     };
     Fonts = {
       general = ''"${theme.fonts.sans},${toString theme.fonts.size}"'';
@@ -63,15 +56,13 @@ in
     };
     gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
     gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
-    gtk3.extraCss = paletteImport;
-    gtk4.extraCss = paletteImport;
   };
 
   qt = {
     enable = true;
     platformTheme.name = "qtct";
-    qt5ctSettings = qtctSettings "qt5ct";
-    qt6ctSettings = qtctSettings "qt6ct";
+    qt5ctSettings = qtctSettings;
+    qt6ctSettings = qtctSettings;
   };
 
   home.pointerCursor = {
@@ -84,7 +75,6 @@ in
   };
 
   home.packages = [
-    theme.gtk.iconTheme.package
     hyprcursorTheme
     pkgs.hicolor-icon-theme
     pkgs.adwaita-icon-theme

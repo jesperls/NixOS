@@ -5,17 +5,22 @@
     user = {
       username = lib.mkOption {
         type = lib.types.str;
+        default = "jesperls";
         description = "The username of the primary user.";
       };
       fullName = lib.mkOption {
         type = lib.types.str;
+        default = "Jesper Lönn Stråle";
         description = "The full name of the primary user.";
       };
       email = lib.mkOption {
         type = lib.types.str;
+        default = "jesper.ls@hotmail.com";
         description = "The email of the primary user.";
       };
     };
+
+    hardware.nvidia.enable = lib.mkEnableOption "the NVIDIA driver stack";
 
     system = {
       locale = lib.mkOption {

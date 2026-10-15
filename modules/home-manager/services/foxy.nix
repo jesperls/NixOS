@@ -14,7 +14,5 @@ in
   systemd.user.services.foxy = import ../lib/autostart.nix {
     description = "Foxy — jumpscare overlay";
     execStart = lib.getExe foxy;
-    unit.ConditionEnvironment = "WAYLAND_DISPLAY";
-    service.Slice = "session.slice";
   };
 }
