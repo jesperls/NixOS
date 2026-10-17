@@ -43,7 +43,7 @@
         sshUser = "ubuntu";
       };
       gonggong = {
-        address = "192.168.1.96";
+        address = "192.168.50.96";
         sshUser = "jesperls";
         sshTty = true;
       };

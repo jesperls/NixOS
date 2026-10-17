@@ -8,6 +8,7 @@
     gh
     ripgrep
     jq
+    nodejs
     yq
     rsync
     tmux
