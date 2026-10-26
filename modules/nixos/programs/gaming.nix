@@ -35,6 +35,10 @@ in
   };
 
   environment.systemPackages = with pkgs; [
+    lutris
+    mangohud
+    winetricks
+
     mgba
     melonds
     ryubing
@@ -44,7 +48,6 @@ in
 
   programs.gamemode = {
     enable = true;
-    enableRenice = false; # ananicy-cpp manages process nice levels.
     settings = {
       general = {
         ioprio = 0;

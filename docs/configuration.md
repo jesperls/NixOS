@@ -46,7 +46,7 @@ in the `input` group.
 applications, theme choices and desktop behaviour. The cross-cutting option
 definitions are in [modules/nixos/options](../modules/nixos/options).
 Feature-specific options live with their implementation, such as
-[kernel.nix](../modules/nixos/performance/kernel.nix).
+[webcam.nix](../modules/nixos/hardware/webcam.nix).
 
 Use a native NixOS or Home Manager option when it already expresses the setting.
 Add a `mySystem` option when consumers need a shared value or coordinated

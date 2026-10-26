@@ -38,6 +38,5 @@ in
     ) "transparent_hugepage=${cfg.transparentHugepages}";
 
     consoleLogLevel = 0;
-    initrd.verbose = false;
   };
 }

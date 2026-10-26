@@ -7,6 +7,16 @@
 
 let
   cfg = config.mySystem.hardware.webcam;
+
+  # v4l2loopback's depmod metadata collides with the kernel's own modules.* in aggregateModules.
+  modulesOnly =
+    mod:
+    pkgs.runCommand "${mod.name}-modules" { } ''
+      mkdir -p $out
+      cp -a ${mod}/. $out/
+      chmod -R u+w $out
+      rm -f $out/lib/modules/*/modules.*
+    '';
 in
 {
   options.mySystem.hardware.webcam = {
@@ -18,8 +28,8 @@ in
   };
 
   config = {
-    boot.extraModulePackages = with config.boot.kernelPackages; [
-      v4l2loopback
+    boot.extraModulePackages = [
+      (modulesOnly config.boot.kernelPackages.v4l2loopback)
     ];
 
     boot.kernelModules = [ "v4l2loopback" ];

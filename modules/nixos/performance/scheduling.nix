@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -12,16 +11,6 @@ in
   services.scx = lib.mkIf (cfg.scheduler != null) {
     enable = true;
     scheduler = cfg.scheduler;
-  };
-
-  services.ananicy = {
-    enable = lib.mkDefault true;
-    package = pkgs.ananicy-cpp;
-    rulesProvider = pkgs.ananicy-rules-cachyos;
-    settings = {
-      cgroup_load = false;
-      apply_sched = false;
-    };
   };
 
   services.irqbalance.enable = lib.mkDefault true;

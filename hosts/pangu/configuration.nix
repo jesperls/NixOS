@@ -14,11 +14,8 @@
     ../../modules/nixos/hardware/vial.nix
     ../../modules/nixos/hardware/webcam.nix
 
-    ../../modules/nixos/performance/kernel.nix
-
     ../../modules/nixos/programs/filemanager.nix
     ../../modules/nixos/programs/gaming.nix
-    ../../modules/nixos/programs/lutris.nix
 
     ../../modules/nixos/services/dlna.nix
     ../../modules/nixos/services/sunshine.nix
@@ -60,6 +57,8 @@
 
     hardware.nvidia.enable = true;
   };
+
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   boot.kernelModules = [
     "k10temp"
