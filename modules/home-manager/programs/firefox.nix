@@ -7,6 +7,15 @@
   programs.firefox = {
     enable = true;
 
+    # The RDD sandbox cannot load the nvidia VA-API driver; scope the opt-out to Firefox.
+    package = pkgs.firefox.overrideAttrs (old: {
+      makeWrapperArgs = old.makeWrapperArgs ++ [
+        "--set"
+        "MOZ_DISABLE_RDD_SANDBOX"
+        "1"
+      ];
+    });
+
     configPath = ".mozilla/firefox";
 
     nativeMessagingHosts = [ pkgs.fx-cast-bridge ];

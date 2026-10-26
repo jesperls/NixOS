@@ -10,7 +10,7 @@
   melonds = pkgs.symlinkJoin {
     name = "melonds-fixed";
     paths = [ pkgs.melonds ];
-    buildInputs = [ pkgs.makeWrapper ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       wrapProgram $out/bin/melonDS --set SDL_JOYSTICK_HIDAPI 0
     '';
@@ -19,7 +19,7 @@
   xemu = pkgs.symlinkJoin {
     name = "xemu-fixed";
     paths = [ pkgs.xemu ];
-    buildInputs = [ pkgs.makeWrapper ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       mv $out/bin/xemu $out/bin/xemu-gapps
       makeWrapper $out/bin/xemu-gapps $out/bin/xemu --set SDL_JOYSTICK_HIDAPI 0

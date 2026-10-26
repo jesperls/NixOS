@@ -19,7 +19,7 @@ in
       };
     }
     // lib.mapAttrs (
-      name: host:
+      _: host:
       {
         HostName = host.address;
         SetEnv.TERM = "xterm-256color";

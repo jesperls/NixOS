@@ -23,7 +23,7 @@ in
     };
 
     tmp.useTmpfs = true;
-    tmp.tmpfsSize = "75%";
+    tmp.tmpfsSize = "50%";
 
     kernelParams = [
       "quiet"
