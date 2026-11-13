@@ -12,10 +12,12 @@ present, contains the user's package list. Disk configuration stays in
 `hardware-configuration.nix`; pangu's copy is generated and should not be edited.
 
 The NixOS [base bundle](../modules/nixos/bundle.nix) supplies shared boot,
-network, user and performance policy. The
+network, user and performance policy, including the latest mainline kernel and
+realtime audio group membership when PipeWire is enabled. The
 [desktop bundle](../modules/nixos/desktop/bundle.nix) adds the graphical stack.
 Home Manager has corresponding [base](../modules/home-manager/bundle.nix) and
-[desktop](../modules/home-manager/desktop/bundle.nix) bundles. Features needed
+[desktop](../modules/home-manager/desktop/bundle.nix) bundles, including GitHub
+CLI Git credential integration. Features needed
 by only some hosts are explicit imports in those hosts.
 
 Put reusable behaviour in `modules/nixos` or `modules/home-manager`. A short

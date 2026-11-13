@@ -5,7 +5,7 @@ let
   mkBase = lib.mkOverride 500; # beats nixpkgs' mkDefault sysctls, loses to a host's plain assignment
 in
 {
-  fileSystems."/".options = lib.mkDefault [ "noatime" ];
+  fileSystems."/".options = [ "noatime" ];
 
   zramSwap = lib.mkIf cfg.zram.enable {
     enable = true;
@@ -16,8 +16,8 @@ in
   boot.kernel.sysctl = lib.mapAttrs (_: mkBase) {
     "vm.swappiness" = if cfg.zram.enable then 180 else 60;
     "vm.page-cluster" = 0;
-    "vm.dirty_bytes" = 268435456; # 256MB
-    "vm.dirty_background_bytes" = 134217728; # 128MB
+    "vm.dirty_bytes" = 256 * 1024 * 1024;
+    "vm.dirty_background_bytes" = 128 * 1024 * 1024;
     "vm.max_map_count" = 2147483642;
 
     "net.ipv4.tcp_congestion_control" = "bbr";

@@ -18,5 +18,10 @@ in
       assertion = builtins.elem cfg.desktop.layouts.default cfg.desktop.layouts.cycle;
       message = "mySystem.desktop.layouts.default (${cfg.desktop.layouts.default}) must be one of mySystem.desktop.layouts.cycle, or the layout toggle can never cycle back to it.";
     }
+    {
+      assertion =
+        cfg.hardware.nvidia.enable -> builtins.elem "nvidia" config.services.xserver.videoDrivers;
+      message = "mySystem.hardware.nvidia.enable requires hardware/nvidia.nix to be imported on the host.";
+    }
   ];
 }

@@ -84,7 +84,6 @@ in
             translucentApps = lib.mkOption {
               type = lib.types.listOf lib.types.str;
               default = [
-                "kitty"
                 "thunar"
                 "gedit"
               ];
@@ -117,6 +116,7 @@ in
               package = lib.mkOption {
                 type = lib.types.nullOr lib.types.package;
                 default = pkgs.adw-gtk3;
+                defaultText = lib.literalExpression "pkgs.adw-gtk3";
                 description = "GTK theme package providing the theme name (null uses built-in).";
               };
             };
@@ -131,6 +131,7 @@ in
               package = lib.mkOption {
                 type = lib.types.package;
                 default = pkgs.papirus-icon-theme;
+                defaultText = lib.literalExpression "pkgs.papirus-icon-theme";
                 description = "Icon theme package.";
               };
             };
@@ -145,6 +146,7 @@ in
               package = lib.mkOption {
                 type = lib.types.package;
                 default = pkgs.bibata-cursors;
+                defaultText = lib.literalExpression "pkgs.bibata-cursors";
                 description = "Cursor theme package.";
               };
 
@@ -192,6 +194,7 @@ in
                 font-awesome
                 nerd-fonts.jetbrains-mono
               ];
+              defaultText = lib.literalExpression "with pkgs; [ noto-fonts noto-fonts-cjk-sans noto-fonts-color-emoji font-awesome nerd-fonts.jetbrains-mono ]";
               description = "Font packages to install.";
             };
           };

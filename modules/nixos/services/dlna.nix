@@ -11,6 +11,7 @@
   };
 
   users.users.minidlna.extraGroups = [ "users" ];
+  systemd.services.minidlna.serviceConfig.PrivateUsers = lib.mkForce false; # user namespaces drop supplementary groups
 
   services.avahi = {
     enable = true;

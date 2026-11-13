@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   ...
 }:
 
@@ -28,8 +27,6 @@
 
     performance.cpuVendor = "intel";
   };
-
-  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.interfaces.enp2s0.wakeOnLan = {
     enable = true;

@@ -9,6 +9,7 @@
     ../../modules/nixos/bundle.nix
     ../../modules/nixos/desktop/bundle.nix
 
+    ../../modules/nixos/hardware/logitech.nix
     ../../modules/nixos/hardware/nvidia.nix
     ../../modules/nixos/hardware/sensors.nix
     ../../modules/nixos/hardware/vial.nix
@@ -49,7 +50,7 @@
     desktop.tearing.enable = true;
     desktop.layouts.centered.fullHeight = true;
     desktop.input.accelProfile = "flat";
-    theme.preset = "obsidian-mocha";
+    theme.preset = "deep-space";
     performance.transparentHugepages = "madvise";
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";
@@ -57,8 +58,6 @@
 
     hardware.nvidia.enable = true;
   };
-
-  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   boot.kernelModules = [
     "k10temp"
@@ -87,10 +86,13 @@
   ];
 
   systemd.tmpfiles.rules = [ "v /swap 0700 root root -" ];
-  systemd.services.mkswap-swap-swapfile.preStart = ''
-    ${pkgs.systemd}/bin/systemd-tmpfiles --create --prefix=/swap
-    ${pkgs.btrfs-progs}/bin/btrfs subvolume show /swap >/dev/null
-  '';
+  systemd.services.mkswap-swap-swapfile = {
+    after = [ "systemd-remount-fs.service" ];
+    preStart = ''
+      ${pkgs.systemd}/bin/systemd-tmpfiles --create --prefix=/swap
+      ${pkgs.btrfs-progs}/bin/btrfs subvolume show /swap >/dev/null
+    '';
+  };
 
   nix.settings = {
     max-jobs = 4;

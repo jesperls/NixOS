@@ -14,11 +14,9 @@
 
   services.pipewire.extraConfig.pipewire."99-performance" = {
     "context.properties" = {
+      "module.x11.bell" = false; # mod.x11-bell segfaults PipeWire when Xwayland exits.
       "default.clock.rate" = 48000;
-      "default.clock.allowed-rates" = [
-        48000
-        44100
-      ];
+      "default.clock.allowed-rates" = [ 48000 ];
       "default.clock.quantum" = 512;
       "default.clock.min-quantum" = 256;
       "default.clock.max-quantum" = 2048;
@@ -34,7 +32,7 @@
     "pulse.rules" = [
       {
         matches = [
-          { "application.name" = "~WEBRTC VoiceEngine|Chromium.*"; }
+          { "application.name" = "~^(WEBRTC VoiceEngine|Chromium.*)$"; }
           { "media.role" = "Communication"; }
         ];
         actions.update-props = {

@@ -6,12 +6,13 @@
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
-        description = "Run Pangu, the Quickshell desktop shell (desktop hosts enable this by importing desktop/bundle.nix).";
+        description = "Enable the Pangu desktop shell.";
       };
 
       wallpapers = lib.mkOption {
         type = lib.types.str;
-        default = "/home/${config.mySystem.user.username}/Pictures/Wallpapers";
+        default = "${config.users.users.${config.mySystem.user.username}.home}/Pictures/Wallpapers";
+        defaultText = lib.literalExpression ''"''${config.users.users.''${config.mySystem.user.username}.home}/Pictures/Wallpapers"'';
         description = "Wallpaper library the shell's picker defaults to.";
       };
 

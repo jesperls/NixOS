@@ -77,14 +77,7 @@ in
     enable = true;
     configType = "lua";
     settings = hyprlandConfig.settings;
-  };
-
-  xdg.configFile = {
-    "hypr/xdph.conf".text = ''
-      screencopy {
-        allow_token_by_default = true
-      }
-    '';
+    xdph.settings.screencopy.allow_token_by_default = true;
   };
 
   programs.pangu.hyprland.preset = {

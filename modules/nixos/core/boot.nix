@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
@@ -11,6 +12,8 @@ in
   hardware.enableRedistributableFirmware = true;
 
   boot = {
+    kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
+
     loader = {
       systemd-boot = {
         enable = true;
@@ -32,11 +35,12 @@ in
       "udev.log_priority=3"
     ]
     ++ lib.optional (cfg.cpuVendor == "amd") "amd_pstate=active"
+    ++ lib.optional (cfg.cpuVendor == "intel") "intel_pstate=active"
     ++ lib.optional cfg.zram.enable "zswap.enabled=0"
     ++ lib.optional (
       cfg.transparentHugepages != null
     ) "transparent_hugepage=${cfg.transparentHugepages}";
 
-    consoleLogLevel = 0;
+    consoleLogLevel = 3;
   };
 }

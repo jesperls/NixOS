@@ -15,6 +15,10 @@ in
     inherit (cfg) enable wallpapers settings;
     package = pkgs.pangu;
     fonts.enable = false;
-    theme.kitty.enable = true;
+    theme = {
+      kitty.enable = true;
+      firefox.enable = true;
+      spicetify.enable = true;
+    };
   };
 }

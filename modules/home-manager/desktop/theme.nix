@@ -18,12 +18,12 @@ let
         ];
       }
       ''
-        hyprcursor-util --extract ${cursor.package}/share/icons/${cursor.name} --output .
-        substituteInPlace "extracted_${cursor.name}/manifest.hl" \
-          --replace-fail "name = Extracted Theme" "name = ${cursor.name}"
-        hyprcursor-util --create extracted_${cursor.name} --output .
+        hyprcursor-util --extract ${lib.escapeShellArg "${cursor.package}/share/icons/${cursor.name}"} --output .
+        substituteInPlace ${lib.escapeShellArg "extracted_${cursor.name}/manifest.hl"} \
+          --replace-fail "name = Extracted Theme" ${lib.escapeShellArg "name = ${cursor.name}"}
+        hyprcursor-util --create ${lib.escapeShellArg "extracted_${cursor.name}"} --output .
         mkdir -p $out/share/icons
-        cp -r "theme_${cursor.name}" $out/share/icons/${cursor.name}
+        cp -r ${lib.escapeShellArg "theme_${cursor.name}"} "$out/share/icons/"${lib.escapeShellArg cursor.name}
       '';
 
   shellPalette = osConfig.mySystem.desktop.shell.enable;
@@ -49,7 +49,6 @@ in
       package = theme.gtk.theme.package;
     };
     iconTheme = theme.gtk.iconTheme;
-    cursorTheme = { inherit (theme.gtk.cursorTheme) name package size; };
     font = {
       name = theme.fonts.sans;
       size = theme.fonts.size;

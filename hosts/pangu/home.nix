@@ -1,4 +1,9 @@
-{ config, osConfig, ... }:
+{
+  config,
+  lib,
+  osConfig,
+  ...
+}:
 
 {
   imports = [
@@ -10,6 +15,7 @@
     ../../modules/home-manager/programs/obs.nix
     ../../modules/home-manager/programs/spicetify.nix
     ../../modules/home-manager/programs/flatpak.nix
+    ../../modules/home-manager/programs/battlenet.nix
     ../../modules/home-manager/services/deltatune.nix
     ../../modules/home-manager/services/foxy.nix
 
@@ -18,25 +24,46 @@
 
   services.easyeffects.enable = true;
 
+  systemd.user.services.easyeffects = lib.mkIf config.services.easyeffects.enable {
+    Unit = {
+      After = lib.mkForce [
+        "hyprland-session.target"
+        "pipewire.service"
+        "wireplumber.service"
+      ];
+      PartOf = lib.mkForce [ "hyprland-session.target" ];
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+    };
+    Service.Slice = "session.slice";
+    Install.WantedBy = lib.mkForce [ "hyprland-session.target" ];
+  };
+
+  programs.battlenet = {
+    prefix = "${config.home.homeDirectory}/Games/battlenet";
+  };
+
   home.stateVersion = "26.05";
 
-  programs.pangu.hyprland.preset.settings.apps.shortcuts = [
-    {
-      key = "R";
-      command = "ratty";
-      description = "Apps: ratty";
-    }
-    {
-      key = "D";
-      command = "vesktop";
-      description = "Apps: Vesktop";
-    }
-    {
-      key = "M";
-      command = "easyeffects";
-      description = "Apps: EasyEffects";
-    }
-  ];
+  programs.pangu.hyprland.preset.settings = {
+    binds.mouse_side_buttons = true;
+    apps.shortcuts = [
+      {
+        key = "R";
+        command = "ratty";
+        description = "Apps: ratty";
+      }
+      {
+        key = "D";
+        command = "vesktop";
+        description = "Apps: Vesktop";
+      }
+      {
+        key = "M";
+        command = "easyeffects";
+        description = "Apps: EasyEffects";
+      }
+    ];
+  };
 
   programs.zsh.shellAliases = {
     trash = "trash-put";

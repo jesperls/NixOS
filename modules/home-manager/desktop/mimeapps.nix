@@ -106,7 +106,6 @@ in
       // assign avTypes apps.videoPlayer
       // {
         "inode/directory" = apps.fileManager.desktopFile;
-        "x-scheme-handler/discord" = "vesktop.desktop";
         "x-scheme-handler/terminal" = apps.terminal.desktopFile;
         "application/x-terminal-emulator" = apps.terminal.desktopFile;
       };

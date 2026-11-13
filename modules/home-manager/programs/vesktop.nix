@@ -19,9 +19,8 @@
 
     vencord = {
       mutableSettings = true;
-      useSystem = true;
       settings = {
-        autoUpdate = false;
+        autoUpdate = true;
         autoUpdateNotification = false;
         notifyAboutUpdates = false;
         enabledThemes = [ "pangu.css" ];
@@ -44,4 +43,6 @@
       };
     };
   };
+
+  xdg.mimeApps.defaultApplications."x-scheme-handler/discord" = "vesktop.desktop";
 }

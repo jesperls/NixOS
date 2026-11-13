@@ -60,14 +60,6 @@ in
     enable = true;
     capSysNice = true;
   };
-  security.polkit.extraConfig = ''
-    polkit.addRule(function(action, subject) {
-      if (action.id.indexOf("com.feralinteractive.GameMode.") === 0 &&
-          subject.isInGroup("gamemode")) {
-        return polkit.Result.YES;
-      }
-    });
-  '';
 
   hardware.xpadneo.enable = true;
 }

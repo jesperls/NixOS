@@ -116,7 +116,8 @@
     paths = {
       repoRoot = lib.mkOption {
         type = lib.types.str;
-        default = "/home/${config.mySystem.user.username}/nixos-config";
+        default = "${config.users.users.${config.mySystem.user.username}.home}/nixos-config";
+        defaultText = lib.literalExpression ''"''${config.users.users.''${config.mySystem.user.username}.home}/nixos-config"'';
         description = "Absolute path to the local nixos-config checkout.";
       };
     };
@@ -127,20 +128,32 @@
       type = lib.types.listOf (
         lib.types.submodule {
           options = {
-            name = lib.mkOption { type = lib.types.nonEmptyStr; };
-            resolution = lib.mkOption { type = lib.types.strMatching "[1-9][0-9]*x[1-9][0-9]*"; };
-            refreshRate = lib.mkOption { type = lib.types.ints.positive; };
+            name = lib.mkOption {
+              type = lib.types.nonEmptyStr;
+              description = "Connector name or `desc:` monitor identifier.";
+            };
+            resolution = lib.mkOption {
+              type = lib.types.strMatching "[1-9][0-9]*x[1-9][0-9]*";
+              description = "Output resolution in `<width>x<height>` pixels.";
+            };
+            refreshRate = lib.mkOption {
+              type = lib.types.ints.positive;
+              description = "Output refresh rate in Hz.";
+            };
             position = lib.mkOption {
-              type = lib.types.str;
+              type = lib.types.strMatching "^(auto(-(left|right|up|down))?|-?[0-9]+x-?[0-9]+)$";
               default = "0x0";
+              description = "Logical layout position (`<x>x<y>` or `auto*`).";
             };
             scale = lib.mkOption {
               type = lib.types.addCheck lib.types.number (value: value > 0);
               default = 1.0;
+              description = "Logical UI scale factor.";
             };
             transform = lib.mkOption {
               type = lib.types.nullOr (lib.types.ints.between 0 7);
               default = null;
+              description = "Hyprland rotation/flip transform code (0–7).";
             };
             vrr = lib.mkOption {
               type = lib.types.ints.between 0 3;
@@ -187,6 +200,7 @@
             disabled = lib.mkOption {
               type = lib.types.bool;
               default = false;
+              description = "Disable this monitor output in Hyprland.";
             };
           };
         }

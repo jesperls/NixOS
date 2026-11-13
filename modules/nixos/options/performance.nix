@@ -53,7 +53,13 @@
         description = "Ceiling on lazily allocated zram as a percentage of RAM.";
       };
       algorithm = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.enum [
+          "zstd"
+          "lz4"
+          "lzo"
+          "lzo-rle"
+          "842"
+        ];
         default = "zstd";
         description = "Compression algorithm.";
       };

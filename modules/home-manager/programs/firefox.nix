@@ -1,4 +1,6 @@
 {
+  lib,
+  osConfig,
   pkgs,
   ...
 }:
@@ -7,14 +9,15 @@
   programs.firefox = {
     enable = true;
 
-    # The RDD sandbox cannot load the nvidia VA-API driver; scope the opt-out to Firefox.
-    package = pkgs.firefox.overrideAttrs (old: {
-      makeWrapperArgs = old.makeWrapperArgs ++ [
-        "--set"
-        "MOZ_DISABLE_RDD_SANDBOX"
-        "1"
-      ];
-    });
+    package = lib.mkIf osConfig.mySystem.hardware.nvidia.enable (
+      pkgs.firefox.overrideAttrs (old: {
+        makeWrapperArgs = old.makeWrapperArgs ++ [
+          "--set"
+          "MOZ_DISABLE_RDD_SANDBOX" # RDD sandbox blocks nvidia-vaapi-driver.
+          "1"
+        ];
+      })
+    );
 
     configPath = ".mozilla/firefox";
 

@@ -24,12 +24,12 @@
         "@wheel"
       ];
       warn-dirty = false;
-      min-free = 1073741824; # 1 GiB
-      max-free = 5368709120; # 5 GiB
+      min-free = 1024 * 1024 * 1024;
+      max-free = 5 * 1024 * 1024 * 1024;
 
       http-connections = lib.mkDefault 64;
       max-substitution-jobs = lib.mkDefault 32;
-      download-buffer-size = lib.mkDefault 536870912; # 512 MiB
+      download-buffer-size = lib.mkDefault (512 * 1024 * 1024);
 
       connect-timeout = 5;
       fallback = true;

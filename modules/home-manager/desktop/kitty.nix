@@ -1,4 +1,5 @@
 {
+  lib,
   osConfig,
   ...
 }:
@@ -6,6 +7,7 @@
 let
   colors = osConfig.mySystem.theme.colors;
   theme = osConfig.mySystem.theme;
+  shellManaged = osConfig.mySystem.desktop.shell.enable;
 in
 {
   programs.kitty = {
@@ -34,7 +36,8 @@ in
       tab_bar_edge = "bottom";
       tab_bar_style = "powerline";
       tab_powerline_style = "slanted";
-
+    }
+    // lib.optionalAttrs (!shellManaged) {
       foreground = colors.text;
       background = colors.background;
       selection_foreground = colors.background;

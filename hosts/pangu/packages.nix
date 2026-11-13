@@ -22,9 +22,9 @@
     trash-cli
     aria2
     ratty
-    gh
     mission-center
     pavucontrol
+    qpwgraph
     overskride
     audacity
     reaper
@@ -41,6 +41,7 @@
     imv
     umu-launcher
     protonup-qt
+    wowup-cf
     evtest
     dbeaver-bin
     alsa-scarlett-gui

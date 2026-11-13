@@ -18,6 +18,7 @@ in
     ]
     ++ lib.optional config.virtualisation.docker.enable "docker"
     ++ lib.optional config.programs.gamemode.enable "gamemode"
+    ++ lib.optional config.services.pipewire.enable "pipewire"
     ++ lib.optional (config.hardware.i2c.enable && !cfg.desktop.shell.enable) "i2c"
     ++ lib.optional (
       config.programs.ydotool.enable && !cfg.desktop.shell.enable

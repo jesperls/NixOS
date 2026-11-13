@@ -1,4 +1,17 @@
 {
+  deep-space = {
+    colors = {
+      accent = "#53bdfa";
+      accent2 = "#4fe3d8";
+      background = "#000000";
+      surface = "#080d14";
+      surfaceAlt = "#0c141e";
+      text = "#e2eef8";
+      muted = "#95acc2";
+      border = "#1c2c3d";
+    };
+  };
+
   obsidian-mocha = {
     colors = {
       accent = "#a869a8";

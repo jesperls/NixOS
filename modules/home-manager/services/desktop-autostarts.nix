@@ -1,8 +1,6 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
-  home.packages = [ pkgs.qpwgraph ];
-
   services.hyprpolkitagent.enable = true;
   services.network-manager-applet.enable = true;
 

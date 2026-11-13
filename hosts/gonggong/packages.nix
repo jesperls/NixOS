@@ -5,7 +5,6 @@
     docker-compose
     fastfetch
     fd
-    gh
     ripgrep
     jq
     nodejs

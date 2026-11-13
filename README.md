@@ -26,8 +26,8 @@ The configured zsh aliases use `$FLAKE`, set from `mySystem.paths.repoRoot`:
 | `nfu` | Update inputs in the checkout |
 | `snuf` | Clean generations, keeping `mySystem.system.keepGenerations` |
 
-Pangu runs the `linuxPackages_latest` kernel; kernel changes take effect after
-rebooting.
+Both hosts run the `linuxPackages_latest` kernel; kernel changes take effect
+after rebooting.
 
 ## Working on the config
 
