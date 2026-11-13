@@ -28,7 +28,7 @@ in
 
   programs.zsh.enable = true;
 
-  systemd.services."getty@tty1" = lib.mkIf cfg.system.autoLogin {
+  systemd.services."getty@tty1" = lib.mkIf (cfg.system.autoLogin && !config.services.greetd.enable) {
     overrideStrategy = "asDropin";
     serviceConfig.ExecStart = [
       ""

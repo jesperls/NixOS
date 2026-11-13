@@ -11,7 +11,7 @@ Do **not** delete these during cleanup passes unless the underlying hardware, ke
 
 ## NVIDIA & Wayland
 - **Suspend VRAM temp path** (`modules/nixos/hardware/nvidia.nix`): `NVreg_TemporaryFilePath=/var/tmp` is required because `/tmp` is `tmpfs` (50% RAM) and NVIDIA suspend/resume fails if VRAM backing fills `/tmp`.
-- **Firefox VA-API on NVIDIA** (`modules/home-manager/programs/firefox.nix`): Scopes `MOZ_DISABLE_RDD_SANDBOX=1` to the Firefox wrapper when `mySystem.hardware.nvidia.enable` is true so `nvidia-vaapi-driver` can load inside the decoder process without weakening the whole session environment.
+- **Firefox VA-API on NVIDIA & Wayland session restore** (`modules/home-manager/programs/firefox.nix`): Scopes `MOZ_DISABLE_RDD_SANDBOX=1` to the Firefox wrapper when `mySystem.hardware.nvidia.enable` is true so `nvidia-vaapi-driver` can load inside the decoder process, and sets `browser.sessionstore.max_resumed_crashes = -1` because Wayland compositor teardown exits GTK before Firefox writes a clean shutdown checkpoint.
 - **Sunshine Wayland capture** (`modules/nixos/services/sunshine.nix`): Forces `capture=wlr` on the `ExecStart` CLI with `capSysAdmin = false` so Hyprland direct capture works without portal prompts while keeping `~/.config/sunshine` editable via the web UI.
 
 ## Storage, Swap & Memory

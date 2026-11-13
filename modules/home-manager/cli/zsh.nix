@@ -1,4 +1,4 @@
-{ osConfig, lib, ... }:
+{ osConfig, ... }:
 
 {
   programs.zsh = {
@@ -43,12 +43,6 @@
       gl = "git log --oneline --graph";
       gd = "git diff";
     };
-
-    loginExtra = lib.optionalString osConfig.programs.hyprland.enable ''
-      if [ "$(tty)" = /dev/tty1 ] && [ -z "$WAYLAND_DISPLAY" ]; then
-        exec start-hyprland
-      fi
-    '';
 
     initContent = ''
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'

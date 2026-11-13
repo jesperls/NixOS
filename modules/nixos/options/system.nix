@@ -62,7 +62,7 @@
       autoLogin = lib.mkOption {
         type = lib.types.bool;
         default = false;
-        description = "Log the primary user into tty1 without a prompt.";
+        description = "Log the primary user in automatically at boot.";
       };
       passwordlessSudo = lib.mkOption {
         type = lib.types.bool;

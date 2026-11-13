@@ -106,11 +106,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794509765,
-        "narHash": "sha256-wn192MqTzq3UCAhsaETp2ZJdbsYr5Ofq1t8lbxc3rxs=",
+        "lastModified": 1794563670,
+        "narHash": "sha256-iV7X9W+zxWygyojdRtHidf49c+mmjhBxNWa6pU+iH3E=",
         "owner": "jesperls",
         "repo": "Pangu-Shell",
-        "rev": "6beda94a0e14c0456d8a6952bd730281e9a7c10a",
+        "rev": "9fde4cf9f9c0a3b9eef224e8d37d46a666bf07bc",
         "type": "github"
       },
       "original": {

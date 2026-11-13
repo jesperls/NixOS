@@ -5,6 +5,7 @@
 | Change | Source |
 | --- | --- |
 | Monitors, scale and placement | [hosts/pangu/monitors.nix](../hosts/pangu/monitors.nix) |
+| Boot splash and session greeter | [modules/nixos/desktop/boot.nix](../modules/nixos/desktop/boot.nix), [hyprland.nix](../modules/nixos/desktop/hyprland.nix) |
 | Input, layout defaults, tearing and default applications | `mySystem` options in the host configuration |
 | Keybindings, window rules and layout behaviour | Pangu `hyprland/pangu`, configured through the local Hyprland adapter |
 | Shell controls and visual components | Pangu `shell/modules` |
@@ -60,7 +61,9 @@ being treated as a fresh login by the lockscreen.
 
 ## Running and debugging
 
-Pangu runs as `pangu.service` under the user manager, tied to
+`greetd` starts the Hyprland session on `tty1` after Plymouth exits, autologging
+in when `mySystem.system.autoLogin` is enabled and falling back to `tuigreet`
+otherwise. Pangu runs as `pangu.service` under the user manager, tied to
 `hyprland-session.target`. The `pangu` wrapper supplies Quickshell, QML imports
 and external tools; running the QML directly skips that setup.
 

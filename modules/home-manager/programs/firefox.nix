@@ -68,6 +68,7 @@
         "general.smoothScroll" = true;
 
         "browser.sessionstore.resume_from_crash" = true;
+        "browser.sessionstore.max_resumed_crashes" = -1; # Wayland socket teardown exits GTK before Firefox writes a clean quit checkpoint.
       };
     };
   };
