@@ -9,7 +9,7 @@ let
   cfg = osConfig.mySystem.desktop.shell;
 in
 {
-  imports = [ inputs.pangu-shell.homeManagerModules.default ];
+  imports = [ inputs.pangu-shell.homeModules.default ];
 
   programs.pangu = {
     inherit (cfg) enable wallpapers settings;

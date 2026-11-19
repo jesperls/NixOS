@@ -23,7 +23,12 @@
     };
   };
 
+  services.pipewire.extraConfig.client."99-resample" = {
+    "stream.properties"."resample.quality" = 10;
+  };
+
   services.pipewire.extraConfig.pipewire-pulse."99-pulse-latency" = {
+    "stream.properties"."resample.quality" = 10;
     "pulse.properties" = {
       "pulse.min.req" = "256/48000";
       "pulse.default.req" = "512/48000";
@@ -41,5 +46,13 @@
         };
       }
     ];
+  };
+
+  services.pipewire.wireplumber.extraConfig."50-bluez" = {
+    "monitor.bluez.properties" = {
+      "bluez5.enable-sbc-xq" = true;
+      "bluez5.enable-msbc" = true;
+      "bluez5.enable-hw-volume" = true;
+    };
   };
 }

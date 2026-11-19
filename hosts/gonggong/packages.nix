@@ -2,6 +2,7 @@
 
 {
   home.packages = with pkgs; [
+    antigravity-cli
     docker-compose
     fastfetch
     fd

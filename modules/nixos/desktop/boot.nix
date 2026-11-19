@@ -6,18 +6,13 @@
 }:
 
 let
-  plymouthTheme = "rings";
   c = config.mySystem.theme.colors;
 in
 {
   boot.plymouth = {
     enable = true;
-    theme = plymouthTheme;
-    themePackages = [
-      (pkgs.adi1090x-plymouth-themes.override {
-        selected_themes = [ plymouthTheme ]; # Unfiltered package pulls ~524 MB of themes.
-      })
-    ];
+    theme = "blahaj";
+    themePackages = [ pkgs.plymouth-blahaj-theme ];
   };
 
   console.colors = lib.mkDefault (

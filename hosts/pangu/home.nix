@@ -22,7 +22,21 @@
     ./packages.nix
   ];
 
-  services.easyeffects.enable = true;
+  services.easyeffects = {
+    enable = true;
+    settings = {
+      Window = {
+        autostartOnLogin = false;
+        inputAutoloadingUsesFallback = false;
+      };
+      EffectsPipelines = {
+        processAllOutputs = false;
+        processAllInputs = false;
+      };
+      StreamOutputs.useDefaultOutputDevice = true;
+      StreamInputs.useDefaultInputDevice = true;
+    };
+  };
 
   systemd.user.services.easyeffects = lib.mkIf config.services.easyeffects.enable {
     Unit = {
@@ -31,10 +45,14 @@
         "pipewire.service"
         "wireplumber.service"
       ];
+      BindsTo = lib.mkForce [ "hyprland-session.target" ];
       PartOf = lib.mkForce [ "hyprland-session.target" ];
       ConditionEnvironment = "WAYLAND_DISPLAY";
     };
-    Service.Slice = "session.slice";
+    Service = {
+      Slice = "session.slice";
+      RestartPreventExitStatus = 255; # Qt6 exits 255 when Wayland compositor closes
+    };
     Install.WantedBy = lib.mkForce [ "hyprland-session.target" ];
   };
 
@@ -44,25 +62,34 @@
 
   home.stateVersion = "26.05";
 
-  programs.pangu.hyprland.preset.settings = {
-    binds.mouse_side_buttons = true;
-    apps.shortcuts = [
-      {
-        key = "R";
-        command = "ratty";
-        description = "Apps: ratty";
-      }
-      {
-        key = "D";
-        command = "vesktop";
-        description = "Apps: Vesktop";
-      }
-      {
-        key = "M";
-        command = "easyeffects";
-        description = "Apps: EasyEffects";
-      }
-    ];
+  programs.pangu = {
+    pets.enable = true;
+    hyprland.preset.settings = {
+      binds.mouse_side_buttons = true;
+      apps.shortcuts = [
+        {
+          key = "R";
+          command = "ratty";
+          description = "Apps: ratty";
+        }
+        {
+          key = "D";
+          command = "vesktop";
+          description = "Apps: Vesktop";
+        }
+        {
+          key = "M";
+          command = "easyeffects";
+          description = "Apps: EasyEffects";
+        }
+        {
+          mods = "SUPER SHIFT";
+          key = "P";
+          command = "qs-vpets pen";
+          description = "Shell: Pokémon Sanctuary";
+        }
+      ];
+    };
   };
 
   programs.zsh.shellAliases = {

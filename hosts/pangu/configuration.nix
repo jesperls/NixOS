@@ -72,6 +72,12 @@
   services.flatpak.enable = true;
   programs.coolercontrol.enable = true;
 
+  services.openssh.enable = true;
+
+  users.users.${config.mySystem.user.username}.openssh.authorizedKeys.keys = [
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDzETJmYhmqxik4LDk6CdNOnVZ8cC+14bdzL1ouSjnJBSENcS9lwrS76cvOC21wOyWRZcwdDrK86IYr9phkR+z3UcFSu4sAJxkoz78CkCP/alQ+Gz0WFsgHhgpTKFNyPswwJu3aZcRTYJZnYndU3b2ttCD4elm0HA+lujQOMkh5/niMGOAIQq0MEC0EuxZzwBprn2xZk6olewHPBbUEr9fil2Yu65EAAyYTamNDcYJzwALKsTM1Gd4MekRCiPs7OEO4NKU4N8st2A0bMb151HRY4/lkIqNekJDAKGblKAzlZ8AuSgOnnfGvJbjmBLv519JI8lnZrKHBNpW4uuQmF0wb elonjes@elx-5cg2212nwm"
+  ];
+
   services.udev.packages = [
     (pkgs.writeTextDir "lib/udev/rules.d/70-nuphy.rules" ''
       SUBSYSTEM=="hidraw", ATTRS{idVendor}=="19f5", TAG+="uaccess"
