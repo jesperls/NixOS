@@ -107,11 +107,11 @@
         "qs-vpets": "qs-vpets"
       },
       "locked": {
-        "lastModified": 1795173443,
-        "narHash": "sha256-8fnHMH2QRhdcdjh0U+g58qqnwr0jpnFWRZSIfpSomAY=",
+        "lastModified": 1795177874,
+        "narHash": "sha256-0GLNCtAJjdyFjMdJ0eo3tmTXFtbuT/8zitngjcRl2a8=",
         "owner": "jesperls",
         "repo": "Pangu-Shell",
-        "rev": "f7be27b304726b16507e8e5a8ef0b2ed70118444",
+        "rev": "647510e9a84f66a25dcbdff726d2cddd56c1c914",
         "type": "github"
       },
       "original": {
@@ -132,11 +132,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795173425,
-        "narHash": "sha256-nV80fzJzQ7DX177pKRUfwwibSo1APEpSzVcPvHkruhQ=",
+        "lastModified": 1795177283,
+        "narHash": "sha256-7ktTS1KOnAi71wEQ46bkcjFdVB1SMaNEp89H9I/D8xs=",
         "owner": "jesperls",
         "repo": "qs-vpets",
-        "rev": "230dd231e19409756d7faa0fda71f70bd8b6a50a",
+        "rev": "48d5ba13838bc59e66c2d595fb540d31a2cad0c4",
         "type": "github"
       },
       "original": {
