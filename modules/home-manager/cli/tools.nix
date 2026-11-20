@@ -60,10 +60,24 @@ in
     enable = true;
     icons = "auto";
     git = true;
+    extraOptions = [ "--group-directories-first" ];
   };
 
   programs.fzf = {
     enable = true;
+    defaultCommand = "fd --type f --strip-cwd-prefix --hidden --follow --exclude .git";
+    fileWidget = {
+      command = "fd --type f --strip-cwd-prefix --hidden --follow --exclude .git";
+      options = [
+        "--preview 'bat --color=always --style=numbers --line-range=:200 {}'"
+      ];
+    };
+    changeDirWidget = {
+      command = "fd --type d --strip-cwd-prefix --hidden --follow --exclude .git";
+      options = [
+        "--preview 'eza --tree --level=2 --color=always --icons=always {}'"
+      ];
+    };
     defaultOptions = [
       "--height 40%"
       "--layout=reverse"
@@ -116,6 +130,11 @@ in
     };
   };
 
+  home.sessionVariables = {
+    MANPAGER = "sh -c 'col -bx | bat -l man -p'";
+    MANROFFOPT = "-c";
+  };
+
   programs.bat = {
     enable = true;
     config = {
@@ -127,6 +146,7 @@ in
 
   programs.btop = {
     enable = true;
+    package = if osConfig.mySystem.hardware.nvidia.enable then pkgs.btop-cuda else pkgs.btop;
     settings = {
       color_theme = "Default";
       theme_background = false;

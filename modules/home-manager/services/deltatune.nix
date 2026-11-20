@@ -5,18 +5,11 @@
 
   services.deltatune.enable = true;
 
-  systemd.user.services.deltatune = {
-    Unit = {
-      After = lib.mkForce [
-        "hyprland-session.target"
-        "pipewire.service"
-        "wireplumber.service"
-      ];
-      BindsTo = lib.mkForce [ "hyprland-session.target" ];
-      PartOf = lib.mkForce [ "hyprland-session.target" ];
-      ConditionEnvironment = "WAYLAND_DISPLAY";
-    };
-    Service.Slice = "session.slice";
-    Install.WantedBy = lib.mkForce [ "hyprland-session.target" ];
+  systemd.user.services.deltatune = (import ../lib/autostart.nix).bindSession {
+    inherit lib;
+    extraAfter = [
+      "pipewire.service"
+      "wireplumber.service"
+    ];
   };
 }

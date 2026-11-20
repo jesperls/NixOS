@@ -38,23 +38,16 @@
     };
   };
 
-  systemd.user.services.easyeffects = lib.mkIf config.services.easyeffects.enable {
-    Unit = {
-      After = lib.mkForce [
-        "hyprland-session.target"
+  systemd.user.services.easyeffects = lib.mkIf config.services.easyeffects.enable (
+    (import ../../modules/home-manager/lib/autostart.nix).bindSession {
+      inherit lib;
+      extraAfter = [
         "pipewire.service"
         "wireplumber.service"
       ];
-      BindsTo = lib.mkForce [ "hyprland-session.target" ];
-      PartOf = lib.mkForce [ "hyprland-session.target" ];
-      ConditionEnvironment = "WAYLAND_DISPLAY";
-    };
-    Service = {
-      Slice = "session.slice";
-      RestartPreventExitStatus = 255; # Qt6 exits 255 when Wayland compositor closes
-    };
-    Install.WantedBy = lib.mkForce [ "hyprland-session.target" ];
-  };
+      service.RestartPreventExitStatus = 255; # Qt6 exits 255 when Wayland compositor closes
+    }
+  );
 
   programs.battlenet = {
     prefix = "${config.home.homeDirectory}/Games/battlenet";
@@ -66,6 +59,10 @@
     pets.enable = true;
     hyprland.preset.settings = {
       binds.mouse_side_buttons = true;
+      scratchpad = {
+        width = 1600;
+        height = 1000;
+      };
       apps.shortcuts = [
         {
           key = "R";

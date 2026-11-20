@@ -32,6 +32,11 @@ let
     "application/x-yaml"
     "text/x-yaml"
     "application/x-shellscript"
+    "text/x-nix"
+    "text/rust"
+    "text/x-lua"
+    "application/toml"
+    "text/x-qml"
   ];
 
   textEditorTypes = [
@@ -46,6 +51,10 @@ let
     "image/png"
     "image/gif"
     "image/webp"
+    "image/avif"
+    "image/heif"
+    "image/jxl"
+    "image/x-icon"
     "image/svg+xml"
     "image/bmp"
     "image/tiff"
@@ -75,9 +84,13 @@ let
   avTypes = [
     "audio/mpeg"
     "audio/ogg"
+    "audio/opus"
     "audio/wav"
     "audio/flac"
     "audio/aac"
+    "audio/mp4"
+    "audio/x-m4a"
+    "audio/webm"
     "audio/x-mp3"
     "video/mp4"
     "video/x-msvideo"

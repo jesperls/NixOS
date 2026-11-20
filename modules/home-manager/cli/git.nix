@@ -13,11 +13,20 @@
       };
       init.defaultBranch = "main";
       pull.rebase = true;
+      rebase = {
+        autoStash = true;
+        autoSquash = true;
+      };
       push.autoSetupRemote = true;
       fetch.prune = true;
       merge.conflictstyle = "zdiff3";
       rerere.enabled = true;
-      diff.colorMoved = "default";
+      diff = {
+        algorithm = "histogram";
+        colorMoved = "default";
+      };
+      branch.sort = "-committerdate";
+      commit.verbose = true;
     };
   };
 

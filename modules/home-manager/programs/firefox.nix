@@ -21,8 +21,6 @@
 
     configPath = ".mozilla/firefox";
 
-    nativeMessagingHosts = [ pkgs.fx-cast-bridge ];
-
     policies = {
       DisableTelemetry = true;
       DisableFirefoxStudies = true;
@@ -62,7 +60,9 @@
         "browser.aboutConfig.showWarning" = false;
         "browser.newtabpage.activity-stream.showSponsored" = false;
         "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
+        "browser.urlbar.suggest.quicksuggest.sponsored" = false;
 
+        "general.autoScroll" = true;
         "general.smoothScroll" = true;
 
         "browser.sessionstore.resume_from_crash" = true;

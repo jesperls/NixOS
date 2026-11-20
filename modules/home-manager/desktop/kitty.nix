@@ -25,6 +25,8 @@ in
       sync_to_monitor = true;
 
       scrollback_lines = 10000;
+      scrollback_pager_history_size = 50;
+      strip_trailing_spaces = "smart";
 
       url_style = "curly";
       open_url_with = "default";

@@ -1,4 +1,5 @@
 {
+  config,
   osConfig,
   lib,
   ...
@@ -67,7 +68,8 @@ let
         speed = theme.animations.speed;
       };
       translucent_opacity = theme.opacity.translucent;
-      translucent_apps = theme.opacity.translucentApps;
+      translucent_apps =
+        if osConfig.mySystem.desktop.shell.enable then [ ] else theme.opacity.translucentApps; # Pangu's gtk.css already sets background alpha without dimming text.
       font_family = theme.fonts.sans;
     };
   };
@@ -77,6 +79,18 @@ in
     enable = true;
     configType = "lua";
     settings = hyprlandConfig.settings;
+    systemd.variables = lib.unique (
+      [
+        "DISPLAY"
+        "HYPRLAND_INSTANCE_SIGNATURE"
+        "WAYLAND_DISPLAY"
+        "XDG_CURRENT_DESKTOP"
+        "XDG_SESSION_TYPE"
+        "HYPRCURSOR_THEME"
+        "HYPRCURSOR_SIZE"
+      ]
+      ++ builtins.attrNames config.home.sessionVariables
+    );
     xdph.settings.screencopy.allow_token_by_default = true;
   };
 

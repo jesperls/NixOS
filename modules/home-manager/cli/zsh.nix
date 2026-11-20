@@ -16,13 +16,23 @@
       expireDuplicatesFirst = true;
     };
 
-    historySubstringSearch.enable = true;
+    historySubstringSearch = {
+      enable = true;
+      searchUpKey = [
+        "^[[A"
+        "^[OA"
+      ];
+      searchDownKey = [
+        "^[[B"
+        "^[OB"
+      ];
+    };
 
     shellAliases = {
-      ll = "eza -lha --group-directories-first --sort=name";
-      l = "eza -lh --group-directories-first --sort=name";
-      ls = "eza --group-directories-first";
-      la = "eza -la --group-directories-first";
+      ll = "eza -lha --sort=name";
+      l = "eza -lh --sort=name";
+      ls = "eza";
+      la = "eza -la";
       lt = "eza --tree --level=2";
 
       ".." = "cd ..";
@@ -45,6 +55,8 @@
     };
 
     initContent = ''
+      setopt INTERACTIVE_COMMENTS
+
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
       zstyle ':completion:*' menu select
       zstyle ':completion:*' list-colors "''${(s.:.)LS_COLORS}"
@@ -53,10 +65,14 @@
       zle -N edit-command-line
       bindkey "^X^E" edit-command-line
 
-      [[ -n "''${terminfo[kcuu1]}" ]] && bindkey "''${terminfo[kcuu1]}" history-substring-search-up
-      [[ -n "''${terminfo[kcud1]}" ]] && bindkey "''${terminfo[kcud1]}" history-substring-search-down
-      bindkey "^[[A" history-substring-search-up
-      bindkey "^[[B" history-substring-search-down
+      bindkey "^[[H" beginning-of-line
+      bindkey "^[OH" beginning-of-line
+      bindkey "^[[F" end-of-line
+      bindkey "^[OF" end-of-line
+      bindkey "^[[3~" delete-char
+      bindkey "^[[1;5D" backward-word
+      bindkey "^[[1;5C" forward-word
+      bindkey "^[[Z" reverse-menu-complete
     '';
   };
 }

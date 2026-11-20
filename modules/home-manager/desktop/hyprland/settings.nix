@@ -67,17 +67,24 @@ let
       width = monitorWidth (builtins.head activeMonitors);
       sideGap = builtins.floor ((width - special.maxWidth) / 2);
     in
-    lib.optionals (numMonitors > 0 && special.maxWidth > 0 && width > special.maxWidth) (
-      map (workspace: {
-        inherit workspace;
-        gaps_out = {
-          left = sideGap;
-          right = sideGap;
-          top = special.verticalGap;
-          bottom = special.verticalGap;
-        };
-      }) [ "special:scratchpad" ]
-    );
+    lib.optionals
+      (
+        numMonitors > 0
+        && special.maxWidth > 0
+        && width > special.maxWidth
+        && !(osConfig.mySystem.desktop.shell.enable or false)
+      )
+      (
+        map (workspace: {
+          inherit workspace;
+          gaps_out = {
+            left = sideGap;
+            right = sideGap;
+            top = special.verticalGap;
+            bottom = special.verticalGap;
+          };
+        }) [ "special:scratchpad" ]
+      );
 
 in
 {

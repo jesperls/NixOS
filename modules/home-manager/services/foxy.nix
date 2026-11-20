@@ -11,7 +11,7 @@ in
 {
   home.packages = [ foxy ];
 
-  systemd.user.services.foxy = import ../lib/autostart.nix {
+  systemd.user.services.foxy = (import ../lib/autostart.nix).mkService {
     description = "Foxy — jumpscare overlay";
     execStart = lib.getExe foxy;
   };
