@@ -7,6 +7,7 @@ let
   shared = import ../lib/gaming.nix { inherit pkgs; };
 in
 {
+  boot.kernelModules = [ "ntsync" ];
   boot.kernelParams = [ "split_lock_detect=off" ]; # Avoid kernel traps on unaligned locks in Wine/Proton games.
 
   programs.steam = {
@@ -16,22 +17,18 @@ in
     dedicatedServer.openFirewall = true;
     extraCompatPackages = with pkgs; [ proton-ge-bin ];
 
-    gamescopeSession.enable = true;
-
     package = pkgs.steam.override {
-      extraPkgs =
-        pkgs:
-        with pkgs;
-        shared.wineRuntimeLibs
-        ++ [
+      extraLibraries =
+        p:
+        (import ../lib/gaming.nix { pkgs = p; }).wineRuntimeLibs
+        ++ (with p; [
           stdenv.cc.cc.lib
           libkrb5
           keyutils
-          vulkan-loader
-        ];
+        ]);
     };
 
-    extraPackages = with pkgs; shared.gamingTools;
+    extraPackages = shared.gamingTools;
   };
 
   environment.systemPackages = with pkgs; [
@@ -58,7 +55,8 @@ in
 
   programs.gamescope = {
     enable = true;
-    capSysNice = true;
+    enableWsi = true;
+    capSysNice = false; # setcap wrapper sets AT_SECURE, stripping LD_PRELOAD for Steam Overlay/MangoHud
   };
 
   hardware.xpadneo.enable = true;

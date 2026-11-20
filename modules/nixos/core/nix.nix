@@ -19,10 +19,7 @@
         "nix-command"
         "flakes"
       ];
-      trusted-users = [
-        "root"
-        "@wheel"
-      ];
+      trusted-users = [ "@wheel" ];
       warn-dirty = false;
       min-free = 1024 * 1024 * 1024;
       max-free = 5 * 1024 * 1024 * 1024;
@@ -33,19 +30,20 @@
 
       connect-timeout = 5;
       fallback = true;
-      substituters = [
-        "https://cache.nixos.org"
+      extra-substituters = [
         "https://nix-community.cachix.org"
-        "https://hyprland.cachix.org"
+        "https://cache.garnix.io"
       ];
-      trusted-public-keys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      extra-trusted-public-keys = [
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+        "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
       ];
     };
 
-    optimise.automatic = true;
+    optimise = {
+      automatic = true;
+      dates = [ "weekly" ];
+    };
   };
   nixpkgs.config.allowUnfree = true;
 

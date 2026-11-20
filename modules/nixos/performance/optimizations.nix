@@ -42,7 +42,7 @@ in
   services.earlyoom = lib.mkIf cfg.earlyoom.enable {
     enable = true;
     inherit (cfg.earlyoom) freeMemThreshold freeSwapThreshold;
-    enableNotifications = true;
+    enableNotifications = lib.mkDefault config.programs.hyprland.enable;
     extraArgs = [
       "--prefer"
       cfg.earlyoom.preferRegex

@@ -57,6 +57,8 @@ in
     };
   };
 
+  systemd.services.greetd.serviceConfig.Type = lib.mkForce "simple"; # avoids Type=idle waiting on unrelated boot units after Plymouth exits
+
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
@@ -75,6 +77,4 @@ in
       };
     };
   };
-
-  environment.systemPackages = [ pkgs.pamixer ];
 }

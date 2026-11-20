@@ -176,6 +176,13 @@ in
   };
 
   config = {
+    assertions = [
+      {
+        assertion = cfg.publicAddress != cfg.serverAddress;
+        message = "mySystem.services.pufferpanelLazymc.publicAddress and serverAddress must differ.";
+      }
+    ];
+
     environment.etc."lazymc/lazymc.toml".source = lazymcConfig;
 
     systemd.services.lazymc = {

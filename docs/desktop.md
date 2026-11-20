@@ -30,7 +30,7 @@ Hyprland's `general` section, but write different keys. Keep those keys
 separate when adding a setting.
 
 Home Manager selects fonts, cursor and GTK/Qt theme names. Pangu generates
-the desktop palette with matugen and writes toolkit/app exports (`~/.cache/pangu/{gtk.css,kitty.conf,firefox.css}`, `~/.config/qt{5,6}ct/colors/pangu.colors`, `~/.config/vesktop/themes/pangu.css`, `~/.config/spicetify/Themes/Pangu/{color.ini,user.css}`). The managed GTK and Firefox stylesheets import
+the desktop palette with matugen and writes toolkit/app exports (`~/.cache/pangu/{gtk.css,kitty.conf,firefox.css,firefox-content.css}`, `~/.config/qt{5,6}ct/colors/pangu.conf`, `~/.config/vesktop/themes/pangu.css`; Pangu's Spicetify export is disabled in favor of static `spicetify-nix`). The managed GTK and Firefox stylesheets import
 their corresponding `~/.cache/pangu/` files; palette updates rewrite those cache files.
 
 ## Persistent settings

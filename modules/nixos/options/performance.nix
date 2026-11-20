@@ -83,12 +83,12 @@
       };
       preferRegex = lib.mkOption {
         type = lib.types.str;
-        default = "^(wine(64)?|wine-preloader|wine64-preloade|wineserver|Battle\\.net|lutris-wrapper)$|\\.exe$"; # comm names are limited to 15 bytes.
+        default = "^(java)$"; # comm names are limited to 15 bytes.
         description = "Processes to kill first.";
       };
       avoidRegex = lib.mkOption {
         type = lib.types.str;
-        default = "^(Hyprland|pipewire|wireplumber|qs|\\.qs-wrapped|pangu)$|quickshell";
+        default = "^(sshd|nginx|dockerd|containerd|lazymc)$";
         description = "Processes to kill last.";
       };
     };

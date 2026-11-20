@@ -28,7 +28,7 @@ in
     initrd = {
       compressor = "zstd";
       compressorArgs = [
-        "-19"
+        "-6"
         "-T0"
       ];
     };

@@ -102,13 +102,10 @@
 
   nix.settings = {
     max-jobs = 4;
-    cores = 8;
+    cores = 16;
   };
 
-  networking.interfaces.eno1.wakeOnLan = {
-    enable = true;
-    policy = [ "magic" ];
-  };
+  networking.networkmanager.connectionConfig."ethernet.wake-on-lan" = 64; # magic (0x40); avoids scripted network-interfaces units alongside NetworkManager
 
   home-manager.users.${config.mySystem.user.username}.imports = [ ./home.nix ];
 

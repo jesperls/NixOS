@@ -12,6 +12,4 @@ in
     enable = true;
     scheduler = cfg.scheduler;
   };
-
-  services.irqbalance.enable = lib.mkDefault true;
 }

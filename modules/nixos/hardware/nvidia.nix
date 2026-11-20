@@ -31,7 +31,8 @@ in
     ];
 
     boot.extraModprobeConfig = ''
-      options nvidia NVreg_UsePageAttributeTable=1 NVreg_TemporaryFilePath=/var/tmp # /tmp is tmpfs
+      # /tmp is tmpfs
+      options nvidia NVreg_UsePageAttributeTable=1 NVreg_TemporaryFilePath=/var/tmp
     '';
 
     environment.sessionVariables = {

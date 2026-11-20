@@ -4,10 +4,10 @@ Do **not** delete these during cleanup passes unless the underlying hardware, ke
 
 ## Audio & PipeWire
 - **PipeWire X11 bell disabled** (`modules/nixos/services/audio.nix`): `"module.x11.bell" = false` prevents `mod.x11-bell` from segfaulting PipeWire when Xwayland exits.
-- **WebRTC / Chromium Pulse regex** (`modules/nixos/services/audio.nix`): Anchored `~^(WEBRTC VoiceEngine|Chromium.*)$` forces 1024/48000 quantum so voice streams do not underrun.
+- **WebRTC / Chromium Pulse regex** (`modules/nixos/services/audio.nix`): Anchored `~^(WEBRTC VoiceEngine|Chromium.*)$` forces 512/48000 quantum so voice streams do not underrun.
 - **Focusrite Scarlett 2i2 4th Gen & Logitech A50** (`hosts/pangu/audio.nix`):
-  - Udev rule `90-usb-audio-power.rules` forces `ATTR{power/control}="on"` on Focusrite USB (`1235`) to stop autosuspend dropouts.
-  - WirePlumber matches both `node.name` and `alsa.long_card_name` (needed to catch UCM SplitPCM's internal `alsa_input.hw_Gen_0` node), disables ALSA batch mode (`api.alsa.disable-batch = true`), sets `session.suspend-timeout-seconds = 0`, and enables `device.recover-on-error = true`.
+  - Udev rule `91-usb-audio.rules` forces `ATTR{power/control}="on"` on PCI xHCI controllers, USB root hubs, Focusrite (`1235`), and Logitech A50 (`046d:0b1c`), and sets `ACP_PROFILE_SET="usb-gaming-headset.conf"` on A50 Gen 5.
+  - WirePlumber matches both `node.name` and `alsa.long_card_name` on Focusrite (needed to catch UCM SplitPCM's internal `alsa_input.hw_Gen_0` node), sets `api.alsa.headroom = 512` on Focusrite, disables ALSA batch mode (`api.alsa.disable-batch = true`) on A50 outputs, sets `session.suspend-timeout-seconds = 0`, and enables `device.recover-on-error = true`.
 
 ## NVIDIA & Wayland
 - **Suspend VRAM temp path** (`modules/nixos/hardware/nvidia.nix`): `NVreg_TemporaryFilePath=/var/tmp` is required because `/tmp` is `tmpfs` (50% RAM) and NVIDIA suspend/resume fails if VRAM backing fills `/tmp`.
@@ -27,5 +27,4 @@ Do **not** delete these during cleanup passes unless the underlying hardware, ke
 ## Desktop Apps & Emulators
 - **Vesktop Vencord updates** (`modules/home-manager/programs/vesktop.nix`): Avoid `vencord.useSystem = true` with `autoUpdate = false`; Discord web rollouts frequently break older nixpkgs-pinned Vencord builds and render a blank window until Vencord updates.
 - **Emulator wrappers** (`pkgs/emulators.nix`):
-  - `melonds`: `GDK_BACKEND=x11` works around Wayland surface/GL issues.
-  - `xemu`: `SDL_JOYSTICK_HIDAPI=0` avoids duplicate/broken controller input under SDL HIDAPI.
+  - `melonds` & `xemu`: `SDL_JOYSTICK_HIDAPI=0` avoids duplicate/broken controller input under SDL HIDAPI.

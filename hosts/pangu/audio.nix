@@ -4,11 +4,11 @@
   services.udev.packages = [
     (pkgs.writeTextDir "lib/udev/rules.d/91-usb-audio.rules" ''
       # 91- runs after 90-pipewire-alsa.rules, which omits A50 Gen 5
-           ACTION=="add|change", SUBSYSTEM=="pci", ATTR{class}=="0x0c0330", ATTR{power/control}="on"
-           ACTION=="add|change", SUBSYSTEM=="usb", KERNEL=="usb[0-9]*", ATTR{power/control}="on"
-           ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="1235", ATTR{power/control}="on"
-           ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="0b1c", ATTR{power/control}="on"
-           SUBSYSTEM=="sound", ACTION=="add|change", KERNEL=="card*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0b1c", ENV{ACP_PROFILE_SET}="usb-gaming-headset.conf"
+      ACTION=="add|change", SUBSYSTEM=="pci", ATTR{class}=="0x0c0330", ATTR{power/control}="on"
+      ACTION=="add|change", SUBSYSTEM=="usb", KERNEL=="usb[0-9]*", ATTR{power/control}="on"
+      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="1235", ATTR{power/control}="on"
+      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="0b1c", ATTR{power/control}="on"
+      SUBSYSTEM=="sound", ACTION=="add|change", KERNEL=="card*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0b1c", ENV{ACP_PROFILE_SET}="usb-gaming-headset.conf"
     '')
   ];
 

@@ -1,6 +1,16 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
+  mySystem.performance.earlyoom = {
+    preferRegex = lib.mkDefault "^(wine(64)?|wine-preloader|wine64-preloade|wineserver|Battle\\.net|lutris-wrapper)$|\\.exe$";
+    avoidRegex = lib.mkDefault "^(Hyprland|\\.Hyprland-wrapp|pipewire|wireplumber|qs|\\.qs-wrapped|pangu)$|quickshell"; # comm is truncated to 15 bytes
+  };
+
   hardware.graphics = {
     enable = true;
     enable32Bit = true;

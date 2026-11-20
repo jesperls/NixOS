@@ -26,7 +26,11 @@ in
     shell = pkgs.zsh;
   };
 
-  programs.zsh.enable = true;
+  programs.zsh = {
+    enable = true;
+    enableGlobalCompInit = false; # Home Manager runs compinit
+    promptInit = ""; # starship owns the prompt
+  };
 
   systemd.services."getty@tty1" = lib.mkIf (cfg.system.autoLogin && !config.services.greetd.enable) {
     overrideStrategy = "asDropin";

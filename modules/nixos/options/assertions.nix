@@ -23,5 +23,12 @@ in
         cfg.hardware.nvidia.enable -> builtins.elem "nvidia" config.services.xserver.videoDrivers;
       message = "mySystem.hardware.nvidia.enable requires hardware/nvidia.nix to be imported on the host.";
     }
+    {
+      assertion = builtins.all (
+        m:
+        (m.sdrBrightness == null || m.sdrBrightness > 0) && (m.sdrSaturation == null || m.sdrSaturation > 0)
+      ) cfg.monitors;
+      message = "mySystem.monitors sdrBrightness and sdrSaturation must be positive when set.";
+    }
   ];
 }
