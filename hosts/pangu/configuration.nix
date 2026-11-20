@@ -60,8 +60,6 @@
     hardware.nvidia.enable = true;
   };
 
-  environment.sessionVariables.AQ_DRM_DEVICES = "/dev/dri/by-path/pci-0000:01:00.0-card"; # Keeps Aquamarine off the unused Radeon 610M iGPU.
-
   boot.kernelModules = [
     "k10temp"
     "nct6775"
