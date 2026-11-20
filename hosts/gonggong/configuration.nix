@@ -37,6 +37,8 @@
     services.pufferpanelLazymc = {
       serverId = "36324fc3";
       serverDirectory = "/var/lib/pufferpanel/servers/36324fc3";
+      allowedHostnames = [ "bonecontrol.com" ];
+      wakeOnlyWhitelist = true;
       mcVersion = "1.21.1";
       protocol = 767;
       sleepAfter = 1800;

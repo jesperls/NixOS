@@ -61,7 +61,10 @@ lib.mapAttrs' (
         python3 ${./tests/test_pufferpanel_lazymc_bridge.py} ${
           lib.getExe (pkgs.callPackage ./pkgs/pufferpanel-lazymc-bridge.nix { })
         }
-        lazymc --config ${hosts.gonggong.config.environment.etc."lazymc/lazymc.toml".source} config test
+        python3 ${./tests/test_mc_host_gate.py} ${lib.getExe (pkgs.callPackage ./pkgs/mc-host-gate.nix { })}
+        cfg=${hosts.gonggong.config.environment.etc."lazymc/lazymc.toml".source}
+        grep -q '^freeze_process = false$' "$cfg"
+        lazymc --config "$cfg" config test
         touch "$out"
       '';
 }
