@@ -6,7 +6,7 @@ Do **not** delete these during cleanup passes unless the underlying hardware, ke
 - **PipeWire X11 bell disabled** (`modules/nixos/services/audio.nix`): `"module.x11.bell" = false` prevents `mod.x11-bell` from segfaulting PipeWire when Xwayland exits.
 - **WebRTC / Chromium Pulse regex** (`modules/nixos/services/audio.nix`): Anchored `~^(WEBRTC VoiceEngine|Chromium.*)$` forces 512/48000 quantum so voice streams do not underrun.
 - **Focusrite Scarlett 2i2 4th Gen & Logitech A50** (`hosts/pangu/audio.nix`):
-  - Udev rule `91-usb-audio.rules` forces `ATTR{power/control}="on"` on PCI xHCI controllers, USB root hubs, Focusrite (`1235`), and Logitech A50 (`046d:0b1c`), and sets `ACP_PROFILE_SET="usb-gaming-headset.conf"` on A50 Gen 5.
+  - Udev rule `91-usb-audio.rules` forces `ATTR{power/control}="on"` on PCI xHCI controllers, USB root hubs, Focusrite (`1235`), Logitech A50 (`046d:0b1c`), Realtek USB hub (`0bda:5411`), Insta360 Link 2 (`2e1a:4c04`), and MT7922 Bluetooth (`13d3:3614`), and sets `ACP_PROFILE_SET="usb-gaming-headset.conf"` on A50 Gen 5.
   - WirePlumber matches both `node.name` and `alsa.long_card_name` on Focusrite (needed to catch UCM SplitPCM's internal `alsa_input.hw_Gen_0` node), sets `api.alsa.headroom = 512` on Focusrite, disables ALSA batch mode (`api.alsa.disable-batch = true`) on A50 outputs, sets `session.suspend-timeout-seconds = 0`, and enables `device.recover-on-error = true`.
 
 ## NVIDIA & Wayland
@@ -17,7 +17,7 @@ Do **not** delete these during cleanup passes unless the underlying hardware, ke
 ## Storage, Swap & Memory
 - **Btrfs `/swap` subvolume** (`hosts/pangu/configuration.nix`): Swap lives at `/swap/swapfile` inside a dedicated subvolume (`mkswap-swap-swapfile` ordered `after = [ "systemd-remount-fs.service" ]`) so active swap never blocks root Btrfs snapshots.
 - **zram + zswap exclusion** (`modules/nixos/core/boot.nix`): Passes `zswap.enabled=0` whenever `zram` is enabled to prevent double-compressing pages before hitting zram.
-- **Desktop earlyoom swap threshold** (`hosts/pangu/configuration.nix`): Sets `freeSwapThreshold = 100` so earlyoom acts when free RAM drops below 5% rather than waiting for 40 GiB of disk swap to thrash.
+- **Desktop earlyoom swap threshold** (`hosts/pangu/configuration.nix`): Sets `freeSwapThreshold = 100` and `freeSwapKillThreshold = 100` so earlyoom sends both SIGTERM and SIGKILL on free RAM pressure without waiting for 40 GiB of disk swap to thrash.
 
 ## Devices, Permissions & Sandboxing
 - **NuPhy HID udev ordering** (`hosts/pangu/configuration.nix`): `70-nuphy.rules` (`TAG+="uaccess"` for vendor `19f5`) must be numbered `< 73` so systemd's `73-seat-late.rules` applies active-seat ACLs without adding the user to the privileged `input` group.

@@ -19,6 +19,10 @@ in
     "vm.dirty_bytes" = 256 * 1024 * 1024;
     "vm.dirty_background_bytes" = 128 * 1024 * 1024;
     "vm.max_map_count" = 2147483642;
+    "vm.watermark_boost_factor" = 0;
+    "vm.watermark_scale_factor" = 125;
+
+    "kernel.nmi_watchdog" = 0;
 
     "net.ipv4.tcp_congestion_control" = "bbr";
     "net.core.default_qdisc" = "fq";
@@ -41,7 +45,7 @@ in
 
   services.earlyoom = lib.mkIf cfg.earlyoom.enable {
     enable = true;
-    inherit (cfg.earlyoom) freeMemThreshold freeSwapThreshold;
+    inherit (cfg.earlyoom) freeMemThreshold freeSwapThreshold freeSwapKillThreshold;
     enableNotifications = lib.mkDefault config.programs.hyprland.enable;
     extraArgs = [
       "--prefer"

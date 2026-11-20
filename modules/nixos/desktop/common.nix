@@ -7,8 +7,8 @@
 
 {
   mySystem.performance.earlyoom = {
-    preferRegex = lib.mkDefault "^(wine(64)?|wine-preloader|wine64-preloade|wineserver|Battle\\.net|lutris-wrapper)$|\\.exe$";
-    avoidRegex = lib.mkDefault "^(Hyprland|\\.Hyprland-wrapp|pipewire|wireplumber|qs|\\.qs-wrapped|pangu)$|quickshell"; # comm is truncated to 15 bytes
+    preferRegex = lib.mkDefault "^(wine(64)?|wine-preloader|wine64-preloade|wineserver|Battle[.]net|lutris-wrapper)$|[.]exe$"; # [.] survives systemd Environment= unescaping
+    avoidRegex = lib.mkDefault "^(Hyprland|[.]Hyprland-wrapp|pipewire|wireplumber|qs|[.]qs-wrapped|pangu)$|quickshell"; # comm is truncated to 15 bytes
   };
 
   hardware.graphics = {

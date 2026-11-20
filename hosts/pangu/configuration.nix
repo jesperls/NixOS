@@ -55,9 +55,12 @@
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";
     performance.earlyoom.freeSwapThreshold = 100;
+    performance.earlyoom.freeSwapKillThreshold = 100;
 
     hardware.nvidia.enable = true;
   };
+
+  environment.sessionVariables.AQ_DRM_DEVICES = "/dev/dri/by-path/pci-0000:01:00.0-card"; # Keeps Aquamarine off the unused Radeon 610M iGPU.
 
   boot.kernelModules = [
     "k10temp"
@@ -102,7 +105,7 @@
 
   nix.settings = {
     max-jobs = 4;
-    cores = 16;
+    cores = 8;
   };
 
   networking.networkmanager.connectionConfig."ethernet.wake-on-lan" = 64; # magic (0x40); avoids scripted network-interfaces units alongside NetworkManager

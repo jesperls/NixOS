@@ -9,6 +9,7 @@ in
 {
   boot.kernelModules = [ "ntsync" ];
   boot.kernelParams = [ "split_lock_detect=off" ]; # Avoid kernel traps on unaligned locks in Wine/Proton games.
+  boot.kernel.sysctl."kernel.split_lock_mitigate" = 0; # Disables bus_lock_detect throttling on AMD CPUs.
 
   programs.steam = {
     enable = true;
@@ -47,6 +48,7 @@ in
     enable = true;
     settings = {
       general = {
+        renice = 10;
         ioprio = 0;
         inhibit_screensaver = 1;
       };

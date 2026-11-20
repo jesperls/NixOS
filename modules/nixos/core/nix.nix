@@ -21,8 +21,8 @@
       ];
       trusted-users = [ "@wheel" ];
       warn-dirty = false;
-      min-free = 1024 * 1024 * 1024;
-      max-free = 5 * 1024 * 1024 * 1024;
+      min-free = 5 * 1024 * 1024 * 1024;
+      max-free = 20 * 1024 * 1024 * 1024;
 
       http-connections = lib.mkDefault 64;
       max-substitution-jobs = lib.mkDefault 32;
@@ -40,7 +40,7 @@
 
     optimise = {
       automatic = true;
-      dates = [ "weekly" ];
+      dates = [ "Tue *-*-* 03:00:00" ]; # Runs after Monday's nh-clean weekly GC.
     };
   };
   nixpkgs.config.allowUnfree = true;

@@ -8,6 +8,9 @@
       ACTION=="add|change", SUBSYSTEM=="usb", KERNEL=="usb[0-9]*", ATTR{power/control}="on"
       ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="1235", ATTR{power/control}="on"
       ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="0b1c", ATTR{power/control}="on"
+      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="5411", ATTR{power/control}="on"
+      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="2e1a", ATTR{idProduct}=="4c04", ATTR{power/control}="on"
+      ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="13d3", ATTR{idProduct}=="3614", ATTR{power/control}="on"
       SUBSYSTEM=="sound", ACTION=="add|change", KERNEL=="card*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0b1c", ENV{ACP_PROFILE_SET}="usb-gaming-headset.conf"
     '')
   ];
@@ -64,8 +67,8 @@
         actions."update-props" = {
           "node.description" = "A50 Game";
           "node.nick" = "A50 Game";
-          "priority.driver" = 1109; # alsa.lua penalizes PCM dev=1 to 828, below stereo-chat (1100)
-          "priority.session" = 1109;
+          "priority.driver" = 1120; # Beats Scarlett 2i2 (1109) and stereo-chat (1100); alsa.lua penalizes PCM dev=1 to 828
+          "priority.session" = 1120;
         };
       }
       {

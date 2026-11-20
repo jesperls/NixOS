@@ -18,7 +18,14 @@
     );
   };
 
-  systemd.user.services.sunshine.serviceConfig.ExecStart = lib.mkForce (
-    "${lib.getExe config.services.sunshine.package} capture=wlr" # CLI overrides preserve mutable web UI settings.
-  );
+  systemd.user.services.sunshine = {
+    after = [ "pangu.service" ];
+    unitConfig.ConditionEnvironment = "WAYLAND_DISPLAY";
+    serviceConfig = {
+      Slice = "session.slice";
+      ExecStart = lib.mkForce (
+        "${lib.getExe config.services.sunshine.package} capture=wlr" # CLI overrides preserve mutable web UI settings.
+      );
+    };
+  };
 }

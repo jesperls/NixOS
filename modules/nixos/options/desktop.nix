@@ -87,7 +87,12 @@
       };
       classPatterns = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = [ "^(steam_app_\\d+)$" ];
+        default = [
+          "^(steam_app_\\d+)$"
+          "^(gamescope)$"
+          "\\.exe$"
+          "^(Minecraft.*)$"
+        ];
         description = "Window class regexes that get the immediate (tearing) window rule.";
       };
     };

@@ -81,6 +81,11 @@
         default = 5;
         description = "Percentage of free swap below which earlyoom starts killing.";
       };
+      freeSwapKillThreshold = lib.mkOption {
+        type = lib.types.nullOr (lib.types.ints.between 1 100);
+        default = null;
+        description = "Percentage of free swap below which earlyoom sends SIGKILL; null halves freeSwapThreshold.";
+      };
       preferRegex = lib.mkOption {
         type = lib.types.str;
         default = "^(java)$"; # comm names are limited to 15 bytes.
