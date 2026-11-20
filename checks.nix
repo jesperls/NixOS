@@ -48,4 +48,20 @@ lib.mapAttrs' (
         python3 ${./tests/test_flatpak_font_cache.py} ${fontActivation} ${lib.escapeShellArg home.home.homeDirectory}
         touch "$out"
       '';
+
+  pufferpanel-lazymc-bridge =
+    pkgs.runCommand "pufferpanel-lazymc-bridge-check"
+      {
+        nativeBuildInputs = [
+          pkgs.python3
+          pkgs.lazymc
+        ];
+      }
+      ''
+        python3 ${./tests/test_pufferpanel_lazymc_bridge.py} ${
+          lib.getExe (pkgs.callPackage ./pkgs/pufferpanel-lazymc-bridge.nix { })
+        }
+        lazymc --config ${hosts.gonggong.config.environment.etc."lazymc/lazymc.toml".source} config test
+        touch "$out"
+      '';
 }

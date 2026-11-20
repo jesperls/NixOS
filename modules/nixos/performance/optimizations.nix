@@ -56,5 +56,5 @@ in
     interval = "weekly";
   };
 
-  services.fwupd.enable = true;
+  services.fwupd.enable = lib.mkDefault true;
 }

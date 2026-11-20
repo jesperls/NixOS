@@ -79,8 +79,8 @@ The host will then have a `nixosConfigurations.<name>` output and a
 Run `nix fmt -- --ci` and `nix flake check` before considering a change ready.
 For desktop changes, also build `.#checks.x86_64-linux.pangu-system` explicitly.
 [checks.nix](../checks.nix) defines both system builds, monitor-generation and
-generated-Lua checks, Pangu's upstream Lua check, backup rotation, and Flatpak
-font-cache invalidation.
+generated-Lua checks, Pangu's upstream Lua check, backup rotation, Flatpak
+font-cache invalidation, and the PufferPanel `lazymc` bridge check.
 
 The Pangu flake owns the shell tests and runtime-command check. Building Pangu
 runs its JavaScript and Python tests, checks shell scripts and
