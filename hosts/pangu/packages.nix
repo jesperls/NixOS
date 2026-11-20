@@ -12,9 +12,6 @@
     rustup
     gcc
     openjdk25
-    yq
-    fd
-    ripgrep
     ncdu
     p7zip
     parted
@@ -34,8 +31,6 @@
     gimp
     prismlauncher
     qbittorrent
-    unzip
-    zip
     unrar
     evince
     imv
@@ -45,7 +40,6 @@
     evtest
     dbeaver-bin
     alsa-scarlett-gui
-    fastfetch
     helix
     lazygit
     pear-desktop

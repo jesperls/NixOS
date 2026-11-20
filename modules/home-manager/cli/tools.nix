@@ -1,12 +1,26 @@
 {
   osConfig,
+  pkgs,
   ...
 }:
 
 let
   colors = osConfig.mySystem.theme.colors;
+  shellManaged = osConfig.mySystem.desktop.shell.enable;
+  accent = if shellManaged then "blue" else colors.accent;
+  accent2 = if shellManaged then "cyan" else colors.accent2;
+  muted = if shellManaged then "bright-black" else colors.muted;
 in
 {
+  home.packages = with pkgs; [
+    fd
+    ripgrep
+    yq
+    unzip
+    zip
+    fastfetch
+  ];
+
   programs.starship = {
     enable = true;
     settings = {
@@ -14,15 +28,15 @@ in
       format = "$directory$git_branch$git_status$nix_shell$character";
       right_format = "$cmd_duration";
       character = {
-        success_symbol = "[➜](bold ${colors.accent2})";
-        error_symbol = "[✗](bold ${colors.accent})";
+        success_symbol = "[➜](bold ${accent2})";
+        error_symbol = "[✗](bold ${accent})";
       };
       directory = {
-        style = "bold ${colors.accent}";
+        style = "bold ${accent}";
         truncation_length = 4;
       };
       git_branch = {
-        style = "bold ${colors.accent2}";
+        style = "bold ${accent2}";
         format = "[$symbol$branch]($style) ";
       };
       git_status = {
@@ -36,7 +50,7 @@ in
       };
       cmd_duration = {
         format = "[$duration]($style)";
-        style = "${colors.muted}";
+        style = "${muted}";
         min_time = 2000;
       };
     };
@@ -56,19 +70,35 @@ in
       "--border"
       "--inline-info"
     ];
-    colors = {
-      fg = colors.text;
-      bg = colors.background;
-      hl = colors.accent;
-      "fg+" = colors.text;
-      "bg+" = colors.surface;
-      "hl+" = colors.accent2;
-      info = colors.muted;
-      prompt = colors.accent;
-      pointer = colors.accent2;
-      marker = colors.accent;
-      spinner = colors.accent;
-    };
+    colors =
+      if shellManaged then
+        {
+          fg = "-1";
+          bg = "-1";
+          hl = "4";
+          "fg+" = "15";
+          "bg+" = "0";
+          "hl+" = "6";
+          info = "8";
+          prompt = "4";
+          pointer = "6";
+          marker = "4";
+          spinner = "4";
+        }
+      else
+        {
+          fg = colors.text;
+          bg = colors.background;
+          hl = colors.accent;
+          "fg+" = colors.text;
+          "bg+" = colors.surface;
+          "hl+" = colors.accent2;
+          info = colors.muted;
+          prompt = colors.accent;
+          pointer = colors.accent2;
+          marker = colors.accent;
+          spinner = colors.accent;
+        };
   };
 
   programs.zoxide = {

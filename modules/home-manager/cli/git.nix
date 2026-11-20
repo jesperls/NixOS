@@ -14,7 +14,9 @@
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
-      merge.conflictstyle = "diff3";
+      fetch.prune = true;
+      merge.conflictstyle = "zdiff3";
+      rerere.enabled = true;
       diff.colorMoved = "default";
     };
   };
@@ -27,5 +29,9 @@
   programs.delta = {
     enable = true;
     enableGitIntegration = true;
+    options = {
+      navigate = true;
+      line-numbers = true;
+    };
   };
 }

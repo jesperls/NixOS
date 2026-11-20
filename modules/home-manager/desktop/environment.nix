@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   osConfig,
   ...
@@ -19,13 +18,10 @@ in
     QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
     NIXOS_OZONE_WL = "1";
 
-    GTK_USE_PORTAL = "1";
-
     ELECTRON_OZONE_PLATFORM_HINT = "auto";
   };
 
   xdg.systemDirs.data = [
-    "${config.home.homeDirectory}/.local/share"
     "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
   ];
 }

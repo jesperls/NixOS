@@ -12,6 +12,7 @@
         "pipewire.service"
         "wireplumber.service"
       ];
+      BindsTo = lib.mkForce [ "hyprland-session.target" ];
       PartOf = lib.mkForce [ "hyprland-session.target" ];
       ConditionEnvironment = "WAYLAND_DISPLAY";
     };

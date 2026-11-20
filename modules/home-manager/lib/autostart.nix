@@ -10,6 +10,7 @@
   Unit = {
     Description = description;
     After = [ target ];
+    BindsTo = [ target ];
     PartOf = [ target ];
     ConditionEnvironment = "WAYLAND_DISPLAY";
   }

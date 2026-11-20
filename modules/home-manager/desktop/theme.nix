@@ -53,8 +53,12 @@ in
       name = theme.fonts.sans;
       size = theme.fonts.size;
     };
-    gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
-    gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
+    gtk3.extraConfig = lib.mkIf (!shellPalette) {
+      gtk-application-prefer-dark-theme = 1;
+    };
+    gtk4.extraConfig = lib.mkIf (!shellPalette) {
+      gtk-application-prefer-dark-theme = 1;
+    };
   };
 
   qt = {
@@ -77,7 +81,6 @@ in
     hyprcursorTheme
     pkgs.hicolor-icon-theme
     pkgs.adwaita-icon-theme
-    pkgs.libappindicator-gtk3
   ];
 
   dconf.settings."org/gnome/desktop/interface" = {

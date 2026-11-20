@@ -19,11 +19,11 @@
     historySubstringSearch.enable = true;
 
     shellAliases = {
-      ll = "eza -lha --icons --group-directories-first --sort=name";
-      l = "eza -lh --icons --group-directories-first --sort=name";
-      ls = "eza --icons --group-directories-first";
-      la = "eza -la --icons --group-directories-first";
-      lt = "eza --tree --level=2 --icons";
+      ll = "eza -lha --group-directories-first --sort=name";
+      l = "eza -lh --group-directories-first --sort=name";
+      ls = "eza --group-directories-first";
+      la = "eza -la --group-directories-first";
+      lt = "eza --tree --level=2";
 
       ".." = "cd ..";
       "..." = "cd ../..";
@@ -52,6 +52,11 @@
       autoload -z edit-command-line
       zle -N edit-command-line
       bindkey "^X^E" edit-command-line
+
+      [[ -n "''${terminfo[kcuu1]}" ]] && bindkey "''${terminfo[kcuu1]}" history-substring-search-up
+      [[ -n "''${terminfo[kcud1]}" ]] && bindkey "''${terminfo[kcud1]}" history-substring-search-down
+      bindkey "^[[A" history-substring-search-up
+      bindkey "^[[B" history-substring-search-down
     '';
   };
 }

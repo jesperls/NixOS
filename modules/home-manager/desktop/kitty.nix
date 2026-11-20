@@ -20,8 +20,8 @@ in
       confirm_os_window_close = 0;
       remember_window_size = false;
 
-      repaint_delay = 10;
-      input_delay = 3;
+      repaint_delay = 4;
+      input_delay = 1;
       sync_to_monitor = true;
 
       scrollback_lines = 10000;

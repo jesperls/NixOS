@@ -18,7 +18,7 @@ in
     theme = {
       kitty.enable = true;
       firefox.enable = true;
-      spicetify.enable = true;
+      spicetify.enable = false;
     };
   };
 }

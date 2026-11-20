@@ -47,7 +47,6 @@
       settings = {
         "gfx.webrender.all" = true;
         "media.hardware-video-decoding.force-enabled" = true;
-        "media.ffmpeg.vaapi.enabled" = true;
 
         "widget.use-xdg-desktop-portal.file-picker" = 1;
         "widget.use-xdg-desktop-portal.mime-handler" = 0;
@@ -63,7 +62,6 @@
         "browser.aboutConfig.showWarning" = false;
         "browser.newtabpage.activity-stream.showSponsored" = false;
         "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
-        "extensions.pocket.enabled" = false;
 
         "general.smoothScroll" = true;
 

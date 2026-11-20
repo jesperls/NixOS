@@ -16,6 +16,9 @@ in
       "*" = {
         ServerAliveInterval = 30;
         ServerAliveCountMax = 3;
+        ControlMaster = "auto";
+        ControlPath = "~/.ssh/cm-%r@%h:%p";
+        ControlPersist = "10m";
       };
     }
     // lib.mapAttrs (
