@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, pkgs, ... }:
 
 {
   security.rtkit.enable = true;
@@ -7,7 +7,7 @@
     enable = true;
     alsa = {
       enable = true;
-      support32Bit = true;
+      support32Bit = lib.mkDefault pkgs.stdenv.hostPlatform.isx86_64;
     };
     pulse.enable = true;
   };

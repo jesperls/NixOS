@@ -28,4 +28,7 @@ in
 lib.mapAttrs mkHost {
   pangu = { };
   gonggong = { };
+  fuxi = {
+    system = "aarch64-linux";
+  };
 }

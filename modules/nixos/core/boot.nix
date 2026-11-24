@@ -18,11 +18,11 @@ in
       systemd-boot = {
         enable = true;
         configurationLimit = config.mySystem.system.keepGenerations;
-        editor = false;
-        consoleMode = "max";
+        editor = lib.mkDefault false;
+        consoleMode = lib.mkDefault "max";
       };
-      efi.canTouchEfiVariables = true;
-      timeout = 0;
+      efi.canTouchEfiVariables = lib.mkDefault true;
+      timeout = lib.mkDefault 0;
     };
 
     initrd = {

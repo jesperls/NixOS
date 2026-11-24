@@ -9,10 +9,13 @@ let
   home = hosts.pangu.config.home-manager.users.${hosts.pangu.config.mySystem.user.username};
   generatedLua = pkgs.writeText "generated.lua" home.xdg.configFile."hypr/pangu/generated.lua".text;
   fontActivation = pkgs.writeText "flatpak-font-cache-activation" home.home.activation.clearFlatpakFontCache.data;
+  systemHosts = lib.filterAttrs (
+    _: host: host.pkgs.stdenv.hostPlatform.system == pkgs.stdenv.hostPlatform.system
+  ) hosts;
 in
 lib.mapAttrs' (
   hostName: host: lib.nameValuePair "${hostName}-system" host.config.system.build.toplevel
-) hosts
+) systemHosts
 // {
   desktop-contract = import ./tests/desktop-contract.nix {
     inherit lib pkgs;

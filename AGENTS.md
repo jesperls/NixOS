@@ -6,7 +6,7 @@ update the documentation first.
 
 ## Structure & ownership
 
-- **Hosts**: `hosts/pangu` (AMD CPU + NVIDIA GPU desktop running Hyprland Lua and Pangu shell) and `hosts/gonggong` (headless Intel server). Assembled in `nix/hosts.nix`.
+- **Hosts**: `hosts/pangu` (AMD CPU + NVIDIA GPU desktop running Hyprland Lua and Pangu shell), `hosts/gonggong` (headless Intel server), and `hosts/fuxi` (Lenovo Yoga Slim 7x Snapdragon X Elite `aarch64-linux` laptop running Hyprland Lua and Pangu shell). Assembled in `nix/hosts.nix`.
 - **Bundles**: `modules/nixos/bundle.nix` + `modules/home-manager/bundle.nix` (all hosts); `modules/nixos/desktop/bundle.nix` + `modules/home-manager/desktop/bundle.nix` (desktop hosts). Host-specific features are explicit imports in `hosts/<name>/`.
 - **Options**: Prefer native NixOS/Home Manager options. Add `mySystem.*` options (`modules/nixos/options/`) only for cross-module coordination; Home Manager reads them via `osConfig.mySystem`. Modules must never import host files or branch on hostnames.
 - **Pangu-Shell boundary**: Shell QML, Hyprland Lua (`hyprland/pangu`), shaders, and reusable Nix/HM modules live in `github:jesperls/Pangu-Shell` (local checkout: `/home/jesperls/Source/Pangu-Shell`). Edit, test, commit, and push there first, then run `nix flake update pangu-shell` here. Never commit `file://` or local path flake URLs — CI and Garnix evaluate from GitHub.

@@ -68,11 +68,12 @@ from Nix; wallpaper colours and window decorations come from Pangu.
 Create `hosts/<name>/configuration.nix`, its hardware configuration and
 `home.nix`. Import the base bundles, then the desktop bundles if needed.
 Connect `home.nix` through `home-manager.users.<username>.imports`, as the
-existing hosts do. Add `<name> = { };` in [nix/hosts.nix](../nix/hosts.nix).
+existing hosts do. Add `<name> = { };` (or `<name> = { system = "aarch64-linux"; };`
+for ARM64 hosts) in [nix/hosts.nix](../nix/hosts.nix).
 Set the host's identity and state versions explicitly.
 
 The host will then have a `nixosConfigurations.<name>` output and a
-`checks.x86_64-linux.<name>-system` build.
+`checks.<system>.<name>-system` build.
 
 ## Verification
 

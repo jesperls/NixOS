@@ -13,7 +13,7 @@
 
   hardware.graphics = {
     enable = true;
-    enable32Bit = true;
+    enable32Bit = lib.mkDefault pkgs.stdenv.hostPlatform.isx86_64;
   };
   programs.dconf.enable = true;
   xdg.mime.enable = true;
