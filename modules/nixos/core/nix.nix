@@ -20,6 +20,7 @@
         "flakes"
       ];
       trusted-users = [ "@wheel" ];
+      use-xdg-base-directories = true;
       warn-dirty = false;
       min-free = 5 * 1024 * 1024 * 1024;
       max-free = 20 * 1024 * 1024 * 1024;

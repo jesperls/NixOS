@@ -19,6 +19,7 @@ in
     unzip
     zip
     fastfetch
+    herdr-core
   ];
 
   programs.starship = {

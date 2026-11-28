@@ -40,5 +40,8 @@ in
     ];
   };
 
-  security.sudo.wheelNeedsPassword = !cfg.system.passwordlessSudo;
+  security.sudo-rs = {
+    enable = true;
+    wheelNeedsPassword = !cfg.system.passwordlessSudo;
+  };
 }

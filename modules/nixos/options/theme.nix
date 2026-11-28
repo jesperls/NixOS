@@ -85,7 +85,7 @@ in
               type = lib.types.listOf lib.types.str;
               default = [
                 "thunar"
-                "gedit"
+                "org.gnome.TextEditor"
               ];
               description = "Window classes that get the translucent opacity rule.";
             };

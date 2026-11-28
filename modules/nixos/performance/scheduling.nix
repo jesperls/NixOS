@@ -8,8 +8,8 @@ let
   cfg = config.mySystem.performance;
 in
 {
-  services.scx = lib.mkIf (cfg.scheduler != null) {
+  services.scx-loader = lib.mkIf (cfg.scheduler != null) {
     enable = true;
-    scheduler = cfg.scheduler;
+    config.default_sched = cfg.scheduler;
   };
 }

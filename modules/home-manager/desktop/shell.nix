@@ -1,7 +1,6 @@
 {
   inputs,
   osConfig,
-  pkgs,
   ...
 }:
 
@@ -13,7 +12,6 @@ in
 
   programs.pangu = {
     inherit (cfg) enable wallpapers settings;
-    package = pkgs.pangu;
     fonts.enable = false;
     theme = {
       kitty.enable = true;

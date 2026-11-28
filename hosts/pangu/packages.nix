@@ -4,7 +4,6 @@
 }:
 {
   home.packages = with pkgs; [
-    nil
     nixd
     vscode
     uv
@@ -13,29 +12,29 @@
     gcc
     openjdk25
     ncdu
-    p7zip
+    _7zz
     parted
     yt-dlp
     trash-cli
     aria2
     ratty
     mission-center
-    pavucontrol
+    pwvucontrol
     qpwgraph
     overskride
     audacity
-    reaper
+    (reaper.override { jackLibrary = pipewire.jack; })
     scrcpy
     obsidian
-    gedit
+    gnome-text-editor
     gimp
     prismlauncher
     qbittorrent
     unrar
-    evince
+    papers
     imv
     umu-launcher
-    protonup-qt
+    protonplus
     wowup-cf
     evtest
     dbeaver-bin
@@ -46,6 +45,7 @@
     phoronix-test-suite
     zed-editor
     antigravity-cli
+    herdr-desktop
     nvme-cli
     wget
     ungoogled-chromium

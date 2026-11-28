@@ -2,25 +2,25 @@
 
 {
   home.packages = with pkgs; [
-    nil
     nixd
     uv
     nodejs
     gcc
     ncdu
-    p7zip
+    _7zz
     parted
     yt-dlp
     trash-cli
     aria2
-    pavucontrol
+    pwvucontrol
     qpwgraph
     overskride
-    evince
+    papers
     imv
     evtest
     helix
     lazygit
+    herdr-desktop
     nvme-cli
     wget
     libcamera

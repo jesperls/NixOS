@@ -14,6 +14,11 @@
   home.stateVersion = "26.05";
 
   programs.pangu.hyprland.preset.settings = {
+    gestures = {
+      workspace_swipe = true;
+      overview_swipe = true;
+      scratchpad_swipe = true;
+    };
     apps.shortcuts = [
       {
         key = "D";

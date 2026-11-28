@@ -54,6 +54,7 @@
     performance.transparentHugepages = "madvise";
     performance.zram.memoryPercent = 25;
     performance.cpuVendor = "amd";
+    performance.scheduler = "scx_lavd";
     performance.earlyoom.freeSwapThreshold = 100;
     performance.earlyoom.freeSwapKillThreshold = 100;
 
@@ -68,6 +69,12 @@
   services.minidlna.settings = {
     friendly_name = "DLNA MEDIA";
     media_dir = [ "V,/srv/media/videos" ];
+  };
+
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly";
+    fileSystems = [ "/" ];
   };
 
   services.flatpak.enable = true;

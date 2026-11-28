@@ -11,12 +11,22 @@ in
   networking = {
     hostName = config.mySystem.system.hostName;
     networkmanager.enable = true;
+    nftables.enable = true;
     hosts = lib.mapAttrs (_: map (entry: entry.name)) (
       lib.groupBy (entry: entry.value.address) ipHostEntries
     );
     firewall = {
       allowedTCPPorts = config.mySystem.network.allowedTCPPorts;
       allowedUDPPorts = config.mySystem.network.allowedUDPPorts;
+    };
+  };
+
+  services.resolved = {
+    enable = true;
+    settings.Resolve = {
+      DNSOverTLS = "opportunistic";
+      DNSSEC = "allow-downgrade";
+      MulticastDNS = !config.services.avahi.enable;
     };
   };
 

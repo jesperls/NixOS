@@ -19,7 +19,7 @@
       })
     );
 
-    configPath = ".mozilla/firefox";
+    configPath = ".config/mozilla/firefox";
 
     policies = {
       DisableTelemetry = true;
